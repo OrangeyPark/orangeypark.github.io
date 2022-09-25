@@ -1,0 +1,792 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="橙留香">
+  <meta name="keywords" content="橙留香车联网安全技术博客">
+  
+    <meta name="description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  Android安全付费专栏长期更新，本篇最新内容请前往：  [车联网安全自学篇] Android安全之检测APK中调试代码是否暴露敏感信息  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;ananasorangey&#x2F;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="检测APK中调试代码是否暴露敏感信息">
+<meta property="og:url" content="https://orangey.info/2022/09/24/126640944/index.html">
+<meta property="og:site_name" content="车联网安全技术博客 | 橙留香">
+<meta property="og:description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  Android安全付费专栏长期更新，本篇最新内容请前往：  [车联网安全自学篇] Android安全之检测APK中调试代码是否暴露敏感信息  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;ananasorangey&#x2F;">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/21/gNXxK.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/aba01d3aa4524f9dbf85045feddcce9d.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/0c8d51ed900b4c3d987627739d00b98c.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/027478f95b304edca6459bb8151f9b3f.png">
+<meta property="article:published_time" content="2022-09-24T09:46:17.262Z">
+<meta property="article:modified_time" content="2022-09-24T16:50:17.033Z">
+<meta property="article:author" content="橙留香">
+<meta property="article:tag" content="AndroidSecurity">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+  
+  
+  
+  <title>检测APK中调试代码是否暴露敏感信息 - 车联网安全技术博客 | 橙留香</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"orangey.info","root":"/","version":"1.9.3","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"java"},"copy_btn":false,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>橙留香</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="检测APK中调试代码是否暴露敏感信息"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-09-24 17:46" pubdate>
+          2022年9月24日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          5.6k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          <!-- compatible with older versions-->
+          47 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">检测APK中调试代码是否暴露敏感信息</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <hr>
+<p><strong>也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大</strong></p>
+<p><strong>少走了弯路，也就错过了风景，无论如何，感谢经历</strong></p>
+<hr>
+<p>Android安全付费专栏长期更新，本篇最新内容请前往：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://orangey.blog.csdn.net/article/details/126640944">[车联网安全自学篇] Android安全之检测APK中调试代码是否暴露敏感信息</a></li>
+</ul>
+<p>更多关于Android安全的知识，可前往：<a target="_blank" rel="noopener" href="https://blog.csdn.net/ananasorangey/category11955914.html">https://blog.csdn.net/ananasorangey/category11955914.html</a></p>
+<p><img src="https://i.imgtg.com/2022/09/25/gdpGP.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><img src="https://i.imgtg.com/2022/09/21/gNXxK.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x01-前言"><a href="#0x01-前言" class="headerlink" title="0x01 前言"></a>0x01 前言</h1><h2 id="1-1StrictMode"><a href="#1-1StrictMode" class="headerlink" title="1.1StrictMode"></a>1.1StrictMode</h2><p>StrictMode是Android开发过程中一个必不可缺的性能检测工具，它能帮助开发者检测出APK中一些不合理的代码块</p>
+<p>Android 2.3提供一个称为严苛模式（StrictMode）的调试特性，Google称该特性已经使数百个Android上的Google应用程序受益</p>
+<ul>
+<li>StrictMode是什么？<ul>
+<li>StrictMode意思为严格模式，是用来检测程序中违例情况的开发者工具</li>
+<li>最常用的场景就是检测主线程中本地磁盘和网络读写等耗时的操作</li>
+<li>StrictMode最常用来捕捉应用程序的主线程，它将报告与线程及虚拟机相关的策略违例。一旦检测到策略违例（<code>policy violation</code>），你将获得警告，其包含了一个栈trace显示你的应用在何处发生违例。我们可以强制用警告代替崩溃（crash），也可以仅将警告计入日志，让你的应用继续执行</li>
+<li>严格模式会将应用的违例细节暴露给开发者方便优化与改善</li>
+</ul>
+</li>
+</ul>
+<p>StrictMode 检查策略的函数：</p>
+<ul>
+<li>线程策略（TreadPolicy）<ul>
+<li>自定义的耗时调用：使用<code>detectCustomSlowCalls()</code>开启</li>
+<li>磁盘读取操作：使用<code>detectDiskReads()</code>开启</li>
+<li>磁盘写入操作：使用<code>detectDiskWrites()</code>开启</li>
+<li>网络操作：使用<code>detectNetwork()</code>开启</li>
+</ul>
+</li>
+<li>VM策略（VmPolicy）<ul>
+<li>Activity泄露：使用<code>detectActivityLeaks()</code>开启</li>
+<li>未关闭的Closable对象泄露：使用<code>detectLeakedClosableObjects()</code>开启</li>
+<li>泄露的Sqlite对象：使用<code>detectLeakedSqlLiteObjects()</code>开启</li>
+<li>检测实例数量：使用<code>setClassInstanceLimit()</code>开启</li>
+</ul>
+</li>
+</ul>
+<p><strong>注</strong>：严格模式需要在debug模式开启，不要在release版本中启用。需要注意严格模式的开启一般情况下会放在Application或者Activity以及其他组件的onCreate方法，那么我们就可以首先去寻找这些关键的地方，优先我们可以去Application的onCreate方法中寻找，因为开发人员为了更好地分析应用中的问题，通常会放在Application的onCreate方法中</p>
+<h3 id="1-1-1-第一种实现方式"><a href="#1-1-1-第一种实现方式" class="headerlink" title="1.1.1 第一种实现方式"></a>1.1.1 第一种实现方式</h3><ul>
+<li>开启与否只在这里设置true或者false就可以了</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">BuildConfig</span> &#123;<br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">boolean</span> <span class="hljs-variable">DEBUG</span> <span class="hljs-operator">=</span> Boolean.parseBoolean(<span class="hljs-string">&quot;true&quot;</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>下面的代码放在Application的onCreate方法中，一般放在最开始的地方</li>
+</ul>
+<p><strong>注</strong>：一般建议在 if 语句中插入带有 <code>DEVELOPER_MODE</code>条件的策略，以及要禁用 <code>StrictMode</code>，且必须禁用发布版构建的 <code>DEVELOPER_MODE</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">if</span> (BuildConfig.DEBUG) &#123;<br>            StrictMode.setThreadPolicy(<span class="hljs-keyword">new</span> <span class="hljs-title class_">StrictMode</span>.ThreadPolicy.Builder()<br>                    .detectAll()<br>                    .penaltyLog()<br>                    .build());<br>            StrictMode.setVmPolicy(<span class="hljs-keyword">new</span> <span class="hljs-title class_">StrictMode</span>.VmPolicy.Builder()<br>                    .detectAll()<br>                    .penaltyLog()<br>                    .build());<br>        &#125;<br></code></pre></td></tr></table></figure>
+
+<p>上面说的<code>StrictMode.setThreadPolicy</code>和<code>StrictMode.setVmPolicy</code>，解释如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">enabledStrictMode</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-comment">// 开启Thread策略模式</span><br>        StrictMode.setThreadPolicy(<span class="hljs-keyword">new</span> <span class="hljs-title class_">StrictMode</span>.ThreadPolicy.Builder() <span class="hljs-comment">// 构造StrictMode</span><br>                .detectNetwork() <span class="hljs-comment">// 访问网络时输出，这里可以替换为detectAll() 就包括了磁盘读写和网络I/O  </span><br>                .detectCustomSlowCalls()<span class="hljs-comment">// 监测自定义运行缓慢函数</span><br>               .detectDiskReads() <span class="hljs-comment">// 当发生磁盘读操作时输出  </span><br>               .detectDiskWrites() <span class="hljs-comment">// 当发生磁盘写操作时输出  </span><br>                .penaltyLog() <span class="hljs-comment">// 以日志的方式输出</span><br>                .penaltyDialog() <span class="hljs-comment">// 监测到上述状况时弹出对话框</span><br>                .build());<br>        <span class="hljs-comment">// 开启VM策略模式</span><br>        StrictMode.setVmPolicy(<span class="hljs-keyword">new</span> <span class="hljs-title class_">StrictMode</span>.VmPolicy.Builder() <span class="hljs-comment">// 构造StrictMode</span><br>                .detectLeakedSqlLiteObjects() <span class="hljs-comment">// 探测SQLite数据库操作  </span><br>                .detectLeakedClosableObjects() <span class="hljs-comment">// 监测没有关闭IO对象</span><br>                .setClassInstanceLimit(MainActivity.class, <span class="hljs-number">1</span>) <span class="hljs-comment">// 设置某个类的同时处于内存中的实例上限，可以协助检查内存泄露</span><br>                .detectActivityLeaks()<br>                .penaltyLog() <span class="hljs-comment">// 以日志的方式输出</span><br>                .penaltyDeath() <span class="hljs-comment">// 出现上述情况异常终止</span><br>                .build());<br>    &#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="1-1-2-第二种实现方式"><a href="#1-1-2-第二种实现方式" class="headerlink" title="1.1.2 第二种实现方式"></a>1.1.2 第二种实现方式</h3><ul>
+<li>开启与否：使用AndroidMainifest文件中的debuggable属性来实现</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java">android:debuggable=<span class="hljs-string">&quot;true&quot;</span><br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>下面的代码放在Application的onCreate方法中，一般放在最开始的地方</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// Return if this application is not in debug mode </span><br><span class="hljs-type">ApplicationInfo</span> <span class="hljs-variable">appInfo</span> <span class="hljs-operator">=</span> context.getApplicationInfo(); <br><span class="hljs-type">int</span> <span class="hljs-variable">appFlags</span> <span class="hljs-operator">=</span> appInfo.flags; <br><span class="hljs-keyword">if</span> ((appFlags &amp; ApplicationInfo.FLAG_DEBUGGABLE) != <span class="hljs-number">0</span>) &#123; <br>  <br>     StrictMode.setThreadPolicy(<span class="hljs-keyword">new</span> <span class="hljs-title class_">StrictMode</span>.ThreadPolicy.Builder()<br>               .detectAll()<br>               .penaltyLog()<br>               .build());<br>     StrictMode.setVmPolicy(<span class="hljs-keyword">new</span> <span class="hljs-title class_">StrictMode</span>.VmPolicy.Builder()<br>               .detectAll()<br>               .penaltyLog()<br>               .build());<br> &#125;<br></code></pre></td></tr></table></figure>
+
+<h1 id="0x02-检测APK中调试代码是否暴露敏感信息"><a href="#0x02-检测APK中调试代码是否暴露敏感信息" class="headerlink" title="0x02 检测APK中调试代码是否暴露敏感信息"></a>0x02 检测APK中调试代码是否暴露敏感信息</h1><p>APK Demo：<a target="_blank" rel="noopener" href="https://github.com/wongkyunban/TimeConsumingViolation">https://github.com/wongkyunban/TimeConsumingViolation</a></p>
+<p>嫌编译麻烦，可用博主同学已编译好的APK：<a target="_blank" rel="noopener" href="https://download.csdn.net/download/Ananas_Orangey/86505852">https://download.csdn.net/download/Ananas_Orangey/86505852</a></p>
+<ul>
+<li>使用dex2jar反编译java源码</li>
+</ul>
+<p>将StrictMode-debug.apk直接修改后缀，改为StrictMode-debug.zip，并解压解压后的文件夹中，classes.dex 就是java源码打包后的文件</p>
+<p><img src="https://img-blog.csdnimg.cn/aba01d3aa4524f9dbf85045feddcce9d.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>将命令行定位到dex2jar.bat所在目录<br>使用命令行：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs">d2j-dex2jar classes.dex<br></code></pre></td></tr></table></figure>
+<p>会生成classes-dex2jar文件，该文件就是反编译后的java源码文件</p>
+<ul>
+<li>使用jadx查看反编译后的java源码，为了确定APK是否使用StrictMode，我们接着全局搜索<code>StrictMode.setThreadPolicy</code>或<code>StrictMode.setVmPolicy</code>来确认是否有开启Thread策略模式或开启开启VM策略模式</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/0c8d51ed900b4c3d987627739d00b98c.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>线程策略的检测方法如下（当然也可以尝试搜索这些关键字）：</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// 开启Thread策略模式的线程策略</span><br>detectNetwork()<br>detectDiskWrites()<br>detectDiskReads()<br>detectCustomSlowCalls()<br>detectAll()  <span class="hljs-comment">// 通用Thread策略模式和VM策略模式</span><br><br><span class="hljs-comment">// 开启VM策略模式的线程策略</span><br>detectActivityLeaks()<br>detectLeakedClosableObjects()<br>detectLeakedSqlLiteObjects()<br>setClassInstanceLimit()<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><figcaption><span>VM```策略可以监控以下问题：</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs StrictMode">- 泄露的 Activity 对象<br>- 泄露的 SQLite 对象<br>- 泄漏的可关闭对象<br><br>泄露的 Activity 对象和泄露的 SQLite 对象就是字面意思，没啥好解释的，泄漏的可关闭对象可以理解为是检查器通过调用 ```close()```或类似方法在最终确定之前监视应该关闭的对象<br><br>上面说的三种策略，也有多种不同的方式让我们知道APK何时违反了规则。一旦发现违规可以写入 Logcat 日志存储在 ```DropBox (android.os.DropBox) ```服务或ANR日志中。此外，线程策略违规可能会闪烁屏幕背景或显示对话框（当然此处也可以手动检测就是自行开启Android 设备中的监控下的严格模式）<br><br><br>除了通过日志查看之外，我们也可以在手机的开发者选项中开启严格模式，开启之后，如果主线程中有执行时间长的操作，屏幕则会闪烁，这是一个更加直接的方法<br><br>![在这里插入图片描述](https://img-blog.csdnimg.cn/14b55b36491a4c86973e0c43cd857a3b.png)<br><br><br><br>- 下面这些是```StrictMode```违反线程策略的关键字，尤其是以日志的方式输出<br><br>```c<br>penaltyLog() // 以日志的方式输出<br>penaltyDeath() // 出现上述情况异常终止<br>penaltyDialog() // 监测到上述状况时弹出对话框<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>通过日志查看并过滤StrictMode就能得到违例的具体stacktrace信息：</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">adb logcat | grep StrictMode<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/027478f95b304edca6459bb8151f9b3f.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li><p>我们应该跟进 StrictMode 生成的大多数警告，但并不是所有该APK产生的StrictMode 警告来判断是否存在敏感信息泄露、能否造成APK应用程序被Doss等漏洞。举个例子，比如在很多情况下，APK在主线程上从磁盘快速读取不会明显阻碍APK应用程序运行或可能开发人员还有其它一些在发布生产版本的APK中存在违规的调试代码</p>
+</li>
+<li><p>动态分析隐藏APK调试符号方法，比如StrictMode，有如下三种方式（之前我们也涉及的讲过这些内容）</p>
+<ul>
+<li>Logcat 日志观察StrictMode 关键字</li>
+<li>观察应用程序的警告提示弹框，因为违规时可能会弹框提示</li>
+<li>应用程序的ANR 崩溃日志信息</li>
+</ul>
+</li>
+</ul>
+<p>配合之前的文章食用更佳：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://orangey.blog.csdn.net/article/details/126344611">[车联网安全自学篇] Android安全之IPC机制敏感信息挖掘</a></li>
+<li><a target="_blank" rel="noopener" href="https://orangey.blog.csdn.net/article/details/126344674">[车联网安全自学篇] Android安全之Log日志敏感信息泄露+自定义URL敏感信息泄露挖掘</a></li>
+<li><a target="_blank" rel="noopener" href="https://orangey.blog.csdn.net/article/details/126346717">[车联网安全自学篇] Android安全之本地存储敏感信息挖掘【一】</a></li>
+<li><a target="_blank" rel="noopener" href="https://orangey.blog.csdn.net/article/details/126347260">[车联网安全自学篇] Android安全之本地存储敏感信息挖掘【二】</a></li>
+<li><a target="_blank" rel="noopener" href="https://orangey.blog.csdn.net/article/details/126348231">[车联网安全自学篇] Android安全之APK备份文件敏感信息挖掘</a></li>
+<li><a target="_blank" rel="noopener" href="https://orangey.blog.csdn.net/article/details/126349620">[车联网安全自学篇] Android安全之剪贴板+键盘缓存+UI界面+自动截屏敏感信息挖掘</a></li>
+<li><a target="_blank" rel="noopener" href="https://orangey.blog.csdn.net/article/details/126352435">[车联网安全自学篇] Android安全之APK应用程序第三方服务&#x2F;通知功能的敏感信息挖掘</a></li>
+<li><a target="_blank" rel="noopener" href="https://orangey.blog.csdn.net/article/details/126600642">[车联网安全自学篇] Android安全之APK内存敏感信息泄露挖掘【静态分析】</a></li>
+<li><a target="_blank" rel="noopener" href="https://orangey.blog.csdn.net/article/details/126600829">[车联网安全自学篇] Android安全之APK内存敏感信息泄露挖掘【动态分析】</a></li>
+</ul>
+<p><strong>参考链接</strong>：</p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/daemon369/p/3227309.html">https://www.cnblogs.com/daemon369/p/3227309.html</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/OWASP/owasp-mstg/blob/master/Document/0x05i-Testing-Code-Quality-and-Build-Settings.md">https://github.com/OWASP/owasp-mstg/blob/master/Document/0x05i-Testing-Code-Quality-and-Build-Settings.md</a></p>
+<p><a target="_blank" rel="noopener" href="https://support.google.com/googleplay/android-developer/answer/9848633?hl=zh-Hans">https://support.google.com/googleplay/android-developer/answer/9848633?hl=zh-Hans</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/beyond702/article/details/56281068">https://blog.csdn.net/beyond702/article/details/56281068</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/271474cd1d91">https://www.jianshu.com/p/271474cd1d91</a></p>
+<p><a target="_blank" rel="noopener" href="https://bbs.huaweicloud.com/blogs/307087">https://bbs.huaweicloud.com/blogs/307087</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/u011033906/article/details/89926229">https://blog.csdn.net/u011033906/article/details/89926229</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.programminghunter.com/article/5661141738/">https://www.programminghunter.com/article/5661141738/</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/jovifan/article/details/11782019">https://blog.csdn.net/jovifan/article/details/11782019</a></p>
+<hr>
+<p><strong>你以为你有很多路可以选择，其实你只有一条路可以走</strong></p>
+<hr>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/AndroidSecurity/">#AndroidSecurity</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>检测APK中调试代码是否暴露敏感信息</div>
+      <div>https://orangey.info/2022/09/24/126640944/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>橙留香</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年9月24日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/09/24/126290777/" title="「干货」Android 车机设备中，监控命令执行的一些想法「概念篇」">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">「干货」Android 车机设备中，监控命令执行的一些想法「概念篇」</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/09/24/126602548/" title="关于利用ADT获取内存中敏感信息，你必须知道的那些事">
+                        <span class="hidden-mobile">关于利用ADT获取内存中敏感信息，你必须知道的那些事</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  <article id="comments" lazyload>
+    
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1e96aec5ac46370916fa","clientSecret":"ee5e97a65cf34e9fe31e15ab0421a94968237f5e","repo":"ogGitalk","owner":"ananasOrangey","admin":["ananasOrangey"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: 'e96707f65e6e833d1f96841240d7d399'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+  </article>
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://orangey.blog.csdn.net" target="_blank" rel="nofollow noopener"><span>橙留香CSDN博客</span></a> <i class="iconfont icon-love"></i> <a href="https://i.imgtg.com/2022/09/21/gNXxK.png" target="_blank" rel="nofollow noopener"><span>橙留香微信公众号</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

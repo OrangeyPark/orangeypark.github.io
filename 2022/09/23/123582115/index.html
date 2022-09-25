@@ -1,0 +1,876 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="橙留香">
+  <meta name="keywords" content="橙留香车联网安全技术博客">
+  
+    <meta name="description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  Android安全付费专栏长期更新，本篇最新内容请前往：  [车联网安全自学篇] Android安全之APK动态方式逆向应用【三种Smali注入方法】  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;ananasor">
+<meta property="og:type" content="article">
+<meta property="og:title" content="「干货」Android APP动态调试的三种Smali注入小技巧">
+<meta property="og:url" content="https://orangey.info/2022/09/23/123582115/index.html">
+<meta property="og:site_name" content="车联网安全技术博客 | 橙留香">
+<meta property="og:description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  Android安全付费专栏长期更新，本篇最新内容请前往：  [车联网安全自学篇] Android安全之APK动态方式逆向应用【三种Smali注入方法】  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;ananasor">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/21/gNXxK.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/bea8e21d113f4cb5bf88f9bab743826f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/4116d4c1bc2440efaebf03f926e85672.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5c10ec774c4546209e0f189e8d8d46b0.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/627c0d49d45c4a8a8f893b18010a2676.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5e41ec1cb8814c60a9f5eed70743d7aa.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/a54740338cf54ffb85d8bd0a970ddff8.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/bfe494be72f349459596bdce2850062e.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d5a4b2a563b14191b200eca9a44004c2.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c13e25a0ab0d4408b414220866fe8e32.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/27b5584119d74b6db682ce64326f86a0.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5713154e70364f099e18c218f38e5c0a.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/720738ec790b4ee48894180bce52a779.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/0d1779a08eb74d25ba65484c09afc3e0.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/07662da769524071b06f7f7cdf3a14c4.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/12619f0da1734860bb7bb9475706ff1c.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/040d0c0cfefa415ca846d06fb4d2e216.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/bbcf49e92182437191756cce4aeddb57.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="article:published_time" content="2022-09-23T15:50:33.575Z">
+<meta property="article:modified_time" content="2022-09-24T16:44:06.554Z">
+<meta property="article:author" content="橙留香">
+<meta property="article:tag" content="AndroidSecurity">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+  
+  
+  
+  <title>「干货」Android APP动态调试的三种Smali注入小技巧 - 车联网安全技术博客 | 橙留香</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"orangey.info","root":"/","version":"1.9.3","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"java"},"copy_btn":false,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>橙留香</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="「干货」Android APP动态调试的三种Smali注入小技巧"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-09-23 23:50" pubdate>
+          2022年9月23日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          7.1k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          <!-- compatible with older versions-->
+          60 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">「干货」Android APP动态调试的三种Smali注入小技巧</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <hr>
+<p><strong>也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大</strong></p>
+<p><strong>少走了弯路，也就错过了风景，无论如何，感谢经历</strong></p>
+<hr>
+<p>Android安全付费专栏长期更新，本篇最新内容请前往：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://orangey.blog.csdn.net/article/details/123582115">[车联网安全自学篇] Android安全之APK动态方式逆向应用【三种Smali注入方法】</a></li>
+</ul>
+<p>更多关于Android安全的知识，可前往：<a target="_blank" rel="noopener" href="https://blog.csdn.net/ananasorangey/category11955914.html">https://blog.csdn.net/ananasorangey/category11955914.html</a></p>
+<p><img src="https://i.imgtg.com/2022/09/25/gdpGP.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><img src="https://i.imgtg.com/2022/09/21/gNXxK.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x01-前言"><a href="#0x01-前言" class="headerlink" title="0x01 前言"></a>0x01 前言</h1><p>动态调试是在没有软件源代码的情况下，通过调试程序来跟踪分析汇编代码，查看寄存器的值，了解软件的执行流程，反馈程序执行时的中间结果</p>
+<p>动态调试一般与静态分析结合使用，尤其是在静态分析难以取得突破时，需要使用动态调试进行辅助分析。主流调试工具包括DDMS、IDA Pro、AndBug、gdb等，主要涉及两种调试方法：</p>
+<ul>
+<li>通过方法跟踪的方式，对Android SDK开发的Java层程序进行动态调试</li>
+<li>通过附加进程的方式，对Android NDK开发的原生动态链接库进行调试</li>
+</ul>
+<h2 id="1-2-动态分析技巧"><a href="#1-2-动态分析技巧" class="headerlink" title="1.2 动态分析技巧"></a>1.2 动态分析技巧</h2><p>打印Log法：</p>
+<ul>
+<li>设置应用可调试</li>
+<li>插入Log</li>
+<li>回编译并安装运行</li>
+<li>查看Log信息</li>
+</ul>
+<p>栈跟踪法：</p>
+<ul>
+<li>在关键位置插入代码</li>
+<li>logcat中查看信息</li>
+</ul>
+<p>Method Profiling：</p>
+<ul>
+<li>运行Device Monitor</li>
+<li>监控方法</li>
+</ul>
+<p>UI查看：</p>
+<ul>
+<li>adb命令查看</li>
+<li>Device Monitor查看</li>
+</ul>
+<h3 id="1-2-1-信息反馈法（-资源id-x2F-字符串-）"><a href="#1-2-1-信息反馈法（-资源id-x2F-字符串-）" class="headerlink" title="1.2.1 信息反馈法（ 资源id &#x2F; 字符串 ）"></a>1.2.1 信息反馈法（ 资源id &#x2F; 字符串 ）</h3><p>所谓信息反馈法，是指先运行目标程序，然后根据程序运行时给出的反馈信息作为突破口寻找关键代码。例如运行目标程序并输入错误的注册码时，会弹出提示“无效用户名或注册码”，这就是程序反馈给我们的信息。通常情况下，程序中用到的字符串会存储在String.xml文件或者硬编码到程序代码中，如果是前者的话，字符串在程序中会以id 的形式访问，只需在反汇编代码中搜索字符串的id 值即可找到调用代码处；如果是后者的话，在反汇编代码中直接搜索字符串即可。</p>
+<p>如果想快速找到某一个按钮或者某个界面的相关代码，即仍旧是找到ID值，再通过JEB等工具进行查找，那么如何找到id值，这里可以使用工具uiautomatorviewer.bat（SDK）</p>
+<p>通俗的来说就是，根据程序正常运行的提示信息进行定位，例如：错误提示，运行提示等等。可以在程序中直接搜索字符串，当提示信息在 String.xml 资源文件中的时候，可以根据 R.java 的映射文件，查找对应的资源id，然后在 smali 或者在 ida 窗口中进行搜索</p>
+<h3 id="1-2-2-特征函数法（-api-函数-）"><a href="#1-2-2-特征函数法（-api-函数-）" class="headerlink" title="1.2.2 特征函数法（ api 函数 ）"></a>1.2.2 特征函数法（ api 函数 ）</h3><p>这种定位代码的方法与信息反馈法类似。在信息反馈法中，无论程序给出什么样的反馈信息，终究是需要调用Android SDK 中提供的相关API 函数来完成的。比如，弹出注册码错误的提示信息就需要调用Toast.MakeText().Show()方法，在反汇编代码中直接搜索Toast应该很快就能定位到调用代码，如果 Toast在程序中有多处的话，可能需要分析人员逐个甄别</p>
+<p>通俗的来说就是，根据程序提示信息的方法，在对应的 Android 的 API 下断点，通过 API 来检索相关的代码</p>
+<h3 id="1-2-3-顺序查看法（分析程序执行流程-x2F-病毒分析）"><a href="#1-2-3-顺序查看法（分析程序执行流程-x2F-病毒分析）" class="headerlink" title="1.2.3 顺序查看法（分析程序执行流程 &#x2F; 病毒分析）"></a>1.2.3 顺序查看法（分析程序执行流程 &#x2F; 病毒分析）</h3><p>顺序查看法是指从软件的启动代码开始，逐行的向下分析，掌握软件的执行流程，这种分析方法在病毒分析时经常用到</p>
+<p>通俗的来说就是，从 AndroidManifest.xml 中找到 主 Activity 界面，然后顺序分析代码，通常在分析病毒软件时使用。（ 通过 UI 进行分析， adb shell dumpsys activity top ）</p>
+<h3 id="1-2-4-代码注入法（-动态调试-x2F-插入log-x2F-查看logcat-x2F-分析加解密-）"><a href="#1-2-4-代码注入法（-动态调试-x2F-插入log-x2F-查看logcat-x2F-分析加解密-）" class="headerlink" title="1.2.4 代码注入法（ 动态调试 &#x2F; 插入log &#x2F; 查看logcat &#x2F; 分析加解密 ）"></a>1.2.4 代码注入法（ 动态调试 &#x2F; 插入log &#x2F; 查看logcat &#x2F; 分析加解密 ）</h3><p>动态调试，又叫插桩，即在关键反汇编代码处插入可以输出 logcat 调试信息的代码</p>
+<p>例如，smali代码注入或者动态修改程序，一般都可归结为代码注入</p>
+<h3 id="1-2-5-栈跟踪法（-动态调试-x2F-函数调用流程-）"><a href="#1-2-5-栈跟踪法（-动态调试-x2F-函数调用流程-）" class="headerlink" title="1.2.5 栈跟踪法（ 动态调试 &#x2F; 函数调用流程 ）"></a>1.2.5 栈跟踪法（ 动态调试 &#x2F; 函数调用流程 ）</h3><p>栈跟踪法属于动态调试的方法，原理是输出运行时栈调用跟踪信息，然后查看函数调用序列来理解方法的执行流程</p>
+<p>通俗的来说就是，利用输出时的栈跟踪信息，通过查看栈上的函数调用序列来理解方法的执行流程</p>
+<h3 id="1-2-6-Method-Profiling（-动态调试-x2F-热点分析-x2F-函数调用流程-）"><a href="#1-2-6-Method-Profiling（-动态调试-x2F-热点分析-x2F-函数调用流程-）" class="headerlink" title="1.2.6 Method Profiling（ 动态调试 &#x2F; 热点分析 &#x2F; 函数调用流程 ）"></a>1.2.6 Method Profiling（ 动态调试 &#x2F; 热点分析 &#x2F; 函数调用流程 ）</h3><p>Method Profiling 动态调试方法，主要用于热点分析和性能优化。除了可以记录每个函数赵勇的CPU时间外，还可以跟踪所有的函数调用关系，并提供比栈跟踪法更详细的函数调用序列报告</p>
+<p>Method Profiling 动态调试方法，主要是使用ptrace来进行，相应的有hook等等技术</p>
+<h1 id="0x02-工具-环境"><a href="#0x02-工具-环境" class="headerlink" title="0x02 工具+环境"></a>0x02 工具+环境</h1><p>常见环境：</p>
+<ul>
+<li>apktool+eclipse&#x2F;idea&#x2F;android studio&#x2F;netbeans</li>
+</ul>
+<p>IDA pro + DDMS 主要用来调试so文件，当然也可以调试dex文件</p>
+<p>linux环境：</p>
+<ul>
+<li>andbug&#x2F;gdb+gdb_server</li>
+</ul>
+<p>其他：</p>
+<ul>
+<li>gikdbg&#x2F;cygwin+ndk-gdb</li>
+</ul>
+<p>Hook技术: </p>
+<ul>
+<li>Xposed</li>
+<li>Cydia Substrate</li>
+<li>Frida</li>
+<li>自定义hook</li>
+</ul>
+<h1 id="0x03-什么是Smali注入？"><a href="#0x03-什么是Smali注入？" class="headerlink" title="0x03 什么是Smali注入？"></a>0x03 什么是Smali注入？</h1><p>Smali注入又称Smali插桩(Smali Instrumentation),WIKI解释:它是在保证被测程序原有逻辑完整性的基础上在程序中插入一些探针（又称为“探测仪”），通过探针的执行并抛出程序运行的特征数据，通过对这些数据的分析，可以获得程序的控制流和数据流信息，进而得到逻辑覆盖等动态信息，从而实现测试目的的方法。这几个词（保证程序原有逻辑性、插入探针、抛出特征数据）也是samli注入需要关注的几个关键点所在</p>
+<h1 id="0x04-什么是Log类？"><a href="#0x04-什么是Log类？" class="headerlink" title="0x04 什么是Log类？"></a>0x04 什么是Log类？</h1><p>SDK提供<code>Android.util.Log </code>类输出调试信息，总共有五种调试方法<code>(v(),d(),i(),w(),e()) </code>，六种调试状态<code>(verbose,debug,info,warning,error,assert) </code>。在插入时可以插入对应的方法进行调试，如果仅是输出对象的值，可以是v或者d()方法,这里需要注意，六种调试状态存在等级之分，依顺序排序，高一级的状态会覆盖低级的状态，这个如果对java语言比较熟悉的话，可以类比java语言的exception异常类</p>
+<p><strong>Android中的日志工具类是<code>Log（android.util.Log）</code>，这个类中提供了如下5个方法打印日志：</strong></p>
+<ul>
+<li>**Log.v()**：调试颜色为黑色的，任何消息都会输出。用于打印那些最为琐碎的、意义最小的日志信息。对应级别verbose，是Android日志里面级别最低的一种</li>
+<li>**Log.d()**：输出颜色是蓝色的，仅输出debug调试的意思，但他会输出上层的信息，过滤起来可以通过DDMS的Logcat标签来选择。用于打印一些调试信息，这些信息对你调试程序和分析问题应该是有帮助的。对应级别debug，比verbose高一级</li>
+<li>**Log.i()**：输出为绿色，一般提示性的消息information，它不会输出Log.v和Log.d的信息，但会显示i、w和e的信息。用于打印一些比较重要的数据，这些数据应该是你非常想看到的、可以帮你分析用户行为数据。对应级别info，比debug高一级</li>
+<li>**Log.w()**：输出为橙色，可以看作为warning警告，一般需要我们注意优化Android代码，同时选择它后还会输出Log.e的信息。用于打印一些警告信息，提示程序在这个地方可能会有潜在的风险，最好去修复一下这些出现警告的地方。对应级别warn，比info高一级</li>
+<li>**Log.e()**：输出为红色，可以想到error错误，这里仅显示红色的错误信息，这些错误就需要我们认真的分析，查看栈的信息了。用于打印程序中的错误信息，比如程序进入到了catch语句当中。当有错误信息打印出来的时候，一般都代表你的程序出现严重问题了，必须尽快修复。对应级别error，比warn高一级</li>
+</ul>
+<h1 id="0x05-插入Log类的动态调试方法"><a href="#0x05-插入Log类的动态调试方法" class="headerlink" title="0x05 插入Log类的动态调试方法"></a>0x05 插入Log类的动态调试方法</h1><h2 id="5-1-直接插入"><a href="#5-1-直接插入" class="headerlink" title="5.1 直接插入"></a>5.1 直接插入</h2><ul>
+<li>直接在smali代码插入log类，寻找到需要插入的代码</li>
+<li>缺点：<ul>
+<li>直接插入smali代码的话，简单的逻辑可能对寄存器没有什么严格的要求，如果是复杂的逻辑结构，或者程序本身使用的寄存器比较少，那么可能没法使用该方法</li>
+</ul>
+</li>
+</ul>
+<h3 id="5-1-1-Android-Studio创建APK-demo"><a href="#5-1-1-Android-Studio创建APK-demo" class="headerlink" title="5.1.1 Android Studio创建APK demo"></a>5.1.1 Android Studio创建APK demo</h3><ul>
+<li>Android Studio创建一个简单的项目(Enpty Activity)，然后新建一个class，将其命名为MyCrackTest，添加如下代码</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">package</span> com.example.mytest;<br><br><span class="hljs-keyword">import</span> android.util.Log;<br><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">MyCrackTest</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">Logd</span><span class="hljs-params">(String v0)</span>&#123;<br>        Log.d (<span class="hljs-string">&quot;hash&quot;</span>, <span class="hljs-string">&quot;testtest&quot;</span>+v0);<br>    &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<p><strong>PS</strong>：要用static进行修饰，之后我们反编译代码后会在onCreate中进行调用，如下smali：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs java">const-string v0, <span class="hljs-string">&quot;The Orangey blog welcomes you!!!-test&quot;</span><br><br>invoke-<span class="hljs-keyword">static</span> &#123;v0&#125;, LMyCrackTest;-&gt;Logd(Ljava/lang/String;)V<br></code></pre></td></tr></table></figure>
+
+<p>smali对应的java代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java">MyCrackTest.Logl(<span class="hljs-string">&quot;The Orangey blog welcomes you!!!-test&quot;</span>);<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>Android Studio打包成APK（自动会签名），我们先来运行下没有改动之前的APK，在打开logcat的情况下搜索hash 这个关键字是没有看到的我们想要的信息的，接下来我们会在smali插入代码来达到调用对应输出信息的目的</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/bea8e21d113f4cb5bf88f9bab743826f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/4116d4c1bc2440efaebf03f926e85672.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h3 id="5-1-2-反编译APK"><a href="#5-1-2-反编译APK" class="headerlink" title="5.1.2 反编译APK"></a>5.1.2 反编译APK</h3><ul>
+<li>用apktool将APK进行反编译，反编译成功后会得到app-debug 文件</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java">java -jar apktool.jar d -f app-debug.apk -o app-debug<br></code></pre></td></tr></table></figure>
+
+<h3 id="5-1-3-插入smali代码"><a href="#5-1-3-插入smali代码" class="headerlink" title="5.1.3 插入smali代码"></a>5.1.3 插入smali代码</h3><ul>
+<li>进入app-debug文件的app-debug\smali\com\example\mytest下，将MyCrackTest.smali放到smali根目录下</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/5c10ec774c4546209e0f189e8d8d46b0.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/627c0d49d45c4a8a8f893b18010a2676.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>MyCrackTest.smali 在onCreate 里面添加调试的smali代码</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/5e41ec1cb8814c60a9f5eed70743d7aa.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h3 id="5-1-4-回编译APK并签名"><a href="#5-1-4-回编译APK并签名" class="headerlink" title="5.1.4 回编译APK并签名"></a>5.1.4 回编译APK并签名</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java">java -jar apktool_2<span class="hljs-number">.6</span><span class="hljs-number">.1</span>.jar b app-debug -o app-debug1.apk<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java">java -jar  signapk.jar testkey.x509.pem testkey.pk8 app-debug1.apk app-debug_qm.apk<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>开启logcat，然后丢到模拟器运行</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java">adb logcat<br></code></pre></td></tr></table></figure>
+
+<p>运行结果如下：</p>
+<p><img src="https://img-blog.csdnimg.cn/a54740338cf54ffb85d8bd0a970ddff8.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="5-2-增加寄存器法"><a href="#5-2-增加寄存器法" class="headerlink" title="5.2 增加寄存器法"></a>5.2 增加寄存器法</h2><ul>
+<li>一般在方法的前面都会声明寄存器的个数。例如，只要增加一个寄存器，即.local 11那么就可以使用v10寄存器来代替上面的v8寄存器</li>
+<li>优点：<ul>
+<li>不需要考虑使用哪个寄存器来做tag，减少了对程序的干扰</li>
+</ul>
+</li>
+<li>缺点：<ul>
+<li>仍旧对程序产生一定干扰</li>
+</ul>
+</li>
+</ul>
+<p><strong>案例APK下载</strong>：<a target="_blank" rel="noopener" href="https://www.wandoujia.com/apps/280375/history_v100991744">https://www.wandoujia.com/apps/280375/history_v100991744</a></p>
+<p><img src="https://img-blog.csdnimg.cn/bfe494be72f349459596bdce2850062e.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h3 id="5-2-1-反编译APK"><a href="#5-2-1-反编译APK" class="headerlink" title="5.2.1 反编译APK"></a>5.2.1 反编译APK</h3><p>将下载好的APK重命名为bd.apk</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java">java -jar apktool.jar d -f bd.apk -o bd<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/d5a4b2a563b14191b200eca9a44004c2.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>打开AndroidManifest.xml文件，找到App最先启动的Activity</p>
+<p><img src="https://img-blog.csdnimg.cn/c13e25a0ab0d4408b414220866fe8e32.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>通过查看AndroidManifest.xml中的Activity的配置信息，可以判定LogoActivity就是最先启动的Activity，也就是后面我们所需要修改的欢迎界面</p>
+<p>那么，如何判断是否为最先启动的呢？可以看有没有如下内容：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs java">&lt;intent-filter&gt;<br>    &lt;action android:name=<span class="hljs-string">&quot;android.intent.action.MAIN&quot;</span>/&gt;<br>    &lt;category android:name=<span class="hljs-string">&quot;android.intent.category.LAUNCHER&quot;</span>/&gt;<br>&lt;/intent-filter&gt;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs java"># 决定应用的入口Activity，也就是我们启动应用时首先显示哪一个Activity<br>android.intent.action.MAIN<br><br># 表示activity应该被列入系统的启动器(launcher)(允许用户启动它)<br># Launcher是安卓系统中的桌面启动器，是桌面UI的统称<br>android.intent.category.LAUNCHER<br></code></pre></td></tr></table></figure>
+
+<p>intent-filter 标签中这两个值：</p>
+<ul>
+<li>android.intent.action.MAIN</li>
+<li>android.intent.category.LAUNCHER</li>
+</ul>
+<p>intent-filter 标签中（MAIN和LAUNCHER）具体作用如下：</p>
+<ul>
+<li>MAIN指定了应用入口地址</li>
+<li>LAUNCHER是应用在手机桌面上的图标</li>
+<li>如果只设置MAIN，没有设置LAUNCHER，应用可以被安装到手机，但是在桌面看不到APP的图标，所以就无法启动APP</li>
+<li>如果只设置了LAUNCHER，而没有设置MAIN，系统不知道应用从哪个Activity启动，所以也就不会在桌面显示图标</li>
+<li>如果给多个Activity设置了MAIN和LAUNCHER，桌面会显示多个APP图标，点击图标会分别进入设置的Activity中</li>
+</ul>
+<h3 id="5-2-2-定位LogoActivity的onCreate方法进行代码注入"><a href="#5-2-2-定位LogoActivity的onCreate方法进行代码注入" class="headerlink" title="5.2.2 定位LogoActivity的onCreate方法进行代码注入"></a>5.2.2 定位LogoActivity的onCreate方法进行代码注入</h3><p>打开\smali\com\baidu\tieba\LogoActivity.smali文件，定位到onCreate方法</p>
+<p><img src="https://img-blog.csdnimg.cn/27b5584119d74b6db682ce64326f86a0.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>修改onCreate方法中的本地寄存器的个数</li>
+</ul>
+<p>为什么要修改呢？因为smali是基于寄存器的，所有的操作都要经过寄存器，所以在进行smali代码注入时首先要适当修改寄存器的个数。因为构造和显示Toast函数至少需要3个寄存器，所以我们应该先将onCreate方法中的.locals值由7修改为10</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">android.widget.Toast 是android提供的一个用于快显信息的类<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/5713154e70364f099e18c218f38e5c0a.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>在onCreate方法中注入Toast代码，需要定位到<code>invoke-super&#123;p0,p1&#125;,Lcom/baidu/tbadk/BaseActivity;-&gt;onCreate(Landroid/os/Bundle;)V </code>这条语句后面添加构造和显示Toast的代码</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs java">invoke-<span class="hljs-built_in">super</span> &#123;p0, p1&#125;, Lcom/baidu/tbadk/BaseActivity;-&gt;onCreate(Landroid/os/Bundle;)V<br>    <br>const-string v7, <span class="hljs-string">&quot;The Orangey blog welcomes you!!!&quot;</span> # 构造toast显示的字符串 <br>    <br>const/<span class="hljs-number">4</span> v8, <span class="hljs-number">0x1</span>   # 构造Toast 的显示时间，<span class="hljs-number">0</span>表示Toast.LENGTH_SHORT；<span class="hljs-number">1</span>表示Toast.LENGTH_LONG<br>    <br>invoke-<span class="hljs-keyword">static</span> &#123;p0, v7, v8&#125;, Landroid/widget/Toast;-&gt;makeText(Landroid/content/Context;Ljava/lang/CharSequence;I)Landroid/widget/Toast; # 调用Toast.makeText方法<br><br>move-result-object v9   # 将前面的Toast.makeText方法的返回值保存到v9寄存器中<br><br>invoke-virtual &#123;v9&#125;, Landroid/widget/Toast;-&gt;show()V  # 调用Toast.show方法弹出Toast信息<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/720738ec790b4ee48894180bce52a779.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h3 id="5-2-3-回编译APK并签名"><a href="#5-2-3-回编译APK并签名" class="headerlink" title="5.2.3 回编译APK并签名"></a>5.2.3 回编译APK并签名</h3><p>apktool b  out -o 3.apk</p>
+<p>java -jar apktool.jar b bd -o bd_log1.apk</p>
+<p><img src="https://img-blog.csdnimg.cn/0d1779a08eb74d25ba65484c09afc3e0.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>java -jar  .\sign\signapk.jar .\sign\testkey.x509.pem .\sign\testkey.pk8 bd_log1.apk bd_log1_qm.apk</p>
+<p><img src="https://img-blog.csdnimg.cn/07662da769524071b06f7f7cdf3a14c4.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><img src="https://img-blog.csdnimg.cn/12619f0da1734860bb7bb9475706ff1c.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>丢到模拟器安装</p>
+<p><img src="https://img-blog.csdnimg.cn/040d0c0cfefa415ca846d06fb4d2e216.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><img src="https://img-blog.csdnimg.cn/bbcf49e92182437191756cce4aeddb57.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="5-3-自定义log类"><a href="#5-3-自定义log类" class="headerlink" title="5.3 自定义log类"></a>5.3 自定义log类</h2><p>编写自定义的log类的samli代码，然后只要将其放入smali文件的根目录文件夹下，然后，在smali代码中插入一句调用代码即可（步骤跟上面说的Android Studio 差不多，只是多了个编写log类的APK反编译后把log类的smali代码放到我们需要插入log类代码的APK的smali文件下）</p>
+<p>具体内容，请前往之前写的文章有介绍：</p>
+<p><a target="_blank" rel="noopener" href="https://orangey.blog.csdn.net/article/details/123520495">[车联网安全自学篇] Android安全之静态方式逆向APK应用浅析【手动注入smali+】+【IDA Pro静态分析so文件】+【IDA Pro基础使用讲解】</a></p>
+<p><strong>参考链接</strong>：</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/pengyan0812/article/details/44568147">https://blog.csdn.net/pengyan0812/article/details/44568147</a></p>
+<p><a target="_blank" rel="noopener" href="http://www.tasfa.cn/index.php/2016/05/18/smali-instrumentation/">http://www.tasfa.cn/index.php/2016/05/18/smali-instrumentation/</a></p>
+<hr>
+<p><strong>你以为你有很多路可以选择，其实你只有一条路可以走</strong></p>
+<hr>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/AndroidSecurity/">#AndroidSecurity</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>「干货」Android APP动态调试的三种Smali注入小技巧</div>
+      <div>https://orangey.info/2022/09/23/123582115/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>橙留香</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年9月23日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/09/23/123485441/" title="「干货」Android 常用逆向工具汇总">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">「干货」Android 常用逆向工具汇总</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/09/23/123787445/" title="「干货」动态调试APP的一些技巧「Android Studio调试」">
+                        <span class="hidden-mobile">「干货」动态调试APP的一些技巧「Android Studio调试」</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  <article id="comments" lazyload>
+    
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1e96aec5ac46370916fa","clientSecret":"ee5e97a65cf34e9fe31e15ab0421a94968237f5e","repo":"ogGitalk","owner":"ananasOrangey","admin":["ananasOrangey"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '523ca262780d45d0b4fe3c3cbec79af5'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+  </article>
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://orangey.blog.csdn.net" target="_blank" rel="nofollow noopener"><span>橙留香CSDN博客</span></a> <i class="iconfont icon-love"></i> <a href="https://i.imgtg.com/2022/09/21/gNXxK.png" target="_blank" rel="nofollow noopener"><span>橙留香微信公众号</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

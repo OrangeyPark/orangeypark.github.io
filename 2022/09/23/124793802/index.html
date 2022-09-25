@@ -1,0 +1,804 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="橙留香">
+  <meta name="keywords" content="橙留香车联网安全技术博客">
+  
+    <meta name="description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  Android安全付费专栏长期更新，本篇最新内容请前往：  [车联网安全自学篇] Android安全之绕过WebView SSL Pinning抓HTTPS数据  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;ana">
+<meta property="og:type" content="article">
+<meta property="og:title" content="「干货」APP绕过WebView SSL Pinning抓包限制，进行抓包">
+<meta property="og:url" content="https://orangey.info/2022/09/23/124793802/index.html">
+<meta property="og:site_name" content="车联网安全技术博客 | 橙留香">
+<meta property="og:description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  Android安全付费专栏长期更新，本篇最新内容请前往：  [车联网安全自学篇] Android安全之绕过WebView SSL Pinning抓HTTPS数据  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;ana">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/21/gNXxK.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/b6f1f066635a43e8aada321af4cc95f2.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/cb2428735d5046f489cdb0cc29f0440f.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/dc7512dbd3ee465993c093dc20ae5645.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/ab71ca2bd9e84093bb1cffcf32b23511.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d3486741fcd64bec9c13c131cdc5df4d.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/de82ad14b9c14b72916adbf2062ecab0.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/f8c966f137604d9abe19506ef9c070cd.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/28b5fd7537be4fc0bc5c7234309e9bc3.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/767f564a08514c63876753c80b9ecc0e.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5a27429042b14de1bc6335ab161c1897.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/06def1dabd8f4f6aa31e25d1bfe68310.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c0b2fd62731e4d14883daada2ce75396.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/0ee8a12d7fb2403d9f2043d5a52e20d5.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/3cb09de8169045d6b7d75469f602f206.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/7d76d2e26d8d40e89bf7e40efef79283.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/3bab545932c043d58266d00141c54d11.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/86f4be1102ff49e78b4646520ca867d4.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/b623651ce698463a861865b731873665.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/458a03243797476cbaf34e39d4c0d881.png">
+<meta property="article:published_time" content="2022-09-23T15:50:33.622Z">
+<meta property="article:modified_time" content="2022-09-24T16:45:45.170Z">
+<meta property="article:author" content="橙留香">
+<meta property="article:tag" content="AndroidSecurity">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+  
+  
+  
+  <title>「干货」APP绕过WebView SSL Pinning抓包限制，进行抓包 - 车联网安全技术博客 | 橙留香</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"orangey.info","root":"/","version":"1.9.3","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"java"},"copy_btn":false,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>橙留香</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="「干货」APP绕过WebView SSL Pinning抓包限制，进行抓包"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-09-23 23:50" pubdate>
+          2022年9月23日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          9.9k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          <!-- compatible with older versions-->
+          83 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">「干货」APP绕过WebView SSL Pinning抓包限制，进行抓包</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <hr>
+<p><strong>也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大</strong></p>
+<p><strong>少走了弯路，也就错过了风景，无论如何，感谢经历</strong></p>
+<hr>
+<p>Android安全付费专栏长期更新，本篇最新内容请前往：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://orangey.blog.csdn.net/article/details/124793802">[车联网安全自学篇] Android安全之绕过WebView SSL Pinning抓HTTPS数据</a></li>
+</ul>
+<p>更多关于Android安全的知识，可前往：<a target="_blank" rel="noopener" href="https://blog.csdn.net/ananasorangey/category11955914.html">https://blog.csdn.net/ananasorangey/category11955914.html</a></p>
+<p><img src="https://i.imgtg.com/2022/09/25/gdpGP.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><img src="https://i.imgtg.com/2022/09/21/gNXxK.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x01-前言"><a href="#0x01-前言" class="headerlink" title="0x01 前言"></a>0x01 前言</h1><p>Android 中的证书固定，Android WebView 中证书锁定，在Android 7.0 Nougat (SDK 24)开始才有的，在 Android 7.0 Nougat (SDK 24)之前，无论开发人员使用什么库，都无法真正管理 Webview 上的固定，因为Android 7.0 Nougat (SDK 24)的网络安全配置允许应用程序定义自己的规则集。</p>
+<p>为了不让攻击者抓到数据包货执行中间人攻击，开发人员使用了WebView SSLPinning，如果我们想成功地对固定的证书域执行中间人攻击，就必须获得实际证书或能够生成有效证书（来自受信任的证书颁发机构）</p>
+<h2 id="1-1-WebView-忽略证书验证"><a href="#1-1-WebView-忽略证书验证" class="headerlink" title="1.1 WebView 忽略证书验证"></a>1.1 WebView 忽略证书验证</h2><h3 id="1-1-1-Okhttp3忽略HTTPS证书校验"><a href="#1-1-1-Okhttp3忽略HTTPS证书校验" class="headerlink" title="1.1.1 Okhttp3忽略HTTPS证书校验"></a>1.1.1 Okhttp3忽略HTTPS证书校验</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">import</span> java.security.SecureRandom;<br><span class="hljs-keyword">import</span> java.security.cert.X509Certificate;<br><br><span class="hljs-keyword">import</span> javax.net.ssl.HostnameVerifier;<br><span class="hljs-keyword">import</span> javax.net.ssl.SSLContext;<br><span class="hljs-keyword">import</span> javax.net.ssl.SSLSession;<br><span class="hljs-keyword">import</span> javax.net.ssl.SSLSocketFactory;<br><span class="hljs-keyword">import</span> javax.net.ssl.TrustManager;<br><span class="hljs-keyword">import</span> javax.net.ssl.X509TrustManager;<br><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">SSLSocketClient</span> &#123;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> SSLSocketFactory <span class="hljs-title function_">getSSLSocketFactory</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-keyword">try</span> &#123;<br>            <span class="hljs-type">SSLContext</span> <span class="hljs-variable">sslContext</span> <span class="hljs-operator">=</span> SSLContext.getInstance(<span class="hljs-string">&quot;SSL&quot;</span>);<br>            sslContext.init(<span class="hljs-literal">null</span>, getTrustManager(), <span class="hljs-keyword">new</span> <span class="hljs-title class_">SecureRandom</span>());<br>            <span class="hljs-keyword">return</span> sslContext.getSocketFactory();<br>        &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">RuntimeException</span>(e);<br>        &#125;<br>    &#125;<br><br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> TrustManager[] getTrustManager() &#123;<br>        TrustManager[] trustAllCerts = <span class="hljs-keyword">new</span> <span class="hljs-title class_">TrustManager</span>[]&#123;<br>                <span class="hljs-keyword">new</span> <span class="hljs-title class_">X509TrustManager</span>() &#123;<br>                    <span class="hljs-meta">@Override</span><br>                    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">checkClientTrusted</span><span class="hljs-params">(X509Certificate[] chain, String authType)</span> &#123;<br>                    &#125;<br><br>                    <span class="hljs-meta">@Override</span><br>                    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">checkServerTrusted</span><span class="hljs-params">(X509Certificate[] chain, String authType)</span> &#123;<br>                    &#125;<br><br>                    <span class="hljs-meta">@Override</span><br>                    <span class="hljs-keyword">public</span> X509Certificate[] getAcceptedIssuers() &#123;<br>                        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">X509Certificate</span>[]&#123;&#125;;<br>                    &#125;<br>                &#125;<br>        &#125;;<br>        <span class="hljs-keyword">return</span> trustAllCerts;<br>    &#125;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> HostnameVerifier <span class="hljs-title function_">getHostnameVerifier</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-type">HostnameVerifier</span> <span class="hljs-variable">hostnameVerifier</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">HostnameVerifier</span>() &#123;<br>            <span class="hljs-meta">@Override</span><br>            <span class="hljs-keyword">public</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">verify</span><span class="hljs-params">(String s, SSLSession sslSession)</span> &#123;<br>                <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;<br>            &#125;<br>        &#125;;<br>        <span class="hljs-keyword">return</span> hostnameVerifier;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs java">sClient = <span class="hljs-keyword">new</span> <span class="hljs-title class_">OkHttpClient</span>.Builder()<br>        .connectTimeout(<span class="hljs-number">10</span>, TimeUnit.SECONDS)<br>        .readTimeout(<span class="hljs-number">10</span>, TimeUnit.SECONDS)<br>        .writeTimeout(<span class="hljs-number">10</span>, TimeUnit.SECONDS)<br>        .sslSocketFactory(SSLSocketClient.getSSLSocketFactory())<br>        .hostnameVerifier(SSLSocketClient.getHostnameVerifier())<br>        .build();<br></code></pre></td></tr></table></figure>
+
+<h3 id="1-1-2-WebView忽略HTTPS证书校验"><a href="#1-1-2-WebView忽略HTTPS证书校验" class="headerlink" title="1.1.2 WebView忽略HTTPS证书校验"></a>1.1.2 WebView忽略HTTPS证书校验</h3><p>Android WebView组件加载网页发生证书认证错误时，会调用WebViewClient类的onReceivedSslError方法，如果该方法实现调用了handler.proceed()来忽略该证书错误，则会受到中间人攻击的威胁，可能导致隐私泄露</p>
+<p>httptest APP中，WebView忽略了SSL证书错误，可能引起中间人攻击</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">/*</span><br><span class="hljs-comment">* https协议</span><br><span class="hljs-comment">* WebView 不进行证书校验</span><br><span class="hljs-comment">*/</span><br>button_webview_ssl_without_ca.setOnClickListener(<span class="hljs-keyword">new</span> <span class="hljs-title class_">View</span>.OnClickListener() &#123;<br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">onClick</span><span class="hljs-params">(View v)</span> &#123;<br>        <span class="hljs-type">MyWebViewClient</span> <span class="hljs-variable">mWebViewClient</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">MyWebViewClient</span>();<br>        mWebViewClient.setCheckflag(<span class="hljs-string">&quot;trustAllCerts&quot;</span>);<br>        mWebview.setWebViewClient(mWebViewClient);<br>        mWebview.loadUrl(<span class="hljs-string">&quot;https://www.baidu.com/?q=WebView_without_CAcheck&quot;</span>);<br>    &#125;<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<p>WebView直接调用onReceivedSslError方法时，直接执行handler.proceed()来忽略该证书错误，setWebViewClient() 实现方法如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs java">wv.setWebViewClient(<span class="hljs-keyword">new</span> <span class="hljs-title class_">WebViewClient</span>() &#123;<br>            <span class="hljs-meta">@Override</span><br>            <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">onReceivedSslError</span><span class="hljs-params">(WebView view, SslErrorHandler handler, SslError error)</span> &#123;<br>                handler.proceed();<span class="hljs-comment">//忽略证书错误继续加载页面</span><br>            &#125;<br>        &#125;);<br></code></pre></td></tr></table></figure>
+
+
+<p>客户端访问使用Https协议加密的url时，如果服务器证书校验错误，客户端应该拒绝继续加载页面</p>
+<p>在使用WebView进行HTTPS请求时，同样可以对HTTPS证书进行校验，WebView控件对请求逻辑进行了封装，所以进行证书校验更加方便，具体代码如下所示，handler.cancel()相当于使用系统证书校验:：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">private</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">MyWebViewClient</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">WebViewClient</span> &#123;<br>    <span class="hljs-keyword">private</span> String checkflag=<span class="hljs-string">&quot;checkCerts&quot;</span>; <span class="hljs-comment">// 是否忽略证书校验</span><br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">setCheckflag</span><span class="hljs-params">(String checkflag)</span> &#123;<br>        <span class="hljs-built_in">this</span>.checkflag = checkflag;<br>    &#125;<br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">onReceivedSslError</span><span class="hljs-params">(WebView view, SslErrorHandler handler, SslError error)</span> &#123;<br>        <span class="hljs-keyword">if</span>(<span class="hljs-string">&quot;trustAllCerts&quot;</span>.equals(checkflag))&#123;<span class="hljs-comment">//忽略证书校验</span><br>            handler.proceed();<br>        &#125;<span class="hljs-keyword">else</span> &#123;<br>            handler.cancel();<br>            Toast.makeText(MainActivity.<span class="hljs-built_in">this</span>, <span class="hljs-string">&quot;证书异常，停止访问&quot;</span>, Toast.LENGTH_SHORT).show();<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>打开Burp，并在Android 设备中配置好代理，然后打开APP后点击【WEBVIEW SSL(忽略证书校验)】按钮，APP成功访问，并在界面显示百度的一个gif图片，Burp也成功抓到信息，如下：</p>
+<p><img src="https://img-blog.csdnimg.cn/b6f1f066635a43e8aada321af4cc95f2.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="1-2-WebView-系统证书校验"><a href="#1-2-WebView-系统证书校验" class="headerlink" title="1.2 WebView 系统证书校验"></a>1.2 WebView 系统证书校验</h2><p>WebView没有自定义SSL Pinning的实现方法，只能通过network_security_config.xml配置证书绑定</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">/*</span><br><span class="hljs-comment"> * https协议</span><br><span class="hljs-comment"> * WebView 使用系统证书校验</span><br><span class="hljs-comment"> * 默认证书链校验，只信任系统CA(根证书)</span><br><span class="hljs-comment">*</span><br><span class="hljs-comment">* tips: OKHTTP默认的https请求使用系统CA验证服务端证书（Android7.0以下还信任用户证书，Android7.0开始默认只信任系统证书）</span><br><span class="hljs-comment"> */</span><br>button_webview_ssl_with_system_ca.setOnClickListener(<span class="hljs-keyword">new</span> <span class="hljs-title class_">View</span>.OnClickListener() &#123;<br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">onClick</span><span class="hljs-params">(View v)</span> &#123;<br>        <span class="hljs-type">MyWebViewClient</span> <span class="hljs-variable">mWebViewClient</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">MyWebViewClient</span>();<br>        mWebViewClient.setCheckflag(<span class="hljs-string">&quot;checkCerts&quot;</span>);<br>        mWebview.setWebViewClient(mWebViewClient);<br>        mWebview.loadUrl(<span class="hljs-string">&quot;https://www.baidu.com/?q=WebView_with_SystemCAcheck&quot;</span>);<br>    &#125;<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/cb2428735d5046f489cdb0cc29f0440f.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>绕过WebView 系统证书校验的方法，跟绕过HTTPS 系统证书校验的方法一样，只需要将抓包工具的证书安装到系统信任库里面即可正常抓包或反编译APK在<code>&lt;app&gt;\res\xml\network_security_config.xml</code>和<code>&lt;app&gt;\AndroidManifest.xml</code>中添加如下信息后重打包APK并签名就能抓到数据：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-meta">&lt;?xml version=<span class="hljs-string">&quot;1.0&quot;</span> encoding=<span class="hljs-string">&quot;utf-8&quot;</span>?&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">network-security-config</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">base-config</span>&gt;</span> <br>      <span class="hljs-tag">&lt;<span class="hljs-name">trust-anchors</span>&gt;</span><br>          <span class="hljs-comment">&lt;!-- 信任系统预置CA 证书 --&gt;</span><br>          <span class="hljs-tag">&lt;<span class="hljs-name">certificates</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;system&quot;</span> /&gt;</span><br>          <span class="hljs-comment">&lt;!-- 信任用户添加的 CA 证书，Charles 和 Fiddler 抓包工具安装的证书属于此类 --&gt;</span><br>          <span class="hljs-tag">&lt;<span class="hljs-name">certificates</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;user&quot;</span> /&gt;</span><br>      <span class="hljs-tag">&lt;/<span class="hljs-name">trust-anchors</span>&gt;</span><br>    <span class="hljs-tag">&lt;/<span class="hljs-name">base-config</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">network-security-config</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p>AndroidManifest.xml：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">application</span>  <span class="hljs-attr">android:networkSecurityConfig</span>=<span class="hljs-string">&quot;@xml/network_security_config&quot;</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>注</strong>：在Android 7.0以前，应用默认会信任系统证书和用户证书，Android 7.0开始，默认只信任系统证书，在root环境下，将证书导入系统目录的方法。只要想办法把证书弄到系统证书列表，就可以抓包解密明文数据，具体的证书安装到系统证书目录的方法，如下：</p>
+<p>目前在Android 7.0或以上的系统有启用了对第三方证书的限制，但在Android 7.0以下依旧可以将Fiddler&#x2F;Charles&#x2F;Burp的证书安装在用户的CA集中抓取https请求</p>
+<p>将Burp或者Charles的证书作为系统级别的信任证书安装。建议重新生产burp证书并重启burp后再导出。系统级别的受信任证书以特殊格式存储在&#x2F;system&#x2F;etc&#x2F;security&#x2F;cacerts文件夹中。我们可以将Burp的证书写入此位置。</p>
+<p>导出一个Burp&#x2F;Charles证书之后，adb push到模拟器，然后修改后缀为crt直接安全，这种方式在Android 6及之前的版本可用，从Android 7.0开始，Android更改了信任用户安装的证书的默认行为，应用程序仅信任系统级CA。这样就导致安装证书后，如果尝试通过Burp或者Charlse代理访问https网站，系统会提示“该证书并非来自可信的授权中心”</p>
+<p>对于Android 7.0 (API 24) 之后，做了些改动，使得系统安全性增加了，导致：</p>
+<ul>
+<li>APP 默认不信任用户域的证书<ul>
+<li>之前把抓包工具的ssl证书，通过【从SD卡安装】安装到受信任的凭据 -&gt; 用户。就没用了，因为不再受信任了</li>
+<li>只信任（安装到）系统域的证书</li>
+<li>导致无法抓包https，抓出来的https的请求，都是加了密的，无法看到原文了</li>
+</ul>
+</li>
+</ul>
+<p>对此，总结出相关解决思路和方案：</p>
+<ul>
+<li>让系统信任抓包工具的ssl证书<ul>
+<li>作为app的开发者自己：改自己的app的配置，允许https抓包（得到或本身有app的源码，把证书放到受系统信任的系统证书中去）</li>
+<li>把证书放到受系统信任的系统证书中去（root权限）</li>
+</ul>
+</li>
+<li>绕开https不去校验<ul>
+<li>借助于其他（JustTrustMe等）工具绕开https的校验（例如XPosed、太极XPosed等框架）</li>
+</ul>
+</li>
+</ul>
+<p>1） <strong>Android 7抓包问题解决方法</strong></p>
+<ol>
+<li>导出Burp的证书后，使用openssl来做一些改动，最后上传到<code>/system/etc/security/cacerts</code></li>
+</ol>
+<p><img src="https://img-blog.csdnimg.cn/dc7512dbd3ee465993c093dc20ae5645.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/ab71ca2bd9e84093bb1cffcf32b23511.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c">root@kali:~<span class="hljs-meta"># openssl x509 -inform DER -in cert-der.crt -out PortSwiggerCA.pem</span><br>root@kali:~<span class="hljs-meta"># openssl x509 -inform PEM -subject_hash_old -in PortSwiggerCA.pem|head -1</span><br>root@kali:~<span class="hljs-meta"># mv PortSwiggerCA.pem 9999.0</span><br></code></pre></td></tr></table></figure>
+
+
+<ol start="2">
+<li>adb传输文件报错<code>couldn‘t create file：Read-only file system</code>解决方法</li>
+</ol>
+<p><img src="https://img-blog.csdnimg.cn/d3486741fcd64bec9c13c131cdc5df4d.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs c">D:\&gt;adb shell<br>VOG-AL00:/ <span class="hljs-meta"># mount -o remount -o rw /system</span><br>mount -o remount -o rw /system<br>VOG-AL00:/ <span class="hljs-meta"># exit;</span><br><span class="hljs-built_in">exit</span>;<br><br>D:\&gt;adb root<br>adbd is already running as root<br><br>D:\&gt;adb remount<br>remount succeeded<br><br>D:\&gt;adb push <span class="hljs-number">9999.0</span> /system/etc/security/cacerts<br><span class="hljs-number">330</span> KB/s (<span class="hljs-number">1330</span> bytes in <span class="hljs-number">0.003</span>s)<br><br>D:\&gt;adb shell chmod <span class="hljs-number">644</span> /system/etc/security/cacerts/<span class="hljs-number">9999.0</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/de82ad14b9c14b72916adbf2062ecab0.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>再次输入adb push就能正常传输文件</p>
+<p><img src="https://img-blog.csdnimg.cn/f8c966f137604d9abe19506ef9c070cd.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>2）<strong>Android10 抓包问题解决方法</strong></p>
+<p>安卓 10 采用了的安全策略-将系统分区 &#x2F;system 挂载为只读，因此Android10以上需要刷入Magisk,在模块里搜索move Cert（MagiskTrustUserCerts） 安装模块，重启后证书就已经被移动到系统目录（system&#x2F;etc&#x2F;security&#x2F;cacerts），可以正常抓包了</p>
+<p>Magisk下载地址：<a target="_blank" rel="noopener" href="https://github.com/topjohnwu/Magisk">https://github.com/topjohnwu/Magisk</a><br>MagiskTrustUserCerts下载地址：<a target="_blank" rel="noopener" href="https://github.com/NVISOsecurity/MagiskTrustUserCerts">https://github.com/NVISOsecurity/MagiskTrustUserCerts</a></p>
+<h1 id="0x02-WebView-SSL-Pinning"><a href="#0x02-WebView-SSL-Pinning" class="headerlink" title="0x02 WebView SSL Pinning"></a>0x02 WebView SSL Pinning</h1><h2 id="2-1-绕过WebView证书文件校验"><a href="#2-1-绕过WebView证书文件校验" class="headerlink" title="2.1 绕过WebView证书文件校验"></a>2.1 绕过WebView证书文件校验</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">/*</span><br><span class="hljs-comment">* https协议 SSL Pinning WebView</span><br><span class="hljs-comment">* 通过network_security_config.xml中定义的证书和密钥进行绑定</span><br><span class="hljs-comment">*/</span><br>button_webview_ssl_pinning.setOnClickListener(<span class="hljs-keyword">new</span> <span class="hljs-title class_">View</span>.OnClickListener() &#123;<br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">onClick</span><span class="hljs-params">(View v)</span> &#123;<br>        <span class="hljs-type">MyWebViewClient</span> <span class="hljs-variable">mWebViewClient</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">MyWebViewClient</span>();<br>        mWebViewClient.setCheckflag(<span class="hljs-string">&quot;checkCerts&quot;</span>);<br>        mWebview.setWebViewClient(mWebViewClient);<br>        mWebview.loadUrl(<span class="hljs-string">&quot;https://www.sogou.com/web?query=WebView_SSLPinningXML&quot;</span>); <span class="hljs-comment">// 证书文件校验</span><br>    &#125;<br>&#125;);<br>````<br><br>**注**：【确定样本APK中编译好的证书是否同学你在使用的时候失效了，建议自行使用下面的方法自行编译】此处的本地证书要替换一下为最新的，下载官网最新的sogou.pem然后在/替换掉/res/raw/目录下的sogou.pem文件<br><br>```c<br>openssl s_client -connect sogou.com:<span class="hljs-number">443</span> -servername sogou.com | openssl x509 -out sogou.pem<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/28b5fd7537be4fc0bc5c7234309e9bc3.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/767f564a08514c63876753c80b9ecc0e.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>network_security_config.xml配置的WebView的证书文件校验和公钥校验内容：</p>
+<p><img src="https://img-blog.csdnimg.cn/5a27429042b14de1bc6335ab161c1897.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>正常访问不挂代理，内容如下：</p>
+<p><img src="https://img-blog.csdnimg.cn/06def1dabd8f4f6aa31e25d1bfe68310.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>挂代理访问，内容如下：</p>
+<p><img src="https://img-blog.csdnimg.cn/c0b2fd62731e4d14883daada2ce75396.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>绕过方式：利用Android 特性绕过，使用Frida</p>
+<p>JS脚本：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-title class_">Java</span>.<span class="hljs-title function_">perform</span>(<span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) &#123;<br><span class="hljs-keyword">try</span> &#123;<br>		<span class="hljs-keyword">var</span> <span class="hljs-title class_">TrustManagerImpl</span> = <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">use</span>(<span class="hljs-string">&#x27;com.android.org.conscrypt.TrustManagerImpl&#x27;</span>);<br>		<span class="hljs-title class_">TrustManagerImpl</span>.<span class="hljs-property">verifyChain</span>.<span class="hljs-property">implementation</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params">untrustedChain, trustAnchorChain, host, clientAuth, ocspData, tlsSctData</span>) &#123;<br>			<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;[+] Bypassing TrustManagerImpl (Android &gt; 7): &#x27;</span> + host);<br>			<span class="hljs-keyword">return</span> untrustedChain;<br>		&#125;;<br>	&#125; <span class="hljs-keyword">catch</span> (err) &#123;<br>		<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;[-] TrustManagerImpl (Android &gt; 7) pinner not found&#x27;</span>);<br>		<span class="hljs-comment">//console.log(err);</span><br>	&#125;<br><br>&#125;);<br></code></pre></td></tr></table></figure>
+
+
+
+<p><img src="https://img-blog.csdnimg.cn/0ee8a12d7fb2403d9f2043d5a52e20d5.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="2-2-绕过WebView证书公钥校验"><a href="#2-2-绕过WebView证书公钥校验" class="headerlink" title="2.2 绕过WebView证书公钥校验"></a>2.2 绕过WebView证书公钥校验</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">/*</span><br><span class="hljs-comment">* https协议 SSL Pinning WebView</span><br><span class="hljs-comment">* 通过network_security_config.xml中定义的证书和密钥进行绑定</span><br><span class="hljs-comment">*/</span><br>button_webview_ssl_pinning.setOnClickListener(<span class="hljs-keyword">new</span> <span class="hljs-title class_">View</span>.OnClickListener() &#123;<br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">onClick</span><span class="hljs-params">(View v)</span> &#123;<br>        <span class="hljs-type">MyWebViewClient</span> <span class="hljs-variable">mWebViewClient</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">MyWebViewClient</span>();<br>        mWebViewClient.setCheckflag(<span class="hljs-string">&quot;checkCerts&quot;</span>);<br>        mWebview.setWebViewClient(mWebViewClient);<br>        mWebview.loadUrl(<span class="hljs-string">&quot;https://www.sogou.com/web?query=WebView_SSLPinningXML&quot;</span>); <span class="hljs-comment">// 证书文件校验</span><br>        <span class="hljs-comment">// mWebview.loadUrl(&quot;https://www.zhihu.com/&quot;); // 证书公钥校验</span><br>    &#125;<br>&#125;);<br>````<br><br><br><br>**注**：【确定样本APK中编译好的证书是否同学你在使用的时候失效了，建议自行使用下面的方法自行编译】此处证书公钥要替换一下<br><br>```c<br>openssl s_client -connect zhihu.com:<span class="hljs-number">443</span> -servername zhihu.com | openssl x509 -pubkey -noout | openssl rsa -pubin -outform der | openssl dgst -sha256 -binary | openssl enc -base64<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/3cb09de8169045d6b7d75469f602f206.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><img src="https://img-blog.csdnimg.cn/7d76d2e26d8d40e89bf7e40efef79283.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>正常访问不挂代理，内容如下：</p>
+<p><img src="https://img-blog.csdnimg.cn/3bab545932c043d58266d00141c54d11.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>挂代理访问，内容如下：</p>
+<p><img src="https://img-blog.csdnimg.cn/86f4be1102ff49e78b4646520ca867d4.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>绕过方式：利用Android 特性绕过，使用Frida</p>
+<p>JS脚本：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-title class_">Java</span>.<span class="hljs-title function_">perform</span>(<span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) &#123;<br><span class="hljs-keyword">try</span> &#123;<br>		<span class="hljs-keyword">var</span> <span class="hljs-title class_">TrustManagerImpl</span> = <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">use</span>(<span class="hljs-string">&#x27;com.android.org.conscrypt.TrustManagerImpl&#x27;</span>);<br>		<span class="hljs-title class_">TrustManagerImpl</span>.<span class="hljs-property">verifyChain</span>.<span class="hljs-property">implementation</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params">untrustedChain, trustAnchorChain, host, clientAuth, ocspData, tlsSctData</span>) &#123;<br>			<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;[+] Bypassing TrustManagerImpl (Android &gt; 7): &#x27;</span> + host);<br>			<span class="hljs-keyword">return</span> untrustedChain;<br>		&#125;;<br>	&#125; <span class="hljs-keyword">catch</span> (err) &#123;<br>		<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;[-] TrustManagerImpl (Android &gt; 7) pinner not found&#x27;</span>);<br>		<span class="hljs-comment">//console.log(err);</span><br>	&#125;<br><br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/b623651ce698463a861865b731873665.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>当然，也可以通过<code>res/xml/network_security_config.xml</code>配置文件对服务端证书进行校验，例如针对证书校验，反编译APK将对应的证书替换为Burp的即可绕过；公钥校验的同理</p>
+<p><img src="https://img-blog.csdnimg.cn/458a03243797476cbaf34e39d4c0d881.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><strong>参考链接</strong>：</p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/Potato-Eater/p/9792725.html">https://www.cnblogs.com/Potato-Eater/p/9792725.html</a></p>
+<p><a target="_blank" rel="noopener" href="https://ch3nye.top/Android-HTTPS%E8%AE%A4%E8%AF%81%E7%9A%84N%E7%A7%8D%E6%96%B9%E5%BC%8F%E5%92%8C%E5%AF%B9%E6%8A%97%E6%96%B9%E6%B3%95%E6%80%BB%E7%BB%93/">https://ch3nye.top/Android-HTTPS%E8%AE%A4%E8%AF%81%E7%9A%84N%E7%A7%8D%E6%96%B9%E5%BC%8F%E5%92%8C%E5%AF%B9%E6%8A%97%E6%96%B9%E6%B3%95%E6%80%BB%E7%BB%93/</a></p>
+<hr>
+<p><strong>你以为你有很多路可以选择，其实你只有一条路可以走</strong></p>
+<hr>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/AndroidSecurity/">#AndroidSecurity</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>「干货」APP绕过WebView SSL Pinning抓包限制，进行抓包</div>
+      <div>https://orangey.info/2022/09/23/124793802/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>橙留香</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年9月23日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/09/23/124755818/" title="「干货」APP绕过直连、HOST校验、系统证书校验、代理检测、双向认证抓包限制，进行抓包">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">「干货」APP绕过直连、HOST校验、系统证书校验、代理检测、双向认证抓包限制，进行抓包</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/09/23/124746120/" title="「干货」APP绕过SSL Pinning抓包限制，进行抓包">
+                        <span class="hidden-mobile">「干货」APP绕过SSL Pinning抓包限制，进行抓包</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  <article id="comments" lazyload>
+    
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1e96aec5ac46370916fa","clientSecret":"ee5e97a65cf34e9fe31e15ab0421a94968237f5e","repo":"ogGitalk","owner":"ananasOrangey","admin":["ananasOrangey"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '526e473b057d03c2418f82c12e413a09'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+  </article>
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://orangey.blog.csdn.net" target="_blank" rel="nofollow noopener"><span>橙留香CSDN博客</span></a> <i class="iconfont icon-love"></i> <a href="https://i.imgtg.com/2022/09/21/gNXxK.png" target="_blank" rel="nofollow noopener"><span>橙留香微信公众号</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

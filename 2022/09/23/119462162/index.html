@@ -1,0 +1,1913 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="橙留香">
+  <meta name="keywords" content="橙留香车联网安全技术博客">
+  
+    <meta name="description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  Android安全付费专栏长期更新，本篇最新内容请前往：  [车联网安全自学篇] Android安全之安卓APK浅析  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;ananasorangey&#x2F;category119">
+<meta property="og:type" content="article">
+<meta property="og:title" content="「干货」关于Android APK应用程序安全，你了解多少？">
+<meta property="og:url" content="https://orangey.info/2022/09/23/119462162/index.html">
+<meta property="og:site_name" content="车联网安全技术博客 | 橙留香">
+<meta property="og:description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  Android安全付费专栏长期更新，本篇最新内容请前往：  [车联网安全自学篇] Android安全之安卓APK浅析  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;ananasorangey&#x2F;category119">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/21/gNXxK.png">
+<meta property="article:published_time" content="2022-09-23T15:50:33.528Z">
+<meta property="article:modified_time" content="2022-09-24T16:36:26.011Z">
+<meta property="article:author" content="橙留香">
+<meta property="article:tag" content="AndroidSecurity">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+  
+  
+  
+  <title>「干货」关于Android APK应用程序安全，你了解多少？ - 车联网安全技术博客 | 橙留香</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"orangey.info","root":"/","version":"1.9.3","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"java"},"copy_btn":false,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>橙留香</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="「干货」关于Android APK应用程序安全，你了解多少？"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-09-23 23:50" pubdate>
+          2022年9月23日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          38k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          <!-- compatible with older versions-->
+          321 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">「干货」关于Android APK应用程序安全，你了解多少？</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <hr>
+<p><strong>也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大</strong></p>
+<p><strong>少走了弯路，也就错过了风景，无论如何，感谢经历</strong></p>
+<hr>
+<p>Android安全付费专栏长期更新，本篇最新内容请前往：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://orangey.blog.csdn.net/article/details/119462162">[车联网安全自学篇] Android安全之安卓APK浅析</a></li>
+</ul>
+<p>更多关于Android安全的知识，可前往：<a target="_blank" rel="noopener" href="https://blog.csdn.net/ananasorangey/category11955914.html">https://blog.csdn.net/ananasorangey/category11955914.html</a></p>
+<p><img src="https://i.imgtg.com/2022/09/25/gdpGP.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><img src="https://i.imgtg.com/2022/09/21/gNXxK.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x01-Android-应用程序分析"><a href="#0x01-Android-应用程序分析" class="headerlink" title="0x01 Android 应用程序分析"></a>0x01 Android 应用程序分析</h1><p>随着物联网的普及，许多智能设备网联化、例如智能门锁、智能手环、智能汽车等智能设备都是由APP来进行远程控制的，比如启动、点火、远程控制，那么由此可看出，APP也是车联网安全中必不可少的一个环节，存在的安全隐患以及攻击面也是相当大的。</p>
+<h1 id="0x02-Android-apk安装包分析"><a href="#0x02-Android-apk安装包分析" class="headerlink" title="0x02 Android apk安装包分析"></a>0x02 Android apk安装包分析</h1><h2 id="2-1-Android-是啥？"><a href="#2-1-Android-是啥？" class="headerlink" title="2.1 Android 是啥？"></a>2.1 Android 是啥？</h2><p>Android是基于Linux系统的开源操作系统，是由Andy Rubin于2003年在美国加州创建，后被Google于2005年收购。在2008年的时候发布了第一部Android智能手机，随后Android不断发展更新，占据了全球大部分的手机市场。<br>Android每一个版本都会用一个按照A-Z开头顺序的甜品来命名，但从Android P之后Google改变了这一传统的命名规则，可能是没有那么多让人熟知的甜品代号供使用以及甜品名字并不能让人直观的了解到哪一个甜品有什么特性，于是Google直接采用数字来命令系统，并且加深了logo的颜色，不再使用甜品作为代号。</p>
+<p>Android各版本代号、图片及市场占有率（感兴趣的可以<a target="_blank" rel="noopener" href="https://blog.csdn.net/csdnxia/article/details/101513820">https://blog.csdn.net/csdnxia/article/details/101513820</a> 了解）</p>
+<h2 id="2-2-Android-应用组件"><a href="#2-2-Android-应用组件" class="headerlink" title="2.2 Android 应用组件"></a>2.2 Android 应用组件</h2><p>Android 四大组件分别是：</p>
+<ul>
+<li><p>活动（Activity）</p>
+</li>
+<li><p>服务（Service）</p>
+</li>
+<li><p>广播接收器（BroadcasReceiver）</p>
+</li>
+<li><p>内容提供者（Content Provider）</p>
+</li>
+<li><p>Activity：通俗来讲就是提供一个界面让用户点击和各种滑动操作，例如，你正在QQ软件跟人聊天，突然微信软件有信息来了，你点击上方弹出的信息提示，你跳转到了微信软件去跟人回复信息，此时就相当于是一个Activity，QQ被暂时放到了栈底。</p>
+<ul>
+<li>生命周期</li>
+</ul>
+</li>
+</ul>
+<p>启动Activity： onCreate()—&gt;onStart()—&gt;onResume()，Activity进入运行状态。</p>
+<p>Activity退居后台： 当前Activity转到新的Activity界面或按Home键回到主屏： onPause()—&gt;onStop()，进入停滞状态。</p>
+<p>Activity返回前台： onRestart()—&gt;onStart()—&gt;onResume()，再次回到运行状态。</p>
+<p>Activity退居后台，且系统内存不足， 系统会杀死这个后台状态的Activity，若再次回到这个Activity,则会走onCreate()–&gt;onStart()—&gt;onResume()</p>
+<p>锁定屏与解锁屏幕 只会调用onPause()，而不会调用onStop方法，开屏后则调用onResume()</p>
+<ul>
+<li>Service：可以在后台执行长时间运行操作而没有用户界面的应用组件（Service 分为两种工作状态，一种是启动状态，主要用于执行后台计算；另一种是绑定状态，主要用于其他组件和 Service 的交互。）</li>
+</ul>
+<h1 id="0x03-反编译工具的使用"><a href="#0x03-反编译工具的使用" class="headerlink" title="0x03 反编译工具的使用"></a>0x03 反编译工具的使用</h1><table>
+<thead>
+<tr>
+<th>jaa</th>
+<th>smali</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>if(A&#x3D;&#x3D;B)</td>
+<td>if-eq A,B</td>
+<td>如果A等于B</td>
+</tr>
+<tr>
+<td>if(A!&#x3D;B)</td>
+<td>if-ne A,B</td>
+<td>如果A不等于B</td>
+</tr>
+<tr>
+<td>if(A&lt;B)</td>
+<td>if-lt A,B</td>
+<td>如果A小于B</td>
+</tr>
+<tr>
+<td>if(A&lt;&#x3D;B)</td>
+<td>if-le A,B</td>
+<td>如果A小于等于B</td>
+</tr>
+<tr>
+<td>if(A&gt;B)</td>
+<td>if-gt A,B</td>
+<td>如果A大于B</td>
+</tr>
+<tr>
+<td>if(A&gt;&#x3D;B)</td>
+<td>if-ge A,B</td>
+<td>如果A大于等于B</td>
+</tr>
+<tr>
+<td>if(A&#x3D;&#x3D;0)</td>
+<td>if-eqz A</td>
+<td>如果A等于0</td>
+</tr>
+<tr>
+<td>if(A!&#x3D;0)</td>
+<td>if-nez A</td>
+<td>如果A不等于0</td>
+</tr>
+<tr>
+<td>if(A&lt;08)</td>
+<td>if-ltz A</td>
+<td>如果A小于0</td>
+</tr>
+<tr>
+<td>if(A&gt;0)</td>
+<td>if-gtz A</td>
+<td>如果A大于0</td>
+</tr>
+<tr>
+<td>if(A&gt;&#x3D;0)</td>
+<td>if-gez A</td>
+<td>如果A大于等于0</td>
+</tr>
+<tr>
+<td>if(A&lt;&#x3D;0)</td>
+<td>if-lez A</td>
+<td>如果A小于等于0</td>
+</tr>
+</tbody></table>
+<h1 id="0x04-Smali-寄存器"><a href="#0x04-Smali-寄存器" class="headerlink" title="0x04 Smali 寄存器"></a>0x04 Smali 寄存器</h1><p>在Smali中，如果需要存储变量，必须先声明足够数量的寄存器，1个寄存器可以存储32位长度的类型，比如Int，而两个寄存器可以存储64位长度类型的数据，比如Long或Double。</p>
+<p>声明可使用的寄存器数量的方式为：.registers N，N代表需要的寄存器的总个数，同时，还有一个关键字 .local ，它用于声明非参数的寄存器个数（包含在registers声明的个数当中），也叫做本地寄存器，只在一个方法内有效，但不常用，一般使用registers即可。</p>
+<p>.registers 3说明该方法有三个寄存器，其中一个本地寄存器v0，两个参数寄存器p0,p1，细心的人可能会注意到没有看到p0，原因是p0存放的是this。如果是静态方法的话就只有2个寄存器了，不需要存this了。</p>
+<p>1.本地寄存器（local register，非参寄存器）用v开头数字结尾的符号来表示，如v0、v1、v2、…，</p>
+<p>2.参数寄存器(parameter register)用p开头数字结尾的符号来表示，如p0、p1、p2、…，</p>
+<p>3..registers 用来标明方法中寄存器的总数，即参数寄存器和非参寄存器的总数。</p>
+<p>4..local 0，标明在这个函数中最少要用到的本地寄存器的个数，出现在方法中的第一行。在这里，由于只需要调用一个父类的onDestroy()处理，所以只需要用到p0，所以使用到的本地寄存器数为0，在植入代码后不要忘记可能要修改.local的值。</p>
+<p>如 .local 4，则可以使用的寄存器是v0-v3。</p>
+<p>5.当一个方法被调用的时候，方法的参数被置于最后N个寄存器中。</p>
+<p>6.在实例函数中，p0代指“this”，p1表示函数的第一个参数，p2代表函数中的第二个参数…，</p>
+<p>7.在static函数中，p1表示函数的第一个参数，p2代表函数中的第二个参数…，因为Java的static方法中没有this方法。</p>
+<p>那么，如何确定需要使用的寄存器的个数？</p>
+<p>由于非static方法，需要占用一个寄存器以保存this指针，那么这类方法的寄存器个数，最低就为1，如果还需要处理传入的参数，则需要再次叠加，此时还需要考虑Double</p>
+<h2 id="4-1-Smali-介绍"><a href="#4-1-Smali-介绍" class="headerlink" title="4.1 Smali 介绍"></a>4.1 Smali 介绍</h2><p>Smali是Davlik的寄存器语言,语法上和汇编语言类似. Davlik是基于寄存器的,就是说smali里的所有操作都必须经过寄存器来进行.</p>
+<h2 id="4-2-Smali-函数定义"><a href="#4-2-Smali-函数定义" class="headerlink" title="4.2  Smali 函数定义"></a>4.2  Smali 函数定义</h2><ul>
+<li>函数的定义一般为：函数名(参数类型1参数类型2…)返回值类型<ul>
+<li>基本数据类型的参数与参数之间没有任何分隔符(,)对象数据类型使用分号(;)结束</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs gradle">test()V<br><br><span class="hljs-keyword">void</span> test()<br><br><br>test(lll)Z<br><br><span class="hljs-keyword">boolean</span> test(<span class="hljs-keyword">int</span>,<span class="hljs-keyword">int</span>,<span class="hljs-keyword">int</span>)<br><br><br>test(Z[l[lLjava<span class="hljs-regexp">/lang/</span>String;J)Ljava<span class="hljs-regexp">/lang/</span>String;<br><br>String test(<span class="hljs-keyword">boolean</span>,<span class="hljs-keyword">int</span>[],<span class="hljs-keyword">int</span>[],String,<span class="hljs-keyword">long</span>)<br></code></pre></td></tr></table></figure>
+
+<p>PS：注意: 参数之间没有任何分隔符,返回值在最后</p>
+<h2 id="4-3-Smail-基本语法"><a href="#4-3-Smail-基本语法" class="headerlink" title="4.3  Smail 基本语法"></a>4.3  Smail 基本语法</h2><table>
+<thead>
+<tr>
+<th>语法</th>
+<th>语法含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>.field private isFlag:z</td>
+<td>定义变量</td>
+</tr>
+<tr>
+<td>.method</td>
+<td>方法</td>
+</tr>
+<tr>
+<td>.parameter</td>
+<td>方法参数</td>
+</tr>
+<tr>
+<td>.prologue</td>
+<td>方法开始</td>
+</tr>
+<tr>
+<td>.line 12</td>
+<td>此方法位于第12行</td>
+</tr>
+<tr>
+<td>invoke-super</td>
+<td>调用父函数</td>
+</tr>
+<tr>
+<td>const&#x2F;high16  v0, 0x7fo3</td>
+<td>把0x7fo3赋值给v0</td>
+</tr>
+<tr>
+<td>invoke-direct</td>
+<td>调用函数</td>
+</tr>
+<tr>
+<td>return-void</td>
+<td>函数返回void</td>
+</tr>
+<tr>
+<td>.end method</td>
+<td>函数结束</td>
+</tr>
+<tr>
+<td>new-instance</td>
+<td>创建实例</td>
+</tr>
+<tr>
+<td>iput-object</td>
+<td>对象赋值</td>
+</tr>
+<tr>
+<td>iget-object</td>
+<td>调用对象</td>
+</tr>
+<tr>
+<td>invoke-static</td>
+<td>调用静态函数</td>
+</tr>
+<tr>
+<td>invoke-virtual</td>
+<td>调用protected或public方法</td>
+</tr>
+<tr>
+<td>#</td>
+<td>smali注释</td>
+</tr>
+<tr>
+<td>.locals</td>
+<td>指定方法中非参寄存器总数,出现在方法第一行</td>
+</tr>
+<tr>
+<td>.registers</td>
+<td>指定方法中寄存器总数</td>
+</tr>
+<tr>
+<td>p0</td>
+<td>在静态方法中表示当前对象实例</td>
+</tr>
+<tr>
+<td>p1</td>
+<td>表示当前onCreate方法参数</td>
+</tr>
+<tr>
+<td>v0</td>
+<td>表示本地(局部)变量,存放在locals寄存器</td>
+</tr>
+<tr>
+<td>move-result</td>
+<td>获取方法返回基本数据类型</td>
+</tr>
+<tr>
+<td>move-result-object</td>
+<td>获取方法返回对象</td>
+</tr>
+<tr>
+<td>.class public Lcom&#x2F;disney&#x2F;WMW&#x2F;WMWActivty;</td>
+<td>类名</td>
+</tr>
+<tr>
+<td>.super Lcom&#x2F;XXX&#x2F;XXX&#x2F;XXX;</td>
+<td>父类名</td>
+</tr>
+<tr>
+<td>.source “XXX.java”</td>
+<td>源文件名</td>
+</tr>
+<tr>
+<td>.implements Lcom&#x2F;XXX&#x2F;XXX&#x2F;XXX;</td>
+<td>实现了接口</td>
+</tr>
+<tr>
+<td>.annotation</td>
+<td>内部类</td>
+</tr>
+</tbody></table>
+<h2 id="4-4-Smail-基本数据类型"><a href="#4-4-Smail-基本数据类型" class="headerlink" title="4.4 Smail 基本数据类型"></a>4.4 Smail 基本数据类型</h2><table>
+<thead>
+<tr>
+<th>smali类型</th>
+<th>java类型</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>V</td>
+<td>void</td>
+</tr>
+<tr>
+<td>Z</td>
+<td>boolean</td>
+</tr>
+<tr>
+<td>B</td>
+<td>byte</td>
+</tr>
+<tr>
+<td>S</td>
+<td>short</td>
+</tr>
+<tr>
+<td>C</td>
+<td>char</td>
+</tr>
+<tr>
+<td>I</td>
+<td>int</td>
+</tr>
+<tr>
+<td>J</td>
+<td>long （64位 需要2个寄存器存储）</td>
+</tr>
+<tr>
+<td>F</td>
+<td>float</td>
+</tr>
+<tr>
+<td>D</td>
+<td>double （64位 需要2个寄存器存储）</td>
+</tr>
+<tr>
+<td>L</td>
+<td>Java类类型</td>
+</tr>
+<tr>
+<td>[</td>
+<td>数组类型</td>
+</tr>
+</tbody></table>
+<h2 id="4-5-Smail-对象"><a href="#4-5-Smail-对象" class="headerlink" title="4.5  Smail 对象"></a>4.5  Smail 对象</h2><table>
+<thead>
+<tr>
+<th>smali对象</th>
+<th>java对象</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Lpackage&#x2F;name&#x2F;ObjectName;</td>
+<td>package.name.ObjectName</td>
+</tr>
+<tr>
+<td>Ljava&#x2F;lang&#x2F;String;</td>
+<td>java.lang.String</td>
+</tr>
+<tr>
+<td>L 表示对象类型</td>
+<td></td>
+</tr>
+<tr>
+<td>package&#x2F;name 表示包名</td>
+<td></td>
+</tr>
+<tr>
+<td>; 表示结束</td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id="4-6-Smail-数组"><a href="#4-6-Smail-数组" class="headerlink" title="4.6  Smail 数组"></a>4.6  Smail 数组</h2><table>
+<thead>
+<tr>
+<th>smali数组</th>
+<th>java数组</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>[I</td>
+<td>int[] 一维数组</td>
+</tr>
+<tr>
+<td>[[I</td>
+<td>int[][] 二维数组</td>
+</tr>
+<tr>
+<td>[Ljava&#x2F;lang&#x2F;String</td>
+<td>String[] 对象数组</td>
+</tr>
+</tbody></table>
+<ul>
+<li>注：每一维最多255个</li>
+<li>一维数组在类型的左边加一个方括号，比如：[I 等同于Java的 int[ ] ，[F 等同于Java的 float[ ] ，每多一维就加一个方括号，最多可以设置255维。</li>
+</ul>
+<h2 id="4-7-Smail-类字段-x2F-变量"><a href="#4-7-Smail-类字段-x2F-变量" class="headerlink" title="4.7 Smail 类字段&#x2F;变量"></a>4.7 Smail 类字段&#x2F;变量</h2><p>Lpackage&#x2F;name&#x2F;ObjectName;——&gt;FieldName:Ljava&#x2F;lang&#x2F;String;</p>
+<table>
+<thead>
+<tr>
+<th>smali字段</th>
+<th>java字段</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>public f1:Z</td>
+<td>public boolean f1;</td>
+</tr>
+<tr>
+<td>public f2:I</td>
+<td>public int f2;</td>
+</tr>
+<tr>
+<td>public f3:L</td>
+<td>java&#x2F;lang&#x2F;String; public String f3;</td>
+</tr>
+</tbody></table>
+<h3 id="4-7-1-赋值"><a href="#4-7-1-赋值" class="headerlink" title="4.7.1 赋值"></a>4.7.1 赋值</h3><ul>
+<li>赋值<ul>
+<li>静态static</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs smali">const-string v0, <span class="hljs-string">&quot;Hello Smali&quot;</span><br><span class="hljs-built_in"></span><br><span class="hljs-built_in">sput-object </span>v0, <span class="hljs-class">Lcom/MyActivity;</span>-&gt;name:<span class="hljs-class">Ljava/lang/String;</span><br><br>````<br><br>相当于java代码 MyActivity.name = <span class="hljs-string">&quot;Hello Smali&quot;</span><br><br>- 赋值<br>	- 非静态instance<br><br></code></pre></td></tr></table></figure>
+<p>.local v0, act:Lcom&#x2F;MyActivity;</p>
+<p>const&#x2F;4 v1, 0x2</p>
+<p>iput v1, v0, Lcom&#x2F;MyActivity;-&gt;name:Ljava&#x2F;lang&#x2F;String;</p>
+<figure class="highlight clean"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs clean"><br>相当于java代码 act.name = <span class="hljs-string">&quot;Hello Smali&quot;</span><br><br><br>### <span class="hljs-number">4.7</span><span class="hljs-number">.2</span>  取值<br><br>- 取值<br>	- 静态(static fields)<br><br></code></pre></td></tr></table></figure>
+<p>sget-object v0, Lcom&#x2F;MyActivity;-&gt;name:Ljava&#x2F;lang&#x2F;String;</p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs mipsasm"><br>相当于<span class="hljs-keyword">java代码 </span><span class="hljs-built_in">v0</span> = MyActivity.name;<br><br>- 取值<br>	- 非静态(<span class="hljs-keyword">instance </span>fields)<br><br></code></pre></td></tr></table></figure>
+<p>.local v0, act:Lcom&#x2F;MyActivity;</p>
+<p>iget-object v1, v0 Lcom&#x2F;MyActivity;-&gt;name:Ljava&#x2F;lang&#x2F;String;</p>
+<figure class="highlight gherkin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs gherkin"><br>相当于java代码 v1 = act.name;<br><br><span class="hljs-comment">## 4.8 类方法/函数</span><br><br>|<span class="hljs-string">smali方法    </span>|<span class="hljs-string">   java方法</span>|<br>|<span class="hljs-string">-------</span>|<span class="hljs-string">------</span>|<br>|<span class="hljs-string">myMethod([I)Ljava/lang/String;</span>|<span class="hljs-string">String myMethod(int[])</span>|<br><br>例如：<br></code></pre></td></tr></table></figure>
+<p>Lpackage&#x2F;name&#x2F;ObjectName;-&gt;MethodName(III)Z</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs gradle">第一部分：Lpackage<span class="hljs-regexp">/name/</span>ObjectName；用于声明具体的类型，以便JVM寻找<br><br>第二部分：MethodName(III)Z，其中 MethodName 为具体的方法名，()中的字符，表示了参数数量和类型，即<span class="hljs-number">3</span>个<span class="hljs-keyword">int</span>型参数，Z为返回值的类型，返回<span class="hljs-keyword">Boolean</span>类型<br><br>由于方法的参数列表没有使用逗号这样的分隔符进行划分，所以只能从左到右，根据类型定义来区分参数个数。<br><br>通过几个例子来说明,以java.lang.String为例:<br></code></pre></td></tr></table></figure>
+<p>java方法:public char charAt(int index){…}<br>Davilk描述:Ljava&#x2F;lang&#x2F;String;-&gt;charAt(I)C</p>
+<p>java方法:public void getChars(int srcBegin,int srcEnd,char dst[],int dstBegin){…}<br>Davilk描述:Ljava&#x2F;lang&#x2F;String;-&gt;getChars(II[CI)V</p>
+<p>java方法:public boolean equals(Object anObject){…}<br>Davilk描述:Ljava&#x2F;lang&#x2F;String;-&gt;equals(Ljava&#x2F;lang&#x2F;Object)Z</p>
+<p>&#96;&#96;&#96;&#96;</p>
+<p>如果需要调用构造方法，则MethodName为：<init></p>
+<p><strong>例子</strong></p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs gradle">String对象在Smali中为：Ljava<span class="hljs-regexp">/lang/</span>String<br><br>Class1对象的一个<span class="hljs-keyword">Boolean</span>成员表示为：Lcom<span class="hljs-regexp">/disney/</span>Class1;-&gt;isRunning:Z<br><br>Class2对象的一个String对象成员表示为：Lcom<span class="hljs-regexp">/disney/</span>Class2;-&gt;name:Ljava<span class="hljs-regexp">/lang/</span>String<br></code></pre></td></tr></table></figure>
+<ul>
+<li>总结为<figure class="highlight clean"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs clean">对象类型 -&gt; 成员名 : 成员类型<br>-&gt; 表示所属关系，类型尾部必须包括一个分号<br></code></pre></td></tr></table></figure></li>
+</ul>
+<p>&#x2F;&#x2F;Samli代码</p>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs smali"><span class="hljs-keyword">.method</span><span class="hljs-keyword"> protected</span> onCreate(<span class="hljs-class">Landroid/os/Bundle;</span>)V<br><br><span class="hljs-keyword">.locals</span> 1<br><br><span class="hljs-keyword">.parameter</span> <span class="hljs-string">&quot;savedInstanceState&quot;</span><br><br><span class="hljs-keyword">.prologue</span><br><br><span class="hljs-keyword">.line</span> 8<br><span class="hljs-built_in"></span><br><span class="hljs-built_in">invoke-super </span>&#123;p0, p1&#125;, <span class="hljs-class">Landroid/app/Activity;</span>-&gt;onCreate(<span class="hljs-class">Landroid/os/Bundle;</span>)V<br><br><span class="hljs-keyword">.line</span> 9<br><span class="hljs-built_in"></span><br><span class="hljs-built_in">const/high16 </span>v0, 0x7f03<br><span class="hljs-built_in"></span><br><span class="hljs-built_in">invoke-virtual </span>&#123;p0, v0&#125;, <span class="hljs-class">Lcom/fusijie/helloworld/MainActivity;</span>-&gt;setContentView(I)V<br><br><span class="hljs-keyword">.line</span> 10<br><span class="hljs-built_in"></span><br><span class="hljs-built_in">return-void</span><br><span class="hljs-built_in"></span><span class="hljs-keyword"></span><br><span class="hljs-keyword">.end method</span><br><br></code></pre></td></tr></table></figure>
+
+
+<p>&#x2F;&#x2F;Java代码</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs reasonml"><br>protected void on<span class="hljs-constructor">Create(Bundle <span class="hljs-params">savedInstanceState</span>)</span> &#123;<br><br>super.on<span class="hljs-constructor">Create(<span class="hljs-params">savedInstanceState</span>)</span>;<br><br>set<span class="hljs-constructor">ContentView(R.<span class="hljs-params">layout</span>.<span class="hljs-params">activity_main</span>)</span>;<br><br>&#125;<br><br></code></pre></td></tr></table></figure>
+<h3 id="4-8-1-Smali函数分析"><a href="#4-8-1-Smali函数分析" class="headerlink" title="4.8.1  Smali函数分析"></a>4.8.1  Smali函数分析</h3><h4 id="4-8-1-1-类型"><a href="#4-8-1-1-类型" class="headerlink" title="4.8.1.1  类型"></a>4.8.1.1  类型</h4><p>smali中的函数和成员变量一样也分为两种:</p>
+<ul>
+<li>direct</li>
+<li>virtual<br>(1) direct method 就是 private 函数.</li>
+</ul>
+<p>(2)其余的public 和 protected 函数都属于 virtual method.</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs cpp">eg:<br>invoke-direct,invoke-<span class="hljs-keyword">virtual</span>,invole-<span class="hljs-type">static</span><br>invole-XXX/<span class="hljs-built_in">range</span> (参数大于等于<span class="hljs-number">5</span>个时候调用的指令)<br></code></pre></td></tr></table></figure>
+
+<h5 id="4-8-1-1-1-invoke-static"><a href="#4-8-1-1-1-invoke-static" class="headerlink" title="4.8.1.1.1 invoke-static"></a>4.8.1.1.1 invoke-static</h5><ul>
+<li><p>用于调用static 函数</p>
+</li>
+<li><p>eg:<br>invoke-static{},Lcom&#x2F;aaa;-&gt;CheckSignature()Z</p>
+</li>
+<li><p>static后面的一对大括号{},实际就是调用该方法的实例 + 参数列表, 由于方法即不需要参数也是static, 所以{}为空.</p>
+</li>
+<li><p>eg:<br>const-string v0,”NDKLIB”<br>invoke-staticP{v0},Ljava&#x2F;lang&#x2F;System;-&gt;loadLibrary(Ljava&#x2F;lang&#x2F;String;)V</p>
+</li>
+<li><p>static void System.loadLibrary(String) 来加载 NDK编译的so库用的方法, 就是说这里的v0 就是参数”NDKLIB”</p>
+</li>
+</ul>
+<h5 id="4-8-1-1-2-invoke-super"><a href="#4-8-1-1-2-invoke-super" class="headerlink" title="4.8.1.1.2  invoke-super"></a>4.8.1.1.2  invoke-super</h5><ul>
+<li>用于调用父类方法用的指令, 一般用于onCreate,onDestory等方法</li>
+</ul>
+<h5 id="4-8-1-1-3-invoke-direct"><a href="#4-8-1-1-3-invoke-direct" class="headerlink" title="4.8.1.1.3  invoke-direct"></a>4.8.1.1.3  invoke-direct</h5><ul>
+<li><p>调用private 函数</p>
+</li>
+<li><p>eg:<br>  invoke-direct{p0},Landroid&#x2F;app&#x2F;TabActivity;-&gt;<init>()V</p>
+</li>
+<li><p>这里init()就是定义在TabActivity中的一个private函数</p>
+</li>
+</ul>
+<h5 id="4-8-1-1-4-invoke-virtual"><a href="#4-8-1-1-4-invoke-virtual" class="headerlink" title="4.8.1.1.4  invoke-virtual"></a>4.8.1.1.4  invoke-virtual</h5><ul>
+<li><p>用于调用protectd或 public函数, 同时要注意修改smali时候不要错用invoke-direct或 invoke-static</p>
+</li>
+<li><p>eg:<br>  sget-object v0,Lcom&#x2F;ddd;-&gt;bbb:Lcom&#x2F;ccc;</p>
+<p>  invoke-virtual{v0,v1},Lcom&#x2F;ccc;-&gt;Message(Ljava&#x2F;lang&#x2F;Object;)V</p>
+</li>
+<li><p>v0  就是 bbb:Lcom&#x2F;ccc</p>
+</li>
+<li><p>v1  就是 Ljava&#x2F;lang&#x2F;Object参数</p>
+</li>
+</ul>
+<h5 id="4-8-1-1-5-invoke-xxx-x2F-range"><a href="#4-8-1-1-5-invoke-xxx-x2F-range" class="headerlink" title="4.8.1.1.5  invoke-xxx&#x2F;range"></a>4.8.1.1.5  invoke-xxx&#x2F;range</h5><ul>
+<li><p>当方法的参数大于等于5个时候,需要在后面加上 “&#x2F;range”, range表示范围,使用方法也与以上不同</p>
+</li>
+<li><p>eg:<br>  invoke-direct&#x2F;range{v0..v5<br>},Lcom&#x2F;pb&#x2F;ui&#x2F;TestActivity;-&gt;<br>h(ILjava&#x2F;lang&#x2F;String,Ljava&#x2F;lang&#x2F;String;Landroid&#x2F;content&#x2F;intent;I)Z</p>
+</li>
+<li><p>表示需要传递v0到v5 一共6个参数,大括号里的参数采用省略形式, 且需要连续</p>
+</li>
+</ul>
+<h5 id="4-8-1-1-6-Smali-中函数返回结果的操作"><a href="#4-8-1-1-6-Smali-中函数返回结果的操作" class="headerlink" title="4.8.1.1.6 Smali 中函数返回结果的操作"></a>4.8.1.1.6 Smali 中函数返回结果的操作</h5><ul>
+<li><p>Smali中需要分开来表示调用函数和返回函数结果</p>
+</li>
+<li><p>如果调用的函数返回非void, 还需要<br>move-result(返回基本数据类型)和move-result-object(返回对象)指令:</p>
+</li>
+<li><p>eg:<br>const-string v0,”Eric”<br>invoke-static{v0},Lcom&#x2F;pbi;-&gt;t(Ljava&#x2F;lang&#x2F;String;)Ljava&#x2F;lang&#x2F;String;<br>move-result-object v2;</p>
+</li>
+<li><p>这里 v2保存的就是调用t方法返回的字符串</p>
+</li>
+</ul>
+<h3 id="4-8-2-Smali局部变量"><a href="#4-8-2-Smali局部变量" class="headerlink" title="4.8.2 Smali局部变量"></a>4.8.2 Smali局部变量</h3><ul>
+<li>本地寄存器 (local register, 非参寄存器)</li>
+</ul>
+<p>常用v开头数字结尾的符号表示 v0,v1,v2…</p>
+<ul>
+<li>参数寄存器 (parameter regisgter)</li>
+</ul>
+<p>常用p开头数字结尾的符号来表示 p1,p2,p3…</p>
+<ul>
+<li>.register 用来标明方法中寄存器的总数,即参数寄存器和非参寄存器</li>
+</ul>
+<p>.local 标明在这个函数中最少要用到本地寄存器的个数,出现在方法第一行.</p>
+<h4 id="4-8-2-1-条件判断语句-if"><a href="#4-8-2-1-条件判断语句-if" class="headerlink" title="4.8.2.1 条件判断语句(if)"></a>4.8.2.1 条件判断语句(if)</h4><ul>
+<li>if-gt 大于</li>
+<li>if-ge 大于等于</li>
+<li>if-lt 小于</li>
+<li>if-le 小于等于</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>java</th>
+<th>smali</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>if(vA&#x3D;&#x3D;vB)</td>
+<td>if-eq vA,vB</td>
+<td>如果vA等于vB</td>
+</tr>
+<tr>
+<td>if(vA!&#x3D;vB)</td>
+<td>if-ne vA,vB</td>
+<td>如果vA不等于vB</td>
+</tr>
+<tr>
+<td>if(vA&lt;vB)</td>
+<td>if-lt vA,vB</td>
+<td>如果vA小于vB</td>
+</tr>
+<tr>
+<td>if(vA&lt;&#x3D;vB)</td>
+<td>if-le vA,vB</td>
+<td>如果vA小于等于vB</td>
+</tr>
+<tr>
+<td>if(vA&gt;vB)</td>
+<td>if-gt vA,vB</td>
+<td>如果vA大于vB</td>
+</tr>
+<tr>
+<td>if(vA&gt;&#x3D;vB)</td>
+<td>if-ge vA,vB</td>
+<td>如果vA大于等于vB</td>
+</tr>
+<tr>
+<td>if(vA&#x3D;&#x3D;0)</td>
+<td>if-eqz vA</td>
+<td>如果vA等于0</td>
+</tr>
+<tr>
+<td>if(vA!&#x3D;0)</td>
+<td>if-nez vA</td>
+<td>如果vA不等于0</td>
+</tr>
+<tr>
+<td>if(vA&lt;0)</td>
+<td>if-ltz vA</td>
+<td>如果vA小于0</td>
+</tr>
+<tr>
+<td>if(vA&gt;0)</td>
+<td>if-gtz vA</td>
+<td>如果vA大于0</td>
+</tr>
+<tr>
+<td>if(vA&gt;&#x3D;0)</td>
+<td>if-gez vA</td>
+<td>如果vA大于等于0</td>
+</tr>
+<tr>
+<td>if(vA&lt;&#x3D;0)</td>
+<td>if-lez vA</td>
+<td>如果vA小于等于0</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>private boolean isFlag</td>
+<td>.field private isFlag:z</td>
+<td>定义变量</td>
+</tr>
+<tr>
+<td>Package</td>
+<td>.class<br>.super<br>.local<br>.method<br>.parameter<br>.prologue<br>.line 12</td>
+<td>指定当前的类名<br>所继承的父类<br>定义使用局部变量<br>方法<br>方法参数<br>方法开始<br>此方法位于.java中的第12行，可以在混淆稳重去除，去除不影响运行结果</td>
+</tr>
+<tr>
+<td>super</td>
+<td>invoke-super<br>const&#x2F;high16 v0, 0x7fo3<br>invoke-direct</td>
+<td>调用父函数<br>把0x7fo3赋值给v0<br>调用函数</td>
+</tr>
+<tr>
+<td>return</td>
+<td>Return-void<br>.end method</td>
+<td>函数返回void<br>函数结束</td>
+</tr>
+<tr>
+<td>new</td>
+<td>new-instance<br>iput-object<br>iget-object</td>
+<td>创建实例<br>对象赋值<br>调用对象</td>
+</tr>
+</tbody></table>
+<p>定义一个函数的时候会首先定义这个函数里面有几个寄存器，寄存器版本不同，寄存器的数量也是不一定是一样的</p>
+<h3 id="4-8-3-Smali的包信息"><a href="#4-8-3-Smali的包信息" class="headerlink" title="4.8.3 Smali的包信息"></a>4.8.3 Smali的包信息</h3><ul>
+<li>.class public Lcom&#x2F;aaa;</li>
+<li>.super Lcom&#x2F;bbb;</li>
+<li>.source “ccc.java”</li>
+</ul>
+<h4 id="4-8-3-1-说明"><a href="#4-8-3-1-说明" class="headerlink" title="4.8.3.1 说明"></a>4.8.3.1 说明</h4><ul>
+<li>是com.aaa 这个package下的一个类</li>
+<li>继承自 com.bbb这个类</li>
+<li>是由 ccc.java这个类编译得到的smali文件</li>
+</ul>
+<h3 id="4-8-4-Smali字段声明指令"><a href="#4-8-4-Smali字段声明指令" class="headerlink" title="4.8.4 Smali字段声明指令"></a>4.8.4 Smali字段声明指令</h3><p>smali文件中字段的声明使用“.field”指令，字段有静态字段与实例字段两种:</p>
+<p>静态字段：</p>
+<figure class="highlight gherkin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs gherkin"><span class="hljs-comment"># static fields</span><br>.field <span class="hljs-variable">&lt;访问权限&gt;</span> static [修饰关键字] <span class="hljs-variable">&lt;字段名&gt;</span>:<span class="hljs-variable">&lt;字段类型&gt;</span><br><br></code></pre></td></tr></table></figure>
+<p>实例字段：</p>
+<figure class="highlight gherkin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs gherkin"><span class="hljs-comment"># instance fields  </span><br>.field <span class="hljs-variable">&lt;访问权限&gt;</span> [修饰关键字] <span class="hljs-variable">&lt;字段名&gt;</span>:<span class="hljs-variable">&lt;字段类型&gt;</span>  <br></code></pre></td></tr></table></figure>
+
+<p>Java代码：</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs gradle"><br><span class="hljs-comment">//实例字段</span><br><span class="hljs-keyword">private</span> <span class="hljs-keyword">byte</span> byteType=<span class="hljs-number">0</span>;<br><span class="hljs-keyword">private</span> <span class="hljs-keyword">short</span> shortType=<span class="hljs-number">0</span>;<br><span class="hljs-keyword">private</span> <span class="hljs-keyword">int</span> intType=<span class="hljs-number">0</span>;<br><span class="hljs-keyword">private</span> <span class="hljs-keyword">long</span> longType=<span class="hljs-number">8</span>L;<br><span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span>[] intArray = &#123;<span class="hljs-number">0</span>,<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>&#125;;<br><br><span class="hljs-comment">//静态字段</span><br><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">float</span> floatType=<span class="hljs-number">0</span>F;<br><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">double</span> doubleType=<span class="hljs-number">6</span>D;<br><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">boolean</span> booleanType=<span class="hljs-keyword">Boolean</span>.<span class="hljs-keyword">TRUE</span>;<br><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">char</span> charType=<span class="hljs-string">&#x27;a&#x27;</span>;<br><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> String stringObject = <span class="hljs-string">&quot;ABC&quot;</span>;<br><br></code></pre></td></tr></table></figure>
+
+<p>Smali代码：</p>
+<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs arduino"><span class="hljs-meta"># static fields</span><br>.field <span class="hljs-keyword">private</span> <span class="hljs-type">static</span> booleanType:Z = <span class="hljs-literal">false</span><br>.field <span class="hljs-keyword">private</span> <span class="hljs-type">static</span> charType:C = <span class="hljs-string">&#x27;\u0000&#x27;</span><br>.field <span class="hljs-keyword">private</span> <span class="hljs-type">static</span> doubleType:D = <span class="hljs-number">0.0</span><br>.field <span class="hljs-keyword">private</span> <span class="hljs-type">static</span> floatType:F = <span class="hljs-number">0.0f</span><br>.field <span class="hljs-keyword">private</span> <span class="hljs-type">static</span> <span class="hljs-keyword">final</span> stringObject:Ljava/lang/<span class="hljs-type">String</span>; = <span class="hljs-string">&quot;ABC&quot;</span><br><br><span class="hljs-meta"># instance fields</span><br>.field <span class="hljs-keyword">private</span> byteType:B<br>.field <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> intArray:[I<br>.field <span class="hljs-keyword">private</span> intType:I<br>.field <span class="hljs-keyword">private</span> longType:J<br>.field <span class="hljs-keyword">private</span> shortType:S<br><br></code></pre></td></tr></table></figure>
+
+<h3 id="4-8-5-Smali数据定义指令、字段操作指令"><a href="#4-8-5-Smali数据定义指令、字段操作指令" class="headerlink" title="4.8.5 Smali数据定义指令、字段操作指令"></a>4.8.5 Smali数据定义指令、字段操作指令</h3><p>Smali数据定义指令</p>
+<table>
+<thead>
+<tr>
+<th>指令</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>const&#x2F;4 vA,#+B</td>
+<td>将数值符号扩展为32后赋值给寄存器vA</td>
+</tr>
+<tr>
+<td>const-wide&#x2F;16 vAA,#+BBBB</td>
+<td>将数值符号扩展为64位后赋值个寄存器对vAA</td>
+</tr>
+<tr>
+<td>const-string vAA,string@BBBB</td>
+<td>通过字符串索引高走字符串赋值给寄存器vAA</td>
+</tr>
+<tr>
+<td>const-class vAA,type@BBBB</td>
+<td>通过类型索引获取一个类的引用赋值给寄存器vAA</td>
+</tr>
+</tbody></table>
+<p>Smali字段操作指令-实例字段</p>
+<table>
+<thead>
+<tr>
+<th>指令</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>iget vX,pY,filed_id</td>
+<td>取值，读取pY寄存器中的对象中的filed_id字段值赋值给vX寄存器</td>
+</tr>
+<tr>
+<td>iput vX,pY,filed_id</td>
+<td>赋值，设置pY寄存器中的对象中filed_id字段的值为vX寄存器的值</td>
+</tr>
+<tr>
+<td>iget-wide vX,pY,filed_id</td>
+<td>64位，解释见 iget</td>
+</tr>
+<tr>
+<td>iput-wide vX,pY,filed_id</td>
+<td>64位，解释见 iput</td>
+</tr>
+<tr>
+<td>iget-object vX,pY,filed_id</td>
+<td>解释见 iget</td>
+</tr>
+<tr>
+<td>iput-object vX,pY,filed_id</td>
+<td>解释见 iput</td>
+</tr>
+<tr>
+<td>iget-bype、iget-short、iget-long、iget-float、iget-double、iget-boolean、iget-char</td>
+<td></td>
+</tr>
+<tr>
+<td>iput-bype、iput-short、iput-long、iput-float、iput-double、iput-boolean、iput-char</td>
+<td></td>
+</tr>
+</tbody></table>
+<p>Smali字段操作指令-静态字段</p>
+<table>
+<thead>
+<tr>
+<th>指令</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>sget vX,pY,filed_id</td>
+<td>取值，读取pY寄存器中的对象中的filed_id字段值赋值给vX寄存器</td>
+</tr>
+<tr>
+<td>sput vX,pY,filed_id</td>
+<td>赋值，设置pY寄存器中的对象中filed_id字段的值为vX寄存器的值</td>
+</tr>
+<tr>
+<td>sget-wide vX,pY,filed_id</td>
+<td>64位，解释见 sget</td>
+</tr>
+<tr>
+<td>sput-wide vX,pY,filed_id</td>
+<td>64位，解释见 sput</td>
+</tr>
+<tr>
+<td>sget-object vX,pY,filed_id</td>
+<td>解释见 sget</td>
+</tr>
+<tr>
+<td>sput-object vX,pY,filed_id</td>
+<td>解释见 sput</td>
+</tr>
+<tr>
+<td>sget-bype、sget-short、sget-long、sget-float、sget-double、sget-boolean、sget-char</td>
+<td></td>
+</tr>
+<tr>
+<td>sput-bype、sput-short、sput-long、sput-float、sput-double、sput-boolean、sput-char</td>
+<td></td>
+</tr>
+</tbody></table>
+<p>Java代码：</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs gradle"><span class="hljs-comment">//实例字段</span><br><span class="hljs-keyword">private</span> <span class="hljs-keyword">byte</span> byteType=<span class="hljs-number">0</span>;<br><span class="hljs-keyword">private</span> <span class="hljs-keyword">short</span> shortType=<span class="hljs-number">0</span>;<br><span class="hljs-keyword">private</span> <span class="hljs-keyword">int</span> intType=<span class="hljs-number">0</span>;<br><span class="hljs-keyword">private</span> <span class="hljs-keyword">long</span> longType=<span class="hljs-number">8</span>L;<br><span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span>[] intArray = &#123;<span class="hljs-number">0</span>,<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>&#125;;<br><br><span class="hljs-comment">//静态字段</span><br><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">float</span> floatType=<span class="hljs-number">0</span>F;<br><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">double</span> doubleType=<span class="hljs-number">6</span>D;<br><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">boolean</span> booleanType=<span class="hljs-keyword">Boolean</span>.<span class="hljs-keyword">TRUE</span>;<br><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">char</span> charType=<span class="hljs-string">&#x27;a&#x27;</span>;<br><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> String stringObject = <span class="hljs-string">&quot;ABC&quot;</span>;<br><br></code></pre></td></tr></table></figure>
+
+<p>Smali代码：</p>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><code class="hljs smali"><span class="hljs-comment"># direct methods 静态字段赋值</span><br><span class="hljs-keyword">.method</span><span class="hljs-keyword"> static</span><span class="hljs-keyword"> constructor</span> &lt;clinit&gt;()V<br><span class="hljs-keyword">    .registers</span> 2 <span class="hljs-comment">#.registers指令表示有2个寄存器可用</span><br><br><span class="hljs-keyword">    .prologue</span> <span class="hljs-comment">#.prologue 方法开始</span><br><span class="hljs-keyword">    .line</span> 10 <span class="hljs-comment">#行号</span><br>   <span class="hljs-built_in"> const/4 </span>v0, 0x0 <span class="hljs-comment">#</span><br>   <span class="hljs-built_in"> sput </span>v0, <span class="hljs-class">Lcom/erlin/smali/SmaliParse;</span>-&gt;floatType:F<br><br><span class="hljs-keyword">    .line</span> 11<br>   <span class="hljs-built_in"> const-wide/16 </span>v0, 0x0<br>   <span class="hljs-built_in"> sput-wide </span>v0, <span class="hljs-class">Lcom/erlin/smali/SmaliParse;</span>-&gt;doubleType:D<br><br><span class="hljs-keyword">    .line</span> 12<br>   <span class="hljs-built_in"> sget-object </span>v0, <span class="hljs-class">Ljava/lang/Boolean;</span>-&gt;TRUE:<span class="hljs-class">Ljava/lang/Boolean;</span> <span class="hljs-comment">#取Boolean对象实例，赋值给v0</span><br>   <span class="hljs-built_in"> invoke-virtual </span>&#123;v0&#125;, <span class="hljs-class">Ljava/lang/Boolean;</span>-&gt;booleanValue()Z <br>   <span class="hljs-built_in"> move-result </span>v0 <span class="hljs-comment">#将Boolean.TRUE值赋于v0寄存器</span><br>   <span class="hljs-built_in"> sput-boolean </span>v0, <span class="hljs-class">Lcom/erlin/smali/SmaliParse;</span>-&gt;booleanType:Z <span class="hljs-comment">#将v0寄存器的值赋于booleanType字段</span><br><br><span class="hljs-keyword">    .line</span> 13<br>   <span class="hljs-built_in"> const/16 </span>v0, 0x61<br>   <span class="hljs-built_in"> sput-char </span>v0, <span class="hljs-class">Lcom/erlin/smali/SmaliParse;</span>-&gt;charType:C<br>   <span class="hljs-built_in"> return-void</span><br><span class="hljs-built_in"></span><span class="hljs-keyword">.end method</span><br><br><span class="hljs-comment"># direct methods 实例字段赋值</span><br><span class="hljs-keyword">.method</span><span class="hljs-keyword"> public</span><span class="hljs-keyword"> constructor</span> &lt;init&gt;()V<br><span class="hljs-keyword">    .registers</span> 3 <span class="hljs-comment">#.registers指令表示有3个寄存器可用</span><br><br><span class="hljs-keyword">    .prologue</span><br>   <span class="hljs-built_in"> const/4 </span>v0, 0x0 <span class="hljs-comment">#将0赋值给v0</span><br><br><span class="hljs-keyword">    .line</span> 3<br>   <span class="hljs-built_in"> invoke-direct </span>&#123;p0&#125;, <span class="hljs-class">Ljava/lang/Object;</span>-&gt;&lt;init&gt;()V<br><br><span class="hljs-keyword">    .line</span> 4<br>   <span class="hljs-built_in"> iput-byte </span>v0, p0, <span class="hljs-class">Lcom/erlin/smali/SmaliParse;</span>-&gt;byteType:B <span class="hljs-comment">#p0代表this,将v0的值赋值给byteType字段</span><br><br><span class="hljs-keyword">    .line</span> 5<br>   <span class="hljs-built_in"> iput-short </span>v0, p0, <span class="hljs-class">Lcom/erlin/smali/SmaliParse;</span>-&gt;shortType:S<br><br><span class="hljs-keyword">    .line</span> 6<br>   <span class="hljs-built_in"> iput </span>v0, p0, <span class="hljs-class">Lcom/erlin/smali/SmaliParse;</span>-&gt;intType:I<br><br><span class="hljs-keyword">    .line</span> 7<br>   <span class="hljs-built_in"> const-wide/16 </span>v0, 0x0<br>   <span class="hljs-built_in"> iput-wide </span>v0, p0, <span class="hljs-class">Lcom/erlin/smali/SmaliParse;</span>-&gt;longType:J<br><br><span class="hljs-keyword">    .line</span> 8<br>   <span class="hljs-built_in"> const/4 </span>v0, 0x5 <span class="hljs-comment">#数组长度赋值给v0寄存器</span><br>   <span class="hljs-built_in"> new-array </span>v0, v0, [I <span class="hljs-comment">#创建指定类型[I即int数组，长度为v0即5，并将数组引用赋值于v0寄存器</span><br>   <span class="hljs-built_in"> fill-array-data </span>v0,<span class="hljs-keyword"> :array_18</span> <span class="hljs-comment">#用指定标记array_18处的数据填充数组</span><br>   <span class="hljs-built_in"> iput-object </span>v0, p0, <span class="hljs-class">Lcom/erlin/smali/SmaliParse;</span>-&gt;intArray:[I <span class="hljs-comment">#为数组赋值</span><br>   <span class="hljs-built_in"> return-void </span><br><br>   <span class="hljs-built_in"> nop </span><span class="hljs-comment">#空 指令</span><br><br>   <span class="hljs-keyword"> :array_18</span><br><span class="hljs-keyword">    .array</span>-data 4<br>        0x0<br>        0x1<br>        0x2<br>        0x3<br>        0x4<span class="hljs-keyword"></span><br><span class="hljs-keyword">    .end array</span>-data<span class="hljs-keyword"></span><br><span class="hljs-keyword">.end method</span><br><br><br></code></pre></td></tr></table></figure>
+
+<h3 id="4-8-6-Smali空指令"><a href="#4-8-6-Smali空指令" class="headerlink" title="4.8.6 Smali空指令"></a>4.8.6 Smali空指令</h3><table>
+<thead>
+<tr>
+<th>指令</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>nop</td>
+<td>空操作指令，通常用于代码对齐，不进行实际操作，值为00</td>
+</tr>
+</tbody></table>
+<h3 id="Smali数组操作指令"><a href="#Smali数组操作指令" class="headerlink" title="Smali数组操作指令"></a>Smali数组操作指令</h3><p>数组操作指令包括读取数组长度、新建数组、数组赋值、数组元素取值与赋值等操作。</p>
+<table>
+<thead>
+<tr>
+<th>指令</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>array-length vA,vB</td>
+<td>获取给定vB寄存器中数组的长度并将值赋给vA寄存器</td>
+</tr>
+<tr>
+<td>new-array vA,vB,type@CCCC</td>
+<td>构造指定类型（type@CCCC）与大小（vB）的数组，并将值赋给vA寄存器</td>
+</tr>
+<tr>
+<td>new-array&#x2F;jumbo vAAAA,vBBBB,type@CCCCCCCC</td>
+<td>指令功能与上一条指令相同，只是寄存器与指令的索引取值范围更大</td>
+</tr>
+<tr>
+<td>filled-new-array {vC,vD,vE,vF,vG},type@BBBB</td>
+<td>构造指定类型（type@BBBB）与大小（vA）的数组并填充数组内容。vA寄存器是隐含使用的，除了指定数组的大小外还制订了参数的个数，vC~vG是使用到的参数寄存器序列</td>
+</tr>
+<tr>
+<td>filled-new-array&#x2F;range {vCCCC, … ,vNNNN},type@BBBB</td>
+<td>指定功能与上一条指令相同，只是参数寄存器使用range字节码后缀指定了取值范围，vC是第一个参数寄存器， N&#x3D;A+C-1。</td>
+</tr>
+<tr>
+<td>filled-new-array&#x2F;jumbo {vCCCC, … ,vNNNN},type@BBBBBBBB</td>
+<td>指令功能与上一条指令相同，只是寄存器与指令的索引取值范围更大.</td>
+</tr>
+<tr>
+<td>arrayop vAA,vBB,vCC</td>
+<td>对vBB寄存器指定的数组元素进入取值与赋值。vCC寄存器指定数组元素索引，vAA寄存器用来寄放读取的或需要设置的数组元素的值。读取元素使用 aget类指令，元素赋值使用aput指令，元素赋值使用aput类指令，根据数组中存储的类型指令后面会紧跟不同的指令后缀，指令列表有aget、 aget-wide、aget-object、aget-boolean、aget-byte、aget-char、aget-short、aput、 aput-wide、aput-boolean、aput-byte、aput-char、aput-short。</td>
+</tr>
+</tbody></table>
+<p>java代码：</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs angelscript"><span class="hljs-keyword">public</span> <span class="hljs-built_in">void</span> <span class="hljs-built_in">array</span>() &#123;<br>    <span class="hljs-built_in">int</span>[] <span class="hljs-built_in">int</span>Array = &#123;<span class="hljs-number">10</span>, <span class="hljs-number">-1</span>, <span class="hljs-number">9</span>&#125;;<br>    <span class="hljs-built_in">int</span> len = <span class="hljs-built_in">int</span>Array.length;<br><br>    String[] <span class="hljs-built_in">string</span>Array = new String[len];<br>    <span class="hljs-built_in">string</span>Array[<span class="hljs-number">0</span>] = <span class="hljs-string">&quot;A&quot;</span>;<br>    <span class="hljs-built_in">string</span>Array[<span class="hljs-number">1</span>] = <span class="hljs-string">&quot;B&quot;</span>;<br>    <span class="hljs-built_in">string</span>Array[<span class="hljs-number">2</span>] = <span class="hljs-string">&quot;C&quot;</span>;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<p>Smali代码：</p>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><code class="hljs smali"><span class="hljs-keyword">.method</span><span class="hljs-keyword"> public</span> array()V<br><span class="hljs-keyword">    .registers</span> 6 <span class="hljs-comment">#.registers 声明6个寄存器</span><br><br><span class="hljs-keyword">    .prologue</span><br><span class="hljs-keyword">    .line</span> 5<br>   <span class="hljs-built_in"> const/4 </span>v3, 0x3 <span class="hljs-comment">#将0x3寄存给v3寄存器</span><br>   <span class="hljs-built_in"> new-array </span>v0, v3, [I <span class="hljs-comment">#创建[I类型长度为v3寄存器数组，引用赋值给v0寄存器</span><br>   <span class="hljs-built_in"> fill-array-data </span>v0,<span class="hljs-keyword"> :array_1a</span> <span class="hljs-comment">#用array_1a标记处数据，赋值于v0寄存器</span><br><br><span class="hljs-keyword">    .line</span> 6<br><span class="hljs-keyword">    .local</span> v0, <span class="hljs-string">&quot;intArray&quot;</span>:[I <span class="hljs-comment">#创建指定类型数组，并用v0寄存器中的值填充数据，赋于寄存器v0</span><br>   <span class="hljs-built_in"> array-length </span>v1, v0 <span class="hljs-comment">#获取v0寄存器长度，赋值给v1寄存器</span><br><br><span class="hljs-keyword">    .line</span> 8<br><span class="hljs-keyword">    .local</span> v1, <span class="hljs-string">&quot;len&quot;</span>:I<br>   <span class="hljs-built_in"> new-array </span>v2, v1, [<span class="hljs-class">Ljava/lang/String;</span><br><br><span class="hljs-keyword">    .line</span> 9<br><span class="hljs-keyword">    .local</span> v2, <span class="hljs-string">&quot;stringArray&quot;</span>:[<span class="hljs-class">Ljava/lang/String;</span><br>   <span class="hljs-built_in"> const/4 </span>v3, 0x0<br>   <span class="hljs-built_in"> const-string </span>v4, <span class="hljs-string">&quot;A&quot;</span><br>   <span class="hljs-built_in"> aput-object </span>v4, v2, v3 <span class="hljs-comment">#v4寄存器值，赋值给v2寄存器数组，数组索引为v3</span><br><br><span class="hljs-keyword">    .line</span> 10<br>   <span class="hljs-built_in"> const/4 </span>v3, 0x1<br>   <span class="hljs-built_in"> const-string </span>v4, <span class="hljs-string">&quot;B&quot;</span><br>   <span class="hljs-built_in"> aput-object </span>v4, v2, v3<br><br><span class="hljs-keyword">    .line</span> 11<br>   <span class="hljs-built_in"> const/4 </span>v3, 0x2<br>   <span class="hljs-built_in"> const-string </span>v4, <span class="hljs-string">&quot;C&quot;</span><br>   <span class="hljs-built_in"> aput-object </span>v4, v2, v3<br><br><span class="hljs-keyword">    .line</span> 12<br>   <span class="hljs-built_in"> return-void</span><br><span class="hljs-built_in"></span><br><span class="hljs-keyword">    .line</span> 5<br>   <span class="hljs-built_in"> nop</span><br><span class="hljs-built_in"></span><br>   <span class="hljs-keyword"> :array_1a</span><br><span class="hljs-keyword">    .array</span>-data 4<br>        0xa<br>        -0x1<br>        0x9<span class="hljs-keyword"></span><br><span class="hljs-keyword">    .end array</span>-data<span class="hljs-keyword"></span><br><span class="hljs-keyword">.end method</span><br><br></code></pre></td></tr></table></figure>
+
+<h3 id="4-8-8-Smali类指令，Smali方法指令，Smali返回指令"><a href="#4-8-8-Smali类指令，Smali方法指令，Smali返回指令" class="headerlink" title="4.8.8 Smali类指令，Smali方法指令，Smali返回指令"></a>4.8.8 Smali类指令，Smali方法指令，Smali返回指令</h3><p>Smali类指令</p>
+<table>
+<thead>
+<tr>
+<th>类指令</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>.class &lt;访问权限&gt; [修饰关键字] L&lt;完整类名&gt;;</td>
+<td>表示类</td>
+</tr>
+<tr>
+<td>.super L&lt;父类完整类名&gt;;</td>
+<td>父类</td>
+</tr>
+<tr>
+<td>.source “Java类名”</td>
+<td>java文件名</td>
+</tr>
+<tr>
+<td><strong>注解指令</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>.annotation</td>
+<td>[注解属性] &lt;注解类名&gt;</td>
+</tr>
+<tr>
+<td>value &#x3D; {值列表}</td>
+<td></td>
+</tr>
+<tr>
+<td>.end annotation</td>
+<td>注解结束</td>
+</tr>
+<tr>
+<td><strong>接口指令</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>.implements&lt;接口名&gt;</td>
+<td>接口名</td>
+</tr>
+</tbody></table>
+<p>案例一：Java类</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs gradle"><span class="hljs-comment">//java</span><br><span class="hljs-keyword">package</span> com.erlin.smali;<br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> SmaliParse &#123;<span class="hljs-comment">//基类Object</span><br>    <span class="hljs-comment">//类</span><br>&#125;<br><span class="hljs-comment">//Smali</span><br>.<span class="hljs-keyword">class</span> <span class="hljs-keyword">public</span> Lcom<span class="hljs-regexp">/erlin/</span>smali/SmaliParse;<br>.<span class="hljs-keyword">super</span> Ljava<span class="hljs-regexp">/lang/</span>Object;<br>.<span class="hljs-keyword">source</span> <span class="hljs-string">&quot;SmaliParse.java&quot;</span><br><br></code></pre></td></tr></table></figure>
+
+<p>案例二：Java final类</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs gradle"><span class="hljs-comment">//Java</span><br><span class="hljs-keyword">package</span> com.erlin.smali;<br><span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">class</span> SmaliParse &#123;<span class="hljs-comment">//基类Object</span><br>    <span class="hljs-comment">//类</span><br>&#125;<br><br><span class="hljs-comment">//Smali</span><br>.<span class="hljs-keyword">class</span> <span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> Lcom<span class="hljs-regexp">/erlin/</span>smali/SmaliParse;<br>.<span class="hljs-keyword">super</span> Ljava<span class="hljs-regexp">/lang/</span>Object;<br>.<span class="hljs-keyword">source</span> <span class="hljs-string">&quot;SmaliParse.java&quot;</span><br><br></code></pre></td></tr></table></figure>
+
+<p>案例三：Java Interface类</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs gradle"><span class="hljs-comment">//Java</span><br><span class="hljs-keyword">package</span> com.erlin.smali;<br><span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-keyword">Interface</span> &#123;<br>    <span class="hljs-keyword">void</span> interfaceMethod();<br>&#125;<br><br><span class="hljs-comment">//Smali</span><br>.<span class="hljs-keyword">class</span> <span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-keyword">abstract</span> Lcom<span class="hljs-regexp">/erlin/</span>smali/<span class="hljs-keyword">Interface</span>;<br>.<span class="hljs-keyword">super</span> Ljava<span class="hljs-regexp">/lang/</span>Object;<br>.<span class="hljs-keyword">source</span> <span class="hljs-string">&quot;Interface.java&quot;</span><br><br><br># virtual methods<br>.method <span class="hljs-keyword">public</span> <span class="hljs-keyword">abstract</span> interfaceMethod()V<br>.end method<br><br></code></pre></td></tr></table></figure>
+
+<p>案例四：Java Interface类实现</p>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><code class="hljs smali">//Java<br>package com.erlin.smali;<span class="hljs-keyword"></span><br><span class="hljs-keyword">public</span> class InterfaceImpl implements Interface&#123;<br>    @Override<br>   <span class="hljs-keyword"> public</span> void interfaceMethod() &#123;<br><br>    &#125;<br>&#125;<br><br>//Smali<br><span class="hljs-keyword">.class</span><span class="hljs-keyword"> public</span> <span class="hljs-class">Lcom/erlin/smali/InterfaceImpl;</span><br><span class="hljs-keyword">.super</span> <span class="hljs-class">Ljava/lang/Object;</span><br><span class="hljs-keyword">.source</span> <span class="hljs-string">&quot;InterfaceImpl.java&quot;</span><br><br><span class="hljs-comment"># interfaces</span><br><span class="hljs-keyword">.implements</span> <span class="hljs-class">Lcom/erlin/smali/Interface;</span><br><br><br><span class="hljs-comment"># direct methods</span><br><span class="hljs-keyword">.method</span><span class="hljs-keyword"> public</span><span class="hljs-keyword"> constructor</span> &lt;init&gt;()V<br><span class="hljs-keyword">    .registers</span> 1<br><br><span class="hljs-keyword">    .prologue</span><br><span class="hljs-keyword">    .line</span> 3<br>   <span class="hljs-built_in"> invoke-direct </span>&#123;p0&#125;, <span class="hljs-class">Ljava/lang/Object;</span>-&gt;&lt;init&gt;()V<br><br>   <span class="hljs-built_in"> return-void</span><br><span class="hljs-built_in"></span><span class="hljs-keyword">.end method</span><br><br><br><span class="hljs-comment"># virtual methods</span><br><span class="hljs-keyword">.method</span><span class="hljs-keyword"> public</span> interfaceMethod()V<br><span class="hljs-keyword">    .registers</span> 1<br><br><span class="hljs-keyword">    .prologue</span><br><span class="hljs-keyword">    .line</span> 7<br>   <span class="hljs-built_in"> return-void</span><br><span class="hljs-built_in"></span><span class="hljs-keyword">.end method</span><br><br></code></pre></td></tr></table></figure>
+
+<p>案例五：抽象类</p>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><code class="hljs smali">//Java<br>package com.erlin.smali;<span class="hljs-keyword"></span><br><span class="hljs-keyword">public</span><span class="hljs-keyword"> abstract</span> class  AbstractClass &#123;<br>   <span class="hljs-keyword"> abstract</span> void<span class="hljs-keyword"> abstract</span>Method();<br><br>   <span class="hljs-keyword"> public</span> void method()&#123;<br><br>    &#125;<br>&#125;<br><br>//Smali<br><span class="hljs-keyword">.class</span><span class="hljs-keyword"> public</span><span class="hljs-keyword"> abstract</span> <span class="hljs-class">Lcom/erlin/smali/AbstractClass;</span><br><span class="hljs-keyword">.super</span> <span class="hljs-class">Ljava/lang/Object;</span><br><span class="hljs-keyword">.source</span> <span class="hljs-string">&quot;AbstractClass.java&quot;</span><br><br><br><span class="hljs-comment"># direct methods</span><br><span class="hljs-keyword">.method</span><span class="hljs-keyword"> public</span><span class="hljs-keyword"> constructor</span> &lt;init&gt;()V<br><span class="hljs-keyword">    .registers</span> 1<br><br><span class="hljs-keyword">    .prologue</span><br><span class="hljs-keyword">    .line</span> 3<br>   <span class="hljs-built_in"> invoke-direct </span>&#123;p0&#125;, <span class="hljs-class">Ljava/lang/Object;</span>-&gt;&lt;init&gt;()V<br><br>   <span class="hljs-built_in"> return-void</span><br><span class="hljs-built_in"></span><span class="hljs-keyword">.end method</span><br><br><span class="hljs-comment"># virtual methods</span><br><span class="hljs-keyword">.method</span><span class="hljs-keyword"> abstract</span><span class="hljs-keyword"> abstract</span>Method()V<span class="hljs-keyword"></span><br><span class="hljs-keyword">.end method</span><br><br><span class="hljs-keyword">.method</span><span class="hljs-keyword"> public</span> method()V<br><span class="hljs-keyword">    .registers</span> 1<br><br><span class="hljs-keyword">    .prologue</span><br><span class="hljs-keyword">    .line</span> 8<br>   <span class="hljs-built_in"> return-void</span><br><span class="hljs-built_in"></span><span class="hljs-keyword">.end method</span><br><br></code></pre></td></tr></table></figure>
+
+<p>案例六：内部类、内部接口、内部抽象类</p>
+<p>SmaliParse.java</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><code class="hljs angelscript"><span class="hljs-comment">//Java</span><br>package com.erlin.smali;<br><span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">class</span> <span class="hljs-symbol">SmaliParse</span> &#123;<br>    <span class="hljs-comment">//内部类</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-symbol">InnerClass</span>&#123;<br>        <span class="hljs-keyword">public</span> <span class="hljs-built_in">void</span> method()&#123;&#125;<br>    &#125;<br>    <span class="hljs-comment">//内部接口</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-symbol">InnerInterface</span>&#123;<br>        <span class="hljs-built_in">void</span> <span class="hljs-built_in">int</span>erfaceMethod();<br>    &#125;<br>    <span class="hljs-comment">//内部抽象类</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">abstract</span> <span class="hljs-keyword">class</span> <span class="hljs-symbol">InnerAbstractClass</span>&#123;<br>        <span class="hljs-keyword">abstract</span> <span class="hljs-built_in">void</span> <span class="hljs-built_in">int</span>erfaceMethod();<br>        <span class="hljs-keyword">public</span> <span class="hljs-built_in">void</span> method()&#123;&#125;<br>    &#125;<br>    <span class="hljs-comment">//内部类继承</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-symbol">InnerClassExtends</span> <span class="hljs-symbol">extends</span> <span class="hljs-symbol">InnerClass</span>&#123;<br>        <span class="hljs-keyword">public</span> <span class="hljs-built_in">void</span> method()&#123;&#125;<br>    &#125;<br>    <span class="hljs-comment">//内部接口实现</span><br>    <span class="hljs-keyword">class</span> <span class="hljs-symbol">InnerInterfaceImpl</span> <span class="hljs-symbol">implements</span> <span class="hljs-symbol">InnerInterface</span>&#123;<br>        <span class="hljs-keyword">public</span> <span class="hljs-built_in">void</span> method()&#123;&#125;<br>        @Override<br>        <span class="hljs-keyword">public</span> <span class="hljs-built_in">void</span> <span class="hljs-built_in">int</span>erfaceMethod() &#123;<br><br>        &#125;<br>    &#125;<br>    <span class="hljs-comment">//内部抽象类继承</span><br>    <span class="hljs-keyword">class</span> <span class="hljs-symbol">InnerAbstractClassExtends</span> <span class="hljs-symbol">extends</span> <span class="hljs-symbol">InnerAbstractClass</span>&#123;<br>        <span class="hljs-keyword">public</span> <span class="hljs-built_in">void</span> method()&#123;&#125;<br>        @Override<br>        <span class="hljs-built_in">void</span> <span class="hljs-built_in">int</span>erfaceMethod() &#123;<br><br>        &#125;<br>    &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<p>SmaliParse.Smali文件</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs awk">.class public final Lcom<span class="hljs-regexp">/erlin/</span>smali/SmaliParse;<br>.super Ljava<span class="hljs-regexp">/lang/</span>Object;<br>.source <span class="hljs-string">&quot;SmaliParse.java&quot;</span><br><br><br><span class="hljs-comment"># annotations</span><br>.annotation system Ldalvik<span class="hljs-regexp">/annotation/</span>MemberClasses;<br>    value = &#123;<br>        Lcom<span class="hljs-regexp">/erlin/</span>smali/SmaliParse<span class="hljs-variable">$InnerAbstractClassExtends</span>;,<br>        Lcom<span class="hljs-regexp">/erlin/</span>smali/SmaliParse<span class="hljs-variable">$InnerInterfaceImpl</span>;,<br>        Lcom<span class="hljs-regexp">/erlin/</span>smali/SmaliParse<span class="hljs-variable">$InnerClassExtends</span>;,<br>        Lcom<span class="hljs-regexp">/erlin/</span>smali/SmaliParse<span class="hljs-variable">$InnerAbstractClass</span>;,<br>        Lcom<span class="hljs-regexp">/erlin/</span>smali/SmaliParse<span class="hljs-variable">$InnerInterface1</span>;,<br>        Lcom<span class="hljs-regexp">/erlin/</span>smali/SmaliParse<span class="hljs-variable">$InnerInterface</span>;,<br>        Lcom<span class="hljs-regexp">/erlin/</span>smali/SmaliParse<span class="hljs-variable">$InnerClass</span>;<br>    &#125;<br>.end annotation<br><br><br><span class="hljs-comment"># direct methods</span><br>.method public constructor &lt;init&gt;()V<br>    .registers <span class="hljs-number">1</span><br><br>    .prologue<br>    .line <span class="hljs-number">3</span><br>    invoke-direct &#123;p0&#125;, Ljava<span class="hljs-regexp">/lang/</span>Object;-&gt;&lt;init&gt;()V<br><br>    return-void<br>.end method<br><br></code></pre></td></tr></table></figure>
+
+
+<p>SmaliParse$InnerClass.smali文件</p>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><code class="hljs smali"><br><span class="hljs-keyword">.class</span><span class="hljs-keyword"> public</span> <span class="hljs-class">Lcom/erlin/smali/SmaliParse$InnerClass;</span><br><span class="hljs-keyword">.super</span> <span class="hljs-class">Ljava/lang/Object;</span><br><span class="hljs-keyword">.source</span> <span class="hljs-string">&quot;SmaliParse.java&quot;</span><br><br><br><span class="hljs-comment"># annotations</span><br><span class="hljs-keyword">.annotation</span><span class="hljs-keyword"> system</span> <span class="hljs-class">Ldalvik/annotation/EnclosingClass;</span><br>    value = <span class="hljs-class">Lcom/erlin/smali/SmaliParse;</span><span class="hljs-keyword"></span><br><span class="hljs-keyword">.end annotation</span><br><br><span class="hljs-keyword">.annotation</span><span class="hljs-keyword"> system</span> <span class="hljs-class">Ldalvik/annotation/InnerClass;</span><br>    accessFlags = 0x1<br>    name = <span class="hljs-string">&quot;InnerClass&quot;</span><span class="hljs-keyword"></span><br><span class="hljs-keyword">.end annotation</span><br><br><br><span class="hljs-comment"># instance fields</span><br><span class="hljs-keyword">.field</span><span class="hljs-keyword"> final</span><span class="hljs-keyword"> synthetic</span> this$0:<span class="hljs-class">Lcom/erlin/smali/SmaliParse;</span><br><br><br><span class="hljs-comment"># direct methods</span><br><span class="hljs-keyword">.method</span><span class="hljs-keyword"> public</span><span class="hljs-keyword"> constructor</span> &lt;init&gt;(<span class="hljs-class">Lcom/erlin/smali/SmaliParse;</span>)V<br><span class="hljs-keyword">    .registers</span> 2<br><span class="hljs-keyword">    .param</span> p1, <span class="hljs-string">&quot;this$0&quot;</span>    <span class="hljs-comment"># Lcom/erlin/smali/SmaliParse;</span><br><br><span class="hljs-keyword">    .prologue</span><br><span class="hljs-keyword">    .line</span> 4<br>   <span class="hljs-built_in"> iput-object </span>p1, p0, <span class="hljs-class">Lcom/erlin/smali/SmaliParse$InnerClass;</span>-&gt;this$0:<span class="hljs-class">Lcom/erlin/smali/SmaliParse;</span><br><br>   <span class="hljs-built_in"> invoke-direct </span>&#123;p0&#125;, <span class="hljs-class">Ljava/lang/Object;</span>-&gt;&lt;init&gt;()V<br><br>   <span class="hljs-built_in"> return-void</span><br><span class="hljs-built_in"></span><span class="hljs-keyword">.end method</span><br><br><br><span class="hljs-comment"># virtual methods</span><br><span class="hljs-keyword">.method</span><span class="hljs-keyword"> public</span> method()V<br><span class="hljs-keyword">    .registers</span> 1<br><br><span class="hljs-keyword">    .prologue</span><br><span class="hljs-keyword">    .line</span> 5<br>   <span class="hljs-built_in"> return-void</span><br><span class="hljs-built_in"></span><span class="hljs-keyword">.end method</span><br><br></code></pre></td></tr></table></figure>
+
+<p>SmaliParse$InnerInterface.smali</p>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs crystal">.<span class="hljs-keyword">class</span> public interface <span class="hljs-keyword">abstract</span> Lcom/erlin/smali/SmaliParse<span class="hljs-variable">$InnerInterface</span>;<br>.<span class="hljs-keyword">super</span> Ljava/lang/Object;<br>.source <span class="hljs-string">&quot;SmaliParse.java&quot;</span><br><br><br><span class="hljs-comment"># annotations</span><br>.<span class="hljs-keyword">annotation</span> system Ldalvik/<span class="hljs-keyword">annotation</span>/<span class="hljs-title">EnclosingClass</span>;<br>    value = Lcom/erlin/smali/SmaliParse;<br>.<span class="hljs-keyword">end</span> <span class="hljs-keyword">annotation</span><br><br>.<span class="hljs-keyword">annotation</span> system Ldalvik/<span class="hljs-keyword">annotation</span>/<span class="hljs-title">InnerClass</span>;<br>    accessFlags = <span class="hljs-number">0x609</span><br>    name = <span class="hljs-string">&quot;InnerInterface&quot;</span><br>.<span class="hljs-keyword">end</span> <span class="hljs-keyword">annotation</span><br><br><br><span class="hljs-comment"># virtual methods</span><br>.method public <span class="hljs-keyword">abstract</span> interfaceMethod()V<br>.<span class="hljs-keyword">end</span> method<br><br></code></pre></td></tr></table></figure>
+
+<p>SmaliParse$InnerAbstractClass.smali</p>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><code class="hljs smali"><span class="hljs-keyword">.class</span><span class="hljs-keyword"> public</span><span class="hljs-keyword"> abstract</span> <span class="hljs-class">Lcom/erlin/smali/SmaliParse$InnerAbstractClass;</span><br><span class="hljs-keyword">.super</span> <span class="hljs-class">Ljava/lang/Object;</span><br><span class="hljs-keyword">.source</span> <span class="hljs-string">&quot;SmaliParse.java&quot;</span><br><br><br><span class="hljs-comment"># annotations</span><br><span class="hljs-keyword">.annotation</span><span class="hljs-keyword"> system</span> <span class="hljs-class">Ldalvik/annotation/EnclosingClass;</span><br>    value = <span class="hljs-class">Lcom/erlin/smali/SmaliParse;</span><span class="hljs-keyword"></span><br><span class="hljs-keyword">.end annotation</span><br><br><span class="hljs-keyword">.annotation</span><span class="hljs-keyword"> system</span> <span class="hljs-class">Ldalvik/annotation/InnerClass;</span><br>    accessFlags = 0x401<br>    name = <span class="hljs-string">&quot;InnerAbstractClass&quot;</span><span class="hljs-keyword"></span><br><span class="hljs-keyword">.end annotation</span><br><br><br><span class="hljs-comment"># instance fields</span><br><span class="hljs-keyword">.field</span><span class="hljs-keyword"> final</span><span class="hljs-keyword"> synthetic</span> this$0:<span class="hljs-class">Lcom/erlin/smali/SmaliParse;</span><br><br><br><span class="hljs-comment"># direct methods</span><br><span class="hljs-keyword">.method</span><span class="hljs-keyword"> public</span><span class="hljs-keyword"> constructor</span> &lt;init&gt;(<span class="hljs-class">Lcom/erlin/smali/SmaliParse;</span>)V<br><span class="hljs-keyword">    .registers</span> 2<br><span class="hljs-keyword">    .param</span> p1, <span class="hljs-string">&quot;this$0&quot;</span>    <span class="hljs-comment"># Lcom/erlin/smali/SmaliParse;</span><br><br><span class="hljs-keyword">    .prologue</span><br><span class="hljs-keyword">    .line</span> 15<br>   <span class="hljs-built_in"> iput-object </span>p1, p0, <span class="hljs-class">Lcom/erlin/smali/SmaliParse$InnerAbstractClass;</span>-&gt;this$0:<span class="hljs-class">Lcom/erlin/smali/SmaliParse;</span><br><br>   <span class="hljs-built_in"> invoke-direct </span>&#123;p0&#125;, <span class="hljs-class">Ljava/lang/Object;</span>-&gt;&lt;init&gt;()V<br><br>   <span class="hljs-built_in"> return-void</span><br><span class="hljs-built_in"></span><span class="hljs-keyword">.end method</span><br><br><br><span class="hljs-comment"># virtual methods</span><br><span class="hljs-keyword">.method</span><span class="hljs-keyword"> abstract</span> interfaceMethod()V<span class="hljs-keyword"></span><br><span class="hljs-keyword">.end method</span><br><br><span class="hljs-keyword">.method</span><span class="hljs-keyword"> public</span> method()V<br><span class="hljs-keyword">    .registers</span> 1<br><br><span class="hljs-keyword">    .prologue</span><br><span class="hljs-keyword">    .line</span> 17<br>   <span class="hljs-built_in"> return-void</span><br><span class="hljs-built_in"></span><span class="hljs-keyword">.end method</span><br><br></code></pre></td></tr></table></figure>
+
+<p>SmaliParse$InnerInterfaceImpl.smali</p>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><code class="hljs smali"><span class="hljs-keyword">.class</span> <span class="hljs-class">Lcom/erlin/smali/SmaliParse$InnerInterfaceImpl;</span><br><span class="hljs-keyword">.super</span> <span class="hljs-class">Ljava/lang/Object;</span><br><span class="hljs-keyword">.source</span> <span class="hljs-string">&quot;SmaliParse.java&quot;</span><br><br><span class="hljs-comment"># interfaces</span><br><span class="hljs-keyword">.implements</span> <span class="hljs-class">Lcom/erlin/smali/SmaliParse$InnerInterface;</span><br><span class="hljs-keyword">.implements</span> <span class="hljs-class">Lcom/erlin/smali/SmaliParse$InnerInterface1;</span><br><br><br><span class="hljs-comment"># annotations</span><br><span class="hljs-keyword">.annotation</span><span class="hljs-keyword"> system</span> <span class="hljs-class">Ldalvik/annotation/EnclosingClass;</span><br>    value = <span class="hljs-class">Lcom/erlin/smali/SmaliParse;</span><span class="hljs-keyword"></span><br><span class="hljs-keyword">.end annotation</span><br><br><span class="hljs-keyword">.annotation</span><span class="hljs-keyword"> system</span> <span class="hljs-class">Ldalvik/annotation/InnerClass;</span><br>    accessFlags = 0x0<br>    name = <span class="hljs-string">&quot;InnerInterfaceImpl&quot;</span><span class="hljs-keyword"></span><br><span class="hljs-keyword">.end annotation</span><br><br><br><span class="hljs-comment"># instance fields</span><br><span class="hljs-keyword">.field</span><span class="hljs-keyword"> final</span><span class="hljs-keyword"> synthetic</span> this$0:<span class="hljs-class">Lcom/erlin/smali/SmaliParse;</span><br><br><br><span class="hljs-comment"># direct methods</span><br><span class="hljs-keyword">.method</span><span class="hljs-keyword"> constructor</span> &lt;init&gt;(<span class="hljs-class">Lcom/erlin/smali/SmaliParse;</span>)V<br><span class="hljs-keyword">    .registers</span> 2<br><span class="hljs-keyword">    .param</span> p1, <span class="hljs-string">&quot;this$0&quot;</span>    <span class="hljs-comment"># Lcom/erlin/smali/SmaliParse;</span><br><br><span class="hljs-keyword">    .prologue</span><br><span class="hljs-keyword">    .line</span> 24<br>   <span class="hljs-built_in"> iput-object </span>p1, p0, <span class="hljs-class">Lcom/erlin/smali/SmaliParse$InnerInterfaceImpl;</span>-&gt;this$0:<span class="hljs-class">Lcom/erlin/smali/SmaliParse;</span><br><br>   <span class="hljs-built_in"> invoke-direct </span>&#123;p0&#125;, <span class="hljs-class">Ljava/lang/Object;</span>-&gt;&lt;init&gt;()V<br><br>   <span class="hljs-built_in"> return-void</span><br><span class="hljs-built_in"></span><span class="hljs-keyword">.end method</span><br><br><br><span class="hljs-comment"># virtual methods</span><br><span class="hljs-keyword">.method</span><span class="hljs-keyword"> public</span> interfaceMethod()V<br><span class="hljs-keyword">    .registers</span> 1<br><br><span class="hljs-keyword">    .prologue</span><br><span class="hljs-keyword">    .line</span> 29<br>   <span class="hljs-built_in"> return-void</span><br><span class="hljs-built_in"></span><span class="hljs-keyword">.end method</span><br><br><span class="hljs-keyword">.method</span><span class="hljs-keyword"> public</span> interfaceMethod1()V<br><span class="hljs-keyword">    .registers</span> 1<br><br><span class="hljs-keyword">    .prologue</span><br><span class="hljs-keyword">    .line</span> 34<br>   <span class="hljs-built_in"> return-void</span><br><span class="hljs-built_in"></span><span class="hljs-keyword">.end method</span><br><br><span class="hljs-keyword">.method</span><span class="hljs-keyword"> public</span> method()V<br><span class="hljs-keyword">    .registers</span> 1<br><br><span class="hljs-keyword">    .prologue</span><br><span class="hljs-keyword">    .line</span> 25<br>   <span class="hljs-built_in"> return-void</span><br><span class="hljs-built_in"></span><span class="hljs-keyword">.end method</span><br><br></code></pre></td></tr></table></figure>
+
+<p>SmaliParse$InnerClassExtends.smali</p>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><code class="hljs smali"><span class="hljs-keyword">.class</span><span class="hljs-keyword"> public</span> <span class="hljs-class">Lcom/erlin/smali/SmaliParse$InnerClassExtends;</span><br><span class="hljs-keyword">.super</span> <span class="hljs-class">Lcom/erlin/smali/SmaliParse$InnerClass;</span><br><span class="hljs-keyword">.source</span> <span class="hljs-string">&quot;SmaliParse.java&quot;</span><br><br><br><span class="hljs-comment"># annotations</span><br><span class="hljs-keyword">.annotation</span><span class="hljs-keyword"> system</span> <span class="hljs-class">Ldalvik/annotation/EnclosingClass;</span><br>    value = <span class="hljs-class">Lcom/erlin/smali/SmaliParse;</span><span class="hljs-keyword"></span><br><span class="hljs-keyword">.end annotation</span><br><br><span class="hljs-keyword">.annotation</span><span class="hljs-keyword"> system</span> <span class="hljs-class">Ldalvik/annotation/InnerClass;</span><br>    accessFlags = 0x1<br>    name = <span class="hljs-string">&quot;InnerClassExtends&quot;</span><span class="hljs-keyword"></span><br><span class="hljs-keyword">.end annotation</span><br><br><br><span class="hljs-comment"># instance fields</span><br><span class="hljs-keyword">.field</span><span class="hljs-keyword"> final</span><span class="hljs-keyword"> synthetic</span> this$0:<span class="hljs-class">Lcom/erlin/smali/SmaliParse;</span><br><br><br><span class="hljs-comment"># direct methods</span><br><span class="hljs-keyword">.method</span><span class="hljs-keyword"> public</span><span class="hljs-keyword"> constructor</span> &lt;init&gt;(<span class="hljs-class">Lcom/erlin/smali/SmaliParse;</span>)V<br><span class="hljs-keyword">    .registers</span> 2<br><span class="hljs-keyword">    .param</span> p1, <span class="hljs-string">&quot;this$0&quot;</span>    <span class="hljs-comment"># Lcom/erlin/smali/SmaliParse;</span><br><br><span class="hljs-keyword">    .prologue</span><br><span class="hljs-keyword">    .line</span> 20<br>   <span class="hljs-built_in"> iput-object </span>p1, p0, <span class="hljs-class">Lcom/erlin/smali/SmaliParse$InnerClassExtends;</span>-&gt;this$0:<span class="hljs-class">Lcom/erlin/smali/SmaliParse;</span><br><br>   <span class="hljs-built_in"> invoke-direct </span>&#123;p0, p1&#125;, <span class="hljs-class">Lcom/erlin/smali/SmaliParse$InnerClass;</span>-&gt;&lt;init&gt;(<span class="hljs-class">Lcom/erlin/smali/SmaliParse;</span>)V<br><br>   <span class="hljs-built_in"> return-void</span><br><span class="hljs-built_in"></span><span class="hljs-keyword">.end method</span><br><br><br><span class="hljs-comment"># virtual methods</span><br><span class="hljs-keyword">.method</span><span class="hljs-keyword"> public</span> method()V<br><span class="hljs-keyword">    .registers</span> 1<br><br><span class="hljs-keyword">    .prologue</span><br><span class="hljs-keyword">    .line</span> 21<br>   <span class="hljs-built_in"> return-void</span><br><span class="hljs-built_in"></span><span class="hljs-keyword">.end method</span><br><br></code></pre></td></tr></table></figure>
+
+<p>SmaliParse$InnerAbstractClassExtends.smali</p>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><code class="hljs smali"><br><span class="hljs-keyword">.class</span> <span class="hljs-class">Lcom/erlin/smali/SmaliParse$InnerAbstractClassExtends;</span><br><span class="hljs-keyword">.super</span> <span class="hljs-class">Lcom/erlin/smali/SmaliParse$InnerAbstractClass;</span><br><span class="hljs-keyword">.source</span> <span class="hljs-string">&quot;SmaliParse.java&quot;</span><br><br><br><span class="hljs-comment"># annotations</span><br><span class="hljs-keyword">.annotation</span><span class="hljs-keyword"> system</span> <span class="hljs-class">Ldalvik/annotation/EnclosingClass;</span><br>    value = <span class="hljs-class">Lcom/erlin/smali/SmaliParse;</span><span class="hljs-keyword"></span><br><span class="hljs-keyword">.end annotation</span><br><br><span class="hljs-keyword">.annotation</span><span class="hljs-keyword"> system</span> <span class="hljs-class">Ldalvik/annotation/InnerClass;</span><br>    accessFlags = 0x0<br>    name = <span class="hljs-string">&quot;InnerAbstractClassExtends&quot;</span><span class="hljs-keyword"></span><br><span class="hljs-keyword">.end annotation</span><br><br><br><span class="hljs-comment"># instance fields</span><br><span class="hljs-keyword">.field</span><span class="hljs-keyword"> final</span><span class="hljs-keyword"> synthetic</span> this$0:<span class="hljs-class">Lcom/erlin/smali/SmaliParse;</span><br><br><br><span class="hljs-comment"># direct methods</span><br><span class="hljs-keyword">.method</span><span class="hljs-keyword"> constructor</span> &lt;init&gt;(<span class="hljs-class">Lcom/erlin/smali/SmaliParse;</span>)V<br><span class="hljs-keyword">    .registers</span> 2<br><span class="hljs-keyword">    .param</span> p1, <span class="hljs-string">&quot;this$0&quot;</span>    <span class="hljs-comment"># Lcom/erlin/smali/SmaliParse;</span><br><br><span class="hljs-keyword">    .prologue</span><br><span class="hljs-keyword">    .line</span> 37<br>   <span class="hljs-built_in"> iput-object </span>p1, p0, <span class="hljs-class">Lcom/erlin/smali/SmaliParse$InnerAbstractClassExtends;</span>-&gt;this$0:<span class="hljs-class">Lcom/erlin/smali/SmaliParse;</span><br><br>   <span class="hljs-built_in"> invoke-direct </span>&#123;p0, p1&#125;, <span class="hljs-class">Lcom/erlin/smali/SmaliParse$InnerAbstractClass;</span>-&gt;&lt;init&gt;(<span class="hljs-class">Lcom/erlin/smali/SmaliParse;</span>)V<br><br>   <span class="hljs-built_in"> return-void</span><br><span class="hljs-built_in"></span><span class="hljs-keyword">.end method</span><br><br><br><span class="hljs-comment"># virtual methods</span><br><span class="hljs-keyword">.method</span> interfaceMethod()V<br><span class="hljs-keyword">    .registers</span> 1<br><br><span class="hljs-keyword">    .prologue</span><br><span class="hljs-keyword">    .line</span> 42<br>   <span class="hljs-built_in"> return-void</span><br><span class="hljs-built_in"></span><span class="hljs-keyword">.end method</span><br><br><span class="hljs-keyword">.method</span><span class="hljs-keyword"> public</span> method()V<br><span class="hljs-keyword">    .registers</span> 1<br><br><span class="hljs-keyword">    .prologue</span><br><span class="hljs-keyword">    .line</span> 38<br>   <span class="hljs-built_in"> return-void</span><br><span class="hljs-built_in"></span><span class="hljs-keyword">.end method</span><br><br><br></code></pre></td></tr></table></figure>
+
+
+<ul>
+<li>Smali方法指令-静态方法</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>指令</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>.method &lt;访问权限&gt; static [修饰关键字] methodName()&lt;类型&gt;</td>
+<td></td>
+</tr>
+<tr>
+<td>.registers count</td>
+<td>方法内使用寄存器数量</td>
+</tr>
+<tr>
+<td>.prologue</td>
+<td>方法开始</td>
+</tr>
+<tr>
+<td>return-void</td>
+<td>方法返回数据类型</td>
+</tr>
+<tr>
+<td>.end method</td>
+<td>方法结束</td>
+</tr>
+</tbody></table>
+<p>案例一：</p>
+<figure class="highlight oxygene"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs oxygene"><span class="hljs-comment">//Java</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> void methodStaticSmali()<span class="hljs-comment">&#123;</span><br><span class="hljs-comment">    //静态方法</span><br><span class="hljs-comment">&#125;</span><br><br><span class="hljs-comment">//Smali</span><br>.method <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> methodStaticSmali()V<br>    .registers <span class="hljs-number">0</span><br><br>    .prologue<br>    return-void<br>.end <span class="hljs-keyword">method</span><br></code></pre></td></tr></table></figure>
+
+<p>案例二：</p>
+<figure class="highlight oxygene"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs oxygene"><span class="hljs-comment">//Java</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">static</span> void methodStaticFinalSmali() <span class="hljs-comment">&#123;</span><br><span class="hljs-comment">    //静态方法</span><br><span class="hljs-comment">&#125;</span><br><br><span class="hljs-comment">//Smail</span><br>.method <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> methodStaticFinalSmali()V<br>    .registers <span class="hljs-number">0</span><br><br>    .prologue<br>    return-void<br>.end <span class="hljs-keyword">method</span><br><br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>Smali返回指令</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>指令</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>return-void</td>
+<td>返回Void类型</td>
+</tr>
+<tr>
+<td>return vAA</td>
+<td>返回非32位对象类型值，返回值为8位寄存器vAA</td>
+</tr>
+<tr>
+<td>return-wide vAA</td>
+<td>返回非64位对象类型值，返回值为8位寄存器对vAA</td>
+</tr>
+<tr>
+<td>return-object vAA</td>
+<td>返回对象类型，返回值为8位寄存器对vAA</td>
+</tr>
+</tbody></table>
+<p>案例一：</p>
+<figure class="highlight oxygene"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs oxygene"><span class="hljs-comment">// Java</span><br><span class="hljs-keyword">public</span> void methodSmali() <span class="hljs-comment">&#123;</span><br><span class="hljs-comment">&#125;</span><br><br><span class="hljs-comment">//Smali</span><br>.method <span class="hljs-keyword">public</span> methodSmali()V<br>    .registers <span class="hljs-number">1</span><br><br>    .prologue<br>    .line <span class="hljs-number">6</span><br>    return-void<br>.end <span class="hljs-keyword">method</span><br><br></code></pre></td></tr></table></figure>
+
+
+<p>案例二：</p>
+<figure class="highlight oxygene"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs oxygene"><span class="hljs-comment">//Java</span><br><span class="hljs-keyword">public</span> int methodSmaliInt()<span class="hljs-comment">&#123;</span><br><span class="hljs-comment">    return Integer.MAX_VALUE;</span><br><span class="hljs-comment">&#125;</span><br><br><span class="hljs-comment">//Smali</span><br>.method <span class="hljs-keyword">public</span> methodSmaliInt()I<br>    .registers <span class="hljs-number">2</span><br><br>    .prologue<br>    .line <span class="hljs-number">9</span><br>    <span class="hljs-keyword">const</span> v0, <span class="hljs-number">0</span>x7fffffff<br><br>    return v0<br>.end <span class="hljs-keyword">method</span><br><br></code></pre></td></tr></table></figure>
+
+<p>案例三：</p>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs smali">//Java<span class="hljs-keyword"></span><br><span class="hljs-keyword">public</span><span class="hljs-built_in"> long </span>methodSmaliLong()&#123;<br>   <span class="hljs-built_in"> return </span><span class="hljs-class">Long.MAX_VALUE;</span><br>&#125;<br><br>//Smali<br><span class="hljs-keyword">.method</span><span class="hljs-keyword"> public</span> methodSmaliLong()J<br><span class="hljs-keyword">    .registers</span> 3<br><br><span class="hljs-keyword">    .prologue</span><br><span class="hljs-keyword">    .line</span> 13<br>   <span class="hljs-built_in"> const-wide </span>v0, 0x7fffffffffffffffL<br><br>   <span class="hljs-built_in"> return-wide </span>v0<span class="hljs-keyword"></span><br><span class="hljs-keyword">.end method</span><br><br></code></pre></td></tr></table></figure>
+
+
+<p>案例四：</p>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs smali">//Java<span class="hljs-keyword"></span><br><span class="hljs-keyword">public</span> String methodSmaliString()&#123;<br>   <span class="hljs-built_in"> return </span><span class="hljs-string">&quot;String&quot;</span>;<br>&#125;<br><br>//Smali<br><span class="hljs-keyword">.method</span><span class="hljs-keyword"> public</span> methodSmaliString()<span class="hljs-class">Ljava/lang/String;</span><br><span class="hljs-keyword">    .registers</span> 2<br><br><span class="hljs-keyword">    .prologue</span><br><span class="hljs-keyword">    .line</span> 17<br>   <span class="hljs-built_in"> const-string </span>v0, <span class="hljs-string">&quot;String&quot;</span><br><br>   <span class="hljs-built_in"> return-object </span>v0<span class="hljs-keyword"></span><br><span class="hljs-keyword">.end method</span><br><br></code></pre></td></tr></table></figure>
+
+<h4 id="4-8-8-1-方法操作指令"><a href="#4-8-8-1-方法操作指令" class="headerlink" title="4.8.8.1 方法操作指令"></a>4.8.8.1 方法操作指令</h4><p>方法调用指令负责调用类实例的方法，基础指令为invoke。</p>
+<table>
+<thead>
+<tr>
+<th>指令</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>invoke-virtual{parameters}, methodtocall</td>
+<td>虚方法调用，调用的方法运行时确认实际调用，和实例引用的实际对象有关，动态确认的，一般是带有修饰符protected或public的方法.</td>
+</tr>
+<tr>
+<td>invoke-super {parameter},methodtocall</td>
+<td>直接调用父类的虚方法，编译时，静态确认的。</td>
+</tr>
+<tr>
+<td>invoke-direct { parameters }, methodtocall</td>
+<td>没有被覆盖方法的调用，即不用动态根据实例所引用的调用，编译时，静态确认的，一般是private或<init>方法；</td>
+</tr>
+<tr>
+<td>invoke-static {parameters}, methodtocall</td>
+<td>是类静态方法的调用，编译时，静态确定的</td>
+</tr>
+<tr>
+<td>invoke-interface {parameters},methodtocall</td>
+<td>调用接口方法，调用的方法运行时确认实际调用，即会在运行时才确定一个实现此接口的对象</td>
+</tr>
+</tbody></table>
+<p>案例一：</p>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><code class="hljs smali">//Java<span class="hljs-keyword"></span><br><span class="hljs-keyword">public</span> void invokeMethod()&#123;<br>    BaseClassImpl baseClassImpl =<span class="hljs-built_in"> new </span>BaseClassImpl();<br>    baseClassImpl.baseFinalMethod();<br>    super.baseFinalMethod();<br>    baseClassImpl.staticMethod();<br>    ((Interface)baseClassImpl).interfaceMethod();<br>    baseClassImpl.method();<br>&#125;<br>//Smali<br><span class="hljs-keyword">.method</span><span class="hljs-keyword"> public</span> invokeMethod()V<br><span class="hljs-keyword">    .registers</span> 2<br><br><span class="hljs-keyword">    .prologue</span><br><span class="hljs-keyword">    .line</span> 17<br>   <span class="hljs-built_in"> new-instance </span>v0, <span class="hljs-class">Lcom/erlin/smali/BaseClassImpl;</span><br><br>   <span class="hljs-built_in"> invoke-direct </span>&#123;v0&#125;, <span class="hljs-class">Lcom/erlin/smali/BaseClassImpl;</span>-&gt;&lt;init&gt;()V<br><br><span class="hljs-keyword">    .line</span> 18<br><span class="hljs-keyword">    .local</span> v0, <span class="hljs-string">&quot;baseClassImpl&quot;</span>:<span class="hljs-class">Lcom/erlin/smali/BaseClassImpl;</span><br>   <span class="hljs-built_in"> invoke-virtual </span>&#123;v0&#125;, <span class="hljs-class">Lcom/erlin/smali/BaseClassImpl;</span>-&gt;baseFinalMethod()V<br><br><span class="hljs-keyword">    .line</span> 19<br>   <span class="hljs-built_in"> invoke-super </span>&#123;p0&#125;, <span class="hljs-class">Lcom/erlin/smali/BaseClass;</span>-&gt;baseFinalMethod()V<br><br><span class="hljs-keyword">    .line</span> 20<br>   <span class="hljs-built_in"> invoke-static </span>&#123;&#125;, <span class="hljs-class">Lcom/erlin/smali/BaseClassImpl;</span>-&gt;staticMethod()V<br><br><span class="hljs-keyword">    .line</span> 21<br>   <span class="hljs-built_in"> invoke-interface </span>&#123;v0&#125;, <span class="hljs-class">Lcom/erlin/smali/Interface;</span>-&gt;interfaceMethod()V<br><br><span class="hljs-keyword">    .line</span> 22<br>   <span class="hljs-built_in"> invoke-virtual </span>&#123;v0&#125;, <span class="hljs-class">Lcom/erlin/smali/BaseClassImpl;</span>-&gt;method()V<br><br><span class="hljs-keyword">    .line</span> 23<br>   <span class="hljs-built_in"> return-void</span><br><span class="hljs-built_in"></span><span class="hljs-keyword">.end method</span><br><br><br></code></pre></td></tr></table></figure>
+
+<h3 id="4-8-9-实例操作指令"><a href="#4-8-9-实例操作指令" class="headerlink" title="4.8.9 实例操作指令"></a>4.8.9 实例操作指令</h3><table>
+<thead>
+<tr>
+<th>指令</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>instance-of vA, vB, type@CCCC</td>
+<td>用于判断vB寄存器中对象引用是否可以转换成指定的类型，如果可以转换vA寄存器值为1，否则vA寄存器值为0</td>
+</tr>
+<tr>
+<td>例：if(innerClassExtends instanceof InnerClass){</td>
+<td></td>
+</tr>
+<tr>
+<td>}</td>
+<td></td>
+</tr>
+<tr>
+<td>check-cast vAA, type@BBBB</td>
+<td>将vAA寄存器中的对象引用转换成指定的类型，如果不能转换则抛出ClassCatException异常。如果type@BBBB指定的是基本类型，那么对非基本类型的类型vAA来说，运行将会失败。</td>
+</tr>
+<tr>
+<td>new-instance vAA,type@CCCC</td>
+<td>用于构造一个指定类型对象的新实例，并将对象引用赋值给vAA寄存器。</td>
+</tr>
+</tbody></table>
+<p>案例一：</p>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><code class="hljs smali">//Java<span class="hljs-keyword"></span><br><span class="hljs-keyword">public</span> void instanceOperationMethod()&#123;<br>    InnerClass innerClass =<span class="hljs-built_in"> new </span>InnerClass();<br>    InnerClassExtends innerClassExtends = (InnerClassExtends)innerClass;<br><br>    if(innerClass instanceof InnerClassExtends)&#123;<br><br>    &#125;<br>&#125;<br>//Smali<br><span class="hljs-comment"># virtual methods</span><br><span class="hljs-keyword">.method</span><span class="hljs-keyword"> public</span> instanceOperationMethod()V<br><span class="hljs-keyword">    .registers</span> 4<br><br><span class="hljs-keyword">    .prologue</span><br><span class="hljs-keyword">    .line</span> 41<br>   <span class="hljs-built_in"> new-instance </span>v0, <span class="hljs-class">Lcom/erlin/smali/SmaliParse$InnerClass;</span><br><br>   <span class="hljs-built_in"> invoke-direct </span>&#123;v0, p0&#125;, <span class="hljs-class">Lcom/erlin/smali/SmaliParse$InnerClass;</span>-&gt;&lt;init&gt;(<span class="hljs-class">Lcom/erlin/smali/SmaliParse;</span>)V<br><br><span class="hljs-keyword">    .local</span> v0, <span class="hljs-string">&quot;innerClass&quot;</span>:<span class="hljs-class">Lcom/erlin/smali/SmaliParse$InnerClass;</span><br>   <span class="hljs-built_in"> move-object </span>v1, v0<br><br><span class="hljs-keyword">    .line</span> 42<br>   <span class="hljs-built_in"> check-cast </span>v1, <span class="hljs-class">Lcom/erlin/smali/SmaliParse$InnerClassExtends;</span><br><br><span class="hljs-keyword">    .line</span> 44<br><span class="hljs-keyword">    .local</span> v1, <span class="hljs-string">&quot;innerClassExtends&quot;</span>:<span class="hljs-class">Lcom/erlin/smali/SmaliParse$InnerClassExtends;</span><br>   <span class="hljs-built_in"> instance-of </span>v2, v0, <span class="hljs-class">Lcom/erlin/smali/SmaliParse$InnerClassExtends;</span><br><br>   <span class="hljs-built_in"> if-eqz </span>v2,<span class="hljs-keyword"> :cond_c</span><br><br><span class="hljs-keyword">    .line</span> 47<br>   <span class="hljs-keyword"> :cond_c</span><br>   <span class="hljs-built_in"> return-void</span><br><span class="hljs-built_in"></span><span class="hljs-keyword">.end method</span><br><br></code></pre></td></tr></table></figure>
+
+<h3 id="4-8-11-Smali数据运算指令"><a href="#4-8-11-Smali数据运算指令" class="headerlink" title="4.8.11 Smali数据运算指令"></a>4.8.11 Smali数据运算指令</h3><p>Smali算数运算：加、减、乘、除、模(取余)</p>
+<table>
+<thead>
+<tr>
+<th>指令</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>add-type vAA, vBB, vCC</td>
+<td>加：type 类型后缀包括 int、long、float、double，vAA&#x3D;(vBB+vCC)</td>
+</tr>
+<tr>
+<td>sub-type vAA, vBB, vCC</td>
+<td>减：type 类型后缀包括 int、long、float、double，vAA&#x3D;(vBB-vCC)</td>
+</tr>
+<tr>
+<td>mul-type vAA, vBB, vCC</td>
+<td>乘：type 类型后缀包括 int、long、float、double，vAA&#x3D;(vBB*vCC)</td>
+</tr>
+<tr>
+<td>div-type vAA, vBB, vCC</td>
+<td>除：type 类型后缀包括 int、long、float、double，vAA&#x3D;(vBB&#x2F;vCC)</td>
+</tr>
+<tr>
+<td>rem-type vAA, vBB, vCC</td>
+<td>模：type 类型后缀包括 int、long、float、double，vAA&#x3D;(vBB%vCC)</td>
+</tr>
+</tbody></table>
+<p>Java代码：</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs perl">public void number()&#123;<br>    <span class="hljs-keyword">int</span> a = <span class="hljs-number">3</span>;<br>    <span class="hljs-keyword">int</span> b = <span class="hljs-number">7</span>;<br><br>    <span class="hljs-keyword">int</span> add = a+b;<br>    <span class="hljs-keyword">int</span> <span class="hljs-function"><span class="hljs-keyword">sub</span> = <span class="hljs-title">b</span>-<span class="hljs-title">a</span></span>;<br>    <span class="hljs-keyword">int</span> mul = a*b;<br>    <span class="hljs-keyword">int</span> div = b/a;<br>    <span class="hljs-keyword">int</span> rem = a%b;<br><br>    a++;<br>    b--;<br><br>    a+=b;<br>    b+=a;<br><br>    a*=b;<br>    b*=a;<br><br>    a/=b;<br>    b/=a;<br><br>    a%=b;<br>    b%=a;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<p>Smali代码：</p>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><code class="hljs smali"><span class="hljs-keyword">.method</span><span class="hljs-keyword"> public</span> number()V<br><span class="hljs-keyword">    .registers</span> 8<br><br><span class="hljs-keyword">    .prologue</span><br><span class="hljs-keyword">    .line</span> 5<br>   <span class="hljs-built_in"> const/4 </span>v0, 0x3<br><br><span class="hljs-keyword">    .line</span> 6<br><span class="hljs-keyword">    .local</span> v0, <span class="hljs-string">&quot;a&quot;</span>:I<br>   <span class="hljs-built_in"> const/4 </span>v2, 0x7<br><br><span class="hljs-keyword">    .line</span> 8<br><span class="hljs-keyword">    .local</span> v2, <span class="hljs-string">&quot;b&quot;</span>:I<br>   <span class="hljs-built_in"> add-int </span>v1, v0, v2 <span class="hljs-comment">#v1 = v0+v2</span><br><br><span class="hljs-keyword">    .line</span> 9<br><span class="hljs-keyword">    .local</span> v1, <span class="hljs-string">&quot;add&quot;</span>:I<br>   <span class="hljs-built_in"> sub-int </span>v6, v2, v0 <span class="hljs-comment">#v6=v2-v0</span><br><br><span class="hljs-keyword">    .line</span> 10<br><span class="hljs-keyword">    .local</span> v6, <span class="hljs-string">&quot;sub&quot;</span>:I<br>   <span class="hljs-built_in"> mul-int </span>v4, v0, v2 <span class="hljs-comment">#v4=v0*v2</span><br><br><span class="hljs-keyword">    .line</span> 11<br><span class="hljs-keyword">    .local</span> v4, <span class="hljs-string">&quot;mul&quot;</span>:I<br>   <span class="hljs-built_in"> div-int </span>v3, v2, v0 <span class="hljs-comment">#v3=v2/v0</span><br><br><span class="hljs-keyword">    .line</span> 12<br><span class="hljs-keyword">    .local</span> v3, <span class="hljs-string">&quot;div&quot;</span>:I<br>   <span class="hljs-built_in"> rem-int </span>v5, v0, v2 <span class="hljs-comment">#v5=v0%v2</span><br><br><span class="hljs-keyword">    .line</span> 14<br><span class="hljs-keyword">    .local</span> v5, <span class="hljs-string">&quot;rem&quot;</span>:I<br>   <span class="hljs-built_in"> add-int/lit8 </span>v0, v0, 0x1 <span class="hljs-comment">#v0=v0+0x1即 ++ 运算符</span><br><br><span class="hljs-keyword">    .line</span> 15<br>   <span class="hljs-built_in"> add-int/lit8 </span>v2, v2, -0x1 <span class="hljs-comment">#v2=v2-0x1即 -- 运算符</span><br><br><span class="hljs-keyword">    .line</span> 17<br>   <span class="hljs-built_in"> add-int/lit8 </span>v0, v0, 0x6 <span class="hljs-comment">#v0=v0+0x6</span><br><br><span class="hljs-keyword">    .line</span> 18<br>   <span class="hljs-built_in"> add-int/lit8 </span>v2, v2, 0xa <span class="hljs-comment">#v2=v2+0xa</span><br><br><span class="hljs-keyword">    .line</span> 20<br>   <span class="hljs-built_in"> mul-int/lit8 </span>v0, v0, 0x10<br><br><span class="hljs-keyword">    .line</span> 21<br>   <span class="hljs-built_in"> mul-int/lit16 </span>v2, v2, 0xa0<br><br><span class="hljs-keyword">    .line</span> 23<br>   <span class="hljs-built_in"> div-int/2addr </span>v0, v2 <span class="hljs-comment">#v0=v0/v2</span><br><br><span class="hljs-keyword">    .line</span> 24<br>   <span class="hljs-built_in"> div-int/2addr </span>v2, v0<br><br><span class="hljs-keyword">    .line</span> 26<br>   <span class="hljs-built_in"> rem-int/2addr </span>v0, v2 <span class="hljs-comment">#v0=v0%v2</span><br><br><span class="hljs-keyword">    .line</span> 27<br>   <span class="hljs-built_in"> rem-int/2addr </span>v2, v0<br><br><span class="hljs-keyword">    .line</span> 28<br>   <span class="hljs-built_in"> return-void</span><br><span class="hljs-built_in"></span><span class="hljs-keyword">.end method</span><br><br></code></pre></td></tr></table></figure>
+
+<p>Smali位运算符:&amp;、|、^、&lt;&lt;、&gt;&gt;</p>
+<table>
+<thead>
+<tr>
+<th>指令</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>and-type vAA, vBB, vCC</td>
+<td>and：type类型后缀包括 int、long、float、double，vAA&#x3D;(vBB and vCC)</td>
+</tr>
+<tr>
+<td>or-type vAA, vBB, vCC</td>
+<td>or：type类型后缀包括 int、long、float、double，vAA&#x3D;(vBB or vCC)</td>
+</tr>
+<tr>
+<td>xor-type vAA, vBB, vCC</td>
+<td>xor：type类型后缀包括 int、long、float、double，vAA&#x3D;(vBB xor vCC)</td>
+</tr>
+<tr>
+<td>shl-type vAA, vBB, vCC</td>
+<td>有符号左移：type类型后缀包括 int、long、float、double，vAA&#x3D;(vBB &lt;&lt; vCC)</td>
+</tr>
+<tr>
+<td>shr-type vAA, vBB, vCC</td>
+<td>有符号右移：type类型后缀包括 int、long、float、double，vAA&#x3D;(vBB &gt;&gt; vCC)</td>
+</tr>
+<tr>
+<td>ushr-type vAA, vBB, vCC</td>
+<td>无符号右移：type类型后缀包括 int、long、float、double，vAA&#x3D;(vBB &gt;&gt; vCC)</td>
+</tr>
+</tbody></table>
+<p>Java代码：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs csharp"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">number</span>()</span>&#123;<br>    <span class="hljs-built_in">int</span> a = <span class="hljs-number">3</span>;<br>    <span class="hljs-built_in">int</span> b = <span class="hljs-number">7</span>;<br><br>    <span class="hljs-built_in">int</span> c = (a&amp;b);<br>    c = (a|b);<br>    c = (a^b);<br>    c=(a&lt;&lt;b);<br>    c=(a&gt;&gt;b);<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<p>Smali代码：</p>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><code class="hljs smali"><span class="hljs-keyword">.method</span><span class="hljs-keyword"> public</span> number()V<br><span class="hljs-keyword">    .registers</span> 4<br><br><span class="hljs-keyword">    .prologue</span><br><span class="hljs-keyword">    .line</span> 5<br>   <span class="hljs-built_in"> const/4 </span>v0, 0x3<br><br><span class="hljs-keyword">    .line</span> 6<br><span class="hljs-keyword">    .local</span> v0, <span class="hljs-string">&quot;a&quot;</span>:I<br>   <span class="hljs-built_in"> const/4 </span>v1, 0x7<br><br><span class="hljs-keyword">    .line</span> 8<br><span class="hljs-keyword">    .local</span> v1, <span class="hljs-string">&quot;b&quot;</span>:I<br>   <span class="hljs-built_in"> and-int </span>v2, v0, v1<br><br><span class="hljs-keyword">    .line</span> 9<br><span class="hljs-keyword">    .local</span> v2, <span class="hljs-string">&quot;c&quot;</span>:I<br>   <span class="hljs-built_in"> or-int </span>v2, v0, v1<br><br><span class="hljs-keyword">    .line</span> 10<br>   <span class="hljs-built_in"> xor-int </span>v2, v0, v1<br><br><span class="hljs-keyword">    .line</span> 11<br>   <span class="hljs-built_in"> shl-int </span>v2, v0, v1<br><br><span class="hljs-keyword">    .line</span> 12<br>   <span class="hljs-built_in"> shr-int </span>v2, v0, v1<br><br><span class="hljs-keyword">    .line</span> 13<br>   <span class="hljs-built_in"> return-void</span><br><span class="hljs-built_in"></span><span class="hljs-keyword">.end method</span><br><br></code></pre></td></tr></table></figure>
+
+<h3 id="4-8-12-goto跳转指令"><a href="#4-8-12-goto跳转指令" class="headerlink" title="4.8.12 goto跳转指令"></a>4.8.12 goto跳转指令</h3><p>无条件跳转</p>
+<table>
+<thead>
+<tr>
+<th>指令</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>goto +AA</td>
+<td>无条件跳转到指定偏移处，偏移量不能为0,偏移宽度为8位</td>
+</tr>
+<tr>
+<td>goto&#x2F;16 +AAAA</td>
+<td>无条件跳转到指定偏移处，偏移量不能为0,偏移宽度为16位</td>
+</tr>
+<tr>
+<td>goto&#x2F;32 +AAAAAAAA</td>
+<td>无条件跳转到指定偏移处，偏移量不能为0,偏移宽度为32位</td>
+</tr>
+</tbody></table>
+<p><strong>PS:代码参见 for&#x2F;whlie 循环</strong></p>
+<h3 id="4-8-13-if跳转指令"><a href="#4-8-13-if跳转指令" class="headerlink" title="4.8.13 if跳转指令"></a>4.8.13 if跳转指令</h3><p>if-test vA, vB, +CCCC:</p>
+<table>
+<thead>
+<tr>
+<th>指令</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>if-ne vA, vB, +CCCC</td>
+<td>如果vA!&#x3D;vB,则跳转到CCCC位置</td>
+</tr>
+<tr>
+<td>if-eq vA, vB, +CCCC</td>
+<td>如果vA&#x3D;&#x3D;vB,则跳转到CCCC位置</td>
+</tr>
+<tr>
+<td>if-lt vA, vB, +CCCC</td>
+<td>如果vA &lt; vB,则跳转到CCCC位置</td>
+</tr>
+<tr>
+<td>if-le vA, vB, +CCCC</td>
+<td>如果vA &lt;&#x3D; vB,则跳转到CCCC位置</td>
+</tr>
+<tr>
+<td>if-gt vA, vB, +CCCC</td>
+<td>如果vA &gt; vB,则跳转到CCCC位置</td>
+</tr>
+<tr>
+<td>if-ge vA, vB, :CCCC</td>
+<td>如果vA &gt;&#x3D; vB,则跳转到CCCC位置</td>
+</tr>
+</tbody></table>
+<p>Java代码：</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs aspectj"><span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">ifSmali</span><span class="hljs-params">()</span></span>&#123;<br>    <span class="hljs-keyword">int</span> a = <span class="hljs-number">8</span>;<br>    <span class="hljs-keyword">int</span> b = <span class="hljs-number">8</span>;<br>    <span class="hljs-keyword">if</span>(a == b)&#123;<br>        a+=a;<br>    &#125;<span class="hljs-function"><span class="hljs-keyword">else</span> <span class="hljs-title">if</span><span class="hljs-params">(a!=b)</span></span>&#123;<br>        b+=b;<br>    &#125;<span class="hljs-function"><span class="hljs-keyword">else</span> <span class="hljs-title">if</span><span class="hljs-params">(a&lt;b)</span></span>&#123;<br>        a+=b;<br>    &#125;<span class="hljs-function"><span class="hljs-keyword">else</span> <span class="hljs-title">if</span><span class="hljs-params">(a&gt;b)</span></span>&#123;<br>        b+=a;<br>    &#125;<span class="hljs-function"><span class="hljs-keyword">else</span> <span class="hljs-title">if</span><span class="hljs-params">(a&gt;=b)</span></span>&#123;<br>        a+=<span class="hljs-number">1</span>;<br>    &#125;<span class="hljs-function"><span class="hljs-keyword">else</span> <span class="hljs-title">if</span><span class="hljs-params">(a&lt;=b)</span></span>&#123;<br>        b+=<span class="hljs-number">1</span>;<br>    &#125;<span class="hljs-keyword">else</span>&#123;<br>        a+=<span class="hljs-number">2</span>;<br>    &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<p>Smali代码：</p>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><code class="hljs smali"><span class="hljs-keyword">.method</span><span class="hljs-keyword"> public</span> ifSmali()V<br><span class="hljs-keyword">    .registers</span> 3<br><br><span class="hljs-keyword">    .prologue</span><br><span class="hljs-keyword">    .line</span> 19<br>   <span class="hljs-built_in"> const/16 </span>v0, 0x8<br><br><span class="hljs-keyword">    .line</span> 20<br><span class="hljs-keyword">    .local</span> v0, <span class="hljs-string">&quot;a&quot;</span>:I<br>   <span class="hljs-built_in"> const/16 </span>v1, 0x8<br><br><span class="hljs-keyword">    .line</span> 21<br><span class="hljs-keyword">    .local</span> v1, <span class="hljs-string">&quot;b&quot;</span>:I<br>   <span class="hljs-built_in"> if-ne </span>v0, v1,<span class="hljs-keyword"> :cond_8</span><br><br><span class="hljs-keyword">    .line</span> 22<br>   <span class="hljs-built_in"> add-int/2addr </span>v0, v0<br><br><span class="hljs-keyword">    .line</span> 36<br>   <span class="hljs-keyword"> :goto_7</span><br>   <span class="hljs-built_in"> return-void</span><br><span class="hljs-built_in"></span><br><span class="hljs-keyword">    .line</span> 23<br>   <span class="hljs-keyword"> :cond_8</span><br>   <span class="hljs-built_in"> if-eq </span>v0, v1,<span class="hljs-keyword"> :cond_c</span><br><br><span class="hljs-keyword">    .line</span> 24<br>   <span class="hljs-built_in"> add-int/2addr </span>v1, v1<br><br>   <span class="hljs-built_in"> goto </span>:goto_7<br><br><span class="hljs-keyword">    .line</span> 25<br>   <span class="hljs-keyword"> :cond_c</span><br>   <span class="hljs-built_in"> if-ge </span>v0, v1,<span class="hljs-keyword"> :cond_10</span><br><br><span class="hljs-keyword">    .line</span> 26<br>   <span class="hljs-built_in"> add-int/2addr </span>v0, v1<br><br>   <span class="hljs-built_in"> goto </span>:goto_7<br><br><span class="hljs-keyword">    .line</span> 27<br>   <span class="hljs-keyword"> :cond_10</span><br>   <span class="hljs-built_in"> if-le </span>v0, v1,<span class="hljs-keyword"> :cond_14</span><br><br><span class="hljs-keyword">    .line</span> 28<br>   <span class="hljs-built_in"> add-int/2addr </span>v1, v0<br><br>   <span class="hljs-built_in"> goto </span>:goto_7<br><br><span class="hljs-keyword">    .line</span> 29<br>   <span class="hljs-keyword"> :cond_14</span><br>   <span class="hljs-built_in"> if-lt </span>v0, v1,<span class="hljs-keyword"> :cond_19</span><br><br><span class="hljs-keyword">    .line</span> 30<br>   <span class="hljs-built_in"> add-int/lit8 </span>v0, v0, 0x1<br><br>   <span class="hljs-built_in"> goto </span>:goto_7<br><br><span class="hljs-keyword">    .line</span> 31<br>   <span class="hljs-keyword"> :cond_19</span><br>   <span class="hljs-built_in"> if-gt </span>v0, v1,<span class="hljs-keyword"> :cond_1e</span><br><br><span class="hljs-keyword">    .line</span> 32<br>   <span class="hljs-built_in"> add-int/lit8 </span>v1, v1, 0x1<br><br>   <span class="hljs-built_in"> goto </span>:goto_7<br><br><span class="hljs-keyword">    .line</span> 34<br>   <span class="hljs-keyword"> :cond_1e</span><br>   <span class="hljs-built_in"> add-int/lit8 </span>v0, v0, 0x2<br><br>   <span class="hljs-built_in"> goto </span>:goto_7<span class="hljs-keyword"></span><br><span class="hljs-keyword">.end method</span><br><br></code></pre></td></tr></table></figure>
+
+<p>if-testz vAA, +BBBB</p>
+<table>
+<thead>
+<tr>
+<th>指令</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>if-eqz vAA,+BBBB</td>
+<td>如果vAA&#x3D;&#x3D;0，则跳转到BBBB</td>
+</tr>
+<tr>
+<td>if-nez vAA,+BBBB</td>
+<td>如果vAA!&#x3D;0，则跳转到BBBB</td>
+</tr>
+<tr>
+<td>if-ltz vAA,+BBBB</td>
+<td>如果vAA&lt;0，则跳转到BBBB</td>
+</tr>
+<tr>
+<td>if-lez vAA,+BBBB</td>
+<td>如果vAA&lt;&#x3D;0，则跳转到BBBB</td>
+</tr>
+<tr>
+<td>if-gtz vAA,+BBBB</td>
+<td>如果vAA&gt;0，则跳转到BBBB</td>
+</tr>
+<tr>
+<td>if-gez vAA,+BBBB</td>
+<td>如果vAA&gt;&#x3D;0，则跳转到BBBB</td>
+</tr>
+</tbody></table>
+<p>Java代码</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs aspectj"><span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">ifSmali</span><span class="hljs-params">()</span></span>&#123;<br>    <span class="hljs-keyword">int</span> a = <span class="hljs-number">0</span>;<br>    <span class="hljs-keyword">boolean</span> b = <span class="hljs-keyword">false</span>;<br>    <span class="hljs-keyword">if</span>(b)&#123;<br>        a++;<br>    &#125;<span class="hljs-function"><span class="hljs-keyword">else</span> <span class="hljs-title">if</span><span class="hljs-params">(!b)</span></span>&#123;<br>        b=!b;<br>    &#125;<span class="hljs-function"><span class="hljs-keyword">else</span> <span class="hljs-title">if</span><span class="hljs-params">(a&lt;<span class="hljs-number">0</span>)</span></span>&#123;<br>        a++;<br>    &#125;<span class="hljs-function"><span class="hljs-keyword">else</span> <span class="hljs-title">if</span><span class="hljs-params">(a&gt;<span class="hljs-number">0</span>)</span></span>&#123;<br>        a++;<br>    &#125;<span class="hljs-function"><span class="hljs-keyword">else</span> <span class="hljs-title">if</span><span class="hljs-params">(a&gt;=<span class="hljs-number">0</span>)</span></span>&#123;<br>        a+=<span class="hljs-number">1</span>;<br>    &#125;<span class="hljs-function"><span class="hljs-keyword">else</span> <span class="hljs-title">if</span><span class="hljs-params">(a&lt;=<span class="hljs-number">0</span>)</span></span>&#123;<br>        a++;<br>    &#125;<span class="hljs-keyword">else</span>&#123;<br>        a+=<span class="hljs-number">2</span>;<br>    &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<p>Smali代码</p>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><code class="hljs smali"><span class="hljs-keyword">.method</span><span class="hljs-keyword"> public</span> ifSmali()V<br><span class="hljs-keyword">    .registers</span> 3<br><br><span class="hljs-keyword">    .prologue</span><br><span class="hljs-keyword">    .line</span> 39<br>   <span class="hljs-built_in"> const/4 </span>v0, 0x0<br><br><span class="hljs-keyword">    .line</span> 40<br><span class="hljs-keyword">    .local</span> v0, <span class="hljs-string">&quot;a&quot;</span>:I<br>   <span class="hljs-built_in"> const/4 </span>v1, 0x0<br><br><span class="hljs-keyword">    .line</span> 41<br><span class="hljs-keyword">    .local</span> v1, <span class="hljs-string">&quot;b&quot;</span>:Z<br>   <span class="hljs-built_in"> if-eqz </span>v1,<span class="hljs-keyword"> :cond_7</span><br><br><span class="hljs-keyword">    .line</span> 42<br>   <span class="hljs-built_in"> add-int/lit8 </span>v0, v0, 0x1<br><br><span class="hljs-keyword">    .line</span> 56<br>   <span class="hljs-keyword"> :goto_6</span><br>   <span class="hljs-built_in"> return-void</span><br><span class="hljs-built_in"></span><br><span class="hljs-keyword">    .line</span> 43<br>   <span class="hljs-keyword"> :cond_7</span><br>   <span class="hljs-built_in"> if-nez </span>v1,<span class="hljs-keyword"> :cond_f</span><br><br><span class="hljs-keyword">    .line</span> 44<br>   <span class="hljs-built_in"> if-nez </span>v1,<span class="hljs-keyword"> :cond_d</span><br><br>   <span class="hljs-built_in"> const/4 </span>v1, 0x1<br><br>   <span class="hljs-keyword"> :goto_c</span><br>   <span class="hljs-built_in"> goto </span>:goto_6<br><br>   <span class="hljs-keyword"> :cond_d</span><br>   <span class="hljs-built_in"> const/4 </span>v1, 0x0<br><br>   <span class="hljs-built_in"> goto </span>:goto_c<br><br><span class="hljs-keyword">    .line</span> 45<br>   <span class="hljs-keyword"> :cond_f</span><br>   <span class="hljs-built_in"> if-gez </span>v0,<span class="hljs-keyword"> :cond_14</span><br><br><span class="hljs-keyword">    .line</span> 46<br>   <span class="hljs-built_in"> add-int/lit8 </span>v0, v0, 0x1<br><br>   <span class="hljs-built_in"> goto </span>:goto_6<br><br><span class="hljs-keyword">    .line</span> 47<br>   <span class="hljs-keyword"> :cond_14</span><br>   <span class="hljs-built_in"> if-lez </span>v0,<span class="hljs-keyword"> :cond_19</span><br><br><span class="hljs-keyword">    .line</span> 48<br>   <span class="hljs-built_in"> add-int/lit8 </span>v0, v0, 0x1<br><br>   <span class="hljs-built_in"> goto </span>:goto_6<br><br><span class="hljs-keyword">    .line</span> 49<br>   <span class="hljs-keyword"> :cond_19</span><br>   <span class="hljs-built_in"> if-ltz </span>v0,<span class="hljs-keyword"> :cond_1e</span><br><br><span class="hljs-keyword">    .line</span> 50<br>   <span class="hljs-built_in"> add-int/lit8 </span>v0, v0, 0x1<br><br>   <span class="hljs-built_in"> goto </span>:goto_6<br><br><span class="hljs-keyword">    .line</span> 51<br>   <span class="hljs-keyword"> :cond_1e</span><br>   <span class="hljs-built_in"> if-gtz </span>v0,<span class="hljs-keyword"> :cond_23</span><br><br><span class="hljs-keyword">    .line</span> 52<br>   <span class="hljs-built_in"> add-int/lit8 </span>v0, v0, 0x1<br><br>   <span class="hljs-built_in"> goto </span>:goto_6<br><br><span class="hljs-keyword">    .line</span> 54<br>   <span class="hljs-keyword"> :cond_23</span><br>   <span class="hljs-built_in"> add-int/lit8 </span>v0, v0, 0x2<br><br>   <span class="hljs-built_in"> goto </span>:goto_6<span class="hljs-keyword"></span><br><span class="hljs-keyword">.end method</span><br><br></code></pre></td></tr></table></figure>
+
+<h3 id="4-8-13-switch跳转指令"><a href="#4-8-13-switch跳转指令" class="headerlink" title="4.8.13 switch跳转指令"></a>4.8.13 switch跳转指令</h3><table>
+<thead>
+<tr>
+<th>指令</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>sparse-switch vAA, +BBBBBBBB</td>
+<td>分支跳转指令：vAA寄存器为switch分支中需要判断的值，BBBBBBBB指向一个sparse-switch-payload格式的偏移表，表中的值是无规律的偏移量。</td>
+</tr>
+</tbody></table>
+<p>Smali偏移表-整形顺序结构：</p>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs smali">packed-switch p1,<span class="hljs-keyword"> :pswitch_data_c</span> <span class="hljs-comment">#偏移表pswitch_data_c</span><span class="hljs-built_in"></span><br><span class="hljs-built_in">add-int/lit8 </span>p1, p1, 0x1 <span class="hljs-comment">#如果 switch 表没有命中case，则顺序执行代码，即default</span><br><span class="hljs-keyword"></span><br><span class="hljs-keyword">:pswitch_6</span><span class="hljs-built_in"></span><br><span class="hljs-built_in">add-int/lit8 </span>p1, p1, 0x1<br> <span class="hljs-keyword"></span><br><span class="hljs-keyword">:pswitch_9</span><span class="hljs-built_in"></span><br><span class="hljs-built_in">add-int/lit8 </span>p1, p1, -0x1<br><span class="hljs-keyword"></span><br><span class="hljs-keyword">:pswitch_data_c</span> <span class="hljs-comment">#偏移表位置</span><br><span class="hljs-keyword">.packed</span>-switch 0x0 <span class="hljs-comment">#指定头偏移为0x0 </span><br>   <span class="hljs-keyword"> :pswitch_6</span> <span class="hljs-comment">#case 0</span><br>   <span class="hljs-keyword"> :pswitch_9</span> <span class="hljs-comment">#case 1</span><span class="hljs-keyword"></span><br><span class="hljs-keyword">.end packed</span>-switch<br><br></code></pre></td></tr></table></figure>
+
+<p>Smali偏移表-整形非顺序结构：</p>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs smali"><span class="hljs-built_in"></span><br><span class="hljs-built_in">sparse-switch </span>p1,<span class="hljs-keyword"> :sswitch_data_c</span><span class="hljs-built_in"></span><br><span class="hljs-built_in">add-int/lit8 </span>p1, p1, 0x1 <span class="hljs-comment">#如果 switch 表没有命中case，则顺序执行代码，即default</span><br><span class="hljs-keyword"></span><br><span class="hljs-keyword">:sswitch_6</span><span class="hljs-built_in"></span><br><span class="hljs-built_in">add-int/lit8 </span>p1, p1, 0x1<br><span class="hljs-keyword"></span><br><span class="hljs-keyword">:sswitch_9</span><span class="hljs-built_in"></span><br><span class="hljs-built_in">add-int/lit8 </span>p1, p1, -0x1<br><span class="hljs-keyword"></span><br><span class="hljs-keyword">:sswitch_data_c</span><br><span class="hljs-keyword">.sparse</span>-switch<br>    0x50 -&gt;<span class="hljs-keyword"> :sswitch_6</span> <span class="hljs-comment">#case 80</span><br>    0x3f1 -&gt;<span class="hljs-keyword"> :sswitch_9</span> <span class="hljs-comment">#case 1009</span><span class="hljs-keyword"></span><br><span class="hljs-keyword">.end sparse</span>-switch<br><br></code></pre></td></tr></table></figure>
+
+<p>Java代码：</p>
+<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs arduino"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-type">void</span> <span class="hljs-title">switchSmali</span><span class="hljs-params">(<span class="hljs-type">int</span> value)</span> </span>&#123;<br>    <span class="hljs-keyword">switch</span> (value) &#123;<br>        <span class="hljs-keyword">case</span> <span class="hljs-number">0</span>:<br>            value++;<br>            <span class="hljs-keyword">break</span>;<br>        <span class="hljs-keyword">case</span> <span class="hljs-number">1</span>:<br>            value--;<br>            <span class="hljs-keyword">break</span>;<br>        <span class="hljs-keyword">default</span>:<br>            ++value;<br>            <span class="hljs-keyword">break</span>;<br>    &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<p>Smali顺序结构代码：</p>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><code class="hljs smali"><span class="hljs-keyword">.method</span><span class="hljs-keyword"> public</span> switchSmali(I)V<br><span class="hljs-keyword">    .registers</span> 2<br><span class="hljs-keyword">    .param</span> p1, <span class="hljs-string">&quot;value&quot;</span>    <span class="hljs-comment"># I</span><br><br><span class="hljs-keyword">    .prologue</span><br><span class="hljs-keyword">    .line</span> 5<br>   <span class="hljs-built_in"> packed-switch </span>p1,<span class="hljs-keyword"> :pswitch_data_c</span><br><br><span class="hljs-keyword">    .line</span> 13<br>   <span class="hljs-built_in"> add-int/lit8 </span>p1, p1, 0x1<br><br><span class="hljs-keyword">    .line</span> 16<br>   <span class="hljs-keyword"> :goto_5</span><br>   <span class="hljs-built_in"> return-void</span><br><span class="hljs-built_in"></span><br><span class="hljs-keyword">    .line</span> 7<br>   <span class="hljs-keyword"> :pswitch_6</span><br>   <span class="hljs-built_in"> add-int/lit8 </span>p1, p1, 0x1<br><br><span class="hljs-keyword">    .line</span> 8<br>   <span class="hljs-built_in"> goto </span>:goto_5<br><br><span class="hljs-keyword">    .line</span> 10<br>   <span class="hljs-keyword"> :pswitch_9</span><br>   <span class="hljs-built_in"> add-int/lit8 </span>p1, p1, -0x1<br><br><span class="hljs-keyword">    .line</span> 11<br>   <span class="hljs-built_in"> goto </span>:goto_5<br><br><span class="hljs-keyword">    .line</span> 5<br>   <span class="hljs-keyword"> :pswitch_data_c</span><br><span class="hljs-keyword">    .packed</span>-switch 0x0<br>       <span class="hljs-keyword"> :pswitch_6</span><br>       <span class="hljs-keyword"> :pswitch_9</span><span class="hljs-keyword"></span><br><span class="hljs-keyword">    .end packed</span>-switch<span class="hljs-keyword"></span><br><span class="hljs-keyword">.end method</span><br><br></code></pre></td></tr></table></figure>
+
+<p>Java代码</p>
+<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs arduino"><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-type">void</span> <span class="hljs-title">switchSmali</span><span class="hljs-params">(<span class="hljs-type">int</span> value)</span> </span>&#123;<br>    <span class="hljs-keyword">switch</span> (value) &#123;<br>        <span class="hljs-keyword">case</span> <span class="hljs-number">80</span>:<br>            value++;<br>            <span class="hljs-keyword">break</span>;<br>        <span class="hljs-keyword">case</span> <span class="hljs-number">1009</span>:<br>            value--;<br>            <span class="hljs-keyword">break</span>;<br>        <span class="hljs-keyword">default</span>:<br>            ++value;<br>            <span class="hljs-keyword">break</span>;<br>    &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<p>Smali非顺序结构代码：</p>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><code class="hljs smali"><br><span class="hljs-keyword">.method</span><span class="hljs-keyword"> public</span> switchSmali(I)V<br><span class="hljs-keyword">    .registers</span> 2<br><span class="hljs-keyword">    .param</span> p1, <span class="hljs-string">&quot;value&quot;</span>    <span class="hljs-comment"># I</span><br><br><span class="hljs-keyword">    .prologue</span><br><span class="hljs-keyword">    .line</span> 7<br>   <span class="hljs-built_in"> sparse-switch </span>p1,<span class="hljs-keyword"> :sswitch_data_c</span><br><br><span class="hljs-keyword">    .line</span> 15<br>   <span class="hljs-built_in"> add-int/lit8 </span>p1, p1, 0x1<br><br><span class="hljs-keyword">    .line</span> 18<br>   <span class="hljs-keyword"> :goto_5</span><br>   <span class="hljs-built_in"> return-void</span><br><span class="hljs-built_in"></span><br><span class="hljs-keyword">    .line</span> 9<br>   <span class="hljs-keyword"> :sswitch_6</span><br>   <span class="hljs-built_in"> add-int/lit8 </span>p1, p1, 0x1<br><br><span class="hljs-keyword">    .line</span> 10<br>   <span class="hljs-built_in"> goto </span>:goto_5<br><br><span class="hljs-keyword">    .line</span> 12<br>   <span class="hljs-keyword"> :sswitch_9</span><br>   <span class="hljs-built_in"> add-int/lit8 </span>p1, p1, -0x1<br><br><span class="hljs-keyword">    .line</span> 13<br>   <span class="hljs-built_in"> goto </span>:goto_5<br><br><span class="hljs-keyword">    .line</span> 7<br>   <span class="hljs-keyword"> :sswitch_data_c</span><br><span class="hljs-keyword">    .sparse</span>-switch<br>        0x50 -&gt;<span class="hljs-keyword"> :sswitch_6</span><br>        0x3f1 -&gt;<span class="hljs-keyword"> :sswitch_9</span><span class="hljs-keyword"></span><br><span class="hljs-keyword">    .end sparse</span>-switch<span class="hljs-keyword"></span><br><span class="hljs-keyword">.end method</span><br><br></code></pre></td></tr></table></figure>
+
+<h3 id="4-8-14-for-x2F-whlie-循环"><a href="#4-8-14-for-x2F-whlie-循环" class="headerlink" title="4.8.14 for&#x2F;whlie 循环"></a>4.8.14 for&#x2F;whlie 循环</h3><p>for&#x2F;whlie循环最终表现的Smali指令形式是goto指令,参见 八、goto跳转指令</p>
+<p>Smali循环基础代码：</p>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs smali">:goto_1 <span class="hljs-comment">#goto标签</span><span class="hljs-built_in"></span><br><span class="hljs-built_in">if-ge </span>vAA, vBB,<span class="hljs-keyword"> :</span>+CCCCCCCC <span class="hljs-comment">#vAA寄存器&gt;=vBB寄存器，跳至+CCCCCCCC即循环体外</span><br><span class="hljs-built_in"></span><br><span class="hljs-built_in">add-int/lit8 </span>vAA, vAA, 0x1 <span class="hljs-comment">#条件递增或递减</span><br><span class="hljs-built_in"></span><br><span class="hljs-built_in">goto </span>:goto_1 <span class="hljs-comment">#goto跳转到goto_1标签</span><br><span class="hljs-keyword"></span><br><span class="hljs-keyword">:</span>+CCCCCCCC<br><span class="hljs-comment">#for循环之外的代码</span><br><br><br></code></pre></td></tr></table></figure>
+
+<p>for循环代码：</p>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs smali">//Java代码<span class="hljs-keyword"></span><br><span class="hljs-keyword">public</span> void forSmali()&#123;<br>    for(int i=0;i&lt;100;i++)&#123;<br>    &#125;<br>&#125;<br>//Smail代码<br><span class="hljs-keyword">.method</span><span class="hljs-keyword"> public</span> forSmali()V<br><span class="hljs-keyword">    .registers</span> 3<br><br><span class="hljs-keyword">    .prologue</span><br><span class="hljs-keyword">    .line</span> 66<br>   <span class="hljs-built_in"> const/4 </span>v0, 0x0<br><br><span class="hljs-keyword">    .local</span> v0, <span class="hljs-string">&quot;i&quot;</span>:I<br>   <span class="hljs-keyword"> :goto_1</span><br>   <span class="hljs-built_in"> const/16 </span>v1, 0x64<br><br>   <span class="hljs-built_in"> if-ge </span>v0, v1,<span class="hljs-keyword"> :cond_8</span><br><br>   <span class="hljs-built_in"> add-int/lit8 </span>v0, v0, 0x1<br><br>   <span class="hljs-built_in"> goto </span>:goto_1<br><br><span class="hljs-keyword">    .line</span> 70<br>   <span class="hljs-keyword"> :cond_8</span><br>   <span class="hljs-built_in"> return-void</span><br><span class="hljs-built_in"></span><span class="hljs-keyword">.end method</span><br><br></code></pre></td></tr></table></figure>
+
+<p>while循环代码：</p>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><code class="hljs smali">//Java<span class="hljs-keyword"></span><br><span class="hljs-keyword">public</span> void whileSmali()&#123;<br>   <span class="hljs-built_in"> int </span>i = 0;<br>    while (i&lt;100)&#123;<br>        i++;<br>    &#125;<br>&#125;<br>//Smali<br><span class="hljs-keyword">.method</span><span class="hljs-keyword"> public</span> whileSmali()V<br><span class="hljs-keyword">    .registers</span> 3<br><br><span class="hljs-keyword">    .prologue</span><br><span class="hljs-keyword">    .line</span> 73<br>   <span class="hljs-built_in"> const/4 </span>v0, 0x0<br><br><span class="hljs-keyword">    .line</span> 74<br><span class="hljs-keyword">    .local</span> v0, <span class="hljs-string">&quot;i&quot;</span>:I<br>   <span class="hljs-keyword"> :goto_1</span><br>   <span class="hljs-built_in"> const/16 </span>v1, 0x64<br><br>   <span class="hljs-built_in"> if-ge </span>v0, v1,<span class="hljs-keyword"> :cond_8</span><br><br><span class="hljs-keyword">    .line</span> 75<br>   <span class="hljs-built_in"> add-int/lit8 </span>v0, v0, 0x1<br><br>   <span class="hljs-built_in"> goto </span>:goto_1<br><br><span class="hljs-keyword">    .line</span> 77<br>   <span class="hljs-keyword"> :cond_8</span><br>   <span class="hljs-built_in"> return-void</span><br><span class="hljs-built_in"></span><span class="hljs-keyword">.end method</span><br><br></code></pre></td></tr></table></figure>
+
+<h3 id="4-8-15-try-x2F-catch"><a href="#4-8-15-try-x2F-catch" class="headerlink" title="4.8.15 try&#x2F;catch"></a>4.8.15 try&#x2F;catch</h3><table>
+<thead>
+<tr>
+<th>指令</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>:try_start_标号</td>
+<td>try的开始</td>
+</tr>
+<tr>
+<td>:try_end_标号</td>
+<td>try的结束</td>
+</tr>
+<tr>
+<td>.catch &lt;异常类型&gt; {&lt; try_start_标号&gt; .. &lt; try_end_标号&gt;} &lt; catch_标号&gt;</td>
+<td>.catch指令：catch指令指明异常类型，指明try块的开始和结束，如果异常捕获成功，则会跳转到catch_标号处，如果捕获不成功，则顺序执行代码</td>
+</tr>
+</tbody></table>
+<p>try&#x2F;catch Smali基础代码：</p>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs smali">:try_start_0<span class="hljs-built_in"></span><br><span class="hljs-built_in">const-string </span>v0, <span class="hljs-string">&quot;a&quot;</span><br><span class="hljs-built_in"></span><br><span class="hljs-built_in">invoke-static </span>&#123;v0&#125;, <span class="hljs-class">Ljava/lang/Integer;</span>-&gt;valueOf(<span class="hljs-class">Ljava/lang/String;</span>)<span class="hljs-class">Ljava/lang/Integer;</span><span class="hljs-keyword"></span><br><span class="hljs-keyword">:try_end_5</span><br><span class="hljs-keyword">.catch</span> <span class="hljs-class">Ljava/lang/Exception;</span> &#123;:try_start_0 ..<span class="hljs-keyword"> :try_end_5</span>&#125;<span class="hljs-keyword"> :catch_6</span><br><span class="hljs-keyword"></span><br><span class="hljs-keyword">:goto_5</span><span class="hljs-built_in"></span><br><span class="hljs-built_in">return-void</span><br><span class="hljs-built_in"></span><span class="hljs-keyword"></span><br><span class="hljs-keyword">:catch_6</span><span class="hljs-built_in"></span><br><span class="hljs-built_in">move-exception </span>v0<br><span class="hljs-built_in"></span><br><span class="hljs-built_in">goto </span>:goto_5<br><br></code></pre></td></tr></table></figure>
+
+<p>try&#x2F;catch代码</p>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs smali"><br>//Java<span class="hljs-keyword"></span><br><span class="hljs-keyword">public</span> void tryCatchSmali() &#123;<br>    try &#123;<br>        Integer.valueOf(<span class="hljs-string">&quot;a&quot;</span>);<br>    &#125; catch (Exception e) &#123;<br><br>    &#125;<br>&#125;<br>//Smali<br><span class="hljs-keyword">.method</span><span class="hljs-keyword"> public</span> tryCatchSmali()V<br><span class="hljs-keyword">    .registers</span> 2<br><br><span class="hljs-keyword">    .prologue</span><br><span class="hljs-keyword">    .line</span> 81<br>   <span class="hljs-keyword"> :try_start_0</span><br>   <span class="hljs-built_in"> const-string </span>v0, <span class="hljs-string">&quot;a&quot;</span><br><br>   <span class="hljs-built_in"> invoke-static </span>&#123;v0&#125;, <span class="hljs-class">Ljava/lang/Integer;</span>-&gt;valueOf(<span class="hljs-class">Ljava/lang/String;</span>)<span class="hljs-class">Ljava/lang/Integer;</span><br>   <span class="hljs-keyword"> :try_end_5</span><br><span class="hljs-keyword">    .catch</span> <span class="hljs-class">Ljava/lang/Exception;</span> &#123;:try_start_0 ..<span class="hljs-keyword"> :try_end_5</span>&#125;<span class="hljs-keyword"> :catch_6</span><br><br><span class="hljs-keyword">    .line</span> 85<br>   <span class="hljs-keyword"> :goto_5</span><br>   <span class="hljs-built_in"> return-void</span><br><span class="hljs-built_in"></span><br><span class="hljs-keyword">    .line</span> 82<br>   <span class="hljs-keyword"> :catch_6</span><br>   <span class="hljs-built_in"> move-exception </span>v0<br><br>   <span class="hljs-built_in"> goto </span>:goto_5<span class="hljs-keyword"></span><br><span class="hljs-keyword">.end method</span><br><br></code></pre></td></tr></table></figure>
+
+
+<p><strong>参考链接</strong>：</p>
+<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/2766b76da201">https://www.jianshu.com/p/2766b76da201</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/lee0oo0/p/3728271.html">https://www.cnblogs.com/lee0oo0/p/3728271.html</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/pwelyn/article/details/50487404/">https://blog.csdn.net/pwelyn/article/details/50487404/</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_36252044/article/details/86636885">https://blog.csdn.net/qq_36252044/article/details/86636885</a></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/AndroidSecurity/">#AndroidSecurity</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>「干货」关于Android APK应用程序安全，你了解多少？</div>
+      <div>https://orangey.info/2022/09/23/119462162/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>橙留香</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年9月23日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/09/23/122619481/" title="Snort使用手册详细版「起手篇」">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Snort使用手册详细版「起手篇」</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/09/23/121377483/" title="Android加密算法浅析">
+                        <span class="hidden-mobile">Android加密算法浅析</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  <article id="comments" lazyload>
+    
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1e96aec5ac46370916fa","clientSecret":"ee5e97a65cf34e9fe31e15ab0421a94968237f5e","repo":"ogGitalk","owner":"ananasOrangey","admin":["ananasOrangey"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: 'd2f1ede6172a5dcb9c34198d5bf9e611'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+  </article>
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://orangey.blog.csdn.net" target="_blank" rel="nofollow noopener"><span>橙留香CSDN博客</span></a> <i class="iconfont icon-love"></i> <a href="https://i.imgtg.com/2022/09/21/gNXxK.png" target="_blank" rel="nofollow noopener"><span>橙留香微信公众号</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

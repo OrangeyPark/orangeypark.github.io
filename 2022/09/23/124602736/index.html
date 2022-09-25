@@ -1,0 +1,2417 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="橙留香">
+  <meta name="keywords" content="橙留香车联网安全技术博客">
+  
+    <meta name="description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;ananasorangey&#x2F;category11955914.html   0x01前言物联网，也称为物联网（IoT），代表可以连接到互联网或内部网络的设备和外围设备的集">
+<meta property="og:type" content="article">
+<meta property="og:title" content="「干货」关于IoT安全该如何入门？你必须知道那些事">
+<meta property="og:url" content="https://orangey.info/2022/09/23/124602736/index.html">
+<meta property="og:site_name" content="车联网安全技术博客 | 橙留香">
+<meta property="og:description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;ananasorangey&#x2F;category11955914.html   0x01前言物联网，也称为物联网（IoT），代表可以连接到互联网或内部网络的设备和外围设备的集">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/21/gNXxK.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/677aa2a9510b43d1adbf2841a37bf3a6.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/a3051942c0ac400ba3398a834f892c1d.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/25e2e265f28f4319ababf4938dd239c1.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c648651f6a8842dd8043371028448296.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/298f6b4959e44490b8ed1e5ecdc1dff3.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/99b0bf1be617435aa934c14cea546351.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8a72f18f013e4ad5be4245aeaa95f9a2.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8b5f4f220cdb4463b04828a897cc4889.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e4b7234e2aa74bdb818404b8186ecd5a.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2002a604a33a49649cb6116386fc0591.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/dd48e10d5a814a6d9af71a8913302e6d.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/0ee941512c514318a28025a2c5f56fb7.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/7299f89aaf8b4126bd4d05f42df7e8d7.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/3a43a5875a0d4edcb1ea21172f8450b8.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/b09cf68053234796a3d86815f6d5eaf1.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5547c2c5ba37461b878f6b44f31c0989.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c9d26ee48dfb4887b0134b04fe636aec.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5c27cc0f2b854810a00fe10bfd072f3f.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/ad567ebbcba14dbcbe5e2fdac78602ee.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/a7df9db47fa34d9eb3ded578adc72965.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/fb09221b844043bfb7765e2505a41e45.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2a233fa934514c9b8184409ac727b745.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/f257c818bb2c446da59a0934b2d4eb16.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/fe0f8498dd3a4ecebb72d194859c7ea4.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/9de5c5c892674a33aafa0d79d3b06792.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/ed24584f84ce42b5994ac79c9e49a768.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/9ec80cc47d7d4080a87b43aeda1f399e.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/a6bb0e5a95154d8aabf895ef0f9e6719.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/9608f8d36b6e4605a0755385bd29e781.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8be0d2aaa8354ccfb54fec23980d81d2.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/740e081ad9a44415bb29d345a536fcea.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/cf780865bfbd4ca1ba7c09a142851aa2.png">
+<meta property="article:published_time" content="2022-09-23T15:50:33.606Z">
+<meta property="article:modified_time" content="2022-09-24T16:45:16.415Z">
+<meta property="article:author" content="橙留香">
+<meta property="article:tag" content="IoT安全">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+  
+  
+  
+  <title>「干货」关于IoT安全该如何入门？你必须知道那些事 - 车联网安全技术博客 | 橙留香</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"orangey.info","root":"/","version":"1.9.3","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"java"},"copy_btn":false,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>橙留香</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="「干货」关于IoT安全该如何入门？你必须知道那些事"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-09-23 23:50" pubdate>
+          2022年9月23日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          41k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          <!-- compatible with older versions-->
+          340 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">「干货」关于IoT安全该如何入门？你必须知道那些事</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <hr>
+<p><strong>也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大</strong></p>
+<p><strong>少走了弯路，也就错过了风景，无论如何，感谢经历</strong></p>
+<hr>
+<p>更多关于Android安全的知识，可前往：<a target="_blank" rel="noopener" href="https://blog.csdn.net/ananasorangey/category11955914.html">https://blog.csdn.net/ananasorangey/category11955914.html</a></p>
+<p><img src="https://i.imgtg.com/2022/09/25/gdpGP.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><img src="https://i.imgtg.com/2022/09/21/gNXxK.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x01前言"><a href="#0x01前言" class="headerlink" title="0x01前言"></a>0x01前言</h1><p>物联网，也称为物联网（IoT），代表可以连接到互联网或内部网络的设备和外围设备的集合。这些设备有多种形状和尺寸。您现在的家庭或工作网络中可能有一些，您的网络打印机甚至您的家庭 WiFi 路由器都可以被视为物联网设备，因为它们是连接到内部网络或公共互联网以提供附加功能的非传统计算设备</p>
+<p>IoT 这个词意味着物联网，如果我把它分成更简单的格式，那么互联网+设备&#x3D;物联网，网是现有互联网基础设施内唯一可识别的嵌入式计算设备的互连。或理解为是可以相互交互以共享信息和采取行动的物理对象网络</p>
+<p>物联网的本质，是从端到云的数据交互及计算过程。根据这个特点，可以将物联网划分为3个层次：云、网络和设备（当然这里面应该还有APP），也就形成了物联网的攻击面。</p>
+<p>其中，云层包括云端提供的服务，例如物联网平台、日志等等；网络层代表云和设备、设备与设备之间的传输过程；设备层包括了IoT设备、网关设备及其上的系统和应用</p>
+<p><img src="https://img-blog.csdnimg.cn/677aa2a9510b43d1adbf2841a37bf3a6.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>对黑客而言，以上三个层次都具有攻击的价值。在IoT架构中，我们可以把安全威胁归类为以下几种：</p>
+<ul>
+<li>身份伪装</li>
+</ul>
+<p>通过获取的认证信息，将恶意的设备、服务伪装成合法设备和服务</p>
+<p><strong>S1场景</strong>：阿里云已经为IoT设备提供方便的上云方式。对于设备认证，阿里云目前提供了设备证书、LinkID2等认证方案。对于开发者来说，最常用的方式是通过设备认证信息认证：开发者从云端服务获取设备认证信息，并将其烧写到设备上。当设备连接云端时，阿里云会根据设备认证信息对设备进行认证。在这种场景下，如果能够通过漏洞或物理接触窃取到设备认证信息，黑客就能够将其他设备伪装成用户的设备，从而向用户发送伪造数据</p>
+<p><strong>D1场景</strong>：通过DNS欺骗，黑客可以直接伪装云端服务。如果设备端应用未进行双向验证，黑客可以伪装云端服务与设备进行数据交互、操纵设备；在设备间通信时，如果设备上开启了被动连接服务，黑客可以利用窃取的认证信息伪造合法设备与目标设备交互</p>
+<ul>
+<li>拒绝服务</li>
+</ul>
+<p>使服务、设备或网络传输过程瘫痪</p>
+<ul>
+<li>数据篡改</li>
+</ul>
+<p>对系统、应用和数据进行篡改</p>
+<p><strong>N2场景</strong>：对于设备之间、设备端与云端之间的不安全通信，黑客可以发起中间人攻击，截获数据包并提取隐私数据，或者对数据包中的数据进行篡改和继续转发</p>
+<p><strong>D2场景</strong>：与服务器不同的是，IoT设备常常会处于“暴露”的状态。这意味着在设备端，黑客不仅能够利用应用和内核中的漏洞对设备上的系统、应用和文件进行篡改，还能通过物理接触的方式篡改设备上的内容。物联网产品从出厂后到投入使用的整个生命周期中，会接触到许多不同的角色，任何一个环节都可能出现威胁</p>
+<ul>
+<li>信息窃取</li>
+</ul>
+<p>窃取隐私信息</p>
+<p><strong>N3场景</strong>：对于设备之间、设备端与云端之间的不安全通信，黑客可以发起中间人攻击，截获数据包并提取隐私数据，或者对数据包中的数据进行篡改和继续转发</p>
+<p><strong>D3场景</strong>：设备上不仅会保存了隐私数据，还有应用的可执行文件。通过漏洞或物理接触，黑客可以直接获取用户隐私（例如摄像头数据、密钥等），还能获得应用的二进制文件以进行逆向分析</p>
+<ul>
+<li>越权</li>
+</ul>
+<p>强迫应用进行超过其权限范围的行为</p>
+<p><strong>D4场景</strong>：当黑客利用漏洞攻破设备上的某个应用时，他可能会迫使应用进行默认权限之上的行为：例如关闭系统、访问其他应用的数据、大量占用系统资源。黑客可以通过越权直接进行攻击，或者为其他攻击方式提供条件</p>
+<p><strong>结合安全威胁类型和IoT系统架构，总结出了如下的威胁模型</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>层次</th>
+<th>序号</th>
+<th>威胁类型</th>
+<th>描述</th>
+<th>和设备端OS相关</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>云</td>
+<td>S1</td>
+<td>身份伪装</td>
+<td>通过窃取的认证信息伪装合法设备与云端服务交互</td>
+<td>是</td>
+</tr>
+<tr>
+<td></td>
+<td>S2</td>
+<td>拒绝服务</td>
+<td>通过攻击使云端服务瘫痪</td>
+<td>否</td>
+</tr>
+<tr>
+<td></td>
+<td>S3</td>
+<td>篡改</td>
+<td>利用漏洞在云端篡改数据、注入恶意代码</td>
+<td>否</td>
+</tr>
+<tr>
+<td></td>
+<td>S4</td>
+<td>信息窃取</td>
+<td>利用漏洞窃取云端隐私信息</td>
+<td>否</td>
+</tr>
+<tr>
+<td>网络</td>
+<td>N1</td>
+<td>拒绝服务</td>
+<td>通过制造拥堵、干扰网络阻碍网络通信</td>
+<td>否</td>
+</tr>
+<tr>
+<td></td>
+<td>N2</td>
+<td>篡改</td>
+<td>截获数据包并篡改数据</td>
+<td>是</td>
+</tr>
+<tr>
+<td></td>
+<td>N3</td>
+<td>信息窃取</td>
+<td>截获数据包以窃取隐私信息</td>
+<td>是</td>
+</tr>
+<tr>
+<td>设备</td>
+<td>D1</td>
+<td>身份伪装</td>
+<td>通过DNS欺骗、窃取的认证信息伪装云端服务或合法设备与设备交互</td>
+<td>是</td>
+</tr>
+<tr>
+<td></td>
+<td>D2</td>
+<td>篡改</td>
+<td>通过漏洞或物理接触篡改设备上的系统、应用和数据</td>
+<td>是</td>
+</tr>
+<tr>
+<td></td>
+<td>D3</td>
+<td>信息窃取</td>
+<td>通过漏洞或物理接触窃取设备上的数据和代码</td>
+<td>是</td>
+</tr>
+<tr>
+<td></td>
+<td>D4</td>
+<td>越权</td>
+<td>通过漏洞迫使应用进行默认权限之上的行为</td>
+<td>是</td>
+</tr>
+</tbody></table>
+<p>在IoT架构的不同层次上，均有与设备端OS相关的安全威胁存在；而IoT设备资源受限、物理暴露等特性，直接导致了设备端安全能力的不足。接下来，结合具体场景，对与设备端OS相关的安全风险逐一进行分析</p>
+<p><strong>备注</strong>：OS是operating system的缩写，表示操作系统，它是管理计算机硬件与软件资源的计算机程序</p>
+<p>但物联网不等于是硬件，这是人们之间普遍的误解，认为物联网仅指硬件，这造成了想象中的障碍，并使大多数安全研究人员不愿涉足物联网安全。是的，其中涉及硬件，并且可以学习分析硬件所需的技能。如果有帮助，“物联网安全研究并不难”，但需要奉献精神和学习意愿。当您阅读本博客文章时，您将意识到硬件仅构成IoT生态系统的1&#x2F;3。最重要的是，如果您可以破坏其他组件（例如，Cloud），则不仅会入侵设备，还会造成更大的破坏</p>
+<p><strong>物联网的一些附加因素</strong>：</p>
+<ul>
+<li>人</li>
+</ul>
+<p>在人这一块，物联网可以监控和控制更多“事物”，从而使人们变得更有能力</p>
+<ul>
+<li>时间</li>
+</ul>
+<p>在时间这一块，物联网可以跟更多的用户和机器可以实时协作，因此可以在更短的时间内完成更复杂的任务。因此，我们拥有更多协作和协调的数据。</p>
+<ul>
+<li>数据</li>
+</ul>
+<p>在数据这一块，物联网可以更频繁、更可靠地收集数据。这些结果对决策更准确。</p>
+<ul>
+<li>过程</li>
+</ul>
+<p>在过程这一块，物联网让事情变得更加可控，因此移动设备和这些物联网设备变得更有价值</p>
+<ul>
+<li>经济影响</li>
+</ul>
+<p>预测表面，未来功物联网有可能会给全球企业带来持续增加的利润增长</p>
+<p>现代随着技术的进步，智能硬件有了长足的发展，未来将会是一个万物互联的物联网时代，作为信息技术时代的新兴产物，IoT 以迅猛的发展速度正悄然地走进千门万户，随着智能家居、智能城市、互联医疗保健系统和 4.0 行业的发展，物联网安全是一项重大挑战。也由于技术的范围和可能的攻击点的数量，连接对象的安全性是一个复杂的主题。</p>
+<p>连接对象渗透测试的目的是识别不同层中存在的缺陷，以保护对象的整个环境。在这种情况下，审计的目标是硬件（电子）、软件（嵌入式软件、通信协议）以及 API、Web 和移动接口（服务器、Web 应用程序、移动应用程序）。但是，也可以根据先前确定的安全问题将审计重点放在有限的技术领域。</p>
+<p>不幸的是，随着连接技术的普及，许多此类设备在设计过程中并未考虑或仅最低限度地考虑安全性。虽然我们在其他传统安全类型的身渗透测试中也看到了这种行为，但物联网是不同的，因为它利用并将许多不同的技术堆栈混合在一起，例如自定义操作系统构建、Web 和 API 接口、各种网络协议（例如 Zigbee、LoRA、蓝牙&#x2F;BLE、WiFi）和专有无线。这种广泛多样性、安全性差的技术为网络攻击提供了攻击面，为修改用户数据、网络流量操纵等攻击提供了更多的攻击的可能。</p>
+<p><strong>工业控制物联网</strong>：在工业4.0 的时代背景下， 传统企业的生产线和生产流程全面引入智能控制终端和智能机器人，是未来工业发展的大趋势。</p>
+<p><strong>车载物联网</strong>：是一项新兴技术，可以大幅提高未来交通系统的安全和效率，并将车辆连接到计算机网络。车载物联网能够在行驶中的车辆之间建立无线通信，也能够在过路车辆和路边基站之间建立无线通信。</p>
+<p><strong>智能家居</strong>：是以住宅为平台，利用综合布线技术、网络通信技术、 安全防范技术、自动控制技术、音视频技术将家居生活有关的设施集成，构建高效的住宅设施与家庭日程事务的管理系统，提升家居安全性、便利性、舒适性、艺术性，并实现环保节能的居住环境</p>
+<p><strong>基于互联网的拓展，人们可以</strong>：</p>
+<ul>
+<li>通过语音助手远程控制电灯的开关</li>
+<li>实时观看无人机执行飞行任务的影像</li>
+<li>乘坐无人驾驶汽车到达目的地</li>
+</ul>
+<p><strong>通过如上所知</strong>：</p>
+<ul>
+<li>互联网上有许多关于物联网的定义，掌握一项技术的关键是要了解其背后的基本思想，这有助于定义您自己的含义和适用性。每个人都可以有自己的定义，对我来说，物联网主要涉及三件事：<ul>
+<li>自动化：面对现实，我们很懒惰，而未来就是让我们变得更懒惰，并使我们手动完成的任务自动化</li>
+<li>虚拟物理世界接口：在物理世界和虚拟世界之间建立桥梁。简而言之，允许虚拟世界从物理世界读取和写入物理世界。当我说读时，我的意思是感测物理环境并将状态转换为数据，并将其发送到虚拟数据存储以进行进一步分析，例如温度传感器，医疗传感器，照相机等。写方法是通过动作来控制物理世界，即将数据转换为对现实世界的动作，例如门锁，控制车辆运行，喷水，医用泵等</li>
+<li>洞察力和决策能力：可以实时分析从设备收集的数据，以更好地了解环境，对某些事件采取行动，找到任何物理世界问题的根本原因等</li>
+</ul>
+</li>
+</ul>
+<p>本篇系列专栏同学们将会掌握如下技能：</p>
+<ul>
+<li>以 IoT 为重点，评估面向 IoT 网络的控件、Web 应用程序和 API 端点</li>
+<li>检查硬件以发现功能并找到交互点并使用它们从硬件获取数据</li>
+<li>从硬件和其他方式中发现固件，并探索它的攻击利用和攻击失败的方法</li>
+<li>嗅探、命令交互和操作 WiFi、LoRA 和 Zigbee 无线技术，并了解实施中的安全故障</li>
+<li>与蓝牙低功耗 (BLE) 交互以进行设备攻击的利用</li>
+<li>自动恢复未知无线电协议来执行重放攻击和额外的攻击分析</li>
+</ul>
+<p>需要准备的工具：</p>
+<ul>
+<li>Bus Pirate v3.6a和电缆</li>
+<li>SPI Flash集成电路</li>
+<li>无焊面包板【面包板（也称万用线路板或集成电路实验板）】</li>
+<li>HackRF One 带天线版</li>
+<li>HackRF ANT500 带天线版</li>
+<li>USB逻辑分析仪</li>
+<li>杜邦电线</li>
+<li>RaspberryPi 2G Vilros 套件（32 Gig SD 卡）（注意：这是一个美国插头，所以我们需要额外再准备一个适配器）</li>
+<li>USB无线适配器</li>
+<li>购买一个TP-Link 蓝牙低功耗 USB 适配器</li>
+<li>433Mhz IoT 电源插座（仅限 110&#x2F;120V，欧盟和亚太地区的需要购买电压转换器）</li>
+<li>一对 CC2531 定制闪存 USB Zigbee 适配器</li>
+<li>USB 3.0&#x2F;4.0端口集线器</li>
+<li>以太网电缆</li>
+<li>自定义 Slingshot Linux 虚拟机</li>
+<li>自定义 Raspberry Pi 映像 (PIoT 101)</li>
+<li>… …不仅限于此，学硬件安全光是购买设备上貌似没有较大的钱或公司支持，貌似挺脑壳痛的… …</li>
+</ul>
+<p><strong>那么本系列适合初学者学吗？</strong></p>
+<ul>
+<li>即使……您之前没有任何使用物联网的经验</li>
+<li>即使……您没有电子或数字信号处理方面的背景</li>
+<li>即使……您不知道从哪里开始或拥有任何物联网工具和设备</li>
+<li>开玩笑的，没那么牛掰，其实就是跟博主同学这个菜逼一起从零一起尬学物联网安全… …</li>
+</ul>
+<p>本系列不会更新很快，因为博主在思考以后走的方向，暂时侧重点不会太偏向硬件方面，没办法条件不允许，嘻嘻… …</p>
+<h1 id="0x02-什么是物联网安全？"><a href="#0x02-什么是物联网安全？" class="headerlink" title="0x02 什么是物联网安全？"></a>0x02 什么是物联网安全？</h1><p>物联网安全是指为保护物联网设备及其连接的网络而采取的一系列措施。无处不在的连接带来了新的风险。物联网安全曾经是一项希望具备的功能，如今已成为当今互联应用的基本要素。</p>
+<p>由于物联网设备暴露于更广泛的互联网，物联网设备开发人员必须时刻注意以下原则：</p>
+<ul>
+<li>攻击总是造成伤害，包括：直接成本、损害和后果性成本</li>
+<li>应用中任何暴露的接口都可被用作攻击面</li>
+</ul>
+<p>保护物联网设备、保护数据和确保数据传输安全已成为构建可持续业务以应对日益增长的物联网安全威胁的首要任务。凭借强大的端到端安全措施，相关企业可以保护其收入，并通过保护设备和敏感数据降低与运营和声誉损害相关的成本。</p>
+<h2 id="2-1-物联网安全性的要求"><a href="#2-1-物联网安全性的要求" class="headerlink" title="2.1 物联网安全性的要求"></a>2.1 物联网安全性的要求</h2><ul>
+<li>物理层：要求在执行过程中有一个安全的计算机环境，这种计算环境可以保证数据的完整性，以便于本地或者远程的服务可以顺利执行</li>
+<li>感知层：对感知节点进行身份验证，防止非法节点访问；节点间传输的信息需要轻量级的加密算法和协议，保证信息的机密性；保证数据的完整性和真实性</li>
+<li>网络层：防范分布式拒绝服务攻击；保证数据的机密性和完整性；信息隐私保护</li>
+<li>应用层：网格计算、云计算等技术随着物联网的发展和普及应运而生，这些新型计算模式需要保证安全性；应用数据的隐私完全和应用部署安全</li>
+</ul>
+<h2 id="2-2-物联网安全的特征"><a href="#2-2-物联网安全的特征" class="headerlink" title="2.2  物联网安全的特征"></a>2.2  物联网安全的特征</h2><ul>
+<li>机密性：数据拥有机密性可以确保数据是安全的，不会被其他非授权用户所见</li>
+<li>完整性：保障数据来自正确的发送方，而不会被其他人在传输过程中被篡改或者伪造</li>
+<li>可用性：物联网用户应该在需要的时候及时拥有所有可用的数据，服务和设备。</li>
+<li>身份验证：物联网中的每个对象必须能够识别和验证其他对象</li>
+<li>轻量级的解决方案：由于物联网中涉及的设备在计算能力和电源能力方面的限制，是在设计算法时需要考虑的限制</li>
+<li>异构性：物联网将不同实体、不同功能和复杂性、不同供应商连接起来。因此必须将协议设计为适用于所有不同的设备</li>
+</ul>
+<h2 id="2-3-重要的物联网技术"><a href="#2-3-重要的物联网技术" class="headerlink" title="2.3 重要的物联网技术"></a>2.3 重要的物联网技术</h2><h3 id="2-3-1-射频识别-RFID"><a href="#2-3-1-射频识别-RFID" class="headerlink" title="2.3.1 射频识别 (RFID)"></a>2.3.1 射频识别 (RFID)</h3><ol>
+<li>RFID芯片保存有关“事物”的信息</li>
+<li>RFID芯片被连接并将数据传输到阅读器</li>
+<li>RFID 模块上的天线用于接收用于操作 RFID 设备的能量并将信息传输回阅读器</li>
+<li>RFID 可实现高效的管理、跟踪和监控流程以及物流和供应链应用</li>
+</ol>
+<h3 id="2-3-2-无线传感器网络-WSN"><a href="#2-3-2-无线传感器网络-WSN" class="headerlink" title="2.3.2 无线传感器网络(WSN)"></a>2.3.2 无线传感器网络(WSN)</h3><ol>
+<li>用于遥感应用的高效、低成本、低功耗设备</li>
+<li>低功耗集成电路和无线通信</li>
+<li>大量智能传感器采集原始数据，通过对数据的处理、分析和传播创造有价值的服务</li>
+<li>挑战与有限的处理能力和存储以及多设备&#x2F;系统协作的传感器数据共享有关</li>
+</ol>
+<h3 id="2-3-3-物联网云计算支持"><a href="#2-3-3-物联网云计算支持" class="headerlink" title="2.3.3 物联网云计算支持"></a>2.3.3 物联网云计算支持</h3><ol>
+<li>对于高级物联网服务，物联网网络可能需要收集、分析和处理部分原始数据，并将其转化为运营控制信息</li>
+<li>先进的物联网服务将需要云计算的支持</li>
+<li>将与各种设备和传感器建立大量物联网连接</li>
+<li>许多物联网设备不具备 PC 或智能手机级别的足够数据处理能力或互操作性功能</li>
+</ol>
+<h3 id="2-3-4-云计算"><a href="#2-3-4-云计算" class="headerlink" title="2.3.4 云计算"></a>2.3.4 云计算</h3><ol>
+<li>物联网应用将需要可靠、快速、敏捷的计算平台的支持</li>
+<li>物联网设备可以使用云计算克服软件、固件、内存存储、硬件和数据处理能力的不足</li>
+</ol>
+<p>云服务类型：</p>
+<ul>
+<li>软件即服务 (SaaS)</li>
+<li>平台即服务 (PaaS)</li>
+<li>基础设施即服务 (IaaS)</li>
+</ul>
+<h1 id="0x03-物联网的发展与历史"><a href="#0x03-物联网的发展与历史" class="headerlink" title="0x03 物联网的发展与历史"></a>0x03 物联网的发展与历史</h1><h2 id="3-1-萌芽期（上个世纪八十年代初到九十年代末）"><a href="#3-1-萌芽期（上个世纪八十年代初到九十年代末）" class="headerlink" title="3.1 萌芽期（上个世纪八十年代初到九十年代末）"></a>3.1 萌芽期（上个世纪八十年代初到九十年代末）</h2><ul>
+<li>20世纪80年代和90年代：将传感器和只能添加到物体——联网贩售可乐机</li>
+<li>1993年初：全球定位卫星（GPS）为大部分物联网提供了基本通信</li>
+<li>1998年：IPV6成为草案标准，使得更多的设备拥有唯一的标准</li>
+</ul>
+<h2 id="3-2-发展期（上世纪九十年代末到2010年）"><a href="#3-2-发展期（上世纪九十年代末到2010年）" class="headerlink" title="3.2 发展期（上世纪九十年代末到2010年）"></a>3.2 发展期（上世纪九十年代末到2010年）</h2><ul>
+<li>1999年：物联网正式被定义</li>
+<li>2000年：LG公司公布了物联网设备：联网冰箱</li>
+<li>2007年：第一台iPhone手机问世，为用户与联网设备的连接提供了一种全新的方式</li>
+<li>2009年：谷歌对无人驾驶进行研究</li>
+</ul>
+<h2 id="3-3-爆发期（2010年——至今）"><a href="#3-3-爆发期（2010年——至今）" class="headerlink" title="3.3 爆发期（2010年——至今）"></a>3.3 爆发期（2010年——至今）</h2><ul>
+<li>2010年：中国把物联网作为关键技术以及作为长期发展的计划</li>
+<li>2014年：亚马逊发布了名为Echo的智能音箱产品，表示进军智能家居市场</li>
+<li>2017年-至今：无人驾驶，区块链和人工智能与物联网相结合等关键技术风波蓬勃发展</li>
+</ul>
+<h1 id="0x04-物联网的核心组成"><a href="#0x04-物联网的核心组成" class="headerlink" title="0x04 物联网的核心组成"></a>0x04 物联网的核心组成</h1><p>物联网的基本构架由三层组成，分别是感知层、网络层和应用层。同时物联网也是基于目前的互联网OSI计算机网络体系结构，目前物联网面临的协议层威胁主要为，物理层、数据链路层、网络层、传输层</p>
+<ul>
+<li>物理层是指承载着感知层设备的物理载体（芯片、手机等）</li>
+<li>感知层对物理世界只能够的各类物理量、音频、视频等数据进行采集、感知和处理（温度计的温度传感器）</li>
+<li>网络层又称传输层，包括接入网和传输网两种。主要解决在感知层传输的数据传输问题，负责信息的传递、路由和控制</li>
+<li>应用层利用感知层的信息，并经过处理和分析后，为用户提供特别的服务。主要解决的是信息处理与用户交互的问题</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>层级结构</th>
+<th>安全需求</th>
+<th>存在攻击</th>
+<th>主要防御技术</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>物理层</td>
+<td>物理设备的可靠性<br>固件系统的安全<br>内存安全</td>
+<td>固件升级攻击<br>内存溢出攻击<br>侧信道攻击<br>物理干扰破坏</td>
+<td>安全启动<br>可信计算<br>保险丝熔断<br>暴力拆解情况下的自动销毁</td>
+</tr>
+<tr>
+<td>感知层</td>
+<td>物理安全防护<br>认证性<br>机密性<br>保证数据的完整性</td>
+<td>窃听攻击<br>篡改攻击<br>伪造攻击<br>禁用攻击<br>中继攻击<br>睡眠攻击</td>
+<td>访问控制<br>身份认证 <br>轻量级密码</td>
+</tr>
+<tr>
+<td>网络层</td>
+<td>机密性<br>数据的完整性<br>可用性<br>隐私保护</td>
+<td>窃听攻击<br>篡改攻击<br>伪造攻击<br>禁用攻击<br>中继攻击<br>睡眠攻击</td>
+<td>访问控制<br>加密签名技术<br>终端生命周期监控<br>防火墙<br>安全路由协议</td>
+</tr>
+<tr>
+<td>应用层</td>
+<td>认证<br>授权<br>审计<br>隐私安全和应用部署安全</td>
+<td>身份冒充攻击<br>认证拥塞攻<br>恶意代码攻击<br>恶意程序</td>
+<td>身份和访问控制<br>漏洞扫描<br>入侵监测系统</td>
+</tr>
+</tbody></table>
+<p><img src="https://img-blog.csdnimg.cn/a3051942c0ac400ba3398a834f892c1d.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>例如下边介绍一下各协议层易受到的攻击手段：</p>
+<ol>
+<li>物理层</li>
+</ol>
+<ul>
+<li>拥塞攻击</li>
+</ul>
+<p>通过发出无线干扰射频信号，实现破坏无线通信的目的，分为全频段拥塞干扰和瞄准式拥塞干扰。传感器网络可采用诸如跳频、调节节点占空比等技术防范拥塞攻击</p>
+<ul>
+<li>物理破坏</li>
+</ul>
+<p>攻击者俘获一些节点，对它进行物理上的分析和修改，并利用其干扰网络的正常功能，甚至可以通过分析其内部敏感信息和上层协议机制，破坏网络安全性。攻击者直接停止俘获节点的工作，造成网络拓扑结构变化，如果是骨干节点被俘获，将造成网络瘫痪。对抗物理破坏可在节点设计时采用抗篡改硬件，同时增加物理损害感知机制</p>
+<p><img src="https://img-blog.csdnimg.cn/25e2e265f28f4319ababf4938dd239c1.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ol start="2">
+<li>数据链路层</li>
+</ol>
+<ul>
+<li>碰撞攻击</li>
+</ul>
+<p>攻击者通过公开算法伪造hash值来骗过电脑的密码验证，进入系统进行危险操作。我们可以采取冲突检测的方法确定恶意引发冲突，同时设置更加有效的退避算法，也可以采用纠错编码的方法在通信数据包中增加冗余信息来纠正数据包中的错误位</p>
+<ul>
+<li>耗尽攻击</li>
+</ul>
+<p>攻击者利用协议漏洞，通过持续通信的方式使节点能量资源耗尽，例如当有些算法试图重传分组时，攻击者将不断干扰其发送，直至节点耗尽资源。我们在协议实现的时候，制定一些执行策略，对过度频繁的请求不予理睬，或者对同一个数据包的重传数据进行限制，以免恶意节点无休止干扰导致能源耗尽</p>
+<ul>
+<li>非公平竞争</li>
+</ul>
+<p>非公平竞争指恶意节点滥用高优先级的报文占据信道，使其他节点在通信过程中处于劣势，从而导致报文传送的不公平，进而减低系统性能，但这种攻击方式需要完全了解传感器网络的MAC协议机制。我们可以采用短小帧格式的方法，这样就可以降低单个节点占用信道的时间；另一种方法采用竞争或者时分多址（TDMA）的方式实现数据传输</p>
+<p><img src="https://img-blog.csdnimg.cn/c648651f6a8842dd8043371028448296.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ol start="3">
+<li>网络层</li>
+</ol>
+<ul>
+<li>虚假路由信息</li>
+</ul>
+<p>通过欺骗、篡改或重发路由信息，攻击者可以创建路由循环，引起或抵制网络传输，延长或缩短源路径，形成虚假错误消息，分割网络，增加端到端的延迟等</p>
+<ul>
+<li>选择性转发攻击</li>
+</ul>
+<p>恶意性节点可以概率性的转发或者丢弃特定消息，使数据包不能到达目的地，导致网络陷入混乱状态。当攻击者确定自身在数据流传输路径上的时候，该攻击通常是最有效的。该种攻击的一个简单做法是恶意节点拒绝转发经由它的任何数据包，类似一个黑洞(即所谓“黑洞攻击”)</p>
+<ul>
+<li>槽洞Sinkhole攻击</li>
+</ul>
+<p>攻击者的目标是尽可能地引诱一个区域中的流量通过一个恶意节点（或已遭受入侵的节点），进而制造一个以恶意节点为中心的“接受洞”，一旦数据都经过该恶意节点，节点就可以对正常数据进行篡改，并能够引发很多其他类型的攻击。因此，无线传感器网络对sinkhole攻击特别敏感</p>
+<ul>
+<li>女巫Sybil攻击</li>
+</ul>
+<p>能够明显地降低路由方案对于诸如分布式存储、分散和多路径路由，拓扑结构保持的容错能力。对于基于位置信息的路由算法很有威胁</p>
+<ul>
+<li>虫洞Wormholes攻击</li>
+</ul>
+<p>恶意节点通过声明低延迟链路骗取网络的部分消息并开凿隧道，以一种不同的方式来重传收到的消息，Wormholes攻击可以引发其他类似于Sinkhole攻击等，也可能与选择性地转发或者Sybil攻击结合起来</p>
+<ol start="4">
+<li>传输层</li>
+</ol>
+<ul>
+<li>洪泛攻击</li>
+</ul>
+<p>攻击者利用TCP传输的三次握手机制，在攻击端利用伪造的IP地址向被攻击端发送大批请求，使被攻击端得不到响应，用来消耗服务器资源。我们可以在服务器端引入入侵机制，基站限制这些洪泛报文的发送</p>
+<ul>
+<li>失步攻击</li>
+</ul>
+<p>攻击者向节点发送重放的虚假信息，导致节点请求重传丢失的数据帧。利用这种方式，攻击者能够削弱甚至完全削夺节点进行数据交换的能力，并浪费能量，缩短节点的生命周期</p>
+<p>从以上攻击方式可见物联网中常见的攻击类型有，保密与认证攻击、拒绝服务攻击、针对完整性的隐秘攻击等主要的攻击手段。目前物联网工程的安全性我们主要从数据机密性、数据完整性、数据新鲜性、可用性、鲁棒性和访问控制六方面考虑</p>
+<h2 id="4-1-物理层关键技术"><a href="#4-1-物理层关键技术" class="headerlink" title="4.1 物理层关键技术"></a>4.1 物理层关键技术</h2><p>例如，物理层是构建物联网架构的骨架，其中关键技术包括：</p>
+<ul>
+<li>芯片技术（英特尔公司的Quark系列处理器等）</li>
+<li>可信计算技术（技术目标是讲常规的功能操作与安全敏感的应用程序或服务分割隔离，从而减少整个系统的攻击面。可信计算包括5个关键技术概念，他们是完整可信系统所必须的，这个系统将遵从TCG规范：认证密钥、安全输入输出、内存屏蔽&#x2F;受保护执行、封装存储、远程证明）</li>
+<li>固件升级技术（由于当前大多数设备都将固件存储在Flash中，因此升级固件实际上是使用新的固件程序重写Flash）</li>
+</ul>
+<h2 id="4-2-感知层关键技术"><a href="#4-2-感知层关键技术" class="headerlink" title="4.2 感知层关键技术"></a>4.2 感知层关键技术</h2><p>感知层是为了实现设备对物理世界的感知，其中关键技术包括：</p>
+<ul>
+<li>传感器技术：能感受被测量并按照一定的规律转换成可用输出信号的器件或装置，传感器技术工作流程如下：</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/298f6b4959e44490b8ed1e5ecdc1dff3.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>RFID技术：自动识别技术的一种，通过无线射频方式进行非接触双向数据通信，利用无线射频方式对记录媒体（电子标签或射频卡）进行读写，从而达到识别目标和数据交换的目的，其被认为是21世纪最具发展潜力的信息技术之一。一般由信号发射机即电子标签、信号接收机即读写器、发射接收天线这三部分组成，如下所示：</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/99b0bf1be617435aa934c14cea546351.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>条码技术：条形码是由一组规则的条空及对应字符组成的符号，用于表示一定的信息。条形码技术的核心内容是通过利用光电扫描设备识读这些条形码符号来实现机器的自动识别，并快速、准确地把数据录入计算机进行数据处理，从而达到自动管理的目的</li>
+</ul>
+<h2 id="4-3-网络层关键技术"><a href="#4-3-网络层关键技术" class="headerlink" title="4.3 网络层关键技术"></a>4.3 网络层关键技术</h2><ul>
+<li>无线传感器网络：由多个传感器节点通过自组织方式构成的分布式传感网络，这些传感器节点一般位置相邻的或者属于同一检测区域。一般由多个不同功能的节点组成，例如传感器节点，汇聚节点和管理节点</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/8a72f18f013e4ad5be4245aeaa95f9a2.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>无线网络技术：在较小范围内，通过除了网络连接线之外的某种通信媒介相互连接，实现数个设备相互通信的网络，比如蓝牙</li>
+<li>云计算技术：云计算是分布式计算的一种，指的是通过网络“云”将巨大的数据计算处理程序分解成无数个小程序，然后，通过多部服务器组成的系统进行处理和分析这些小程序得到结果并返回给用户</li>
+</ul>
+<h2 id="4-4-应用层关键技术"><a href="#4-4-应用层关键技术" class="headerlink" title="4.4 应用层关键技术"></a>4.4 应用层关键技术</h2><ul>
+<li>无人驾驶感知系统</li>
+<li>智能火灾检测系统</li>
+<li>智能交通管理系统</li>
+</ul>
+<h2 id="4-5-物联网架构层"><a href="#4-5-物联网架构层" class="headerlink" title="4.5 物联网架构层"></a>4.5 物联网架构层</h2><p>IoT架构基础设施可分为三大类</p>
+<ul>
+<li>嵌入式设备</li>
+<li>软件和应用程序</li>
+<li>无线电通信</li>
+</ul>
+<p>物联网架构以其最简单的形式包括三个组件：</p>
+<ul>
+<li>移动</li>
+<li>云</li>
+<li>设备</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/8b5f4f220cdb4463b04828a897cc4889.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>组件之间的通信取决于IoT产品的用途和&#x2F;或类型。以下是一些示例，这些示例将使组件之间如何以及为何不相互交谈变得清晰。</p>
+<ul>
+<li>设备只能移动通话-例如。基于BLE的设备</li>
+<li>设备仅与IoT网关对话–例如。ZigBee，无线HART设备等</li>
+<li>移动仅与云对话–如果用户没有对设备的邻近访问权，并且只能通过云进行控制。</li>
+</ul>
+<p><strong>功能架构</strong>：</p>
+<p>可以进一步扩展功能架构，以定义通过互联网与云和移动&#x2F; Web界面通信的传感器网络。在传统的基于TCP &#x2F; IP的技术无法实现的情况下，传感器可能拥有自己的网络，或者在无法实现传统网络并且无线电通信提供更高效率和更多意义的情况下，具有基于无线电的网络。在后一种情况下，需要有一个网关（我们的IoT网关&#x2F;集线器&#x2F;路由器）充当无线电通信与传统TCP &#x2F; IP通信之间的接口。从现在开始，我将把TCP &#x2F; IP称为传统的网络&#x2F;通信</p>
+<p><img src="https://img-blog.csdnimg.cn/e4b7234e2aa74bdb818404b8186ecd5a.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>我们还可以拥有地理位置分散的传感器网络，这些网络可以通过IoT网关通过传统网络相互通信&#x2F;连接，如下所示：</p>
+<p><img src="https://img-blog.csdnimg.cn/2002a604a33a49649cb6116386fc0591.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><img src="https://img-blog.csdnimg.cn/dd48e10d5a814a6d9af71a8913302e6d.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>物联网有两种分层方法：</p>
+<ul>
+<li>第一种：感知层、网络层、应用层</li>
+<li>第二种：感知层、网络层、平台层、应用层</li>
+</ul>
+<p>从分层的角度看待物联网技术，可以将构成物联网核心的基本架构分为三层：</p>
+<ul>
+<li>感知层(传感层)：由硬件传感器和传感器网络组成；主要是指前端数据的获取，通过传感器采集某些数据（声、光、电等），比如北斗获得经纬度，还有环境监测温湿度传感器等</li>
+<li>网络层：它由通信机制组成，该机制允许传感层与管理层进行通信，例如– Wifi，3G，LTE，以太网等；将感知层采集的数据进行回传，基于不同特点采用不同的通信协议技术</li>
+<li>应用层：这是最顶层，负责从原始数据中弄清楚意义，并为用户提供可呈现的精美视图。它包括云，存储，应用等；把前端感知层的得到的信息进行处理，并实现具体的应用。可以理解为物联网的数据平台和业务平台</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/0ee941512c514318a28025a2c5f56fb7.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>通信的上行和下行（上下行是通信的两个方向）：</p>
+<ul>
+<li>上行：把设备端传感器的数据传到云上</li>
+<li>下行：通过手机或电脑下发一些控制指令到设备端</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/7299f89aaf8b4126bd4d05f42df7e8d7.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h3 id="4-5-1-感知层（感知信息）"><a href="#4-5-1-感知层（感知信息）" class="headerlink" title="4.5.1 感知层（感知信息）"></a>4.5.1 感知层（感知信息）</h3><p>承担感知信息作用的传感器，一直是工业领域和信息技术领域发展的重点，传感器不仅感知信号、标识物体，还具有处理控制功能</p>
+<p>感知层是整个物联网系统的数据基础。它利用传感器获得被测量(物理量、化学量或生物量)的模拟信号，并负责把模拟信号量转换成数字，也包括从电子设备（如串口设备）中采集到的直接的数字，最终由传输层转发到应用层</p>
+<h3 id="4-5-2-感知层划分"><a href="#4-5-2-感知层划分" class="headerlink" title="4.5.2 感知层划分"></a>4.5.2 感知层划分</h3><ol>
+<li>信息采集与控制</li>
+</ol>
+<ul>
+<li><p>信息采集与控制的主要功能：把模拟的信号，转换成单片机MCU能够处理的数字信息。</p>
+</li>
+<li><p>各种传感器和执行器：温度传感器、湿度传感器、压力传感器、液压传感器、三轴传感器、GPS定位、摄像头、电机</p>
+</li>
+</ul>
+<p><strong>PS</strong>：传感器主要是读取数据以及控制器主要是写入数据</p>
+<ol start="2">
+<li>物联网无线终端</li>
+</ol>
+<p>物联网无线终端由MCU和无线收发器组成，MCU读取传感器的数字信息，并把读取到数字信息通过无线信号传送给物联网的网络层设备。</p>
+<p>涉及到的无线技术有：</p>
+<ul>
+<li>LoRa协议、sigfox、2G GRPS、4G IoT、5G eMTC</li>
+<li>RFID、蓝牙、ZigeBee、WiFi</li>
+</ul>
+<p>伴随着物联网产业的快速发展， 对新型传感器、 芯片的需求逐渐增大， 因此对其尺寸和功耗提出了更高的要求。</p>
+<p>而MCU（Micro Control Unit ， 微控制单元） 和MEMS（Micro-Electro-Mechanical System ， 微机电系统） 由于其高性能、 低功耗和高集成度的优势， 得到了全面发展， 成为感知层发展最重要的两项技术。</p>
+<h3 id="4-5-3-网络层（传输信息）"><a href="#4-5-3-网络层（传输信息）" class="headerlink" title="4.5.3 网络层（传输信息）"></a>4.5.3 网络层（传输信息）</h3><p>网络层也可以叫做传输层，物联网的传输层主要负责传递和处理感知层获取的信息</p>
+<p>分为：有线传输和无线传输两大类， 其中无线传输是物联网的主要应用</p>
+<p>无线传输技术按传输距离可划分为两类：</p>
+<ul>
+<li>低功耗、短距离、局域网通信技术（几米-几百米）：LP-LAN（low-power Local-Area Network）<ul>
+<li>包括Zigbee、 WiFi、 蓝牙等为代表的短距离传输技术。</li>
+</ul>
+</li>
+<li>低功耗、长距离、广域网通信技术（几千米到几十千米）：LP-WAN（low-power Wide-Area Network）</li>
+</ul>
+<p> LPWAN又可分为两类：</p>
+<ul>
+<li>一类是工作于未授权免费频谱：如LoRa、 Sigfox等技术；</li>
+<li>一类是工作于授权收费频谱下： 3GPP支持的2&#x2F;3&#x2F;4&#x2F;5G蜂窝通信技术， 比如eMTC（enhanced machinetype of communication ， 增强机器类通信） 、 NB-IoT（Narrow Band Internet of Things ， 窄带物联网）</li>
+</ul>
+<p>下面是这两类无线传输技术的对比图：</p>
+<p><img src="https://img-blog.csdnimg.cn/3a43a5875a0d4edcb1ea21172f8450b8.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>有线：主要是IP&#x2F;以太网数据传输网，有以太网交换机和路由器组成，物理接口包括SFP光口和RJ45电口、Modulbus等</p>
+<h3 id="4-5-4-平台层"><a href="#4-5-4-平台层" class="headerlink" title="4.5.4 平台层"></a>4.5.4 平台层</h3><p>平台层在整个物联网体系架构中起着承上启下的关键作用，它不仅实现了底层终端设备的“管、控、营”一体化，为上层提供应用开发和统一接口，构建了设备和业务的端到端通道，同时，还提供了业务融合以及数据价值孵化的土壤，为提升产业整体价值奠定了基础</p>
+<p>从历史形成成因来看，平台层是由于社会分工分行形成的产物。有了平台层的存在，企业就可以专心于构建自己的应用或者组建自己的产品网络，而不费心与如何让设备联网。</p>
+<p>各大公司都构建了自己的物联网平台，比如：</p>
+<ul>
+<li>中国移动的OneNet</li>
+<li>华为的OceanConnect</li>
+<li>腾讯的QQ物联</li>
+<li>阿里云物联网套件</li>
+<li>百度IoT Hub</li>
+<li>京东微联</li>
+<li>微软的Azure</li>
+<li>亚马逊的AWS IoT</li>
+</ul>
+<p>在物联网中，平台层也有类似的分层关系，按照逻辑关系由分为四部分：</p>
+<ul>
+<li>连接管理平台CMP（Connectivity Management Platform） </li>
+<li>设备管理平台DMP（Device Management Platform） </li>
+<li>应用使能平台AEP（Application Enablement Platform）</li>
+<li>业务分析平台BAP（Business Analytics Platform）</li>
+</ul>
+<p>四个平台的组成关系如下图所示：</p>
+<p><img src="https://img-blog.csdnimg.cn/b09cf68053234796a3d86815f6d5eaf1.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h4 id="4-5-4-1-连接管理平台CMP"><a href="#4-5-4-1-连接管理平台CMP" class="headerlink" title="4.5.4.1 连接管理平台CMP"></a>4.5.4.1 连接管理平台CMP</h4><p>连接管理平台通常指基于电信运营商网络（蜂窝，LTE等）提供可连接性管理、优化以及终端管理，维护等方面的功能的平台。其功能通常包括：</p>
+<ul>
+<li>号码&#x2F;IP地址&#x2F;Mac资源管理</li>
+<li>SIM卡管控</li>
+<li>连接资费管理</li>
+<li>套餐管理</li>
+<li>网络资源用量管理</li>
+<li>账单管理</li>
+<li>故障管理等</li>
+</ul>
+<p>物联网连接具备M2M连接数大、单个物品连接ARPU值低（人类连接客户ARPU值的3%-5%）的特点，直接结果就是多数运营商将放弃自建CMP平台，转与专门化的CMP平台供应商合作。</p>
+<p>典型的连接管理平台包括思科的Jasper平台、爱立信的DCP、沃达丰的GDSP，Telit的M2M平台、PTC的Thingworx和Axeda。</p>
+<p>目前全球化的CMP主要有三家：Jasper平台、爱立信DCP平台和沃达丰GDSP平台，其中Jasper最大，与全球超过100家运营商、3500家企业客户展开合作，国内的中国联通也通过宜通世纪与Jasper平台进行合作。</p>
+<p>在国内三大运营商中，中国移动选择自研One NET连接管理平台，中国联通与Jasper战略合作，选择其Control平台提供物联网连接服务；中国电信也先后自研及与爱立信合作建立两套连接管理平台。</p>
+<p>需要注意的是，在国内几乎没有纯粹的CMP平台，这个CMP平台是在物联网早期时运营商需要对物联卡进行大量管理时才出现的。无论是中国联通的Jasper还是中国移动的Onenet，本质上至少一个CMP+AEP平台。</p>
+<p>故一般CMP平台的提供商多半都属于运营商，其它的的IOT平台更多是CMP平台的使用方（如果牵涉到物联卡，比如2G&#x2F;3G&#x2F;4G，eMTC和NB-IOT）</p>
+<h4 id="4-5-4-2-设备管理平台DMP"><a href="#4-5-4-2-设备管理平台DMP" class="headerlink" title="4.5.4.2 设备管理平台DMP"></a>4.5.4.2 设备管理平台DMP</h4><p>物联网设备管理平台DMP往往集成在端到端的全套设备管理解决方案中，进行整体报价收费。DMP功能包括用户管理以及物联网设备管理，例如配置、重启、关闭、恢复出厂、升级&#x2F;回退等，设备现场产生的数据的查询，以及基于现场数据的报警功能，设备生命周期管理等。</p>
+<p>典型的DMP平台包括：</p>
+<ul>
+<li>BOSCHIoTSuite、IBMWatson、DiGi、百度云物接入IoTHub、三一重工根云、GEPredix等。</li>
+</ul>
+<p>以百度云为例，百度云物接入IoTHub是建立在IaaS上的PaaS平台，提供全托管的云服务，帮助建立设备与云端之间的双向连接，支撑海量设备的数据收集、监控、故障预测等各种物联网场景</p>
+<p>一些垂直领域巨头本身就是设备提供商，业务外延至平台层面，通常能够提供整体解决方案，部分能够集成CRM、ERP、MES等信息系统</p>
+<p>大部分DMP平台提供商本身也是通信模组、通信设备提供商，比如DiGi、Sierra Wireless、Bosch等，本身拥有连接设备、通信模组、网关等产品和设备管理平台，因此能帮助企业实现设备管理整套解决方案。一般DMP部署在整套设备管理解决方案中，整体报价收费；也有少量单独提供设备管理云端服务的厂商，每台设备每个月收取一定运营管理费用，比如早期的Ablecloud（按接入设备数量收费）</p>
+<h4 id="4-5-4-3-应用使能平台AEP"><a href="#4-5-4-3-应用使能平台AEP" class="headerlink" title="4.5.4.3  应用使能平台AEP"></a>4.5.4.3  应用使能平台AEP</h4><p>应用使能平台AEP是提供快速开发部署物联网应用服务的PaaS平台。它为开发者提供了大量的中间件、开发工具、API接口、应用服务器、业务逻辑引擎等，此外一般都还需要提供相关硬件（比如计算、存储、网络接入环境等）。它的存在，极大地降低了软件开发复杂度和开发门槛。</p>
+<p>典型的AEP平台提供商包括PTCThing worx，艾拉物联，Ablecloud，机智云，Comulo city，AWS IoT，Watson IoT Platform等。</p>
+<h4 id="4-5-4-4-业务分析平台BAP"><a href="#4-5-4-4-业务分析平台BAP" class="headerlink" title="4.5.4.4 业务分析平台BAP"></a>4.5.4.4 业务分析平台BAP</h4><p>业务分析平台BAP主要通过大数据分析和机器学习等方法，对数据进行深度解析，以图表、数据报告等方式进行可视化展示，并应用于垂直行业。</p>
+<p>由于这个平台涉及到大量的数据和业务场景，故绝大部分都是由企业把控，另外由于人工智能技术及数据感知层搭建的进度限制，目前BAP平台发展仍未成熟。</p>
+<h3 id="4-5-5-应用层（处理信息）"><a href="#4-5-5-应用层（处理信息）" class="headerlink" title="4.5.5 应用层（处理信息）"></a>4.5.5 应用层（处理信息）</h3><p>丰富的应用是物联网的最终目标，未来基于政府、企业、消费者三类群体将衍生出多样化物联网应用，创造巨大社会价值。根据企业业务需要,在平台层之上建立相关的物联网应用,例如: 城市交通情况的分析与预测；城市资产状态监控与分析；环境状态监控、分析与预警(例如：风力、雨量、滑坡)；健康状况监测与医疗方案建议等等。</p>
+<p>物联网的十大应用产业：</p>
+<ul>
+<li>智能交通</li>
+<li>智能家居</li>
+<li>智慧建筑</li>
+<li>智能安防</li>
+<li>智能零售</li>
+<li>智慧能源</li>
+<li>智慧农业</li>
+<li>智慧医疗</li>
+<li>智能制造</li>
+<li>智慧物流</li>
+</ul>
+<h1 id="0x05-物联网安全挑战"><a href="#0x05-物联网安全挑战" class="headerlink" title="0x05 物联网安全挑战"></a>0x05 物联网安全挑战</h1><p>物联网设备不断暴露于各类型不断发展的物联网安全威胁中。最常见的类别包括：</p>
+<ul>
+<li>数据窃取：如果物联网黑客能够访问易受攻击的设备，则就可以窃取敏感和潜在的机密数据，并将其在线出售给感兴趣的各方</li>
+<li>设备篡改：举例来说，业务赋能物联网设备（包括可通过篡改固件来修改系统行为的智能表计）可能会少报消耗量</li>
+<li>拒绝服务 (DoS) 攻击：黑客能够将大量物联网设备吸收到所谓的僵尸网络中以进行协同攻击，包括关闭网站</li>
+<li>未经授权的访问：如果安全性差，则联网的监控摄像头、门锁以及带有麦克风和其他传感器的物联网设备可能会被劫持</li>
+<li>勒索软件攻击：黑客可以锁定具有安全漏洞的物联网设备以中断相关公司的业务，直至收到赎金</li>
+<li>传感器欺骗：物联网设备可能会收到虚假信息，导致其出现故障。传感器欺骗涉及从复杂的射频信号干扰到简单的用硬纸板切口愚弄摄像头的任何事项</li>
+</ul>
+<p>IoT受到的威胁大概划分如下：</p>
+<ul>
+<li>远程访问</li>
+<li>手机终端</li>
+<li>静态KEY</li>
+<li>固件分析</li>
+<li>硬件接口</li>
+<li>暴力破解</li>
+<li>云端攻击</li>
+<li>物理攻击</li>
+<li>不安全通信</li>
+<li>软件设计缺陷</li>
+<li>物理接触访问</li>
+<li>通信信息劫持伪造</li>
+</ul>
+<h2 id="5-1-物联网安全-VS-传统互联网安全"><a href="#5-1-物联网安全-VS-传统互联网安全" class="headerlink" title="5.1 物联网安全 VS 传统互联网安全"></a>5.1 物联网安全 VS 传统互联网安全</h2><p>物联网体系架构：</p>
+<ul>
+<li>应用层</li>
+<li>网络层</li>
+<li>感知层</li>
+<li>物理层</li>
+</ul>
+<p>传统互联网五层协议：</p>
+<ul>
+<li>应用层</li>
+<li>运输层</li>
+<li>网络层</li>
+<li>数据链路层</li>
+<li>物理层</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>物联网安全</th>
+<th>传统互联网安全</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>互联要求</td>
+<td>复杂，整体</td>
+<td>分层</td>
+</tr>
+<tr>
+<td>加密方式</td>
+<td>轻量级加密</td>
+<td>标准库加密</td>
+</tr>
+<tr>
+<td>认证方式</td>
+<td>单层或多层</td>
+<td>分层</td>
+</tr>
+<tr>
+<td>数据处理能力</td>
+<td>要求高</td>
+<td>相对低</td>
+</tr>
+<tr>
+<td>安全性需求</td>
+<td>整体安全</td>
+<td>分层安全</td>
+</tr>
+</tbody></table>
+<p><strong>备注</strong>：</p>
+<ol>
+<li>传统互联网：IPv4地址不足，各层安全性问题</li>
+<li>物联网安全：终端暴露在公共场合；网络多而杂；数据量大；运算能力有限；安全要求高</li>
+</ol>
+<h1 id="0x06-物联网攻击分类"><a href="#0x06-物联网攻击分类" class="headerlink" title="0x06 物联网攻击分类"></a>0x06 物联网攻击分类</h1><h2 id="6-1-硬件渗透测试"><a href="#6-1-硬件渗透测试" class="headerlink" title="6.1 硬件渗透测试"></a>6.1 硬件渗透测试</h2><p>硬件渗透测试侧重于解决方案的电子组件（非侵入式和侵入式攻击）。</p>
+<p>使用的技术包括：</p>
+<ul>
+<li>从所研究的硬件设备中提取元素的逆向工程</li>
+<li>内存转储</li>
+<li>密码分析</li>
+</ul>
+<h2 id="6-2-固件渗透测试"><a href="#6-2-固件渗透测试" class="headerlink" title="6.2 固件渗透测试"></a>6.2 固件渗透测试</h2><p>固件的渗透测试侧重于嵌入在对象中的软件，包括一定数量的技术：</p>
+<ul>
+<li>检测打开和保护不良的通信端口</li>
+<li>缓冲区溢出</li>
+<li>破解密码</li>
+<li>逆向工程</li>
+<li>密码分析</li>
+<li>固件修改</li>
+<li>调试</li>
+<li>检测配置接口或后门</li>
+</ul>
+<h2 id="6-3-通信协议渗透测试"><a href="#6-3-通信协议渗透测试" class="headerlink" title="6.3 通信协议渗透测试"></a>6.3 通信协议渗透测试</h2><p>通信协议的渗透测试侧重于实现对象通信和向外部发送数据的技术（RFID、NFC、ZigBee、蓝牙、WiFi、SigFox、LoRa 等）。</p>
+<p>测试基于以下技术：</p>
+<ul>
+<li>捕获和分析多协议无线电信号（嗅探）</li>
+<li>密码分析</li>
+<li>被动监控交易所</li>
+<li>交易所的拦截和腐败</li>
+<li>拒绝服务</li>
+</ul>
+<h2 id="6-4-蓝牙攻击"><a href="#6-4-蓝牙攻击" class="headerlink" title="6.4 蓝牙攻击"></a>6.4 蓝牙攻击</h2><p>低功耗蓝牙 (BLE) 是一种特别使用的通信协议，因为它可以在设备之间发送少量数据，同时节省电池。</p>
+<p>与 BLE 相关的安全问题通常与协议的错误实现有关。有一些方法可以对数据交换进行加密，加强协议的安全性，这些方法需要从连接对象的设计阶段开始研究。</p>
+<h1 id="0x07-物联网安全渗透测试的好处"><a href="#0x07-物联网安全渗透测试的好处" class="headerlink" title="0x07 物联网安全渗透测试的好处"></a>0x07 物联网安全渗透测试的好处</h1><p>识别物联网弱点并进行加固有助于如下：</p>
+<ul>
+<li>加强设备安全</li>
+<li>防止未经授权的使用</li>
+<li>避免提升特权</li>
+<li>降低妥协的风险</li>
+<li>改善用户和数据隐私</li>
+<li>加强加密以避免中间人攻击</li>
+</ul>
+<h1 id="0x08-面对现实问题：学习物联网安全并不容易"><a href="#0x08-面对现实问题：学习物联网安全并不容易" class="headerlink" title="0x08 面对现实问题：学习物联网安全并不容易"></a>0x08 面对现实问题：学习物联网安全并不容易</h1><p>将面临许多挑战，例如从利用工具但没有按预期执行攻击反而让设备变砖等操作，应有尽有。甚至需要几个月的时间才能弄清楚不同的硬件、电子元器件、协议、无线电等方式以及应该在哪里投入宝贵的时间和精力 </p>
+<p>由此大家也看到了，物联网不是一个单一的东西，相反，它是嵌入式设备、云网络应用和移动应用程序、后端应用程序、固件和无线电通信协议的组合。这些组件中的每一个都可能需要数年才能掌握，甚至更久的时间。但是，这并不意味着我们要一次要花费几个月、甚至几年的时间来熟悉每个组件，如果真是这种情况，我们可能需要数年时间才能成为一名了解 IoT 生态系统中所有组件的 IoT 渗透测试工程师 </p>
+<p>那么如何快速知道，在哪里投入时间来学习物联网渗透测试本身就是一件不容易的事情，在 ARM 二进制逆向方面知道多少，以及应该花多少时间来分析 PCB等诸如此类的事情吗？</p>
+<p>如何确定使用哪些设备或平台来学习物联网安全？是否认为在这里和其它地方阅读博客文章和文章或仅观看会议视频来学习是最好的选择。当然，这些博客、论坛、技术等为我所有，为我提供了知识，但是为什么要重复去做没有意义的事情呢？在自身不知道在做什么并且没有系统化学习方法的情况下，一个接一个学习知识，然后陷入困境？    </p>
+<p>本系列专栏，属于小白入门的，因为我也是小白，期望跟着大家一起成长，你们不需要弄清楚每一个小细节，因为我已经为你做了所有需要做的这些，还有更多，只需跟着博客文章走，即可</p>
+<p>我们中的很多人都对我们现在所处的生活、我们正在做的事情以及我们正在做的工作感到满意。如果你是这样的，我不怪你，因我和你一样，但我很快就意识到我已经停止进步了。我在信息安全行业的大多数玩的好的朋友都获得了更好工作、岗位、职业发展，并且能够实现他们的职业目标，但不是我。 </p>
+<p>然后我决定，与其感到舒服或处在一个舒适的环境里，不如尝试一些挑战我不会的东西，毕竟这就是我们所有人的成长方式，无论是专业的还是普通的。我决定开始学习物联网的基础知识，将其作为安全行业中最新兴、最令人兴奋（甚至是现在）的领域之一 </p>
+<p>我面临的第一个挑战是没有足够的可用资源来学习物联网安全，大家从上面的介绍需要的工具中就看出需要购买的工具，就要消耗掉不菲的费用，光是好点的逻辑分析仪就价值数万元甚至数万美金不等（后面我们尽量减少一定开支来做学习，避免产生过高的费用导致学习进展不下去），却网上几乎没有任何关于物联网安全比较系列的教程，只有几次会议演讲和技术文章等都比较零散，不能系统化的学习。然后有相当多的文章和博客文章，但是当我尝试时，有些东西或其他东西都不起作用，我很难找到自己的方法。 </p>
+<p>由此，我想到来一条路，希望有一个从基础开始教授物联网安全的技术博客，让我为现实世界的物联网安全研究做好准备，因为我正在从事的领域是车联网安全，物联网安全是我必须要去学习掌握的技能。 </p>
+<p>所以，我尽我所能… … </p>
+<p>以攻击者视角将物联网，按照攻击面分解各应用组件，可分为生态系统、设备内存、设备物理接口、设备Web 界面、 设备固件、网络服务、管理界面、本地数据存储、云Web 界面、第三方后端APIs、更新机制、移动应用程序、供应商后端 APD、生态系统通信、网络流量、认证与授权、隐私和硬件</p>
+<p>事情到这里，其实还要走很长一段路，但重点是我做出了决定，并朝着目标迈出了一步。正如，你所见的那样，学的东西太多了，压根段时间掌握不了，博主同学我也没啥太多的技巧，业余时间碎片化学习，期望能对同学你有帮助，您不必重新造轮子，你不需要弄清楚每一个小细节。我已经为你做了所有这些，还有更多，当然我也会有错的时候，欢迎大家指出一起进步</p>
+<p>假如，你跟博主同学一样，今天迈出了自己的一步，迈出了让自己开始的第一步呢？ 从那里开始，它只是动力，这种势头往往会让我们走很长的路。这只是第一步，仿佛一座山，它会让我们在头脑中创造了所有无限可能的思维过程</p>
+<h1 id="0x09-相关技术"><a href="#0x09-相关技术" class="headerlink" title="0x09 相关技术"></a>0x09 相关技术</h1><h2 id="9-1-OT"><a href="#9-1-OT" class="headerlink" title="9.1 OT"></a>9.1 OT</h2><p>OT（Operation Technology 操作技术），是为工厂自动化控制系统提供技术支持，确保生产正常进行的专业技术</p>
+<p>随着工业4.0的来临，ICT技术被引入到OT中，IT、OT、CT将紧密的融合（智能制造）</p>
+<h2 id="9-2-PLC"><a href="#9-2-PLC" class="headerlink" title="9.2 PLC"></a>9.2 PLC</h2><p>可编程逻辑控制器(Programmable Logic Controller，PLC)</p>
+<h1 id="0x10-IoT攻击面"><a href="#0x10-IoT攻击面" class="headerlink" title="0x10 IoT攻击面"></a>0x10 IoT攻击面</h1><p>有效的物联网设备的安全测试，需要对于给定设备进行综合评估并发现所有的攻击面。评估IoT攻击面的技术相比于评估Web应用程序、移动应用程序并没有改变很多，多数仍是以Web攻击面为主，比如市面上常见的网关+路由器的组合</p>
+<p>细分IoT的组成：</p>
+<ul>
+<li>云端&#x2F;Web</li>
+<li>移动应用程序</li>
+<li>执行器</li>
+<li>传感器</li>
+<li>网关</li>
+</ul>
+<p>常见IoT架构：</p>
+<p><img src="https://img-blog.csdnimg.cn/5547c2c5ba37461b878f6b44f31c0989.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>IoT 安全相当于一个安全的集合，要学的是真的多，看着就脑壳痛…. ….，需要很多专业的设备进行研究和测试使用，结果还没入门就劝退很多想入门的同学，包括我自己，哈哈… ..</p>
+<ol>
+<li>Web应用程序：</li>
+</ol>
+<ul>
+<li>SQL注入</li>
+<li>XSS</li>
+<li>本地&#x2F;运程文件包舍</li>
+<li>使用不安全组件</li>
+<li>信息泄露</li>
+<li>未授权访问</li>
+<li>认证缺陷</li>
+<li>管理配件错误</li>
+<li>其它安全问题</li>
+</ul>
+<ol start="2">
+<li>手机终端：</li>
+</ol>
+<ul>
+<li>操作系统<ul>
+<li>远程溢出漏洞</li>
+<li>内核提权</li>
+<li>沙箱绕过</li>
+<li>远程代码执行</li>
+<li>信息泄露</li>
+<li>其它安全问题</li>
+</ul>
+</li>
+<li>APP<ul>
+<li>信息泄露</li>
+<li>远程代码执行</li>
+<li>弱口令</li>
+<li>明文通信</li>
+<li>硬编码，密码泄漏</li>
+<li>APP无加固</li>
+<li>其它安全问题</li>
+</ul>
+</li>
+</ul>
+<ol start="3">
+<li>感知层设备：</li>
+</ol>
+<ul>
+<li>操作系统<ul>
+<li>命令行接口</li>
+<li>权限提升</li>
+<li>暴力破解</li>
+<li>缓冲区溢出</li>
+<li>管理配置</li>
+<li>信息泄露</li>
+<li>其它安全问题</li>
+</ul>
+</li>
+<li>固件：<ul>
+<li>固件提取</li>
+<li>加密密钥</li>
+<li>固件降级</li>
+<li>敏感信息泄露</li>
+<li>固件更新机制<ul>
+<li>更新未校检</li>
+<li>明文更新</li>
+<li>更新未签名</li>
+</ul>
+</li>
+<li>其它安全问题</li>
+</ul>
+</li>
+</ul>
+<ol start="4">
+<li>数据通信：</li>
+</ol>
+<ul>
+<li>更新替换</li>
+<li>缓冲区溢出</li>
+<li>敏感信息泄露</li>
+<li>加密密钥泄露</li>
+<li>DDOS&#x2F;DOS攻击</li>
+<li>中间人劫特<ul>
+<li>数据替换</li>
+<li>HTTP注入</li>
+<li>钓鱼攻击</li>
+</ul>
+</li>
+<li>无线电攻击<ul>
+<li>无线电信号劫持</li>
+<li>无线电信号篡改</li>
+<li>无线电重放攻击</li>
+</ul>
+</li>
+<li>其它安全问题</li>
+</ul>
+<p>遵循以下步骤可以更快的发现IoT的攻击面：</p>
+<ul>
+<li>首先了解整个物联网设备架构，通过各种途径或在厂商文档信息中发现更多的相关细节</li>
+<li>对指定设备的每个架构组件建立一个体系结构图，如果是两个“组件”之间的通信，用导向线画出并指定正在使用的通信协议等详细信息，如果应用程序是使用API与云端发送和接收数据，那就在体系结构图中标记它并记录使用的是哪个API</li>
+<li>当完整的体系结构图准备好时就开始像攻击者一样去思考，如果你必须攻击某个特定“组件”的话你需要确定使用什么样的技术并提取哪些辅助攻击的相关信息，在表格中列出IoT架构中的组件和所需做的测试</li>
+</ul>
+<p>下表是IoT架构中一个“组件”的攻击面分析：</p>
+<table>
+<thead>
+<tr>
+<th>组件</th>
+<th>攻击面</th>
+<th>案例</th>
+<th>预期输出&#x2F;数据获取</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>IoT网关</td>
+<td>基于硬件的攻击向量</td>
+<td>1. 使用串口进行通信<br>2. 固件导出技术</td>
+<td>1. 调试日志，shelli访问权限<br>2. 访问固件，逆向分析固件漏洞</td>
+</tr>
+<tr>
+<td></td>
+<td>云网络通信</td>
+<td>1. 嗅探通信数据<br>2. 修改和重放数据</td>
+<td>1. 理解通信数据，检查是否正在发送数据<br>2. 确定云端是否检查消息的真实性和合法</td>
+</tr>
+</tbody></table>
+<p>上述分析步骤完成，就可以执行实际的测试攻击，既然已经有了明确的想法接下来看看可以使用什么样的攻击技术</p>
+<p>1.IoT网关</p>
+<ul>
+<li>基于硬件的攻击向量：<ul>
+<li>串口通信、固件导出等，获得访问固件的权限并提取存储在其中的敏感信息</li>
+<li>嗅探发送到云端的通信数据</li>
+<li>重放和伪造通信数据并发送到云端</li>
+</ul>
+</li>
+</ul>
+<p>2.设备</p>
+<ul>
+<li>基于硬件的攻击向量：<ul>
+<li>串口通信、固件导出等，获得访问固件的权限并提取存储在其中的敏感信息</li>
+<li>设备和网关之间的无线电通信分析攻击如：Zigbee, zWave, 6LoWPAN</li>
+<li>BLE(蓝牙低功耗技术)攻击</li>
+</ul>
+</li>
+</ul>
+<p>3.移动应用程序</p>
+<ul>
+<li>嗅探发送和接收的数据</li>
+<li>重放和伪造通信数据并发送到云端或设备</li>
+<li>移动应用程序逆向分析及敏感数据提取</li>
+</ul>
+<p>4.云端&#x2F;WEB程序</p>
+<ul>
+<li>常见Web漏洞</li>
+</ul>
+<h2 id="10-1-简单案例分析"><a href="#10-1-简单案例分析" class="headerlink" title="10.1 简单案例分析"></a>10.1 简单案例分析</h2><p>下面内容记录了对某款物联网设备的攻击面及安全分析，包括网关、设备、云端、移动客户端之间的通信安全，云端API接口逻辑、网关与设备绑定和解绑等关键操作的安全情况</p>
+<table>
+<thead>
+<tr>
+<th>产品型号</th>
+<th>联合报警网关</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>设备固件版本</td>
+<td>V1.4.1</td>
+</tr>
+<tr>
+<td>移动客户端版本</td>
+<td>V2.5.6</td>
+</tr>
+</tbody></table>
+<h3 id="10-1-1-通信安全"><a href="#10-1-1-通信安全" class="headerlink" title="10.1.1 通信安全"></a>10.1.1 通信安全</h3><p>网关-云端-移动客户端：</p>
+<p>在套用上面的攻击面分析模型后可以发现待测设备的机密性得到了良好的保护。联合报警网关、设备、云端系统、移动客户端四者之间的通信，除了日志统计信息(对于与 <code>logs.***.com</code>服务器的通信)外全部是加密通信，TCP 链接使用 TLS1.2 通信，使用 HTTPS 传输，UDP 数据使用 AES-128-ECB 加密后传输，完整性通用得到了良好的保护。HmacSHA256，HmacSHA1，HmacMd5 的方式保护，Hmac 的 Key 来自于用户登录之后服务端下发的 token，联合报警设备的旧系统固件将数据本地明文存储在 xml 文件中，新版本中本地数据是加密存储的。虽然保证了机密性和完整性但仍存在安全问题，云端接口无法抵御重放攻击</p>
+<ol>
+<li><code>api.******.com</code>无防重放机制，通过<code>api.******.version.check</code>获取当前APP版本，通过更改客户端版本到较低版本，再重放该请求，可以返回需要升级的Response包</li>
+</ol>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-variable constant_">POST</span> /api<span class="hljs-comment">/*****/</span>version/check <span class="hljs-variable constant_">HTTP</span>/<span class="hljs-number">1.1</span><br><span class="hljs-title class_">Host</span>: api.******.<span class="hljs-property">com</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/c9d26ee48dfb4887b0134b04fe636aec.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ol start="2">
+<li><code>api.*****.login</code>通过传输用户名和加密的密码和短信验证码结合才可登录，该接口可以重放，通过分析业务安全防护逻辑可发现虽然云端有IP登录次数限制，但在次数限制内更换代理IP可以持续爆破用户名和密码</li>
+</ol>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-variable constant_">POST</span> /api<span class="hljs-comment">/*****/</span>login <span class="hljs-variable constant_">HTTP</span>/<span class="hljs-number">1.1</span><br><span class="hljs-title class_">Host</span>: api.*****.<span class="hljs-property">com</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/5c27cc0f2b854810a00fe10bfd072f3f.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ol start="3">
+<li><code>api.*****.getit</code>仍可以重放，客户端退出账户，云端未将客户端sessionid做过期处理，导致云端还可以接受该sessionid并且返回相应的返回值</li>
+</ol>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-variable constant_">POST</span> /api<span class="hljs-comment">/*****/</span>getit <span class="hljs-variable constant_">HTTP</span>/<span class="hljs-number">1.1</span><br><span class="hljs-title class_">Host</span>: api.*****.<span class="hljs-property">com</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>注</strong>：类似这样的接口还很多在此不一一列举。大家看着是否觉得跟我们平时在做Web安全的暴力破解、在JS中获取未鉴权的接口构建数据包获取敏感信息书差不多的，前提条件是如果发现它们的利用点在哪里才是关键</p>
+<p>客户端与服务端的通信安全：</p>
+<table>
+<thead>
+<tr>
+<th>检查项</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>机密性</td>
+<td>http协议使用https传输<br>tcp使用AES286加密<br>UDP未加密</td>
+</tr>
+<tr>
+<td>完整性</td>
+<td>到达服务端的请求没有完整性校验</td>
+</tr>
+<tr>
+<td>可用性</td>
+<td>SMS CODE可爆破<br>没有防重放机制</td>
+</tr>
+</tbody></table>
+<p>客户端逆向分析通信的系统和认证方式：</p>
+<table>
+<thead>
+<tr>
+<th>系统</th>
+<th>访问控制分析</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>api.*****.com</code></td>
+<td>1. Identify: sessionId<br>2. Authentication: sessionId方式<br>3. 请求数据格式：JSON<br><code>Data=json&amp;sessionId&amp;******</code></td>
+</tr>
+<tr>
+<td><code>api.*****.com</code></td>
+<td>1. Identify: clientType、clientVersion、sessionId<br>2. Authentication: sessionId方式<br>3. 请求数据格式：JSON<br><code>Data=json&amp;clientType&amp;clientVersion&amp;sessionId&amp;******</code></td>
+</tr>
+<tr>
+<td><code>api.*****.com</code></td>
+<td>1. Identify: clientType、clientVersion、sessionId<br>2. Authentication: sessionId方式<br>3. 请求数据格式：JSON<br><code>Data=json&amp;clientType&amp;clientVersion&amp;sessionId&amp;******</code></td>
+</tr>
+</tbody></table>
+<h3 id="10-1-2-身份认证"><a href="#10-1-2-身份认证" class="headerlink" title="10.1.2 身份认证"></a>10.1.2 身份认证</h3><p>移动客户端访问云端系统使用不同的认证方式，有 token 和 session 校验这两种。在IoT架构设计层面，云端为了验证每次移动客户端的请求都要求附带token，而每次移动客户端向云端请求token将增加云端服务的压力，故该联合网关报警产品允许单次批量获取token存储本地供请求时调用。默认每次申请10个token，将count值改为100甚至更多仍可获取相应数量的token</p>
+<p><img src="https://img-blog.csdnimg.cn/ad567ebbcba14dbcbe5e2fdac78602ee.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h3 id="10-1-3-交互安全"><a href="#10-1-3-交互安全" class="headerlink" title="10.1.3 交互安全"></a>10.1.3 交互安全</h3><p>如果你接触过IoT设备，你会知道联合报警网关可搭配：烟雾探测器、水浸传感器、红外探测器等使用。实际上传感器与网关设备的绑定、解绑也存在安全问题</p>
+<p>下面感觉跟写软件测试用例一样，emo了：</p>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>内容</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>用户绑定设备的前提条件</td>
+<td>用户登录成功后获取有效时间为5min的sessioni，设备提交绑定请求到服务器完成绑定</td>
+<td>优势：实现未绑定设备不能注册到服务端，减小云端压 力 <br>缺陷：不在同一局域网也可绑定设备</td>
+</tr>
+<tr>
+<td>设备解绑的前提条件</td>
+<td>用户主动删除绑定关系，新的绑定关系覆盖旧的绑定关系</td>
+<td>优势：不存在退换货，但是用户没有解绑的业务风险<br>缺陷：设备被盗后还可以使用或二次销售，恶意用户可以通过二维码或设备编码强制绑定设备</td>
+</tr>
+<tr>
+<td>预览的前提条件</td>
+<td>绑定摄像头</td>
+<td>无明显缺陷</td>
+</tr>
+<tr>
+<td>Wi-Fi配置过程</td>
+<td>重置设备之后，设备加电进入Wi-Fi配置状态，通过二维码的形式将Wi-Fi的ssid和密码传输给设备</td>
+<td>无明显缺陷</td>
+</tr>
+<tr>
+<td>设备序列号丢失的解决</td>
+<td>对用户没有实质性影响</td>
+<td>无明显缺陷</td>
+</tr>
+<tr>
+<td>设备注册</td>
+<td>云端通过deviceSerialNo、 sessionId以及validateCode 来验证设备的合法性，云端下发resultCode&#x3D;0标注设备注册成功</td>
+<td>优势：缓解设备序列号与验证码冲突的问题<br>缺陷：无明显缺陷</td>
+</tr>
+<tr>
+<td>用户注册</td>
+<td>通过手机验证码或邮箱注册</td>
+<td>手机验证码注册：四位验证码可以爆破，发送手机短信 的接口可以给不同的手机号码发送短信，绕过60s限制<br>邮箱注册：四位验证码可以爆破</td>
+</tr>
+</tbody></table>
+<h3 id="10-1-4-射频信号重放"><a href="#10-1-4-射频信号重放" class="headerlink" title="10.1.4 射频信号重放"></a>10.1.4 射频信号重放</h3><p>遥控、传感器与网关通信的频率为868MHZ，如下图所示：</p>
+<p><img src="https://img-blog.csdnimg.cn/a7df9db47fa34d9eb3ded578adc72965.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>抓取到的报警信号如下图所示：</p>
+<p><img src="https://img-blog.csdnimg.cn/fb09221b844043bfb7765e2505a41e45.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>休眠模式波形如下：</p>
+<p><img src="https://img-blog.csdnimg.cn/2a233fa934514c9b8184409ac727b745.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>静默模式如下：</p>
+<p><img src="https://img-blog.csdnimg.cn/f257c818bb2c446da59a0934b2d4eb16.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>使用HackRF抓取传感器向联合报警网关发送的告警信号并重放，发现联合报警网关没有防重放机制，将抓取到的信号重放警报声马上响起</p>
+<p><img src="https://img-blog.csdnimg.cn/fe0f8498dd3a4ecebb72d194859c7ea4.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>现在我们可以很容易地将IoT的各个组成部分隔离开来，并尝试为每个组件分别定义攻击面，然后将它们组合起来以创建 一个整体的概述。物联网生态系统的攻击面。我称其为IoT生态系统而不是IoT产品，因为它确实是一个由不同组件相互交谈并解决特定现实问题的生态系统。让我们继续定义IoT生态系统的攻击面，并详细讨论每个组件的攻击面。按组件划分的攻击面可以分为三个或四个（如果我们将通信作为攻击面）主要区域如下：</p>
+<ul>
+<li>移动</li>
+<li>云</li>
+<li>通讯</li>
+<li>设备</li>
+</ul>
+<p>OWASP现在还在IoT安全方面做了很多工作。他们还定义了攻击面。希望大家可以好好阅读它。理解不同的想法是一件好事，因为它可以帮助您创建自己的综合攻击面</p>
+<p><strong>注意</strong>：</p>
+<ol>
+<li>除非特别说明，否则“微控制器”一词的通用形式表示微控制器，微处理器或SoC（片上系统）</li>
+<li>下面的攻击面是我们定义的，可能与其他来源不同</li>
+</ol>
+<h2 id="10-2-移动端攻击面"><a href="#10-2-移动端攻击面" class="headerlink" title="10.2 移动端攻击面"></a>10.2 移动端攻击面</h2><p>移动是物联网的重要用户界面之一，移动端是IoT用户了解物理设备状态的一个重要接口，移动App与IoT系统之间的命令发送和数据读取，是与IoT通信的窗口。通过它最终用户可以洞悉物理世界的状态。由于移动应用程序与IoT生态系统进行通信以发送命令和读取数据，因此它成为IoT生态系统的切入点之一。以下IoT系统移动端可能面临的一些攻击面：</p>
+<ul>
+<li>存储介质</li>
+<li>认证方式</li>
+<li>加密手段</li>
+<li>通讯方式</li>
+<li>通用移动漏洞（OWASP Mobile Top 10）</li>
+</ul>
+<h2 id="10-3-云端攻击面"><a href="#10-3-云端攻击面" class="headerlink" title="10.3 云端攻击面"></a>10.3 云端攻击面</h2><p>云是物联网的重要组成部分之一，通常来自产品线所有实例的数据都在这里汇聚。这使其成为非常有趣的攻击点。记住，我在上一篇文章中提到物联网不仅与硬件有关。原因是云将保存所有已部署的IoT实例的数据，并具有向所有实例发送命令的特权。通常它是由用户启动的，但是如果受到威胁，攻击者将获得对全球部署的设备（及其数据）的控制权，这很危险。</p>
+<p>IoT系统不只包括硬件，云端服务对IoT服务来说同样重要，它是产品线的各种实例汇聚，而实例中又包含了所有终端用户使用者的相关数据，同时云端服务还具备一定的命令执行权限，攻击者一旦成功渗透，就能对相关部署设备形成管理控制，危害甚大。总体而言，攻击面专注于它提供的接口，其中包括如下：</p>
+<ul>
+<li>存储介质</li>
+<li>认证方式</li>
+<li>加密手段</li>
+<li>通信方式</li>
+<li>蜂窝</li>
+<li>APIs接口</li>
+<li>通用的Web &#x2F;云漏洞（OWASP Web Top 10）</li>
+</ul>
+<h2 id="10-4-硬件端攻击面"><a href="#10-4-硬件端攻击面" class="headerlink" title="10.4 硬件端攻击面"></a>10.4 硬件端攻击面</h2><p>接下来是设备，它是IoT技术的游戏规则改变者。它与物理世界进行交互，并与虚拟世界进行通信。这是物理世界数据的第一站。鉴于围绕用户隐私存储的用户敏感数据（例如房屋数据，身体数据，个人信息），围绕用户隐私存在着整个争论。将来，设备可能会直接通过其钱包或单独的临时钱包使用用户的加密货币来购买物品，进行维修等。</p>
+<p>当家电企业忙着让自己的家电“联网”“智能”的时候，人们并没有意识到这些智能硬件会成为无处不在的威胁，于是路由器被入侵、洗衣机被入侵、电视机被入侵、家用摄像头被入侵、专业的安防摄像头也被入侵，直到连智能网联汽车也被成功入侵并可以被远程控制！</p>
+<p>除此之外，近年来涌现的热点 IOT 设备，如智能门锁，攻击者可以绕过云端验证或攻破云端防护，直接破解开锁。共享单车，可以通过特定攻击手段，无须支付即可开锁和屏蔽定位，实现共享单车的破解，更多的诸如智能手表，儿童手表等，都存在诸多的安全隐患。</p>
+<p>对于传统硬件设备厂商而言，在硬件研发过程中，往往主要考虑的是对功能的实现，但随着物联网的发展，传统硬件开始走向云端，以往独立的设备通过云端成为了整体，因此也暴露出了越来越多的安全问题，然而多数厂商因工艺、生产、研发等原因，沿袭的依然是传统硬件的研发思路，在设备本身的安全性上没有引起足够的重视，从而留下了安全隐患，对硬件层面的安全性检测，是提升设备安全的有效手段。</p>
+<p>IoT设备构成分为硬件和软件，硬件方面如下：</p>
+<ol>
+<li>逻辑芯片：对于复杂的设备来说，它们需要多个逻辑芯片或cpu来运行内置的操作系统；对于简单的嵌入式设备或许只需要一个微处理器来运行程序</li>
+<li>内存：为系统和程序运行提供空间，大小从KB到GB不等</li>
+<li>闪存：储存IOT设备固件，部分设备的bootloader也存放在闪存</li>
+<li>网络模块：IOT设备和传统嵌入式设备的区别就是（前者连接了网络），通常采用无线技术连接到互联网，如AP</li>
+<li>串行调试接口：IOT设备需要与外部进行通信，以便调试。串行调试接口可以让开发人员发送和接收命令。最常见的接口是通用异步接收器&#x2F;发送器UART</li>
+</ol>
+<h3 id="10-4-1-硬件层面的攻击"><a href="#10-4-1-硬件层面的攻击" class="headerlink" title="10.4.1 硬件层面的攻击"></a>10.4.1 硬件层面的攻击</h3><p>设备是任何物联网架构的关键，这里的设备指的是架构中所涉及的任何硬件设备（网关、传感器、遥控器等）。</p>
+<p>硬件设备，它是物理世界的接口体现也是虚拟数字世界的通信媒介。相关的数据转换会首先经过硬件设备，由于它本身存储了用户相关的敏感信息（例如家庭统计数据、身体统计信息、个人信息等），所以这种用户隐私存储机制也存在一些争议。而在未来，不同硬件设备还能使用用户的电子钱包或绑定账户实现商品购买或远程维护等服务。其存在的攻击面可能有：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c">存储介质<br>认证方式<br>加密手段<br>通信方式<br>感应接口（传感器接口）<br>外设接口（外围接口）<br>硬件接口（硬件接口）<br>人机交互接口<br></code></pre></td></tr></table></figure>
+
+
+<p>在多数IoT智能环境中，设备通常包括网关和操作设备，网关作为其他设备的控制中心，而操作设备是执行实际动作的设备（如按键遥控器）或监控传感器（烟雾探测器、水浸传感器、红外探测器等）。</p>
+<p>设备漏洞指的是嵌入式设备中常见的漏洞，比如：串口root权限访问，闪存中提取固件等…</p>
+<p>硬件层面的攻击不同于传统的安全领域，它主要包括三个角度：不安全的调试接口、未保护的闪存芯片、硬件敏感信息的泄露</p>
+<ol>
+<li>不安全的调试接口</li>
+</ol>
+<p>当IoT设备被制造的时候，调试接口比如UART会被留在电路板上以便维修。如果它缺少身份验证或者仅有弱身份验证，攻击者就可以通过接口来获得高权限，对固件进行修改或者替换。调试接口在IoT安全检查中排在第一位</p>
+<ul>
+<li>UART</li>
+</ul>
+<p>UART（通用异步接收器发送器）是一个硬件组件，它允许两个硬件外设之间进行异步串行通信。它们可以在同一块板上（例如与电动机或LED屏幕对话的微控制器），也可以在两个不同设备之间（例如与PC对话的设备微控制器）之间。这是一个有趣的攻击面，因为它可能允许通过串行方式对设备进行读&#x2F;写访问。在许多设备中，板上的UART端口保持开放状态，任何人都可以通过串行端口进行连接和访问，以获得某种类型的控制台，例如简单的外壳，自定义命令行控制台，日志输出等。设备通常具有一组针脚，输出连接到微控制器的UART RX和TX引脚，用于发送和接收串行数据</p>
+<p>典型的4引脚UART端口：</p>
+<p><img src="https://img-blog.csdnimg.cn/9de5c5c892674a33aafa0d79d3b06792.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>单片机调试端口</li>
+</ul>
+<p>微控制器具有使用指定的引脚在运行时进行调试的规定，这些引脚连接到板上的引脚输出。这些引脚（端口）供开发人员和设计人员用来调试，读取&#x2F;写入固件和微控制器内部存储器，并在生产后控制&#x2F;测试微控制器引脚。鉴于调试端口提供给攻击者的能力和访问权限，这使得调试端口成为最关键的攻击面之一。有一些用于此目的的标准接口如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs c">JTAG（联合测试行动小组）：随着微控制器和PCB越来越小，在生产后对其进行测试变得越来越困难。<br>   因此，为了有效地在生产后测试电路板，电子行业创建了一个同名协会，<br>   并定义了一种在生产后测试电路板的方法。后来改编为IEEE标准<span class="hljs-number">1149.1</span>。<br>   JTAG协议定义了可用于测试和调试微控制器的标准接口和命令。JTAG定义了四个引脚接口（和一个附加的可选引脚TRST）<br>TMS：测试模式选择<br>TCK：测试时钟<br>TDI：测试数据输入<br>TDO：测试数据输出<br>TRST：测试复位（可选引脚）<br></code></pre></td></tr></table></figure>
+
+<p>除测试芯片外，调试器还使用这些引脚与微控制器上实现的TAP（测试访问端口）进行通信。从安全角度来看，识别JTAG端口并与之连接可以使攻击者提取固件，对逻辑进行逆向工程并在设备上刷新恶意固件。以后会在以后的博客文章中提供更多信息</p>
+<p>1）cJTAG（紧凑型JTAG）：这是标准IEEE 1149.7中定义的新JTAG协议。它不会替代1149.1标准，而是会进一步扩展它，并且与JTAG向后兼容。它定义了两个引脚的接口（TCK和TMS）以及实现新功能的新TAP</p>
+<p>2）SWD（串行线调试）：SWD是用于调试微控制器的另一个接口&#x2F;协议。它是一个两针接口：a。SWDIO（双向）b。SWCLK（时钟）这是ARM特定的协议，使用ARM调试接口v5中定义的ARM CPU标准双向有线协议。SWD的好处是它声称比JTAG更有效</p>
+<p>PCB在JTAG端口（JTAG端口不一定是10个引脚），如下：</p>
+<p><img src="https://img-blog.csdnimg.cn/ed24584f84ce42b5994ac79c9e49a768.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>其他硬件接口</li>
+</ul>
+<p>还有许多其他硬件接口用于与设备通信。作为最后一个阶段，分析并发现所有接口中的缺陷和旁路机制非常重要。一些众所周知的接口包括（但不限于）：</p>
+<ul>
+<li><p>d类微型- <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/D-subminiature">https://en.wikipedia.org/wiki/D-subminiature</a></p>
+</li>
+<li><p>ecommended标准（RS232，RS485等）–有关RS协议的更多详细信息，请参见 <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/EIA_standards">https://en.wikipedia.org/wiki/EIA_standards</a></p>
+</li>
+<li><p>板载诊断（OBD）– <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/On-board_diagnostics">https://en.wikipedia.org/wiki/On-board_diagnostics</a></p>
+</li>
+<li><p>网络通讯接口</p>
+</li>
+</ul>
+<p>该接口允许设备与虚拟世界的其余部分进行对话，包括传感器网络，云和移动设备。负责网络通信的硬件接口可能具有提供通信功能的独立微控制器&#x2F;固件。在这种情况下，攻击面是实施低级通信的固件或驱动程序代码</p>
+<ul>
+<li>Wifi</li>
+</ul>
+<p>wifi接口存在一些已知问题。从攻击面的角度来看，攻击wifi芯片可能会损坏它，DOS，绕过安全限制或执行代码会很有趣</p>
+<ul>
+<li>以太网</li>
+</ul>
+<p>以太网接口（与wifi接口一样）具有低级别的TCP &#x2F; IP堆栈漏洞，硬件实现漏洞和类似的攻击媒介</p>
+<ul>
+<li>广播</li>
+</ul>
+<p>考虑到许多物联网产品已转移到&#x2F;正在使用无线电通信构建，无线电接口已成为最重要的攻击面之一。优先选择源于以下事实：在许多情况下，通过Wifi &#x2F;有线网络连接使用无线电更为有效。我将Wifi进行单独分类而不是在本节中进行分类的原因主要是为了清楚地区分可以直接连接到互联网的设备（Wifi &#x2F;有线）和需要网关（例如智能集线器）的设备，这些设备必须同时实现无线电以及Wifi &#x2F;有线接口，分别用于与传感器和Internet进行通信。从实际的通信角度来看，可以将其视为两种不同的通信模式：</p>
+<ul>
+<li>简单&#x2F;非结构化：这种类型通常用于诸如百叶窗，锁，门铃等简单产品。简单非结构化是指它使用简单（主要是专有的）数据（流）并通过无线电接口发送。作为渗透测试人员，您需要对通信进行反向工程以发现实施中的缺陷。使用诸如SDR（软件定义的无线电）之类的无线电嗅探硬件工具来嗅探无线电通信很容易</li>
+<li>复杂&#x2F;结构化的：复杂和结构化的通信意味着它使用结构化的数据包进行无线电通信，这是复杂的，因为它们不仅携带数据，还携带有关协议的其他信息和元信息。这些协议由于效率，标准化，经济芯片和实施便利性而在物联网世界中非常出名。同样，有多种工具可用于嗅探和解析协议，以提取跨应用程序发送的特定于应用程序的数据。一些常见的协议包括：</li>
+</ul>
+<pre><code class="c">1）Bluetooth and BLE
+2）ZigBee
+3）Zwave
+4）NFC
+5）RFID
+6）LORA
+7）Wireless HART …
+</code></pre>
+<ol start="2">
+<li>未保护的闪存芯片</li>
+</ol>
+<p>因为闪存通常用来存储固件，因此也成为了关注的重点。如果芯片没有读写保护，安全研究者就可以通过读取固件来分析或者修改固件，来绕过接口的身份验证</p>
+<ul>
+<li>非易失性存储器</li>
+</ul>
+<p>这些用于各种用途，包括读&#x2F;写传感器数据，引导程序，固件，凭证，密钥等。在测试硬件板时，查看存储在芯片上的数据至关重要。我们还可以对内存和微控制器之间的通信进行运行时分析，以分析在不同操作期间存储&#x2F;读取的数据类型。这可以通过使逻辑分析仪嗅探总线通信来实现。在触发设备上的特定操作时，您会发现正在读取&#x2F;写入的有趣数据。内存芯片有以下几种：</p>
+<ul>
+<li>EPROM</li>
+<li>EEPROM</li>
+<li>闪存–由于速度和效率较高，因此更常用</li>
+</ul>
+<p>I2C串行EEPROM：</p>
+<p><img src="https://img-blog.csdnimg.cn/9ec80cc47d7d4080a87b43aeda1f399e.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ol>
+<li>易失性记忆</li>
+</ol>
+<p>当谈到易失性内存时，“ RAM”一词立即浮现在脑海中。它们广泛用于PC和嵌入式系统中，并在运行时保存代码和数据。关闭设备电源后，数据将丢失。一些常见的RAM类型如下：</p>
+<ul>
+<li>SRAM（静态随机存取存储器）–一种RAM，用于保存断电时丢失的数据</li>
+<li>DRAM（动态随机存取存储器）–数据将保留一段时间，直到丢失为止，除非在运行时刷新。这意味着与SRAM相比，即使在芯片加电期间，数据的使用寿命也很短。当芯片断电时，数据也会丢失</li>
+</ul>
+<ol start="3">
+<li>硬件敏感信息的泄露</li>
+</ol>
+<p>硬件电路的密封性并不好，诸如声音和电量消耗的硬件信息泄露可以造成侧信道攻击，攻击者可以由此获得重要的信息，比如密钥</p>
+<ol start="4">
+<li>其它</li>
+</ol>
+<ul>
+<li>I2C</li>
+</ul>
+<p>集成电路间是一种短距离通信协议，用于在同一板上的芯片之间进行通信。它是由飞利浦（现在为NXP）发明的。它具有主从（多）架构，并使用两线总线</p>
+<ul>
+<li>SDA –串行数据</li>
+<li>SCL –串行时钟</li>
+</ul>
+<p>I2C的一种使用情况是在EEPROM芯片中，该芯片连接到微控制器的I2C引脚，通常存储数据或代码。典型的攻击包括篡改数据，提取敏感信息，破坏数据等。我们应该分析EEPROM芯片上的静态数据，以及通过嗅探I2C通信执行运行时分析以了解行为和安全隐患</p>
+<ul>
+<li>SPI</li>
+</ul>
+<p>串行外设接口也是一种短距离通信协议，用于在同一板上的芯片之间进行通信。它是由摩托罗拉公司开发的。它是全双工的，并使用主从结构（单个主服务器）。与I2C相比，它还具有更高的吞吐量。它使用四线串行总线：</p>
+<ul>
+<li>SCLK：串行时钟。其他名称包括SCK</li>
+<li>MOSI：主输出从站输入。其他名称<code>包括SIMO，SDI，DI，DIN，SI，MTSR</code></li>
+<li>MISO：主进从出。其他名称包括<code>SOMI，SDO，DO，DOUT，SO，MRST</code></li>
+<li>SS：从机选择。其他名称包括<code>S?S?，SSEL，CS，C?S?，CE，nSS，/ SS，SS＃</code></li>
+</ul>
+<p>它用于与各种外围设备通信。闪存和EEPROM芯片也使用SPI。测试和分析的方法类似于I2C，只是我们具有不同的总线接口。</p>
+<ul>
+<li>USB</li>
+</ul>
+<p>该设备可以具有用于充电或通讯的USB（微型&#x2F;微型等）接口。对于后者，有必要测试接口的已知或未知问题。我们应该嗅探通信以进行运行时分析，并模糊USB接口中的未知错误</p>
+<ul>
+<li>传感器</li>
+</ul>
+<p>这是一个宽松的名称，我们指的是与物理世界的接口。它可以不必限于感测类型的接口。例如，温度传感器将是一个完美的例子，但门锁除了“ Lock &#x2F; Unlock”（锁定&#x2F;解锁）动作可控制物理世界之外，什么也不会感测。根据它们的操作，它们可以分为三种类型：</p>
+<ul>
+<li>监控器：这与传感器的字面含义更紧密地联系在一起，即感测或监控物理世界的任何变化。防爆。温度，运动，脉搏，血压，轮胎气压等</li>
+<li>控制：这些类型的设备以某种方式控制物理世界。防爆。锁，分配器等</li>
+<li>混合：这是上述两种类型的组合，例如温度控制，基于一天中的时间的照明灯等。这是关键接口之一，因为从物理世界获得的所有值和数据都将传输到云中。如果攻击者可以用错误的（错误的）数据强制设备，则整个生态系统都将受到影响，因为所有决策和统计都基于此数据。换句话说，这是物联网生态系统的关键。错误的值可能会对生态系统做出的决定造成灾难性的影响</li>
+</ul>
+<h2 id="10-5-通讯攻击面"><a href="#10-5-通讯攻击面" class="headerlink" title="10.5 通讯攻击面"></a>10.5 通讯攻击面</h2><p>尽管通信攻击不是一种有形的攻击，其理想的有形攻击面将是通信接口和负责通信的各个驱动器和固件，但这只是其中的一部份，因为无数通信协议会共同在有线和无线介质上作用于物联网生态系统。以下是通信方式可能存在的攻击面：</p>
+<ul>
+<li>认证方式</li>
+<li>加密手段</li>
+<li>偏离协议标准</li>
+<li>协议实现异常</li>
+</ul>
+<p>硬件接口允许实际通信。但是，实际的数据通信&#x2F;数据包是由软件中实现的上层定义的。因此，在此“攻击表面积”（通信）中，我们将仅讨论协议。尽管协议中的缺陷可能导致对驻留在移动设备，设备或云上的协议端点的攻击，但为清楚起见，我们将其保留为单独的攻击面。这里的列表中有太多标准要提及。但是，我们将列出各种物联网产品中使用的一些常见协议：</p>
+<ul>
+<li>CoAP：<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Constrained_Application_Protocol">https://en.wikipedia.org/wiki/Constrained_Application_Protocol</a></li>
+<li>MQTT：<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/MQTT">https://en.wikipedia.org/wiki/MQTT</a></li>
+<li>AMQP： <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Advanced_Message_Queuing_Protocol">https://en.wikipedia.org/wiki/Advanced_Message_Queuing_Protocol</a></li>
+<li>WebSocket：<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/WebSocket">https://en.wikipedia.org/wiki/WebSocket</a></li>
+<li>CANbus：<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/CAN_bus">https://en.wikipedia.org/wiki/CAN_bus</a></li>
+<li>Modbus：<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Modbus">https://en.wikipedia.org/wiki/Modbus</a></li>
+<li>Profibus：<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Profibus">https://en.wikipedia.org/wiki/Profibus</a></li>
+<li>DNP3：<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/DNP3">https://en.wikipedia.org/wiki/DNP3</a></li>
+<li>BACNet：<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/BACnet">https://en.wikipedia.org/wiki/BACnet</a></li>
+<li>HL7：<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/Health_Level_7">https://zh.wikipedia.org/wiki/Health_Level_7</a></li>
+<li>XMPP：<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/XMPP">https://en.wikipedia.org/wiki/XMPP</a></li>
+<li>UPnP：<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Universal_Plug_and_Play">https://en.wikipedia.org/wiki/Universal_Plug_and_Play</a></li>
+<li>DNS</li>
+<li>SSH</li>
+</ul>
+<h3 id="10-5-1-协议安全的分类"><a href="#10-5-1-协议安全的分类" class="headerlink" title="10.5.1 协议安全的分类"></a>10.5.1 协议安全的分类</h3><p>物联网协议一般分为两大类：</p>
+<ul>
+<li>传输协议：一般负责子网内设备间的组网及通信;</li>
+<li>通信协议：主要是运行在传统互联网TCP&#x2F;IP协议之上的设备通讯协议，负责设备通过互联网进行数据交换及通信</li>
+</ul>
+<p>无线电通信是IoT架构安全的重要方面，基于无线电通信，简单说任何通信都是发生于设备与设备或应用程序与设备之间。IoT中常用的通信协议有：WiFi、BLE、ZigBee、ZWave、6LowPAN和蜂窝数据等</p>
+<h3 id="10-5-2-协议分层"><a href="#10-5-2-协议分层" class="headerlink" title="10.5.2 协议分层"></a>10.5.2 协议分层</h3><p>将物联网协议分解为以下层以提供一定程度的组织：</p>
+<ul>
+<li>基础设施 （例如：6LowPAN、IPv4&#x2F;IPv6、RPL）</li>
+<li>标识 （例如：EPC、uCode、IPv6、URI）</li>
+<li>通讯&#x2F;传输 （例如：Wifi、蓝牙、LPWAN）</li>
+<li>发现 （例如：物理网络、mDNS、DNS-SD）</li>
+<li>数据协议（例如：MQTT、CoAP、AMQP、WebSocket、节点）</li>
+<li>设备管理 （例如：TR-069、OMA-DM）</li>
+<li>语义（例如：JSON-LD、Web 事物模型）</li>
+<li>多层框架（例如：Alljoyn、IoTivity、Weave、Homekit）</li>
+<li>安全</li>
+<li>行业垂直标准（互联家庭、工业等）</li>
+</ul>
+<h4 id="10-5-2-1-基础设施"><a href="#10-5-2-1-基础设施" class="headerlink" title="10.5.2.1 基础设施"></a>10.5.2.1 基础设施</h4><ul>
+<li>IPv6：IPv6 是一种用于分组交换互联网络的 Internet 层协议，提供跨多个 IP 网络的端到端数据报传输</li>
+<li>6LoWPAN：6LoWPAN 是 IPv6 over Low power Wireless Personal Area Networks 的首字母缩写词。它是 IEEE802.15.4 链路上 IPv6 的适配层。该协议仅在 2.4 GHz 频率范围内以 250 kbps 的传输速率运行</li>
+<li>UDP  （用户数据报协议）：一种简单的 OSI 传输层协议，用于基于 Internet 协议 (IP) 的客户端&#x2F;服务器网络应用程序。UDP 是 TCP 的主要替代品，也是现存最古老的网络协议之一，于 1980 年推出。UDP 经常用于专门针对实时性能进行调整的应用程序中</li>
+<li>QUIC  （Quick UDP Internet Connections，发音为 quick）：通过用户数据报协议 (UDP) 支持两个端点之间的一组多路复用连接，旨在提供与 TLS&#x2F;SSL 等效的安全保护，同时减少连接和传输延迟，以及每个方向的带宽估计以避免拥塞</li>
+<li>Aeron：高效可靠的 UDP 单播、UDP 多播和 IPC 消息传输</li>
+<li>uIP：uIP 是一个开源 TCP&#x2F;IP 堆栈，能够与微型 8 位和 16 位微控制器一起使用。它最初由瑞典计算机科学研究所“网络嵌入式系统”小组的 Adam Dunkels 开发，在 BSD 风格许可下获得许可，并由大量开发人员进一步开发</li>
+<li>DTLS（数据报传输层）：DTLS 协议为数据报协议提供通信隐私。该协议允许客户端&#x2F;服务器应用程序以一种旨在防止窃听、篡改或消息伪造的方式进行通信。DTLS 协议基于传输层安全 (TLS) 协议，并提供等效的安全保证</li>
+<li>ROLL&#x2F; RPL：低功耗&#x2F;有损网络的 IPv6 路由</li>
+<li>NanoIP：NanoIP 代表纳米互联网协议，是一个概念，旨在为嵌入式和传感器设备提供类似互联网的网络服务，而无需 TCP&#x2F;IP 的开销。NanoIP 的设计考虑了最小的开销、无线网络和本地寻址</li>
+<li>以内容为中心的网络 (CCN)：技术概述“解决内容分发可扩展性、移动性和安全性挑战的下一代网络架构。CCN 直接在网络的数据包级别路由和传递命名的内容片段，无论它位于网络中的任何位置，都可以在内存中实现自动和应用程序中立的缓存。结果？随时随地高效、高效地交付内容。由于该架构将这些缓存效果作为数据包传递的自动副作用，因此无需构建昂贵的应用程序级缓存服务即可使用内存</li>
+<li>时间同步网格协议 (TSMP)：一种用于自组织无线设备网络的通信协议，称为微尘。TSMP 设备彼此保持同步并在时隙中进行通信，类似于其他 TDM（时分复用）系统</li>
+</ul>
+<h4 id="10-5-2-2-发现"><a href="#10-5-2-2-发现" class="headerlink" title="10.5.2.2 发现"></a>10.5.2.2 发现</h4><ul>
+<li>mDNS（多播域名系统）：将主机名解析为不包括本地名称服务器的小型网络中的 IP 地址</li>
+<li>物理网络 – 物理网络使您能够使用蓝牙低功耗 (BLE) 信标查看周围环境中的对象正在广播的 URL 列表</li>
+<li>HyperCat：一种开放的、轻量级的基于 JSON 的超媒体目录格式，用于公开 URI 集合</li>
+<li>UPnP  （通用即插即用）：现在由开放连接基金会管理的是一组网络协议，允许联网设备在网络上无缝发现彼此的存在，并为数据共享、通信和娱乐建立功能性网络服务</li>
+</ul>
+<h4 id="10-5-2-3-数据协议"><a href="#10-5-2-3-数据协议" class="headerlink" title="10.5.2.3 数据协议"></a>10.5.2.3 数据协议</h4><ul>
+<li>MQTT  （消息队列遥测传输协议，低带宽）：MQTT 协议以极其轻量级的方式启用发布&#x2F;订阅消息模型，该协议构建于TCP&#x2F;IP协议上，它可以以极少的代码和有限的带宽，为连接远程设备提供实时可靠的消息服务。作为一种低开销、低带宽占用的即时通讯协议，使其在物联网、小型设备、移动应用等方面有较广泛的应用。它对于与需要少量代码和&#x2F;或网络带宽非常宝贵的远程位置的连接非常有用</li>
+<li>MQTT-SN  （用于传感器网络的 MQTT）：一种开放的轻量级发布&#x2F;订阅协议，专为机器对机器和移动应用程序设计</li>
+<li>Mosquitto：开源 MQTT v3.1 代理</li>
+<li>IBM MessageSight</li>
+<li>CoAP  （受限应用协议）：受限应用协议，应用于无线传感网中协议，CoAP 是一种应用层协议，旨在用于资源受限的互联网设备，例如 WSN 节点。CoAP 旨在轻松转换为 HTTP 以简化与 Web 的集成，同时还满足特定要求，例如多播支持、非常低的开销和简单性。CoRE 小组为 CoAP 提出了以下特性：RESTful 协议设计，最大限度地减少与 HTTP 的映射复杂性，低标头开销和解析复杂性，URI 和内容类型支持，支持发现已知 CoAP 服务提供的资源。对资源的简单订阅，以及由此产生的推送通知，基于 max-age 的简单缓存</li>
+<li>SMCP：适用于嵌入式环境的基于 C 语言的 CoAP 堆栈。功能包括：支持draft-ietf-core-coap-13，完全异步I&#x2F;O，同时支持BSD套接字和UIP</li>
+<li>STOMP：简单的面向文本的消息传递协议</li>
+<li>XMPP  （可扩展通讯和表示协议）：一个开源形式组织产生的网络即时通信协议。适用范围：即时通信的应用程序，还能用在网络管理、游戏、远端系统监控等。一种用于实时通信的开放技术，它支持广泛的应用程序，包括即时消息传递、状态、多方聊天、语音和视频通话、协作、轻量级中间件、内容联合和XML 数据的通用路由</li>
+<li>XMPP-IoT：以与 XMPP 相同的方式，默默地创造了人与人之间的通信互操作性。我们的目标是让机器与人、机器与机器之间具有互操作性</li>
+<li>Mihini&#x2F;M3DA：Mihini 代理是一个软件组件，充当 M2M 服务器和嵌入式网关上运行的应用程序之间的中介。M3DA 是一种针对二进制 M2M 数据传输进行了优化的协议。它在 Mihini 项目中既可用于设备管理，通过简化设备数据模型的操作和同步，也可用于资产管理，通过允许用户应用程序与 M2M 来回交换类型数据&#x2F;命令服务器，以优化带宽使用的方式</li>
+<li>AMQP  （先进消息队列协议）：面向消息中间件的开放标准应用层协议。AMQP 的定义特性是消息导向、队列、路由（包括点对点和发布订阅）、可靠性和安全性；先进消息队列协议，用于业务系统例如PLM，ERP，MES等进行数据交换</li>
+<li>DDS （实时系统数据分发服务）：面向实时系统的数据分布服务。以数据为中心，使用无代理的发布&#x2F;订阅消息模式，点对点、点对多、多对多， 提供多达21种QoS服务质量策略。第一个开放的国际中间件标准，直接解决实时和嵌入式系统的发布-订阅通信。适用范围：分布式高可靠性、实时传输设备数据通信。目前DDS已经广泛应用于国防、民航、工业控制等领域</li>
+<li>JMS（消息服务）： JAVA平台中著名的消息队列协议。Java消息服务应用程序接口，是一个Java平台中关于面向消息中间件(MOM)的API，用于在两个应用程序之间，或分布式系统中发送消息，进行异步通信。Java消息服务是一个与具体平台无关的API，绝大多数MOM提供商都对JMS提供支持</li>
+<li>LLAP （轻量级本地自动化协议）：LLAP 是在智能对象之间使用普通文本发送的简单短消息，它不像 TCP&#x2F;IP、蓝牙、Zigbee、6lowpan、WiFi 等在底层实现“如何”移动周围的数据。这意味着 LLAP 可以在任何通信介质上运行。LLAP 的三个优势是，它现在可以运行在任何东西上，将来可以运行在任何东西上，而且它很容易被人类理解</li>
+<li>LWM2M  （轻量级 M2M）：轻量级 M2M（LWM2M）是开放移动联盟中的系统标准。它包括 DTLS、CoAP、Block、Observe、SenML 和资源目录，并将它们与对象结构一起编织到设备-服务器接口中</li>
+<li>SSI  （简单传感器接口）：一种简单的通信协议，用于计算机或用户终端与智能传感器之间的数据传输</li>
+<li>：Reactive Streams：一种在 JVM 上具有非阻塞背压的异步流处理标准</li>
+<li>ONS 2.0</li>
+<li>REST  （代表性状态传输）：即表述性状态传递，是基于HTTP协议开发的一种通信风格</li>
+<li>HTTP：物联网环境中的附加资源</li>
+<li>HTTP&#x2F;2：通过引入标头字段压缩并允许在同一连接上进行多个并发交换，可以更有效地使用网络资源并减少对延迟的感知。</li>
+<li>SOAP  （简单对象访问协议）：JSON&#x2F;XML、  WebHooks、  Jelastic、  MongoDB</li>
+<li>WebSocket：作为 HTML5 倡议的一部分开发的 WebSocket 规范引入了 WebSocket JavaScript 接口，该接口定义了一个全双工的单套接字连接，通过该连接可以在客户端和服务器之间发送消息。WebSocket 标准简化了双向 Web 通信和连接管理的大部分复杂性</li>
+<li>JavaScript &#x2F; Node.js：物联网项目</li>
+</ul>
+<p>可以在如下链接找到 Contiki、Riot OS 等物联网软件项目的列表：</p>
+<p><a target="_blank" rel="noopener" href="http://postscapes2.webhook.org/internet-of-things-software-guide">http://postscapes2.webhook.org/internet-of-things-software-guide</a></p>
+<h4 id="10-5-2-4-通信-x2F-传输层"><a href="#10-5-2-4-通信-x2F-传输层" class="headerlink" title="10.5.2.4 通信&#x2F;传输层"></a>10.5.2.4 通信&#x2F;传输层</h4><p><img src="https://img-blog.csdnimg.cn/a6bb0e5a95154d8aabf895ef0f9e6719.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li><p>以太网</p>
+</li>
+<li><p>WirelessHart：WirelessHART 技术为各种过程测量、控制和资产管理应用提供了强大的无线协议</p>
+</li>
+<li><p>DigiMesh：DigiMesh 是一种专有的对等网络拓扑，用于无线端点连接解决方案。</p>
+</li>
+<li><p>ISA100.11a：“ISA100.11a 是由国际自动化协会 (ISA) 开发的无线网络技术标准。官方描述为《工业自动化无线系统：过程控制及相关应用》</p>
+</li>
+<li><p>IEEE 802.15.4：IEEE 802.15.4 是一种标准，它规定了低速率无线个人区域网络 (LR-WPAN) 的物理层和媒体访问控制。它由 IEEE 802.15 工作组维护。它是 ZigBee、ISA100.11a、WirelessHART 和 MiWi 规范的基础，每一个规范都通过开发 IEEE 802.15.4 中未定义的上层进一步扩展了标准。或者，它可以与 6LoWPAN 和标准互联网协议一起使用，以构建无线嵌入式互联网</p>
+</li>
+<li><p>NFC：基于标准 ISO&#x2F;IEC 18092:2004，使用中心频率为 13.56 MHz 的电感耦合设备。与无线传感器网络相比，数据速率高达 424 kbps，范围只有几米</p>
+</li>
+<li><p>ANT：ANT 是一种专有的无线传感器网络技术，具有无线通信协议栈，使在射频频谱（“ISM 频段”）的 2.4 GHz 工业、科学和医疗分配中运行的半导体无线电能够通过建立共存的标准规则进行通信、数据表示、信令、认证和错误检测</p>
+</li>
+<li><p>蓝牙：蓝牙工作在 2.4 GHz ISM 频段并使用跳频。数据速率高达 3 Mbps，最大范围为 100m。每个可以使用蓝牙的应用程序类型都有自己的配置文件</p>
+</li>
+<li><p>Eddystone ： 一种协议规范，定义了用于接近信标消息的蓝牙低功耗 (BLE) 消息格式</p>
+</li>
+<li><p>ZigBee：ZigBee 协议使用 802.15.4 标准并在 2.4 GHz 频率范围内以 250 kbps 运行。网络中的最大节点数为 1024，范围可达 200 米。ZigBee 可以使用 128 位 AES 加密。</p>
+</li>
+<li><p>EnOcean：EnOcean 是一种能量收集无线技术，适用于欧洲的 868 MHz 和北美的 315 MHz。传输范围在建筑物内可达 30 米，在室外可达 300 米。</p>
+</li>
+<li><p>无线网络</p>
+</li>
+<li><p>WiMax：WiMax 基于标准 IEEE 802.16，适用于无线城域网。固定站的范围不同，最长可达 50 公里，而移动设备的范围为 5 到 15 公里。WiMAx 以 2.5 GHz 至 5.8 GHz 的频率运行，传输速率为 40 Mbps</p>
+</li>
+</ul>
+<h4 id="10-5-2-5-功耗广域网"><a href="#10-5-2-5-功耗广域网" class="headerlink" title="10.5.2.5 功耗广域网"></a>10.5.2.5 功耗广域网</h4><ul>
+<li>Weightless：Weightless 是一种提议的专有开放无线技术标准，用于在基站和其周围的数千台机器之间交换数据（在未占用的电视传输通道中使用波长无线电传输），具有高度的安全性</li>
+<li>NB-IoT  (Narrow-Band IoT) ：由 3GPP 标准机构标准化的技术</li>
+<li>LTE-MTC  （LTE 机器类型通信）：基于标准的技术系列支持适用于物联网的多种技术类别，例如 Cat-1 和 CatM1</li>
+<li>EC-GSM-IoT  （扩展覆盖范围-GSM-IoT）：为 LPWA（低功率广域）物联网应用启用现有蜂窝网络的新功能。EC-GSM-IoT 可以通过部署在非常大的 GSM 足迹上的新软件来激活，从而增加更多的覆盖范围以服务于物联网设备</li>
+<li>LoRaWAN ： 用于区域、国家或全球网络中的无线电池供电物的网络协议</li>
+<li>RPMA  （随机相位多址）：一种采用多址直接序列扩频 (DSSS) 的技术通信系统</li>
+</ul>
+<h4 id="10-5-2-6-蜂窝"><a href="#10-5-2-6-蜂窝" class="headerlink" title="10.5.2.6 蜂窝"></a>10.5.2.6 蜂窝</h4><p>GPRS&#x2F;2G&#x2F;3G&#x2F;4G&#x2F;5G 蜂窝</p>
+<h4 id="10-5-2-7-语义"><a href="#10-5-2-7-语义" class="headerlink" title="10.5.2.7 语义"></a>10.5.2.7 语义</h4><ul>
+<li>IOTDB：描述物联网的 JSON &#x2F; 关联数据标准</li>
+<li>SensorML：SensorML 提供用于描述传感器和测量过程的标准模型和 XML 编码</li>
+<li>Semantic Sensor Net Ontology  – W3C：这个本体描述了传感器和观察，以及相关概念。它没有描述领域概念、时间、位置等。这些旨在通过 OWL 导入从其他本体中包含在内</li>
+<li>Wolfram 语言 - 连接的设备：每个设备的符号表示。然后是一组标准的 Wolfram 语言函数，如 DeviceRead、DeviceExecute、DeviceReadBuffer 和 DeviceReadTimeSeries，它们执行与设备相关的操作</li>
+<li>SENML  （传感器标记语言的媒体类型）：一个简单的传感器，例如温度传感器，可以在 HTTP 或 CoAP 等协议中使用此媒体类型来传输传感器的测量值或进行配置</li>
+<li>LsDL（Lemonbeat 智能设备语言）：面向服务设备的基于 XML 的设备语言</li>
+</ul>
+<h4 id="10-5-2-8-多层框架"><a href="#10-5-2-8-多层框架" class="headerlink" title="10.5.2.8 多层框架"></a>10.5.2.8 多层框架</h4><ul>
+<li>Alljoyn：一个开源软件框架，可让设备和应用程序轻松发现彼此并进行通信</li>
+<li>IoTivity：由 Linux 基金会主办并由 OIC 赞助的开源项目</li>
+<li>IEEE P2413：物联网 (IoT) 架构框架标准</li>
+<li>Thread：建立在以 6LoWPAN 为基础的开放标准和 IPv6 技术之上</li>
+<li>IPSO 应用程序框架 (PDF)：该设计定义了一组 REST 接口，智能对象可以使用这些接口来表示其可用资源、与其他智能对象和后端服务交互。该框架旨在补充现有的 Web 配置文件，包括 SEP2 和 oBIX</li>
+<li>OMA LightweightM2M v1.0：LightweightM2M 的动机是开发一种可快速部署的客户端-服务器规范，以提供机器对机器的服务。LightweightM2M 主要是一种设备管理协议，但它应该被设计为能够扩展以满足应用程序的要求。LightweightM2M 不仅限于设备管理，它应该能够传输服务&#x2F;应用程序数据</li>
+<li>Weave：物联网设备的通信平台，支持设备设置、电话到设备到云的通信以及来自移动设备和网络的用户交互</li>
+<li>Telehash  – JSON+UDP+DHT&#x3D;Freedom：一种安全的有线协议，为应用程序和设备的去中心化覆盖网络提供动力</li>
+</ul>
+<h4 id="10-5-2-9-安全"><a href="#10-5-2-9-安全" class="headerlink" title="10.5.2.9 安全"></a>10.5.2.9 安全</h4><p>开放信任协议 (OTrP)：一种用于在可信执行环境 (TEE) 中安装、更新和删除应用程序以及管理安全配置的协议</p>
+<p>X.509：用于管理数字证书和公钥加密的公钥基础设施 (PKI) 标准。传输层安全协议的关键部分，用于保护 Web 和电子邮件通信</p>
+<h4 id="10-5-2-10-行业垂直标准"><a href="#10-5-2-10-行业垂直标准" class="headerlink" title="10.5.2.10 行业垂直标准"></a>10.5.2.10 行业垂直标准</h4><ul>
+<li>IEEE 1451：IEEE 1451 是一系列智能传感器接口标准，描述了一组开放、通用、独立于网络的通信接口，用于将传感器（传感器或执行器）连接到微处理器、仪表系统和控制&#x2F;现场网络</li>
+<li>IEEE 1888.3-2013：IEEE 无处不在的绿色社区控制网络标准：安全</li>
+<li>IEEE 1905.1-2013：IEEE 异构技术融合数字家庭网络标准</li>
+<li>IEEE 802.16p-2012： IEEE 宽带无线空中接口标准接入系统</li>
+<li>IEEE 1377-2012：公用事业计量通信协议应用层的 IEEE 标准</li>
+<li>IEEE P1828：具有虚拟组件的系统标准</li>
+<li>IEEE P1856：电子系统预测和健康管理标准框架</li>
+</ul>
+<h3 id="10-5-3-物联网通信协议"><a href="#10-5-3-物联网通信协议" class="headerlink" title="10.5.3 物联网通信协议"></a>10.5.3 物联网通信协议</h3><p>物联网设备通常使用的是以下通讯方式：</p>
+<ol>
+<li>远距离传输</li>
+</ol>
+<ul>
+<li>NB-IOT&#x2F;SG</li>
+<li>3G&#x2F;4G</li>
+<li>GPRS</li>
+</ul>
+<ol start="2">
+<li>近距离传输</li>
+</ol>
+<ul>
+<li>RF433&#x2F;315M</li>
+<li>ZigBee</li>
+<li>Z-ware</li>
+<li>LoRa</li>
+<li>蓝牙</li>
+</ul>
+<ol start="3">
+<li>有线传输</li>
+</ol>
+<ul>
+<li>市电传输</li>
+<li>音频线&#x2F;同轴线</li>
+<li>RS232串口</li>
+<li>RS485总线</li>
+</ul>
+<ol start="4">
+<li>传统互联网</li>
+</ol>
+<ul>
+<li>Wi-Fi</li>
+<li>以太网（线）</li>
+</ul>
+<p>直连模式是近距离传输，一般通过无线（蓝牙、WIFI、NFC等）以及有线（USB、网线、电缆）进行操控设备</p>
+<p><img src="https://img-blog.csdnimg.cn/9608f8d36b6e4605a0755385bd29e781.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>网关模式由中心路由或网关统一操控，方便做身份验证、流量识别</p>
+<p><img src="https://img-blog.csdnimg.cn/8be0d2aaa8354ccfb54fec23980d81d2.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>云模式中除了HTTP、FTP、SSH等通用服务外，MQTT、AMQP、CoAP等与云端服务通信所使用的协议也是研究的重点</p>
+<p><img src="https://img-blog.csdnimg.cn/740e081ad9a44415bb29d345a536fcea.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h3 id="10-5-4-协议接口层面的攻击"><a href="#10-5-4-协议接口层面的攻击" class="headerlink" title="10.5.4  协议接口层面的攻击"></a>10.5.4  协议接口层面的攻击</h3><p>协议接口层的攻击包括了通信和API，它涉及到用户侧直接控制和由云端间接控制的设备，以及以上两种通信过程中的信息保护问题，并不涉及到协议的安全。例如，IoT通信协议的滥用和AR-Ddos攻击正是通过IoT通信协议CoAP、SSDP和SNMP执行的，它的目标不是IoT设备，但是它也是IoT安全一个重要的研究方向。协议接口层的攻击主要包括一下三个角度：不安全的远程管理接口、数据传输过程中的信息泄露、弱身份验证</p>
+<ol>
+<li>不安全的远程管理接口</li>
+</ol>
+<p>为了方便管理，IoT设备使用http服务之类的远程管理方式，这带来了诸多漏洞，例如sql注入、XSS和远程执行漏洞等</p>
+<ol start="2">
+<li>数据传输过程中的信息泄露</li>
+</ol>
+<p>IoT通信协议使用了弱加密算法或者根本不进行加密，导致敏感信息泄露。例如论文Passwords in the Air中提到的，当IoT设备接入网络时，WiFi密码以明文传输</p>
+<ol start="3">
+<li>弱身份验证</li>
+</ol>
+<p>由于安全需要，管理IoT设备需要身份验证绑定，于是产生了一个新的攻击面。攻击者可以绕过身份验证，重复绑定然后获得用户的信息，论文Phantom Device Attack在这个攻击面上找到了四种攻击方法</p>
+<h2 id="10-6-软件安全"><a href="#10-6-软件安全" class="headerlink" title="10.6 软件安全"></a>10.6 软件安全</h2><p>IoT设备构成分为硬件和软件，软件方面如下：</p>
+<ol>
+<li>Bootloader：在IOT设备系统启动前，它初始化了硬件设备，将固件加载到引导设备。它使系统的软件和硬件环境达到合适的状态</li>
+<li>固件：固件包括了操作系统、文件系统和一系列服务程序。IOT设备上的安全研究通常从固件分析开始</li>
+</ol>
+<p>物联网设备中的软件和云组件包括以下元素：</p>
+<ul>
+<li>设备固件</li>
+<li>WEB应用</li>
+<li>用于控制、配置和监控设备的移动应用程序</li>
+</ul>
+<p>IoT架构中每个“组件”部分都有特定的漏洞，此处内容后面再讲。</p>
+<h3 id="10-6-1-软件层面的攻击"><a href="#10-6-1-软件层面的攻击" class="headerlink" title="10.6.1 软件层面的攻击"></a>10.6.1 软件层面的攻击</h3><p>软件层面的攻击对应着设备构成中bootloader和固件的软件部分，它主要包括以下五个方面：不安全的bootloader、不安全的操作系统、固件敏感信息泄露、不安全的应用服务、不正确的配置策略</p>
+<ol>
+<li>不安全的bootloader</li>
+</ol>
+<p>因为bootloader是一段在设备运行后加载的代码，因此是一个容易被忽略的攻击点。它的功能是初始化并加载固件，因此当问题出现时它的危险程度很高。例如checkm8这个Boot ROM 漏洞被称为是iphone、ipad、apple TV和 apple watch上的史诗级漏洞</p>
+<ol start="2">
+<li>不安全的操作系统</li>
+</ol>
+<p>由于研发周期短和轻量化的需求，IoT设备的操作系统内核是定制的，版本也不经常更新，这导致了大量的缓冲区溢出问题，如提权等。除此之外，设备使用了各种各样的传感器和通信模块，包括内核中大量的驱动。例如，Marvell WiFi芯片驱动找到了多个漏洞，包括 CVE-2019-14901, CVE-2019-14897 和CVE-2019-14896，它们导致了内核中基于栈或堆的缓冲区溢出。这也是攻击面中重要的一部分</p>
+<ol start="3">
+<li>固件敏感信息泄露</li>
+</ol>
+<p>IoT设备的本地存储通常使用轻量化的存储方案，开发者通常忽略了它的安全性，并使用了明文或只是进行了简单的加密，这很容易导致敏感数据的泄露</p>
+<ul>
+<li>储存</li>
+</ul>
+<p>设备使用的存储空间。这可以进一步分为内部和外部，持久性和易失性</p>
+<ul>
+<li>SD卡</li>
+</ul>
+<p>SD卡通常用于存储配置和产品数据。它们也可以用于存储固件更新。这是一个非常有趣的攻击面，我们将在以后的博客文章中讨论通过SD卡可能发生的某些攻击</p>
+<ul>
+<li>USB</li>
+</ul>
+<p>某些产品可能使用USB驱动器来存储与SD卡中相似的数据，以及读取已下载或存储在USB驱动器中的数据。与SD卡类似的攻击也适用于USB存储设备</p>
+<ul>
+<li>微控制器内部存储器<br>微控制器还具有自己的内部存储器，通常用于存储代码。这些存储器通常在调试微控制器（例如通过JTAG调试）时可访问。微控制器中使用的各种存储器是：</li>
+<li>SRAM</li>
+<li>EEPROM</li>
+</ul>
+<ol start="4">
+<li>不安全的应用服务</li>
+</ol>
+<p>应用服务开发缺少安全标准。为了加快产品的开发，通常直接编译、使用了简单、不安全的应用代码，因此引入未知的漏洞。IoT安全研究者们已经发现了大量开发时产生的应用漏洞，包括出于未知原因留下的后门</p>
+<ol start="5">
+<li>不正确的配置策略</li>
+</ol>
+<p>为了方便管理IoT设备，ssh、telnet等服务是默认的开启，这样会造成配置问题。默认配置下的弱验证策略使攻击者容易获得设备的权限。例如，Telestar Digital GmbH 的物联网收音机可通过未经验证的telnet服务器被远程攻击者劫持利用，这些漏洞已经被CVE-2019-13473和CVE-2019-13474收录</p>
+<ol start="6">
+<li>其它</li>
+</ol>
+<ul>
+<li>人机界面</li>
+</ul>
+<p>与传感器接口一样，我们使用HMI作为通用术语来定义用户与设备之间的接口，而并不局限于工业控制系统中使用的术语。这是用户可用来与设备通信并直接在其上进行操作的界面。一些常见的例子是触摸屏，按钮，触摸板等。测试此接口以发现任何旁路机制，安全漏洞等非常重要</p>
+<h1 id="0x11-物联网操作系统"><a href="#0x11-物联网操作系统" class="headerlink" title="0x11 物联网操作系统"></a>0x11 物联网操作系统</h1><p>物联网操作系统是运行在物联网设备上的提供物物相连能力的操作系统，其核心在于能够将各种物体连接到互联网，并提供数据通信能力。</p>
+<p>如果把常见的操作系统按照其应用场景进行分类，可主要分为桌面操作系统、移动操作系统和物联网操作系统，各个领域主要操作系如下：</p>
+<ul>
+<li>桌面操作系统<ul>
+<li>Windows</li>
+<li>Mac OS</li>
+<li>ubuntu</li>
+</ul>
+</li>
+<li>移动操作系统<ul>
+<li>Android</li>
+<li>iOS</li>
+<li>Chrome OS</li>
+</ul>
+</li>
+<li>物联网操作系统<ul>
+<li>uC&#x2F;OS、FreeRTOS</li>
+<li>AliOS Things、LiteOS</li>
+<li>RT-Thread</li>
+</ul>
+</li>
+</ul>
+<p>到目前为止，桌面操作系统和移动操作系统目前市场占比都形成了比较稳定的格局。相比之下，物联网操作系统领域的碎片化问题则非常严重，并没有哪几个操作系统占据绝对优势，正处于“百花齐放、百家争鸣”的阶段。</p>
+<p>大部分物联网操作系统是从嵌入式操作系统发展而来的，像uC&#x2F;OS、FreeRTOS等，也有一些是从Linux、Android等大型系统裁剪而来，像RT Linux、Android Things等，而AliOS Things则是专门为物联网应用场景而研发的</p>
+<p>当然，肯定不止这么一点，还有其它的物联网操作系统，此处只列出部分，如下：</p>
+<ul>
+<li>uC&#x2F;OS：1998年发布了uC&#x2F;OS-II版本，最新的版本则是uC&#x2F;OS-III，国内比较流行的是uC&#x2F;OS-II。除任务管理、时间管理、内存管理、通信与同步等操作系统基本功能外，uC&#x2F;OS还提供了TCP&#x2F;IP、USB、CAN和Modbus等功能组件，但其网络功能相对来说比较薄弱</li>
+<li>FreeRTOS：FreeRTOS嵌入式操作系统诞生于2003年，采用MIT License，开源免费，适用于任何商业或非商业场合，FreeRTOS在2016年被Amazon公司正式收购，Amazon将自己的AWS服务内嵌到FreeRTOS系统中，并于2017年推出了集成无线连接、安全、OTA等功能的物联网操作系统</li>
+<li>LiteOS：LiteOS是华为公司推出的轻量级物联网操作系统，它目前已经适配了众多的通用MCU以及NB-IoT集成开发套件。它是面向IoT领域构建的轻量级物联网操作系统，遵循BSD-3开源许可协议，可广泛应用于智能家居、个人穿戴、车联网、城市公共服务、制造业等领</li>
+<li>RT-Thread：RT-Thread诞生于2006年，是一款以开源、中立、社区化发展起来的物联网操作系统，它主要采用C语言编写，浅显易懂，且具有方便移植的特性</li>
+<li>Linux：人们通常所说的Linux大多数时候是指Linux内核，但只有内核并不是一个完整的操作系统。实际上，Linux是一套开放源代码、可以自由传播的类Unix操作系统。它是一个基于POSIX的多用户、多任务并且支持多线程和多CPU核心的操作系统。人们常说的Linux系统包含Linux内核、GNU项目组件和应用程序（数据库、网络、图形界面、音频等）等。Linux除了在服务器、大数据、人工智能等领域的广泛应用，在国内物联网操作系统被广泛应用之前，Linux是物联网应用中使用最广泛的操作系统。Linux系统一般都比较大，为了适应物联网领域的应用场景，很多开源组织和商业公司对Linux进行了很多的裁剪，RT Linux和uClinux是两个比较有代表性的基于Linux的物联网操作系统：<ul>
+<li>RT Linux（Real Time Linux）<ul>
+<li>它最初是由新墨西哥矿业及科技学院的V. Yodaiken开发，现在已被WindRiver公司收购。RT Linux是将Linux的内核代码做了一些修改，将Linux本身的任务以及Linux内核作为优先级很低的任务，而将负责物联网应用的实时任务作为优先级最高的任务来执行。这样就可以既享受到Linux丰富的软硬件生态的便利性，也能满足业务层对实时性的需求</li>
+</ul>
+</li>
+<li>uClinux（Micro Control Linux）<ul>
+<li>表示micro-control linux，即“微控制器领域中的Linux系统”，uClinux是Lineo公司的主打产品，同时也是开放源码的嵌入式Linux的典范之作。它是从Linux 2.0&#x2F;2.4内核派生而来，沿袭了Linux的绝大部分特性。它是专门针对没有MMU（内存管理单元）的CPU，并且为嵌入式系统做了许多小型化的工作。它通常用于具有很少内存或Flash的嵌入式操作系统。在GNU通用许可证的保证下，运行uClinux操作系统的用户可以使用几乎所有的Linux API函数。由于经过了裁剪和优化，它形成了一个高度优化，代码紧凑的嵌入式Linux。它具有体积小、稳定、良好的移植性、优秀的网络功能、完备的对各种文件系统的支持以及丰富的API函数等优点</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>AliOS Things：AliOS Things 是阿里巴巴公司2017年推出的面向物联网领域的轻量级操作系统，致力于搭建云端一体化IoT基础设施，具备极致性能、极简开发、云端一体、丰富组件、安全防护等关键能力，并支持终端设备连接到阿里云物联网平台。目前在智能家居、智慧城市、智能制造、新出行等领域大量使用。AliOS Things轻应用的开发模式自推出以来就受到开发者的极大支持，目前在智慧家庭、智能工业、智慧农业等行业有了广泛的应用，真正做到了“JS&#x2F;Python也能轻松开发智能硬件”</li>
+<li>OpenWrt：可以被描述为一个嵌入式的Linux发行版，主流路由器固件有dd-wrt、tomato、openwrt三类，而不是试图建立一个单一的、静态的系统</li>
+<li>Raspbian：是为树莓派设计，基于Debian的操作系统</li>
+<li>VxWorks：是美国WindRiver公司设计开发的一种嵌入式实时操作系统</li>
+<li>Windows CE：微软公司嵌入式、移动计算平台的基础，它是一个开放的、可升级的32位嵌入式操作系统</li>
+</ul>
+<h1 id="0x12-IOT安全研究工具介绍"><a href="#0x12-IOT安全研究工具介绍" class="headerlink" title="0x12 IOT安全研究工具介绍"></a>0x12 IOT安全研究工具介绍</h1><ul>
+<li>binwalk：固件解包分析</li>
+<li>firmwalk：自动化代码审计</li>
+<li>apparatus ASTo：物联网可视化分析</li>
+<li>AttifyOS：固件模拟环境搭建</li>
+<li>datasheet-pdf.com：芯片手册</li>
+<li>Killerbee：Zigbee安全研究工具包</li>
+<li>firmware analysis toolkit</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://github.com/attify/firmware-analysis-toolkit">https://github.com/attify/firmware-analysis-toolkit</a></p>
+<h1 id="0x13-IoT基础构建"><a href="#0x13-IoT基础构建" class="headerlink" title="0x13 IoT基础构建"></a>0x13 IoT基础构建</h1><ul>
+<li>硬件&#x2F;传感器</li>
+<li>处理器</li>
+<li>网关</li>
+<li>应用程序</li>
+</ul>
+<h2 id="13-1-硬件-x2F-传感器"><a href="#13-1-硬件-x2F-传感器" class="headerlink" title="13.1 硬件&#x2F;传感器"></a>13.1 硬件&#x2F;传感器</h2><p>过程的主要目的，是从其周围的传感器收集数据或向其周围的执行器发出数据。设备应该需要与数据收集源连接，这些设备要么自行工作（本质上是自主的），要么可以由用户根据他们的需要工作（用户控制）</p>
+<p>例如，传感器的气体传感器、水质传感器、湿度传感器等</p>
+<h2 id="13-2-处理器"><a href="#13-2-处理器" class="headerlink" title="13.2 处理器"></a>13.2 处理器</h2><p>处理器是物联网系统的大脑，主要的功能是对传感器捕获的数据进行处理，以便从收集的海量原始数据中提取有价值的数据，可以说它为数据提供了智能。处理器大多是实时工作的，可以很容易地被应用程序控制。它们还负责保护数据——即执行数据的加密和解密。</p>
+<p>嵌入式硬件设备、微控制器等是处理数据的设备，因为它们附有处理器。</p>
+<h2 id="13-3-网关"><a href="#13-3-网关" class="headerlink" title="13.3 网关"></a>13.3 网关</h2><p>网关有助于数据的来回通信。它为数据提供网络连接。网络连接对于任何物联网系统进行通信都是必不可少的</p>
+<p>例如，LAN、WAN、PAN 等是网络网关</p>
+<h2 id="13-4-应用程序"><a href="#13-4-应用程序" class="headerlink" title="13.4 应用程序"></a>13.4 应用程序</h2><p>应用程序构成物联网系统的另一端。应用程序对于正确利用收集的所有数据至关重要。这些基于云的应用程序负责为收集的数据提供有效的含义，应用程序由用户控制，是特定服务的交付点。</p>
+<p>例如，包括家庭自动化应用、安全系统、工业控制中心等</p>
+<ul>
+<li>IoT基础构建如下图：</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/cf780865bfbd4ca1ba7c09a142851aa2.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x14-学习IoT安全需要哪些设备？"><a href="#0x14-学习IoT安全需要哪些设备？" class="headerlink" title="0x14 学习IoT安全需要哪些设备？"></a>0x14 学习IoT安全需要哪些设备？</h1><ol>
+<li>电磁屏蔽：</li>
+</ol>
+<ul>
+<li>隔绝内外无线信号</li>
+</ul>
+<ol start="2">
+<li>电脑：</li>
+</ol>
+<ul>
+<li>VPN</li>
+<li>笔记本</li>
+<li>服务器</li>
+</ul>
+<ol start="3">
+<li>网络：</li>
+</ol>
+<ul>
+<li>VPN</li>
+<li>NAS</li>
+</ul>
+<ol start="4">
+<li>NFC：</li>
+</ol>
+<ul>
+<li>Proxmark</li>
+<li>Chameleon</li>
+<li>ACR 122U</li>
+</ul>
+<ol start="5">
+<li>无线电：</li>
+</ol>
+<ul>
+<li>RTL-SDR电视棒</li>
+<li>AirSpy</li>
+<li>HackRF One</li>
+<li>LimeSDR Mini</li>
+<li>BladeRF</li>
+<li>USRP</li>
+</ul>
+<ol start="6">
+<li>开发板：</li>
+</ol>
+<ul>
+<li>Arduino</li>
+<li>树莓派</li>
+<li>MT7688</li>
+<li>STM32(野火或安富莱)</li>
+<li>Zigbee</li>
+<li>Bluetooth</li>
+<li>RK3288&#x2F;RK3399</li>
+<li>FPGA(正点原子)</li>
+</ul>
+<ol start="7">
+<li>拆机工具：</li>
+</ol>
+<ul>
+<li>螺丝刀</li>
+<li>精密螺丝刀</li>
+<li>加磁器</li>
+<li>塑料螺丝刀</li>
+<li>陶瓷螺丝刀</li>
+<li>老虎钳</li>
+<li>尖嘴钳</li>
+<li>斜口钳</li>
+<li>水口钳</li>
+<li>台钳</li>
+<li>剥线钳</li>
+<li>拆机片</li>
+<li>撬棒</li>
+<li>吸盘</li>
+<li>镊子</li>
+<li>塑料镊子</li>
+<li>热熔胶枪</li>
+<li>美工刀</li>
+<li>电钻</li>
+<li>电磨</li>
+<li>电动螺丝批</li>
+<li>各种胶带</li>
+<li>绝缘垫</li>
+<li>维修垫</li>
+</ul>
+<ol start="8">
+<li>仪器设备：</li>
+</ol>
+<ul>
+<li>电烙铁（推荐白光）</li>
+<li>热风枪</li>
+<li>BGA返修台</li>
+<li>电热镊子</li>
+<li>焊锡丝（推荐山崎SANKI)</li>
+<li>飞线</li>
+<li>锡丝架</li>
+<li>吸锡器</li>
+<li>高温海绵</li>
+</ul>
+<ol start="9">
+<li>示波器：</li>
+</ol>
+<ul>
+<li>泰克、安捷伦、周立功、普源</li>
+<li>DSCope便携示波器</li>
+<li>DS213便携示波器</li>
+</ul>
+<ol start="10">
+<li>逻辑分析仪：</li>
+</ol>
+<ul>
+<li>Saleac</li>
+<li>SLA5032</li>
+<li>周立功</li>
+<li>DSLogic</li>
+<li>CCDSO</li>
+</ul>
+<ol start="11">
+<li>万用表：</li>
+</ol>
+<ul>
+<li>手持万用表（推荐Fluke）</li>
+<li>台表</li>
+</ul>
+<ol start="12">
+<li>调试器：</li>
+</ol>
+<ul>
+<li>J-link</li>
+<li>STLink</li>
+<li>CCDebugger</li>
+<li>AVRISP mkII</li>
+<li>三合一下载器</li>
+</ul>
+<ol start="13">
+<li>编程器：</li>
+</ol>
+<ul>
+<li>Gzut</li>
+<li>RT809H</li>
+<li>ZLG SmartPRO 5000U Plus通用编程器</li>
+<li>西尔特6100N</li>
+<li>烧写夹</li>
+<li>烧写座</li>
+</ul>
+<h1 id="0x15-IoT安全研究方向"><a href="#0x15-IoT安全研究方向" class="headerlink" title="0x15 IoT安全研究方向"></a>0x15 IoT安全研究方向</h1><p>目前IoT安全研究大致分为三大部分:</p>
+<ul>
+<li>固件领域</li>
+<li>硬件领域</li>
+<li>无线电领域</li>
+</ul>
+<p>IoT固件分析领域：</p>
+<ul>
+<li>二进制静态逆向</li>
+<li>逆向软件的使用</li>
+<li>漏洞利用</li>
+<li>qemu</li>
+<li>固件模拟</li>
+<li>拆焊flash</li>
+<li>固件重新打包</li>
+<li>无线通信协议</li>
+<li>网络抓包</li>
+<li>固件编写</li>
+<li>脚本编写</li>
+<li>嵌入式基本知识</li>
+<li>APP逆向 PCB板调试</li>
+</ul>
+<p>硬件领域：</p>
+<ul>
+<li>会拆解各类硬件设备</li>
+<li>会PCB布局</li>
+<li>设计电路图</li>
+<li>熟练使用手工焊接元器件</li>
+<li>熟悉数字电路</li>
+<li>熟练使用示波器，万用表，焊台等其它专业设备</li>
+<li>嵌入式方向的安全漏洞挖掘</li>
+<li>信号分析</li>
+<li>模拟电路</li>
+<li>嵌入式系统硬件软件设计与研发</li>
+<li>熟练使用C语言和指针</li>
+</ul>
+<p>无线电领域：</p>
+<ul>
+<li>熟练使用GNURadio和其他无线电工具使用</li>
+<li>熟练使用各类SDR设备</li>
+<li>熟悉信号数字处理</li>
+<li>信道编码算法</li>
+<li>掌握无线通信基本原理</li>
+<li>调制解调算法</li>
+<li>熟悉最少一种常见的无线通信协议<ul>
+<li>Wi-Fi</li>
+<li>Bluetooth</li>
+<li>Zigbee</li>
+<li>4&#x2F;5G</li>
+<li>GPS</li>
+<li>RFID</li>
+</ul>
+</li>
+</ul>
+<p><strong>参考链接</strong>：</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44309300/article/details/118525929">https://blog.csdn.net/weixin_44309300/article/details/118525929</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/prettyX/article/details/120914901">https://blog.csdn.net/prettyX/article/details/120914901</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.certcube.com/iot-pentesting-for-beginners/">https://blog.certcube.com/iot-pentesting-for-beginners/</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/wweiru/article/details/90613617">https://blog.csdn.net/wweiru/article/details/90613617</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/HiWangWenBing/article/details/107570137">https://blog.csdn.net/HiWangWenBing/article/details/107570137</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.certcube.com/iot-primer-for-pentesters-iii/">https://blog.certcube.com/iot-primer-for-pentesters-iii/</a></p>
+<p><a target="_blank" rel="noopener" href="https://paper.seebug.org/1045/#_3">https://paper.seebug.org/1045/#_3</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/HaaSTech/article/details/120671550">https://blog.csdn.net/HaaSTech/article/details/120671550</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/HaaSTech/article/details/116699087">https://blog.csdn.net/HaaSTech/article/details/116699087</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44540329/article/details/104074540">https://blog.csdn.net/weixin_44540329/article/details/104074540</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.anquanke.com/post/id/84762">https://www.anquanke.com/post/id/84762</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_47200070/article/details/123458828">https://blog.csdn.net/weixin_47200070/article/details/123458828</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/sunweixiang1002/article/details/106363128">https://blog.csdn.net/sunweixiang1002/article/details/106363128</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/xu_xy1/article/details/89704452">https://blog.csdn.net/xu_xy1/article/details/89704452</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.freebuf.com/geek/154059.html">https://www.freebuf.com/geek/154059.html</a></p>
+<hr>
+<p><strong>你以为你有很多路可以选择，其实你只有一条路可以走</strong></p>
+<hr>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/IoT%E5%AE%89%E5%85%A8/">#IoT安全</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>「干货」关于IoT安全该如何入门？你必须知道那些事</div>
+      <div>https://orangey.info/2022/09/23/124602736/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>橙留香</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年9月23日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/09/23/124604890/" title="浅析关于Android 工程模式，你必须知道的那些事">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">浅析关于Android 工程模式，你必须知道的那些事</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/09/23/124431951/" title="「干货」关于Android 数据存储与数据安全，你了解多少？">
+                        <span class="hidden-mobile">「干货」关于Android 数据存储与数据安全，你了解多少？</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  <article id="comments" lazyload>
+    
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1e96aec5ac46370916fa","clientSecret":"ee5e97a65cf34e9fe31e15ab0421a94968237f5e","repo":"ogGitalk","owner":"ananasOrangey","admin":["ananasOrangey"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '112f16b1b2c5570212ab0d205a1edb27'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+  </article>
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://orangey.blog.csdn.net" target="_blank" rel="nofollow noopener"><span>橙留香CSDN博客</span></a> <i class="iconfont icon-love"></i> <a href="https://i.imgtg.com/2022/09/21/gNXxK.png" target="_blank" rel="nofollow noopener"><span>橙留香微信公众号</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

@@ -1,0 +1,949 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="橙留香">
+  <meta name="keywords" content="橙留香车联网安全技术博客">
+  
+    <meta name="description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  Android安全付费专栏长期更新，本篇最新内容请前往：  [车联网安全自学篇] Android安全之Android应用的汉化功能(修改so中的字符串内容)  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;anana">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android APP应用程序的汉化功能 (修改so中的字符串内容)">
+<meta property="og:url" content="https://orangey.info/2022/09/23/122089268/index.html">
+<meta property="og:site_name" content="车联网安全技术博客 | 橙留香">
+<meta property="og:description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  Android安全付费专栏长期更新，本篇最新内容请前往：  [车联网安全自学篇] Android安全之Android应用的汉化功能(修改so中的字符串内容)  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;anana">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/21/gNXxK.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/a6d59611c9ca44cb94bacc45b67a41f2.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/34045dd117c741cc98b79cd735cce615.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/a34c5478b4984fdba4ef859e43934b65.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="article:published_time" content="2022-09-23T15:50:33.528Z">
+<meta property="article:modified_time" content="2022-09-24T16:39:02.925Z">
+<meta property="article:author" content="橙留香">
+<meta property="article:tag" content="AndroidSecurity">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+  
+  
+  
+  <title>Android APP应用程序的汉化功能 (修改so中的字符串内容) - 车联网安全技术博客 | 橙留香</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"orangey.info","root":"/","version":"1.9.3","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"java"},"copy_btn":false,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>橙留香</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Android APP应用程序的汉化功能 (修改so中的字符串内容)"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-09-23 23:50" pubdate>
+          2022年9月23日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          17k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          <!-- compatible with older versions-->
+          140 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Android APP应用程序的汉化功能 (修改so中的字符串内容)</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <hr>
+<p><strong>也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大</strong></p>
+<p><strong>少走了弯路，也就错过了风景，无论如何，感谢经历</strong></p>
+<hr>
+<p>Android安全付费专栏长期更新，本篇最新内容请前往：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://orangey.blog.csdn.net/article/details/122089268">[车联网安全自学篇] Android安全之Android应用的汉化功能(修改so中的字符串内容)</a></li>
+</ul>
+<p>更多关于Android安全的知识，可前往：<a target="_blank" rel="noopener" href="https://blog.csdn.net/ananasorangey/category11955914.html">https://blog.csdn.net/ananasorangey/category11955914.html</a></p>
+<p><img src="https://i.imgtg.com/2022/09/25/gdpGP.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><img src="https://i.imgtg.com/2022/09/21/gNXxK.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x01-前言"><a href="#0x01-前言" class="headerlink" title="0x01 前言"></a>0x01 前言</h1><p>反编译Apk替换Apk中英文的字符串位置，找到需要汉化的字符串位置，然后修改成对应的中文即可，但某些apk把相关要汉化的字符串放到底层里，也就是so文件中，此时会比常规的替换要有一些难度，我们不能像往常一样修改smail文件(apktools工具修改smail文件和添加中文的string.xml)，需要去修改so中的内容，so文件因为底层(native层中)都是指针操作字符串，而且还涉及到字符串的地址。需要了解so文件的格式，才能做相应的修改</p>
+<h1 id="0x02-工具准备"><a href="#0x02-工具准备" class="headerlink" title="0x02 工具准备"></a>0x02 工具准备</h1><ul>
+<li><p>010Editor：查看16进制的工具，比UE轻了很多，也很好用</p>
+</li>
+<li><p>HexEditor(HE工具)：手机上的十六进制查看工具</p>
+</li>
+<li><p>hiero：制作字库用工具</p>
+</li>
+<li><p>Xplore文件管理器</p>
+</li>
+<li><p>浮游生物：孢子的世界</p>
+</li>
+<li><p>IDA 7.5 Pro：逆向领域中堪比Android中的AndroidStudio（可以去吾爱破解上找破解版的）</p>
+</li>
+<li><p>NDK：编译so文件时需要用到，所以需要用到他</p>
+</li>
+</ul>
+<p>补充：Java中不会接触到指针的概念，但是用IDA分析so的时候是汇编指令，都是地址，地址就是指针，指针就是地址，例如如下代码中定义一个字符串：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">char</span> *orangey=<span class="hljs-string">&quot;Hello world Orangey&quot;</span><br></code></pre></td></tr></table></figure>
+
+
+
+<p>orangey参数就是一个指针，指向Hello World中的首个字符，也是这个字符串在内存中的首地址，但这个地址不是绝对地址，而是相对地址。是绝对地址减去偏移值</p>
+<p>用IDA打开so文件，用Ctrl+S搜索，到这个段得到起始地址，然后在用010Editor打开</p>
+<p>IDA：Shift+F7快捷键打开段窗口</p>
+<p>在修改文件的内容的时候，一定不能影响到其他内容的地址，这样会导致其他信息的偏移值发生变化之后，代码就会异常报错的</p>
+<ul>
+<li><p>修改字符串时需注意事项：</p>
+<ul>
+<li>如果修改的字符串的长度和源字符串的长度相等，直接替换即可</li>
+<li>如果修改的字符串的长度比源字符串的长度短，需要用空字符串进行补齐</li>
+<li>如果修改的字符串的长度比源字符串的长度要长，需在.rodata段、.data段、.string段找到一块空地，在哪里添加一个字符串</li>
+</ul>
+</li>
+<li><p>十六进制算法：</p>
+<ul>
+<li>当前位不够减，向高位借1，当做16使用</li>
+<li>被低位借走1后，当前位就不够减了，还得再向高位借1，并当做16使用</li>
+<li>被低位借走的1，运算时要减去</li>
+<li>当前位本来就不够减，还被低位借走1，所以必须向高位借1，并且借到后当做16使用</li>
+</ul>
+</li>
+</ul>
+<p>在线十六进制计算地址：<a target="_blank" rel="noopener" href="http://www.99cankao.com/digital-computation/hex-subtraction-calculator.php">http://www.99cankao.com/digital-computation/hex-subtraction-calculator.php</a></p>
+<p>用IDA打开so文件，用Ctrl+S搜索，到这个段得到起始地址，在用010Editor打开，看到存在一大片空字符串的地方，可在这里添加一个字符串，添加完之后需要再改一下十六进制地址，用当前绝对地址减去偏移量，得到减去后的值后，这时候要用HE在so文件里搜索减去后反过来的值(要反过来)</p>
+<h1 id="添加section字段"><a href="#添加section字段" class="headerlink" title="添加section字段"></a>添加section字段</h1><p>ELF文件在被映射时，是以系统的页长度为单位的，那么每个section在映射时的长度都是系统页长度的整数倍，如果section的长度不是其整数倍，则导致多余部分也将占用一个页。所以section段的位置和长度不是随便添加的，要根据program header头的align对齐方式来添加</p>
+<p>新加入的section一般是在文件末尾，但并不是真的文件末尾，而是将文件加载到内存映像中的末尾，但一般等于虚拟地址vaddr+占用空间大小memsiz，还要做字节对其，以及文件末尾不等于映像末尾，一般这个映像末尾比文件末尾大，因为操作系统对内存都是以页的粒度来操作的，所以添加section段要找到真正的映像末尾，操作系统会把program header的type为LOAD的段加入内存映像中，而LOAD类型的program header一般都是做升序排列，只需要取最后一个LOAD就可以，让vaddr+memsiz在和align做对齐操作就能够得到映像末尾</p>
+<p>详情了解前往如下：<a target="_blank" rel="noopener" href="https://www.jianshu.com/p/a2d87d9467cc">https://www.jianshu.com/p/a2d87d9467cc</a></p>
+<ul>
+<li><p>静态分析的流程</p>
+<ul>
+<li>使用apktool来反编译apk</li>
+<li>得到程序的smail源码和AndroidManifest.xml文件</li>
+<li>直接解压apk文件得到classes.dex文件，然后用dex2jar工具得到jar,用jd-gui工具查看</li>
+</ul>
+</li>
+<li><p>全局查找关键字符串和日志信息</p>
+</li>
+<li><p>代码的注入技术</p>
+</li>
+<li><p>使用系统的Hook技术，注入破解程序进程，获取关键方法的执行逻辑(Cydia和Xposed框架)</p>
+</li>
+<li><p>使用IDA来静态分析so文件</p>
+</li>
+</ul>
+<p>动态分析步骤：</p>
+<ul>
+<li>apktool反编译apk</li>
+</ul>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs mipsasm"><span class="hljs-keyword">java </span>-<span class="hljs-keyword">jar </span>apktool.<span class="hljs-keyword">jar </span>d xxx.apk<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><p>修改AndroidManifest.xml中的信息，改成可调式模式(AndroidManifest.xml 的android:debuggable&#x3D;”false” 改为true)</p>
+</li>
+<li><p>回编译</p>
+</li>
+</ul>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs stylus">java -jar apktool<span class="hljs-selector-class">.jar</span> <span class="hljs-selector-tag">b</span> -d test -o debug<span class="hljs-selector-class">.apk</span><br>注：test是之前反编译的目录，debug.apk是回编译之后的文件<br><br>用系统自带的签名文件即可签名：<br>java -jar .\sign\signapk<span class="hljs-selector-class">.jar</span> .\sign\testkey<span class="hljs-selector-class">.x509</span><span class="hljs-selector-class">.pem</span> .\sign\testkey<span class="hljs-selector-class">.pk8</span> debug<span class="hljs-selector-class">.apk</span> debug<span class="hljs-selector-class">.sig</span><span class="hljs-selector-class">.apk</span><br><br>注：step1:Android Studio 采用gradle命令assembleRelease生成未签名的apk<br><br>step2:系统签名，Android自带的签名工具为 signapk.jar， 可以在源码编译目录out中找到，具体路径为：out/host/linux-x86/framework/signapk<span class="hljs-selector-class">.jar</span>    以上APK具有系统权限，重新签名应该使用platform签名文件进行签名。<br><br>签名方法：将对应权限的签名文件platform.pk8、platform<span class="hljs-selector-class">.x509</span>.pem， 签名工具 signapk.jar， 以及需要签名的apk（假设 old.apk） 放到同一目录下，打开linux终端（windows cmd也可以），进入该目录，进行重新签名。<br><br><br>使用java自带的命令jarsigner进行签名：<br>jarsigner -verbose -keystore <span class="hljs-selector-attr">[ 密钥库]</span> -signedjar <span class="hljs-selector-attr">[签名后的apk]</span> <span class="hljs-selector-attr">[待签名的apk]</span> <span class="hljs-selector-attr">[密钥库里的别名]</span><br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>回编译后程序运行失败，是内部做校验，一般做校验的话，有两种：<ul>
+<li>对dex做校验，防止修改dex的</li>
+<li>对apk的签名做校验，防止重新打包</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight pf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs pf"><span class="hljs-keyword">on</span>Create方法，但是这里我们一般找的方法是：<br><br><span class="hljs-number">1</span>、首先看这个类有没有静态方法和静态代码块，因为这类的代码会在对象初始化之前运行，可能在这里加载so文件，或者是加密校验等操作<br><br><span class="hljs-number">2</span>、再看看这个类的构造方法<br><br><span class="hljs-number">3</span>、最后再看生命周期方法<br></code></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+<h1 id="0x03-AndroidManifest-xml文件格式浅析"><a href="#0x03-AndroidManifest-xml文件格式浅析" class="headerlink" title="0x03 AndroidManifest.xml文件格式浅析"></a>0x03 AndroidManifest.xml文件格式浅析</h1><p>Android中的Apk程序其实就是一个压缩包，可用压缩软件进行解压。</p>
+<p>Android中的apk程序本质上是一个包含资源和汇编Java代码的压缩(.zip)包，其中最核心的三个文件 分别是AndroidManifest.xml、classes.dex、resources.arsc</p>
+<p>开源工具Apktool 工作原理就是解析这三个文件格式。apk解压后AndroidManifest.xml(清单文件)用普通文本格式打开的话是乱码的。</p>
+<p>这是因为在打包的过程中，清单文件被编译成二进制数据，存储在apk安装包中。之所以称之为清单文件，因为它的确是应用的 “清单”。它包含了应用的包名，版本号，权限信息，所有的四大组件等信息。在逆向的过程中，通过 apk 的清单文件，我们可以了解应用的一些基本信息，程序的入口 Activity，注册的服务，广播，内容提供者等等。</p>
+<p>如果尝试查看过 apk 中的 AndroidManifest.xml 文件，会发现是一堆乱码，因为在打包过程中，清单文件被编译成了二进制数据存储在安装包中。需要我们了解 AndroidManifest.xml 的二进制文件结构，才可以读取到我们需要的信息。这一步可以使用开源工具读取编译后的清单文件，像 AXmlPrinter ,  apktool 等等。当然，正是由于这些工具都是开源的，一些开发者会利用其中的漏洞对清单文件进行特定的处理，使得无法通过这些工具反编译清单文件。如果我们了解其二进制文件结构的话，就可以对症下药了。</p>
+<ul>
+<li>总体上按顺序分为四大部分：<ul>
+<li>Header : 包括文件魔数和文件大小</li>
+<li>String Chunk : 字符串资源池</li>
+<li>ResourceId Chunk : 系统资源 id 信息</li>
+<li>XmlContent Chunk : 清单文件中的具体信息，其中包含了五个部分，Start Namespace Chunk 、End Namespace Chunk 、Start Tag Chunk 、End Tag Chunk 、 Text Chunk</li>
+</ul>
+</li>
+</ul>
+<p>二进制 AndroidManifest.xml 大致上就是按照这几部分顺序排列组成的，下面就逐一部分详细解析。在这之前还需要知道的一点是，清单文件是小端表示的，ARM 平台下大多数都是小端表示的</p>
+<h1 id="0x04-库文件"><a href="#0x04-库文件" class="headerlink" title="0x04 库文件"></a>0x04 库文件</h1><ul>
+<li>一系列代码功能接口与资源数据的有机集合</li>
+<li>Android SDK 即是大量库文件的集合</li>
+<li>开发兼容不同版本系统的 APK 时，要引用 Android SDK 中不同版本的 android.jar 文件（开发中使用最多的库）</li>
+<li>第三方提供的地理位置 SDK、数据统计 SDK、广告 SDK 等都是库文件</li>
+<li>引用第三方库文件可能带来安全风险（获取用户数据、监控用户行为等），应对它们的“内幕”有所了解</li>
+</ul>
+<h1 id="0x05-jar-包"><a href="#0x05-jar-包" class="headerlink" title="0x05 jar 包"></a>0x05 jar 包</h1><p>Android Studio 问世前，Android 平台软件开发主要用 ADT 工具包完成。ADT 工具包的 IDE 是 Eclipse，库文件使用 Java 语言中标准的 jar 包。jar 包其实是一个 zip 格式的压缩包文件，存放着编译后的 Java 代码的 class 文件的集合。因此称 jar 文件为“jar 包”</p>
+<p>查看 android.jar 的格式和内容（命令行输入 bash，进入 Bash on Ubuntu on Windows 的 Shell 模式，配置方法如下：</p>
+<ul>
+<li>Windows 10 中，可使用全新的 Bash on Ubuntu on Windows Shell 模拟环境。该环境随 Windows 10 的 Linux 子系统提供。<br>安装步骤：</li>
+</ul>
+<p>1）升级到 Windows 10 以支持开发者模式<br>2）在 “设置”的“更新和安全”中选择“开发者选项”，然后选择“开发人员模式”</p>
+<p><img src="https://img-blog.csdnimg.cn/a6d59611c9ca44cb94bacc45b67a41f2.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>3）打开“控制面板”，选择“程序与功能”，然后选择“启动或关闭 Windows 功能”，然后勾选“适用于 Linux 的 Windows 子系统”，系统会下载更新并提示重启计算机</p>
+<p><img src="https://img-blog.csdnimg.cn/34045dd117c741cc98b79cd735cce615.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/a34c5478b4984fdba4ef859e43934b65.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>更新和安全”中选择“开发者选项”</p>
+<p>重启后，打开命令行，输入“bash”命令，会提示继续安装 Bash on Ubuntu on Windows。选择“yes”，系统会安装相关的系统文件。安装完成后，会切换到 Shell 模式<br>在 Bash on Ubuntu on Windows Shell 环境中，安装软件包的命令为：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs routeros">sudo apt-<span class="hljs-built_in">get</span> install 软件包名<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>安装好后再输入如下命令：</li>
+</ul>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs cmake"><span class="hljs-keyword">file</span> android.jar<br>unzip -l android.jar | <span class="hljs-keyword">less</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>PS</strong>：部分对安全性要求较高的 jar 包，会对包含的 class 文件进行签名，签名信息保存在 jar 包的 META-INF 目录<br>分析 jar 包有静态分析和动态分析两种</p>
+<ul>
+<li>静态分析</li>
+</ul>
+<p>可使用 jd-gui 这类 jar 查看工具，jd-gui 内部会调用反编译接口，将 jar 包中的 class 文件编译成 Java 文件，并将结果显示，如下图：</p>
+<p>也可将 jar 包反编译称 Java 文件，导入 Java 编辑器中查看。选择 jd-gui 菜单项“File” -&gt; “Save All Sources”即可保存所有反编译出的 Java 文件</p>
+<p>下载地址：<a target="_blank" rel="noopener" href="https://github.com/java-decompiler/jd-gui/releases">https://github.com/java-decompiler/jd-gui/releases</a></p>
+<ul>
+<li>动态分析</li>
+</ul>
+<p>PC 平台可用与系统特性相关的工具 Dtrace 或 soot 对 jar 包中的文件进行运行时跟踪</p>
+<p>Android 平台没有可直接使用的工具，要用迂回的办法，即先将 jar 包集成到编写的 APK 中，再对要分析的 jar 包中的类与方法进行插桩和运行时分析</p>
+<p>在 Android 平台进行动态分析时，可参考 PC 上的方案，如 AspectJ 的面向切片编程技术。AspectJ 提供了对 jar 包中方法的侵入式 Hook 技术，可通过编写 AspectJ 脚本 Hook jar 包中的方法。Android 平台有 AspectJ 的移植版本，只要编写 Hook 实例即可，详情见之后的笔记</p>
+<h1 id="0x06-aar-包"><a href="#0x06-aar-包" class="headerlink" title="0x06 aar 包"></a>0x06 aar 包</h1><p>Android Studio 问世前：jar 包中通常只包含其所使用的代码，不包含代码所使用的资源数据；如果第三方 SDK 使用了大量的图片、声音、布局等资源，除了要将 jar 包引用到工程外，还要将 SDK 中的资源手动复制到工程中</p>
+<p>Android Studio 问世后：AS 将 aar 文件作为全新的库文件格式。aar 除了可包含代码，还可包含任何在开发中用到的资源数据</p>
+<h2 id="6-1-手动编写一个-aar-库"><a href="#6-1-手动编写一个-aar-库" class="headerlink" title="6.1 手动编写一个 aar 库"></a>6.1 手动编写一个 aar 库</h2><p>启动 AS，新建工程（AS 不允许直接创建 aar 文件，要通过模块的形式在已存在的 APK 工程中添加 aar 文件），命名为“MyAar”，然后选择默认选项即可，如下图：</p>
+<p>在 AS 主界面点击右键，如下图：</p>
+<p>选择“Android Library”，输入名称“MyLib”，如下图：</p>
+<p>在工程中包含 app 和 mylib 两个模块，不对其修改，直接编译 mylib 模块的 Release 版本。编译完成后会在当前工程目录的 mylib&#x2F;build&#x2F;outputs&#x2F;aar 目录下生成 mylib-release.aar 文件</p>
+<p>执行如下命令，查看文件格式：</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs gradle"><span class="hljs-keyword">file</span> mylib<span class="hljs-regexp">/build/</span>outputs<span class="hljs-regexp">/aar/my</span>lib-release.aar<br></code></pre></td></tr></table></figure>
+
+<p>从刚刚输出来的内容可知 aar 文件也是 zip 包，执行如下命令，查看它的内容：</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs awk">unzip -l mylib<span class="hljs-regexp">/build/</span>outputs<span class="hljs-regexp">/aar/my</span>lib-release.aar<br></code></pre></td></tr></table></figure>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs angelscript">它的目录结构与 APK 文件类似<br>  AndroidManifest.xml：可用于定义 aar 包的名称、编译器版本等<br>  classes.jar：包含 aar 库文件中所有代码生成后的 <span class="hljs-keyword">class</span> 文件<br>  <span class="hljs-symbol">res</span> 目录：存放所有资源<br>  <span class="hljs-symbol">aidl</span> 目录（本文件不存在）：存放 <span class="hljs-symbol">AIDL</span> 接口文件<br>  <span class="hljs-symbol">assets</span> 目录（本文件不存在）：存放 <span class="hljs-symbol">Asset</span> 资源<br>  <span class="hljs-symbol">jni</span> 目录（本文件不存在）：存放编译好的不同版本的 <span class="hljs-symbol">so</span> 库<br>  <span class="hljs-symbol">libs</span> 目录：存放 <span class="hljs-symbol">aar</span> 包引用的第三方 <span class="hljs-symbol">jar</span> 包<br></code></pre></td></tr></table></figure>
+
+<h1 id="0x07-APK"><a href="#0x07-APK" class="headerlink" title="0x07 APK"></a>0x07 APK</h1><p>APK（Android Package）：Android 系统的软件安装包文件</p>
+<p>APK 是 Android 软件的核心和 Android 软件开发的结果，要重点关注</p>
+<h2 id="7-1-APK-文件结构"><a href="#7-1-APK-文件结构" class="headerlink" title="7.1 APK 文件结构"></a>7.1 APK 文件结构</h2><p>APK 文件与其他系统中的软件包一样，也有自己的格式和组织结构。自 Android 诞生起，APK 文件的格式就没发生变化，始终使用 zip 作为其格式。在目录结构上，APK 文件也没发生变化，以 Crackme0201为例，解包查看其目录结构：</p>
+<ul>
+<li>查看文件格式</li>
+</ul>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs applescript"><span class="hljs-built_in">file</span> APK文件全路径<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>解包</li>
+</ul>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs nginx"><span class="hljs-attribute">unzip</span> APK文件全路径<br></code></pre></td></tr></table></figure>
+
+
+<ul>
+<li>使用 tree 命令查看目录结构</li>
+</ul>
+<figure class="highlight dos"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs dos"><span class="hljs-built_in">tree</span><br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>一个完整的 APK 文件包含如下内容：<ul>
+<li>AndroidManifest.xml：编译好的 AXML 二进制格式的文件</li>
+<li>META-INF 目录：保存 APK 的签名信息</li>
+<li>classes.dex：程序的可执行代码。如果开启了 MultiDex，则会有多个 DEX 文件</li>
+<li>res 目录：程序中使用的资源信息。针对不同分辨率的设备，可使用不同的资源文件</li>
+<li>resources.arsc：编译好的二进制格式的资源信息</li>
+<li>assets 目录：若程序使用 Asset 系统来存放 Raw 资源，所有的资源都将存放在这个目录下</li>
+</ul>
+</li>
+</ul>
+<h2 id="7-2-APK-文件的生成流程"><a href="#7-2-APK-文件的生成流程" class="headerlink" title="7.2 APK 文件的生成流程"></a>7.2 APK 文件的生成流程</h2><p>使用 AS 开发 Android 程序时，AS 会在系统后台调用编译器，自动生成 APK 文件</p>
+<ul>
+<li>使用 aapt 打包程序资源，处理项目中的 AndroidManifest.xml 文件和 XML 布局文件，并生成 R.java 文件</li>
+<li>使用 aidl 解析 AIDL 接口，定义并生成相应的 Java 文件</li>
+<li>调用 Java 编译器生成 class 文件，使用 dx 将所有的 class 文件与 jar 包打包生成 DEX 文件，调用 apkbuilder 将上述资源与 class 文件合并成 APK 文件</li>
+<li>对 APK 进行对齐处理和签名</li>
+<li>打包生成 APK 的整个过程都基于 ADT 时代的编译工具集实现</li>
+<li>Android Studio 时，编译流程的细节发生一些变化，Android 官方使用 gradle 作为 APK 的构建工具</li>
+<li>整个打包过程被抽象成了将编译模块和依赖项打包成 DEX 文件、将 APK Packager 打包成 APK 和签名两个步骤，底层的操作细节被掩盖</li>
+</ul>
+<h2 id="7-3-APK-的安装流程"><a href="#7-3-APK-的安装流程" class="headerlink" title="7.3 APK 的安装流程"></a>7.3 APK 的安装流程</h2><p>Android 程序的四种安装方式</p>
+<ul>
+<li>通过系统程序安装（开机时安装）</li>
+</ul>
+<p>由开机时启动的 PackageManagerService 服务完成。这个服务在启动时会扫描系统程序目录 &#x2F;system&#x2F;app 并重新安装所有程序</p>
+<ul>
+<li>通过 Android 市场安装<br>手机内置的应用商店如果放置在 &#x2F;system&#x2F;app 目录下，APK 的安装过程就可自动完成，通常不需要用户干预；否则会弹出软件安全界面，引导用户完成安装</li>
+</ul>
+<p>从 Android 6.0 开始，软件安装完成后会弹出权限控制界面，允许用户对软件所使用的权限进行细粒度的管理</p>
+<ul>
+<li>通过 adb 命令安装</li>
+</ul>
+<p>使用 Android SDK 提供的调试桥命令 adb 来安装 APK</p>
+<p>在命令行输入如下命令，即可完成安装：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cmake">adb <span class="hljs-keyword">install</span> APK全路径<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>手机客户端自带安装（通过 SD 卡里的 APK 文件安装）</li>
+</ul>
+<p>点击手机文件浏览器里的 APK 文件，直接调用 Android 系统的软件包 packageinstaller.apk，即可安装 APK</p>
+<ul>
+<li>通过分析 packageinstaller.apk 的实现步骤了解 APK 安装过程</li>
+</ul>
+<p>用户通过 Android 手机的文件管理程序定位到要安装的 APK 时，只要点击 APK，就会弹出软件安装界面（点击“安装”即可开始安装，点击“取消”则返回）。这个安装界面其实是 Android 系统程序 PackageInstaller 的 PackageInstallerActivity，当 Android 系统请求安装 APK 时，就会启动这个 Activity，并接收通过 Intent 传递来的 APK 文件信息</p>
+<p>PackageInstaller 的源码位于 Android 系统源码的 packages&#x2F;apps&#x2F;PackageInstaller 目录下。当 PackageInstallerActivity 启动时，首先初始化一个 PackageManager 对象与一个 PackageParser.Package 对象，接着调用 PackageUtil 类的静态方法 getPackageInfo() 来解析程序包信息。如果解析出错，程序执行失败并返回；如果成功，程序就调用 setContentView() 方法设置 PackageInstallerActivity 的显示视图，然后调用 PackageUtil 类的静态方法 getAppSnippet() 与 initSnippetForNewApp() 来设置 PackageInstallerActivity 的控件，以显示程序的名称和图标，最后调用 initiateInstall() 方法进行其他初始化工作</p>
+<p>PackageInstallerActivity 的 onCreate() 方法代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><code class="hljs java">Protected <span class="hljs-keyword">void</span> <span class="hljs-title function_">onCreate</span><span class="hljs-params">(Bundle icicle)</span> &#123;<br>    <span class="hljs-built_in">super</span>.onCreate(icicle);<br>    <span class="hljs-comment">// Get intent information</span><br>    <span class="hljs-keyword">final</span> <span class="hljs-type">Intent</span> <span class="hljs-variable">intent</span> <span class="hljs-operator">=</span> getIntent();<br>    <span class="hljs-comment">// 获取传递来的 APK 文件信息</span><br>    mPackageURI = intent.getData();<br>    <span class="hljs-comment">// 获取包管理器</span><br>    mPm = getPackageManager();<br>    <span class="hljs-comment">// 解析 APK 文件</span><br>    mPkgInfo = PackageUtil.getPackageInfo(mPackageURI);<br>    <br>    <span class="hljs-comment">// Check for parser errors</span><br>    <span class="hljs-keyword">if</span> (mPkgInfo == <span class="hljs-literal">null</span>) &#123;<br>    Log.w(TAG, <span class="hljs-string">&quot;Parser error when parsing manifest. Discontinuing installation&quot;</span>);<br>    <span class="hljs-comment">// 解析出错，弹出出错对话框</span><br>    showDialogInner(DLG_PACKAGE_ERROR);<br>    setPmResult(PackageManager.INSTALL_FAILD_INVALID_APK);<br>    <span class="hljs-keyword">return</span>;<br>    &#125;<br>    <br>    <span class="hljs-comment">// Set view</span><br>    <span class="hljs-comment">// 设置试图</span><br>    setContentView(R.layout.install_start);<br>    mInstallConfirm = findViewById(R.id.install_confirm_panel);<br>    mInstallConfirm.setVisibility(View.INVISIBLE);<br>    <span class="hljs-comment">// 获取 APK 的程序名和图标</span><br>    PackageUtil.<span class="hljs-type">AppSnippet</span> <span class="hljs-variable">as</span> <span class="hljs-operator">=</span> PackageUtil.getAppSnippet(<br>        <span class="hljs-built_in">this</span>, mPkgInfo.applicationInfo, mPackageURI);<br>    <span class="hljs-comment">// 设置 APK 的程序名和图标</span><br>    PackageUtil.initSnippetForNewApp(<span class="hljs-built_in">this</span>, as, R.id.app_snippet);<br>    <br>    <span class="hljs-comment">// Deal with install source.</span><br>    <span class="hljs-type">String</span> <span class="hljs-variable">callerPackage</span> <span class="hljs-operator">=</span> getCallingPackage();<br>    <span class="hljs-keyword">if</span> (callerPackage != <span class="hljs-literal">null</span> &amp;&amp; intent.getBooleanExtra(<br>        Intent.EXTRA_NOT_UNKNOWN_SOURCE, <span class="hljs-literal">false</span>)) &#123;<br>        <span class="hljs-keyword">try</span> &#123;<br>            <span class="hljs-comment">// 获取程序信息</span><br>            mSourceInfo = mPm.getApplicationInfo(callerPackage, <span class="hljs-number">0</span>);<br>            <span class="hljs-keyword">if</span> (mSourceInfo != <span class="hljs-literal">null</span>) &#123;<br>                <span class="hljs-comment">// 系统程序</span><br>                <span class="hljs-keyword">if</span> ((mSourceInfo.flags &amp; ApplicationInfo.FLAG_SYSTEM) != <span class="hljs-number">0</span>) &#123;<br>                    <span class="hljs-comment">// System apps don&#x27;t need to be approved.</span><br>                    <span class="hljs-comment">// 其他初始化工作</span><br>                    initiateInstall();<br>                    <span class="hljs-keyword">return</span>;<br>                &#125;<br>                <span class="hljs-type">SharedPreFerences</span> <span class="hljs-variable">prefs</span> <span class="hljs-operator">=</span> getSharedPreferences(<br>                    PREFS_ALLOWED_SOURCE, Context.MODE_PRIVATE);<br>                <span class="hljs-keyword">if</span> (prefs.getBoolean(mSourceInfo.packageName, <span class="hljs-literal">false</span>)) &#123;<br>                    <span class="hljs-comment">// User has already allowed this one.</span><br>                    <span class="hljs-comment">// 其他初始化工作</span><br>                    initiateInstall();<br>                    <span class="hljs-keyword">return</span>;<br>                &#125;<br>                <span class="hljs-comment">// Ask user to enable setting first</span><br>                <span class="hljs-comment">// 弹出“新的应用来源”对话框</span><br>                showDialogInner(DLG_ALLOW_SOURCE);<br>                <span class="hljs-keyword">return</span>;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">catch</span> (NameNotFoundException e) &#123;<br>            <br>        &#125;<br>    &#125;<br>    <span class="hljs-comment">// Check unknown sources.</span><br>    <span class="hljs-keyword">if</span> (!isInstallingUnknownAppsAllowed()) &#123;<br>        <span class="hljs-comment">// Ask user to enable setting first</span><br>        <span class="hljs-comment">// 弹出“启用未知来源”对话框</span><br>        showDialogInner(GLG_UNKNOWN_APPS);<br>        <span class="hljs-keyword">return</span>;<br>    &#125;<br>    <span class="hljs-comment">// 其他初始化工作</span><br>    initiateInstall();<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>在整个 onCreate() 方法中有两个重点函数：PackageUtil 类的 getPackageInfo()；initiateInstall()。getPackageInfo() 首先通过 packageURI 获取 APK 的路径，然后构造一个 PackageParser 对象，最后调用 PackageParser 对象的 parsePackage() 解析 APK 程序包。parsePackage() 代码较长，大致如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> Package <span class="hljs-title function_">parsePackage</span><span class="hljs-params">(File sourceFile, String destCodePath,</span><br><span class="hljs-params">    DisplayMetrics metrics, <span class="hljs-type">int</span> flags)</span> &#123;<br>    ...<br>    <span class="hljs-keyword">try</span> &#123;<br>        assmgr = <span class="hljs-keyword">new</span> <span class="hljs-title class_">AssetManager</span>();<br>        <span class="hljs-type">int</span> <span class="hljs-variable">cookie</span> <span class="hljs-operator">=</span> assmgr.addAssetPath(mArchiveSourcePath);<br>        ...<br>    &#125;<br>    <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>        Slog.w(TAG, <span class="hljs-string">&quot;Unable to read AndroidManifest.xml of&quot;</span> +<br>            mArchiveSourcePath, e);<br>    &#125;<br>    ...<br>    <span class="hljs-keyword">try</span> &#123;<br>        <span class="hljs-comment">// XXXX todo: need to figure out correct configuration.</span><br>        pkg = parsePackage(res, parser, flags, errorText);<br>    &#125;<br>    <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>        ...<br>    &#125;<br>    ...<br>    <span class="hljs-keyword">return</span> pkg;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>parsePackage() 调用了另一个版本的 parsePackage()，代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">private</span> Package <span class="hljs-title function_">parsePackage</span><span class="hljs-params">(Resources res, XmlResourceParser parser,</span><br><span class="hljs-params">    <span class="hljs-type">int</span> flags, String[] outError)</span> <span class="hljs-keyword">throws</span> XmlPullParserException, IOException &#123;<br>    ...<br>    <span class="hljs-type">String</span> <span class="hljs-variable">pkgName</span> <span class="hljs-operator">=</span> parsePackageName(parser, attrs, flags, outError);<br>    ...<br>    <span class="hljs-keyword">final</span> <span class="hljs-type">Package</span> <span class="hljs-variable">pkg</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Package</span>(pkgName);<br>    ...<br>    <span class="hljs-keyword">while</span> ((type = parser.next()) != XmlPullParser.END_DOCUMENT &amp;&amp;<br>        (type != XmlPullParser.END_TAG || parser.getDepth() &gt; outerDepth)) &#123;<br>        <span class="hljs-keyword">if</span> (type == XmlPullParser.END_TAG ||<br>            type == XmlPullParser.TEXT) &#123;<br>            <span class="hljs-keyword">continue</span>;<br>        &#125;<br>        <span class="hljs-type">String</span> <span class="hljs-variable">tagName</span> <span class="hljs-operator">=</span> parser.getName();<br>        <span class="hljs-keyword">if</span> (tagName.equals(<span class="hljs-string">&quot;application)) &#123;</span><br><span class="hljs-string">            ...</span><br><span class="hljs-string">            foundApp = true;</span><br><span class="hljs-string">            if (!parseApplication(pkg, res, parser, attrs, flags, outError)) &#123;</span><br><span class="hljs-string">                return null;</span><br><span class="hljs-string">            &#125;</span><br><span class="hljs-string">        &#125;</span><br><span class="hljs-string">        else if (tagName.equals(&quot;</span>permission-group<span class="hljs-string">&quot;)) &#123;</span><br><span class="hljs-string">            ...</span><br><span class="hljs-string">        &#125;</span><br><span class="hljs-string">        ...</span><br><span class="hljs-string">        else if (tagName.equals(&quot;</span>eat-comment<span class="hljs-string">&quot;)) &#123;</span><br><span class="hljs-string">            ...</span><br><span class="hljs-string">        &#125;</span><br><span class="hljs-string">        else if (RIGID_PARSER) &#123;</span><br><span class="hljs-string">            ...</span><br><span class="hljs-string">        &#125;</span><br><span class="hljs-string">        else &#123;</span><br><span class="hljs-string">            Slog.w(TAG, &quot;</span>Unknown element under &lt;manifest&gt;: <span class="hljs-string">&quot; +</span><br><span class="hljs-string">                parser.getName() + &quot;</span> at <span class="hljs-string">&quot; + mArchiveSourcePath +</span><br><span class="hljs-string">                &quot;</span> <span class="hljs-string">&quot; + parser.getPositionDescription());</span><br><span class="hljs-string">            XmlUtils.skipCurrentTag(parser);</span><br><span class="hljs-string">            continue;</span><br><span class="hljs-string">        &#125;</span><br><span class="hljs-string">    &#125;</span><br><span class="hljs-string">    ...</span><br><span class="hljs-string">    return pkg;</span><br><span class="hljs-string">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>首先调用 parsePackageName() 从 AndroidManifest.xml 中获取程序包名，接着构建了一个 Package 对象，然后逐一处理 AndroidManifest.xml 中的标签。在处理 application 标签时使用了 parseApplication()，该方法负责解析 activity、receiver、service、provider，并将它们添加到传递进来的 Package 对象的 ArrayList 中</p>
+<p>在 onCreate() 中，getPackageInfo() 返回后调用了 initiateInstall()、initiateInstall() 负责检测该程序是否已安装。若已安装，就调用 startInstallConfirm() 显示安装界面；若没安装，则调用 showDialogInner(DLG_REPLACE_APP) 弹出替换程序对话框</p>
+<p>startInstallConfirm() 设置了安装与取消按钮的监视器。最后是 onClick() 的按钮点击响应，安装按钮使用 startActivity() 启动一个 Activity 类 InstallAppProgress，该类在初始化 onCreate() 时调用 initView()，后者最终调用 PackageManager 类的installPackage() 来安装 APK</p>
+<p>installPackage() 是 PackageManager 类的一个虚函数，PackageManagerService.java 实现了它。installPackage() 调用了 installPackageWithVerification()，该方法先验证调用者是否具有安装程序的权限，然后通过消息处理的方式调用 processPendingInstall() 进行安装。processPendingInstall() 调用了 installPackageLI()。installPackageLI() 经过一系列验证，最终调用 replacePackageLI() 或 installNewPackageLI() 来替换或安装程序。上述过程的代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">installPackageLi</span><span class="hljs-params">(InstallArgs args,</span><br><span class="hljs-params">    <span class="hljs-type">boolean</span> newInstall, PackageInstalledInfo res)</span> &#123;<br>    <span class="hljs-type">int</span> <span class="hljs-variable">pFlags</span> <span class="hljs-operator">=</span> args.flags;<br>    <span class="hljs-type">String</span> <span class="hljs-variable">installerPackageName</span> <span class="hljs-operator">=</span> args.installerPackageName;<br>    <span class="hljs-type">File</span> <span class="hljs-variable">tmpPackageFile</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">File</span>(args.getCodePath());<br>    ...<br>    <span class="hljs-comment">// Set application objects path explicitly after the rename</span><br>    setApplicationInfoPaths(pkg, args.getCodePath(),<br>        args.getResourcePath());<br>    pkg.applicationInfo.nativeLibraryDir =<br>        args.getNativeLibraryPath();<br>    <span class="hljs-keyword">if</span> (replace) &#123;<br>        <span class="hljs-comment">// 替换已安装的程序</span><br>        replacePackageLI(pkg, parseFlags, scanMode,<br>            installerPackageName, res);<br>    &#125;<br>    <span class="hljs-keyword">else</span> &#123;<br>        <span class="hljs-comment">// 安装新程序</span><br>        installNewPackageLI(pkg, parseFlags, scanMode,<br>            installerPackageName, res);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>尽管安装和替换操作的代码都较长，但它们最终都会调用 scanPackageLI()</p>
+<p>scanPackageLI() 会实例化一个 PackageParser 对象，然后调用其 parsePackage() 来解析 APK 程序包。在代码的最后调用了 scanPackageLI() 的另一版本，此版本的 scanPackageLI() 将完成 APK 的依赖库检测、签名验证、sharedUser 的签名检查、Native 库目录文件的更新、组件名称的检查等工作，并调用 mInstaller 的 install() 来安装程序。mInstaller 为 Installer 类的一个实例，Installer 类的源码位于 Android 源码文件 frameworks&#x2F;base&#x2F;services&#x2F;java&#x2F;com&#x2F;android&#x2F;server&#x2F;pm&#x2F;Installer.java 中。install() 在构造字符串“install name uid gid”后，调用 transaction()，通过 socket 向 &#x2F;system&#x2F;bin&#x2F;installd 程序发送 install 指令。installd 的源码位于 frameworks&#x2F;base&#x2F;cmds&#x2F;installd 目录下，这个程序在开机后常驻内存，可通过在 adb 的 Shell 环境下运行 ps | grep &#x2F;system&#x2F;bin&#x2F;installd 命令查看进程信息。installd 处理 install 指令的函数为 installd.c 文件中的 do_install()，do_install() 调用了 install()，后者在 commands.c 文件中有实现代码，大致如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-type">int</span> <span class="hljs-title function_">install</span><span class="hljs-params">(const <span class="hljs-type">char</span>* pkgname, uid_t uid, gid_t gid)</span> &#123;<br>    ...<br>    <span class="hljs-comment">// 创建包路径</span><br>    <span class="hljs-keyword">if</span> (create_pkg_path(pkgdir, pkgname, PKG_DIR_POSIFIX, <span class="hljs-number">0</span>)) &#123;<br>        ALOGE(<span class="hljs-string">&quot;cannot create package path\n&quot;</span>);<br>        <span class="hljs-keyword">return</span> -<span class="hljs-number">1</span>;<br>    &#125;<br>    <span class="hljs-comment">// 创建库路径</span><br>    <span class="hljs-keyword">if</span> (create_pkg_path(libdir, pkgname, PKG_LIB_POSIFIX, <span class="hljs-number">0</span>)) &#123;<br>        ALOGE(<span class="hljs-string">&quot;cannot create package lib path\n&quot;</span>);<br>        <span class="hljs-keyword">return</span> -<span class="hljs-number">1</span>;<br>    &#125;<br>    <span class="hljs-comment">// 创建包目录</span><br>    <span class="hljs-keyword">if</span> (mkdir(pkgdir, <span class="hljs-number">0751</span>) &lt; <span class="hljs-number">0</span>) &#123;<br>        ALOGE(<span class="hljs-string">&quot;cannot create dir &#x27;%s&#x27;: %s\n&quot;</span>,<br>            pkgdir, strerror(errno));<br>        <span class="hljs-keyword">return</span> -errno;<br>    &#125;<br>    <span class="hljs-comment">// 设置包目录权限</span><br>    <span class="hljs-keyword">if</span> (chmod(pkgdir, <span class="hljs-number">0751</span>) &lt; <span class="hljs-number">0</span>) &#123;<br>        ALOGE(<span class="hljs-string">&quot;cannot chmod dir &#x27;%s&#x27;: %s\n&quot;</span>,<br>            pkgdir, strerror(errno));<br>        unlink(pkgdir);<br>        <span class="hljs-keyword">return</span> -errno;<br>    &#125;<br>    <span class="hljs-comment">// 创建库目录</span><br>    <span class="hljs-keyword">if</span> (mkdir(libdir, <span class="hljs-number">0755</span>) &lt; <span class="hljs-number">0</span>) &#123;<br>        ALOGE(<span class="hljs-string">&quot;cannot create dir &#x27;%s&#x27;: %s\n&quot;</span>,<br>            libdir, strerror(errno));<br>        unlink(pkgdir);<br>        <span class="hljs-keyword">return</span> -errno;<br>    &#125;<br>    <span class="hljs-comment">// 设置库目录权限</span><br>    <span class="hljs-keyword">if</span> (chmod(libdir, <span class="hljs-number">0755</span>) &lt; <span class="hljs-number">0</span>) &#123;<br>        ALOGE(<span class="hljs-string">&quot;cannot chmod dir &#x27;%s&#x27;: %s\n&quot;</span>,<br>            libdir, strerror(errno));<br>        unlink(libdir);<br>        unlink(pkgdir);<br>        <span class="hljs-keyword">return</span> -errno;<br>    &#125;<br>    <span class="hljs-comment">// 设置库目录的所有者</span><br>    <span class="hljs-keyword">if</span> (chown(libdir, AID_SYSTEM, AID_SYSTEM) &lt; <span class="hljs-number">0</span>) &#123;<br>        ALOGE(<span class="hljs-string">&quot;cannot chown dir &#x27;%s&#x27;: %s\n&quot;</span>,<br>            libdir, strerror(errno));<br>        unlink(libdir);<br>        unlink(pkgdir);<br>        <span class="hljs-keyword">return</span> -errno;<br>    &#125;<br>    <span class="hljs-comment">// 设置包目录的所有者</span><br>    <span class="hljs-keyword">if</span> (chown(pkgdir, uid, gid) &lt; <span class="hljs-number">0</span>) &#123;<br>        ALOGE(<span class="hljs-string">&quot;cannot chown dir &#x27;%s&#x27;: %s\n&quot;</span>,<br>            pkgdir, strerror(errno));<br>        unlink(libdir);<br>        unlink(pkgdir);<br>        <span class="hljs-keyword">return</span> -errno;<br>    &#125;<br>    ...<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>install() 执行完毕，会通过 socket 回传结果，最终由PackageInstaller 根据返回结果进行相应的处理，此时一个 APK 就安装完成了</p>
+<h1 id="0x08-AXMLPrinter-工具"><a href="#0x08-AXMLPrinter-工具" class="headerlink" title="0x08 AXMLPrinter 工具"></a>0x08 AXMLPrinter 工具</h1><p>用于解析和打印编译的 Android 清单文件的库</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs crmsh">java -jar AXMLPrinter.java xxx.<span class="hljs-keyword">xml</span> <span class="hljs-title">&gt;demo</span>.xml<br></code></pre></td></tr></table></figure>
+
+<p>将xxx.xml解析之后输出到demo.xml中即可</p>
+<p>地址：<a target="_blank" rel="noopener" href="https://github.com/rednaga/axmlprinter">https://github.com/rednaga/axmlprinter</a></p>
+<h1 id="0x09-Android-aapt-命令"><a href="#0x09-Android-aapt-命令" class="headerlink" title="0x09 Android aapt 命令"></a>0x09 Android aapt 命令</h1><p>aapt即 Android Asset Packaging Tool，该工具在SDK&#x2F;tools目录下。</p>
+<p>只有那些类型为res&#x2F;animator、res&#x2F;anim、res&#x2F;color、res&#x2F;drawable（非Bitmap文件，即非.png、.9.png、.jpg、.gif文件）、res&#x2F;layout、res&#x2F;menu、res&#x2F;values和res&#x2F;xml的资源文件均会从文本格式的XML文件编译成二进制格式的XML文件</p>
+<ul>
+<li>XML资源文件之所要从文本格式编译成二进制格式，原因如下：</li>
+</ul>
+<ol>
+<li>二进制格式的XML文件占用空间更小。这是由于所有XML元素的标签、属性名称、属性值和内容所涉及到的字符串都会被统一收集到一个字符串资源池中去，并且会去重。有了这个字符串资源池，原来使用字符串的地方就会被替换成一个索引到字符串资源池的整数值，从而可以减少文件的大小</li>
+<li>二进制格式的XML文件解析速度更快。这是由于二进制格式的XML元素里面不再包含有字符串值，因此就避免了进行字符串解析，从而提高速度。</li>
+</ol>
+<p>将XML资源文件从文本格式编译成二进制格式解决了空间占用以及解析效率的问题，但是对于Android资源管理框架来说，这只是完成了其中的一部分工作。Android资源管理框架的另外一个重要任务就是要根据资源ID来快速找到对应的资源。</p>
+<ul>
+<li><p>命令：</p>
+<p>  aapt l -a apk名称 &gt; demo.txt</p>
+</li>
+</ul>
+<p>详情了解：<a target="_blank" rel="noopener" href="https://www.codenong.com/jsf0f4856866e0/">https://www.codenong.com/jsf0f4856866e0/</a></p>
+<p><a target="_blank" rel="noopener" href="https://juejin.cn/post/6844903747169026061">https://juejin.cn/post/6844903747169026061</a></p>
+<p><strong>参考链接</strong>：</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/zlmm741/article/details/104640245">https://blog.csdn.net/zlmm741/article/details/104640245</a><br><a target="_blank" rel="noopener" href="https://juejin.cn/post/6844903747169026061">https://juejin.cn/post/6844903747169026061</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/zlmm741/article/details/104577290">https://blog.csdn.net/zlmm741/article/details/104577290</a></p>
+<hr>
+<p><strong>你以为你有很多路可以选择，其实你只有一条路可以走</strong></p>
+<hr>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/AndroidSecurity/">#AndroidSecurity</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Android APP应用程序的汉化功能 (修改so中的字符串内容)</div>
+      <div>https://orangey.info/2022/09/23/122089268/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>橙留香</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年9月23日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/09/23/122088540/" title="Android so文件分析「详细版」">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Android so文件分析「详细版」</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/09/23/118888796/" title="车联网安全常见术语科普">
+                        <span class="hidden-mobile">车联网安全常见术语科普</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  <article id="comments" lazyload>
+    
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1e96aec5ac46370916fa","clientSecret":"ee5e97a65cf34e9fe31e15ab0421a94968237f5e","repo":"ogGitalk","owner":"ananasOrangey","admin":["ananasOrangey"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: 'acc42287d72b6a367d147ed44e0d0810'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+  </article>
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://orangey.blog.csdn.net" target="_blank" rel="nofollow noopener"><span>橙留香CSDN博客</span></a> <i class="iconfont icon-love"></i> <a href="https://i.imgtg.com/2022/09/21/gNXxK.png" target="_blank" rel="nofollow noopener"><span>橙留香微信公众号</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

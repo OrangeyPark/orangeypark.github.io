@@ -1,0 +1,822 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="橙留香">
+  <meta name="keywords" content="橙留香车联网安全技术博客">
+  
+    <meta name="description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  Android安全付费专栏长期更新，本篇最新内容请前往：  [车联网安全自学篇] Android安全之ZIP文件目录遍历漏洞  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;ananasorangey&#x2F;categor">
+<meta property="og:type" content="article">
+<meta property="og:title" content="关于Android ZIP文件目录遍历漏洞，你了解多少？">
+<meta property="og:url" content="https://orangey.info/2022/09/23/125236134/index.html">
+<meta property="og:site_name" content="车联网安全技术博客 | 橙留香">
+<meta property="og:description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  Android安全付费专栏长期更新，本篇最新内容请前往：  [车联网安全自学篇] Android安全之ZIP文件目录遍历漏洞  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;ananasorangey&#x2F;categor">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/21/gNXxK.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e5d5f291514d452585b677679ad1a549.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/1b79ce95b54a4569a551734df26dccb7.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/db4f836667e845ae897257fa9646b89b.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/ca50e58f4c88490584dacac7fb1a5eb6.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/9fe3122f02fb467b9c07080b679edcf2.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/945820e5de104b11bfa9199a5048e91f.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2697f2bca2334ce4b3c62bcb7cf3fe39.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/6bc92dafa9aa4ec08a56fd6a87f323ed.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2ea9bc90be464787b080ab6e0ded891f.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/0718a5573c744fa485b47fcbd8745f41.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/1bc12c40163847aca217db84a5b4bb95.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/3c57328efe824c5986c955ea3c62f1b5.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/7e56b88d8fbd4c72ad1d87645af26354.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/53f19126efa04181a3f2c5290c57d574.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/40890de8691e4269bc6e94a112c5137f.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/ebd7de60166d4f3293549f2f713349b0.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/62cea315544e4f4c9072cbf4c18f0013.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/add49e8eadb244b097294debf9775abe.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/0ead3c3f28d341c1a2f0148b582d6096.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/11483122eaca44b6837bbca1f89d3764.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/19a4bcfd915645d3a8c1a44731007460.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/efb2acdda4e348b899480d0c0795bd66.png">
+<meta property="article:published_time" content="2022-09-23T15:50:33.628Z">
+<meta property="article:modified_time" content="2022-09-24T16:46:47.497Z">
+<meta property="article:author" content="橙留香">
+<meta property="article:tag" content="AndroidSecurity">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+  
+  
+  
+  <title>关于Android ZIP文件目录遍历漏洞，你了解多少？ - 车联网安全技术博客 | 橙留香</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"orangey.info","root":"/","version":"1.9.3","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"java"},"copy_btn":false,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>橙留香</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="关于Android ZIP文件目录遍历漏洞，你了解多少？"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-09-23 23:50" pubdate>
+          2022年9月23日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          7.9k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          <!-- compatible with older versions-->
+          67 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">关于Android ZIP文件目录遍历漏洞，你了解多少？</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <hr>
+<p><strong>也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大</strong></p>
+<p><strong>少走了弯路，也就错过了风景，无论如何，感谢经历</strong></p>
+<hr>
+<p>Android安全付费专栏长期更新，本篇最新内容请前往：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://orangey.blog.csdn.net/article/details/125236134">[车联网安全自学篇] Android安全之ZIP文件目录遍历漏洞</a></li>
+</ul>
+<p>更多关于Android安全的知识，可前往：<a target="_blank" rel="noopener" href="https://blog.csdn.net/ananasorangey/category11955914.html">https://blog.csdn.net/ananasorangey/category11955914.html</a></p>
+<p><img src="https://i.imgtg.com/2022/09/25/gdpGP.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><img src="https://i.imgtg.com/2022/09/21/gNXxK.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x01-前言"><a href="#0x01-前言" class="headerlink" title="0x01 前言"></a>0x01 前言</h1><p>zip 类型的压缩包文件中允许存在 ..&#x2F; 类型的字符串，用于表示上一层级的目录。攻击者可以利用这一特性，通过精心构造 zip 文件，利用多个 <code>../</code>从而改变 zip 包中某个文件的存放位置，达到替换掉原有文件的目的</p>
+<p>那么，如果被替换掉的文件是是 <code>.so、.dex</code>或 <code>.odex</code>类型文件，那么攻击者就可以轻易更改原有的代码逻辑，轻则产生本地拒绝服务漏洞，影响应用的可用性，重则可能造成任意代码执行漏洞，危害用户的设备安全和信息安全。比如寄生兽漏洞、海豚浏览器远程命令执行漏洞和三星默认输入法远程代码执行等著名的安全事件</p>
+<ul>
+<li>漏洞原理</li>
+</ul>
+<p>在linux系统中，<code>../</code>代表切换到上一级目录，有些程序在当前工作目录中处理到诸如<code>../../../../../../../../../../../etc/hosts</code>表示的文件，会跳转出当前工作目录，跳转到到其他目录中对应的hosts目录</p>
+<p>Java代码在解压zip文件时，会使用ZipEntry类的getName()方法，获取文件的名称，如果 zip 文件中包含<code>../</code>字符串，该方法的返回值里面会原样返回，如果没有过滤掉 getName() 返回值中的<code>../</code>字符串，继续解压缩操作，就会在其他目录中创建解压的文件</p>
+<p>因为ZipEntry在进行压缩文件的时候，名称没有做任何限制，而在Android系统中..&#x2F;这种特殊符号代表的是回到上层目录，又因为这个解压工作在本应用中，可以借助app的自生权限，把恶意文件名改成：..&#x2F;..&#x2F;..&#x2F;data&#x2F;data&#x2F;…即可在解压的时候把文件解压到了应用的沙盒中</p>
+<p>一些示例的zip包样本：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/snyk/zip-slip-vulnerability">https://github.com/snyk/zip-slip-vulnerability</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.apkhere.com/app/com.dolphin.browser.express.web">https://www.apkhere.com/app/com.dolphin.browser.express.web</a></li>
+</ul>
+<h1 id="0x02-vuls-APP-ZIP文件目录遍历【漏洞复现】"><a href="#0x02-vuls-APP-ZIP文件目录遍历【漏洞复现】" class="headerlink" title="0x02 vuls APP ZIP文件目录遍历【漏洞复现】"></a>0x02 vuls APP ZIP文件目录遍历【漏洞复现】</h1><p><strong>注</strong>：Android6.0 已经打了补丁，在进行解压的时候对<code>../</code>这种情况进行了过滤，这样就导致不能进行成功的穿越，所以我们用低版本Android系统复现学习</p>
+<p>vuls样本下载：<a target="_blank" rel="noopener" href="https://github.com/AndroidAppSec/vuls/releases/tag/v4.3">https://github.com/AndroidAppSec/vuls/releases/tag/v4.3</a></p>
+<p><strong>ZipEntry关键 API</strong>：</p>
+<ul>
+<li><code>java.util.zip.ZipEntry#getName()</code></li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * Returns the name of the entry. </span><br><span class="hljs-comment"> * <span class="hljs-doctag">@return</span> the name of the entry </span><br><span class="hljs-comment"> */</span><br> <br> <span class="hljs-keyword">public</span> String <span class="hljs-title function_">getName</span><span class="hljs-params">()</span> &#123; <span class="hljs-keyword">return</span> name; &#125;<br></code></pre></td></tr></table></figure>
+
+
+<ul>
+<li><code>java.util.zip.ZipInputStream#getNextEntry()</code></li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * Reads the next ZIP file entry and positions the stream at the</span><br><span class="hljs-comment"> * beginning of the entry data.</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@return</span> the next ZIP file entry, or null if there are no more entries</span><br><span class="hljs-comment"> */</span><br> <br> <span class="hljs-keyword">public</span> ZipEntry <span class="hljs-title function_">getNextEntry</span><span class="hljs-params">()</span><br></code></pre></td></tr></table></figure>
+
+
+
+<p><img src="https://img-blog.csdnimg.cn/e5d5f291514d452585b677679ad1a549.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">zipperDown</span><span class="hljs-params">()</span>&#123;<br>        <span class="hljs-type">String</span> <span class="hljs-variable">url</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;http://www.example.com/test.zip&quot;</span>;<br>        <span class="hljs-type">OkHttpClient</span> <span class="hljs-variable">okHttpClient</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">OkHttpClient</span>();<br>        <span class="hljs-keyword">final</span> <span class="hljs-type">Request</span> <span class="hljs-variable">request</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Request</span>.Builder().url(url).get().build();<br>        <span class="hljs-type">Call</span> <span class="hljs-variable">call</span> <span class="hljs-operator">=</span> okHttpClient.newCall(request);<br>        call.enqueue(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Callback</span>() &#123;<br>            <span class="hljs-meta">@Override</span><br>            <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">onFailure</span><span class="hljs-params">(Call call, IOException e)</span> &#123;<br>                Log.e(<span class="hljs-string">&quot;zipperDown&quot;</span>, <span class="hljs-string">&quot;zipperDown fail&quot;</span>);<br>            &#125;<br><br>            <span class="hljs-meta">@Override</span><br>            <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">onResponse</span><span class="hljs-params">(Call call, Response response)</span> <span class="hljs-keyword">throws</span> IOException &#123;<br>               Log.e(<span class="hljs-string">&quot;zipperDown&quot;</span>, response.body().bytes().length + <span class="hljs-string">&quot;&quot;</span>);<br>                <span class="hljs-type">String</span> <span class="hljs-variable">dstPath</span> <span class="hljs-operator">=</span> getCacheDir().toString();<br>                <span class="hljs-type">ZipEntry</span> <span class="hljs-variable">zipEntry</span> <span class="hljs-operator">=</span> <span class="hljs-literal">null</span>;<br>                <span class="hljs-type">ZipInputStream</span> <span class="hljs-variable">zipInputStream</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ZipInputStream</span>(response.body().byteStream());<br>                <span class="hljs-keyword">while</span> ((zipEntry = zipInputStream.getNextEntry()) != <span class="hljs-literal">null</span>)&#123;<br>                     <span class="hljs-comment">//调用zipEntry的getName方法没有检查是否包含&quot;../&quot;</span><br>                    <span class="hljs-type">String</span> <span class="hljs-variable">entryName</span> <span class="hljs-operator">=</span> zipEntry.getName();<br>                    <span class="hljs-keyword">if</span> (zipEntry.isDirectory())&#123;<br>                        <span class="hljs-comment">// 创建文件夹</span><br>                        entryName = entryName.substring(<span class="hljs-number">0</span>, entryName.length() -<span class="hljs-number">1</span>);<br>                        <span class="hljs-type">File</span> <span class="hljs-variable">folder</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">File</span>(dstPath + File.separator + entryName);<br>                        folder.mkdirs();<br>                    &#125;<span class="hljs-keyword">else</span> &#123;<br>                        <span class="hljs-comment">// 尝试解压zip entry到指定路径</span><br>                        <span class="hljs-type">String</span> <span class="hljs-variable">fileName</span> <span class="hljs-operator">=</span> dstPath + File.separator + entryName;<br>                        Log.e(<span class="hljs-string">&quot;zipperDown&quot;</span>, fileName);<br>                        <span class="hljs-type">File</span> <span class="hljs-variable">file</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">File</span>(fileName);<br>                        file.createNewFile();<br>                        <span class="hljs-type">FileOutputStream</span> <span class="hljs-variable">fileOutputStream</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">FileOutputStream</span>(file);<br>                        <span class="hljs-type">byte</span>[] buffer = <span class="hljs-keyword">new</span> <span class="hljs-title class_">byte</span>[<span class="hljs-number">1024</span>];<br>                        <span class="hljs-type">int</span> <span class="hljs-variable">n</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;<br>                        <span class="hljs-keyword">while</span> ((n = zipInputStream.read(buffer, <span class="hljs-number">0</span> , <span class="hljs-number">1024</span>)) != -<span class="hljs-number">1</span>)&#123;<br>                            fileOutputStream.write(buffer, <span class="hljs-number">0</span> , n);<br>                        &#125;<br>                        fileOutputStream.flush();<br>                        fileOutputStream.close();<br>                    &#125;<br>                &#125;<br>                zipInputStream.close();<br>            &#125;<br>        &#125;);<br><br>    &#125;<br></code></pre></td></tr></table></figure>
+
+<p>在上图红色标记的代码中，直接将获取的压缩文件中的文件名进行拼接，没有对路径中是否包含 <code>../</code>或者 <code>..</code>字符就做过滤判断，即：文件名称不能包含”..&#x2F;“这种特殊字符做处理。正常情况下，zip 文件中文件名为 og_test_zip.txt，会被下载到 <code>/data/data/ddns.android.vuls/cache/og_test_zip.txt</code>【如下图】。如果攻击者构造一个 <code>../files/og_test_zip.txt</code>的文件名，则拼接后的文件名为 <code>/data/data/ddns.android.vuls/cache/../files/og_test_zip.txt</code>，其会下载到vuls APP应用本地的&#x2F;files&#x2F;目录下，当然如果是想做覆盖本地文件的话，只要取相同名字即可覆盖</p>
+<p><img src="https://img-blog.csdnimg.cn/1b79ce95b54a4569a551734df26dccb7.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>构建一个zip poc文件，步骤如下：</p>
+<ul>
+<li>创建一个og_test_zip.txt，内容为<code>Orangey test zip poc！</code></li>
+<li>将 og_test_zip.txt 压缩为 og_test_zip.zip</li>
+<li>切记，别用winrar打开来修改文件名，反正用winrar打开来修改文件名不行，这里，我们使用 7-Zip 打开文件并修改文件名<ul>
+<li>为什么要借用压缩包根据来修改，大家看下图：</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/db4f836667e845ae897257fa9646b89b.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><img src="https://img-blog.csdnimg.cn/ca50e58f4c88490584dacac7fb1a5eb6.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/9fe3122f02fb467b9c07080b679edcf2.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>攻击效果如下</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/945820e5de104b11bfa9199a5048e91f.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>默认抓包host域名或GET 请求地址为：<code>p://www.example.com/test.zip</code>，两种修改方法</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/2697f2bca2334ce4b3c62bcb7cf3fe39.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>第一种：直接通过抓包工具，进行修改请求的host和路径地址为我们自己的，其实抓包工具就是做了一个中间人攻击的角色</p>
+<p><img src="https://img-blog.csdnimg.cn/6bc92dafa9aa4ec08a56fd6a87f323ed.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>Burp配置一下默认的host和端口，当然也可以自行抓到包后自行修改</p>
+<p><img src="https://img-blog.csdnimg.cn/2ea9bc90be464787b080ab6e0ded891f.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/0718a5573c744fa485b47fcbd8745f41.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/1bc12c40163847aca217db84a5b4bb95.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>第二种：反编译APK为smali，然后修改对应的smali文件中请求的地址</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-comment"># 反编译APK</span><br><span class="hljs-attribute">apktool</span>.jar d -f vuls_v4.<span class="hljs-number">4</span>.apk -o vuls_v4.<span class="hljs-number">4</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/3c57328efe824c5986c955ea3c62f1b5.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c"># 修改好后回编译APK并签名以及丢到模拟器中运行<br>java -jar apktool.jar b vuls_v4<span class="hljs-number">.4</span> -o vuls_v4<span class="hljs-number">.4</span>-key.apk<br><br>java -jar  signapk.jar testkey.x509.pem testkey.pk8 vuls_v4<span class="hljs-number">.4</span>-key.apk vuls_v4<span class="hljs-number">.4</span>-key_debug.apk<br></code></pre></td></tr></table></figure>
+
+<p>如果应用动态加载代码之前未做签名校验，利用目录穿越漏洞进行覆盖，可实现稳定的任意代码执行。此外由于在文件系统中写入了可执行文件，还可以实现持久化攻击的效果</p>
+<p>在Android中，<code>System.loadLibrary()</code>是从应用的lib目录中加载 <code>.so</code>文件，而<code>System.load()</code>是用某个<code>.so</code>文件的绝对路径加载，这个.so文件可以不在应用的lib目录中，可以在SD卡中，或者在应用的files目录中，只要应用有读的权限目录中即可</p>
+<p>在files目录中，应用具有写入权限，利用ZIP文件目录遍历漏洞可以替换掉原先的so文件，达到远程命令执行的目的。而应用的lib目录是软链接到了<code>/data/app-lib/</code>应用目录，属于system用户，第三方应用在执行时没有写入<code>/data/app-lib</code>目录的权限</p>
+<h1 id="0x03-海豚浏览器ZIP文件目录遍历【漏洞复现】"><a href="#0x03-海豚浏览器ZIP文件目录遍历【漏洞复现】" class="headerlink" title="0x03 海豚浏览器ZIP文件目录遍历【漏洞复现】"></a>0x03 海豚浏览器ZIP文件目录遍历【漏洞复现】</h1><p>样本下载地址：<a target="_blank" rel="noopener" href="https://www.apkhere.com/down/com.dolphin.browser.express.web_11.4.18_free">https://www.apkhere.com/down/com.dolphin.browser.express.web_11.4.18_free</a></p>
+<p>现在知道了一个应用的沙盒数据的详细信息，比如一些隐私数据存放在SharedPreferences.xml中，那么这时候我们可以利用这个漏洞，把恶意文件命名成 <code>../../../../data/data/xxx.xxx.xxx/shared_pref/info.xml</code>，这样在使用ZipEntry进行解压文件的时候，因为直接使用了ZipEntry.getName方法或者文件名，然后直接释放解压到本地了，所以这时候就相当于替换了本应用的沙盒数据了，这个也是利用了app本身的权限来写入沙盒数据</p>
+<p>海豚浏览器海豚浏览器的主题设置中允许用户通过网络下载新的主题进行更换，如下：</p>
+<p><img src="https://img-blog.csdnimg.cn/7e56b88d8fbd4c72ad1d87645af26354.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><img src="https://img-blog.csdnimg.cn/53f19126efa04181a3f2c5290c57d574.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><img src="https://img-blog.csdnimg.cn/40890de8691e4269bc6e94a112c5137f.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>dwp 文件是海豚浏览器自己定义的主题文件包，本质上是一个 zip 包，里面有如下三个资源文件：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">GET http:<span class="hljs-comment">//opsen-static.dolphin-browser.com/resources/atheme/110010060sea_1498465941.dwp HTTP/1.1</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/ebd7de60166d4f3293549f2f713349b0.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">tar -tf <span class="hljs-number">110010060</span>sea_1498465941.dwp<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/62cea315544e4f4c9072cbf4c18f0013.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>或使用7z压缩工具的命令</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-number">7</span>z l <span class="hljs-number">110010060</span>sea_1498465941.dwp<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/add49e8eadb244b097294debf9775abe.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>那么，如何实现zip目录穿越了，是不是可以尝试去构建一个这样的zip包，去替换浏览器的下载包，并重命令去文件名，使得替换浏览器中的关键文件</p>
+<p>由于海豚浏览器并未对解压的文件进行验证，且安卓系统zip库的默认行为是允许解压文件到所在目录之外，因此通过中间人攻击，修改HTTP请求返回主题文件zip包中的内容，可以实现在海豚浏览器拥有权限的目录写文件</p>
+<p>使用如下 Python 代码生成一个可以触发该漏洞的 zip 包：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># -*- coding: utf-8 -*-</span><br> <br><span class="hljs-keyword">import</span> zipfile  <br><span class="hljs-keyword">import</span> sys<br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:  <br>    <span class="hljs-keyword">try</span>:<br>        <span class="hljs-keyword">with</span> <span class="hljs-built_in">open</span>(<span class="hljs-string">&quot;og_test_zip.txt&quot;</span>, <span class="hljs-string">&#x27;rb&#x27;</span>) <span class="hljs-keyword">as</span> f:<br>            binary = f.read()<br>            zipFile = zipfile.ZipFile(<span class="hljs-string">&quot;og_test_zip.zip&quot;</span>, <span class="hljs-string">&quot;a&quot;</span>, zipfile.ZIP_DEFLATED)<br>            info = zipfile.ZipInfo(<span class="hljs-string">&quot;og_test_zip.zip&quot;</span>)<br>            zipFile.writestr(<span class="hljs-string">&quot;../../../../../data/data/com.dolphin.browser.express.web/files/og_test_zip.txt&quot;</span>, binary)<br>            zipFile.close()<br>    <span class="hljs-keyword">except</span> IOError <span class="hljs-keyword">as</span> e:<br>        <span class="hljs-keyword">raise</span> e<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/0ead3c3f28d341c1a2f0148b582d6096.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/11483122eaca44b6837bbca1f89d3764.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>从上我们已知，海豚浏览器的主题设置中允许用户通过网络下载新的主题进行更换，主题文件其实是一个ZIP压缩文件。通过中间人攻击的方法可以替换掉这个ZIP文件。替换后的ZIP文件中有重新编译过的libdolphin.so。此so文件重写了JNI_OnLoad()函数，此so文件以<code>“../../../../../data/data/com.dolphin.browser.express.web/files/libdolphin.so”</code>的形式存在恶意ZIP文件中。海豚浏览器解压恶意ZIP文件后，重新的libdolphin.so就会覆盖掉原有的so文件</p>
+<p>动态链接库文件libdolphin.so，并没有放在应用数据的lib目录下，而是放在了files目录中，导致存在被覆盖的风险。</p>
+<p>加载使用的地方是com.dolphin.browser.search.redirect包中的SearchRedirector：</p>
+<p><img src="https://img-blog.csdnimg.cn/19a4bcfd915645d3a8c1a44731007460.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>使用的是<code>System.load()</code>来加载<code>libdolphin.so</code>而非<code>System.loadLibrary()</code>，在Android中，<code>System.loadLibrary()</code>是从应用的lib目录中加载.so文件，而<code>System.load()</code>是用某个<code>.so</code>文件的绝对路径加载，这个<code>.so</code>文件可以不在应用的lib目录中，可以在SD卡中，或者在应用的files目录中，只要应用有读的权限目录中即可。</p>
+<p>在files目录中，应用具有写入权限，通过网络中间人攻击，同时利用ZIP文件目录遍历漏洞，替换掉文件<code>libdolphin.so</code>，达到远程命令执行的目的</p>
+<p>应用的lib目录是软链接到了&#x2F;data&#x2F;app-lib&#x2F;应用目录，如果libdolphin.so文件在lib目录下就不会被覆盖了，第三方应用在执行时没有写入&#x2F;data&#x2F;app-lib目录的权限：</p>
+<p><img src="https://img-blog.csdnimg.cn/efb2acdda4e348b899480d0c0795bd66.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x04-修复建议"><a href="#0x04-修复建议" class="headerlink" title="0x04 修复建议"></a>0x04 修复建议</h1><ul>
+<li><p>使用 https 并且对证书进行正确校验，防止中间人攻击，可以在一定程度上增加攻击难度</p>
+</li>
+<li><p>对重要的ZIP压缩包文件进行数字签名校验，校验通过才进行解压</p>
+</li>
+<li><p>当App中使用zipInputStream类对zip压缩包进行解压操作时，在zipEntry.getName()获取文件名后，必须添加过滤代码对文件名中可能包含的“..&#x2F;”进行，要注意ZipEntry.getName()对于Zip包中有“..%2F”的文件路径不会进行处理</p>
+</li>
+<li><p>检查 zip 压缩包中在调用getName()方法之后，判断路径中是否包含 <code>../</code>或者 <code>..</code>字符。如果有包含 <code>../</code>或者 <code>..</code>字符就做过滤判断，即：文件名称不能包含”..&#x2F;“这种特殊字符，检查”..&#x2F;”的时候不必进行URI Decode（以防通过URI编码”..%2F”来进行绕过）</p>
+</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">while</span>(( zipEntry = zipInputStream.getNextEntry()) != <span class="hljs-literal">null</span> )&#123;<br>    <span class="hljs-type">String</span> <span class="hljs-variable">entryName</span> <span class="hljs-operator">=</span> zipEntry.getName();<br>    <span class="hljs-keyword">if</span>(entryName.contains(<span class="hljs-string">&quot;../&quot;</span>))&#123;<br>        <span class="hljs-keyword">continue</span>;<br>        <span class="hljs-comment">// 或者</span><br>        <span class="hljs-comment">// throw new Exception(&quot;发现不安全的zip文件解压路径！&quot;)</span><br>    &#125;<br>    ...<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>在调用<code>ZipEntry.getName()</code>方法之后，调用File的<code>getCanonicalPath()</code>方法，获取绝对路径，要判断该路径是否在要解压目录的子目录</li>
+<li>对重要的 zip 压缩包文件进行数字签名校验，校验通过才进行解压</li>
+<li>更换 zip 解压方式，不使用 <code>ZipEntry.getName()</code>的方式，使用 ZipInputStream 替代</li>
+<li>Google 建议的修复方案：</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-type">InputStream</span> <span class="hljs-variable">is</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">InputStream</span>(untrustedFileName);<br><span class="hljs-type">ZipInputStream</span> <span class="hljs-variable">zis</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ZipInputStream</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">BufferedInputStream</span>(is));<br><span class="hljs-keyword">while</span>((<span class="hljs-type">ZipEntry</span> <span class="hljs-variable">ze</span> <span class="hljs-operator">=</span> zis.getNextEntry()) != <span class="hljs-literal">null</span>) &#123;<br>  <span class="hljs-type">File</span> <span class="hljs-variable">f</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">File</span>(DIR, ze.getName());<br>  <span class="hljs-type">String</span> <span class="hljs-variable">canonicalPath</span> <span class="hljs-operator">=</span> f.getCanonicalPath();<br>  <span class="hljs-keyword">if</span> (!canonicalPath.startsWith(DIR)) &#123;<br>    <span class="hljs-comment">// SecurityException</span><br>  &#125;<br>  <span class="hljs-comment">// Finish unzipping…</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+
+<p><strong>参考链接</strong>：</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/u010889616/article/details/80955250">https://blog.csdn.net/u010889616/article/details/80955250</a></p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/2sQcsKVIXlz2v8u-AQ5Uqw">https://mp.weixin.qq.com/s/2sQcsKVIXlz2v8u-AQ5Uqw</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/f4c05a436785">https://www.jianshu.com/p/f4c05a436785</a></p>
+<p><a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000005785252">https://segmentfault.com/a/1190000005785252</a></p>
+<p><a target="_blank" rel="noopener" href="http://blog.neargle.com/SecNewsBak/drops/%E6%B5%B7%E8%B1%9A%E6%B5%8F%E8%A7%88%E5%99%A8%E4%B8%8E%E6%B0%B4%E6%98%9F%E6%B5%8F%E8%A7%88%E5%99%A8%E8%BF%9C%E7%A8%8B%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E8%AF%A6%E8%A7%A3%20.html">http://blog.neargle.com/SecNewsBak/drops/%E6%B5%B7%E8%B1%9A%E6%B5%8F%E8%A7%88%E5%99%A8%E4%B8%8E%E6%B0%B4%E6%98%9F%E6%B5%8F%E8%A7%88%E5%99%A8%E8%BF%9C%E7%A8%8B%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E8%AF%A6%E8%A7%A3%20.html</a></p>
+<hr>
+<p><strong>你以为你有很多路可以选择，其实你只有一条路可以走</strong></p>
+<hr>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/AndroidSecurity/">#AndroidSecurity</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>关于Android ZIP文件目录遍历漏洞，你了解多少？</div>
+      <div>https://orangey.info/2022/09/23/125236134/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>橙留香</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年9月23日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/09/23/125743446/" title="「干货」检测车机中ADB远程调试控制Android系统攻击">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">「干货」检测车机中ADB远程调试控制Android系统攻击</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/09/23/125079251/" title="Android Activity劫持检测与防护">
+                        <span class="hidden-mobile">Android Activity劫持检测与防护</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  <article id="comments" lazyload>
+    
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1e96aec5ac46370916fa","clientSecret":"ee5e97a65cf34e9fe31e15ab0421a94968237f5e","repo":"ogGitalk","owner":"ananasOrangey","admin":["ananasOrangey"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: 'cc154dec43fab019be8778f41ca0a216'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+  </article>
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://orangey.blog.csdn.net" target="_blank" rel="nofollow noopener"><span>橙留香CSDN博客</span></a> <i class="iconfont icon-love"></i> <a href="https://i.imgtg.com/2022/09/21/gNXxK.png" target="_blank" rel="nofollow noopener"><span>橙留香微信公众号</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

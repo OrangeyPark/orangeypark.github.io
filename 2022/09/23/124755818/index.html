@@ -1,0 +1,1088 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="橙留香">
+  <meta name="keywords" content="橙留香车联网安全技术博客">
+  
+    <meta name="description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  Android安全付费专栏长期更新，本篇最新内容请前往：  [车联网安全自学篇] Android安全之绕过直连、HOST校验、系统证书校验、代理检测、双向认证抓HTTPS数据  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="「干货」APP绕过直连、HOST校验、系统证书校验、代理检测、双向认证抓包限制，进行抓包">
+<meta property="og:url" content="https://orangey.info/2022/09/23/124755818/index.html">
+<meta property="og:site_name" content="车联网安全技术博客 | 橙留香">
+<meta property="og:description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  Android安全付费专栏长期更新，本篇最新内容请前往：  [车联网安全自学篇] Android安全之绕过直连、HOST校验、系统证书校验、代理检测、双向认证抓HTTPS数据  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/21/gNXxK.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/609c72ec78d048ff85942de0fa3fadf3.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/9ff41c63ab644ed9a15774ec9442b52f.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5b83f352e7404b78b7d060c34ef2b0b0.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/52a3ec2c79464b5a9f55335b2d627141.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c78a261c9ce34befa5db9421a10d6404.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/a10471482424421db5227effa70dcea3.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/694f94eeffaa4fbeb875e32dbc2c4d88.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/76901ff90d3844138da6688d0aa1d5ff.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/b64fcf577bdb462db046a4312f7d43eb.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d0cdabdf3e184e598a4c99440796140d.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/9ae7fd12c74848999dc884f2dbf67f96.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/9e47b50385d045b99af915dee029ad11.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/9b0338248efb4370b80aa98063a62bda.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8b387013766d42288dee12d9a05da406.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/bbd3194675174345abce1050bfb2b7ce.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/611ff1a369cb4889857e5bee49c24b32.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/99dc45ceb5354f4c89d02ce3081eb39a.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/ef63031c65654168ba399e1bb375d27f.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/0204afc2cdd447fba6d7a9d517b1c021.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/36110586e86a46ccb78f36085f79ed9a.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/572d908ccf1a4a16a8cdfcf83655a4ed.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/fc26ce5685b1403bb1a02f12c5f28f7d.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/df1fe5e8a0574210ba1c5b321a5be2f9.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/daf6f655d4284377a40c8ed0c8e99635.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e560eebf478a4ada83e3c05042f9ce45.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/f3d86c22f1a84e2db50aa763bb181747.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/085d245118384e65a920d0ce60922917.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2e3ef17bdb79455c8d03172c57b651ce.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e6c6b216b17f4b339c4db64cb29bf5ba.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/7f0c5b12a25042eaa28b5890d84983f3.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2a0a4c2c66e94beeb9f08b705e541a1b.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/f944fd3ff5894186b478de81d2131997.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e096f203164b4e619d97edd5ea1c09e7.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d390d1fa18ff49cdba0623e502db8838.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/200256a8f4274afd86eb81021502c18e.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/61ce98f4391046e1a369bb20d8597e5b.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/26bc2d656ecc47ca8e226e1927fe7b31.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/4be244dd6a8b433491766a64445be33e.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/171655df828141b09c217b420b50f7e6.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/9e16fbf6964e41f5a4754a2a8135a407.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/007bfd70ec2b43f3921c3768a9083040.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/bb0e55a69e744d1690af8bfc4116a611.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/00d71420543a4e30866adea700e049f3.png">
+<meta property="article:published_time" content="2022-09-23T15:50:33.622Z">
+<meta property="article:modified_time" content="2022-09-24T16:45:38.612Z">
+<meta property="article:author" content="橙留香">
+<meta property="article:tag" content="AndroidSecurity">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+  
+  
+  
+  <title>「干货」APP绕过直连、HOST校验、系统证书校验、代理检测、双向认证抓包限制，进行抓包 - 车联网安全技术博客 | 橙留香</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"orangey.info","root":"/","version":"1.9.3","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"java"},"copy_btn":false,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>橙留香</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="「干货」APP绕过直连、HOST校验、系统证书校验、代理检测、双向认证抓包限制，进行抓包"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-09-23 23:50" pubdate>
+          2022年9月23日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          21k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          <!-- compatible with older versions-->
+          175 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">「干货」APP绕过直连、HOST校验、系统证书校验、代理检测、双向认证抓包限制，进行抓包</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <hr>
+<p><strong>也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大</strong></p>
+<p><strong>少走了弯路，也就错过了风景，无论如何，感谢经历</strong></p>
+<hr>
+<p>Android安全付费专栏长期更新，本篇最新内容请前往：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://orangey.blog.csdn.net/article/details/124755818">[车联网安全自学篇] Android安全之绕过直连、HOST校验、系统证书校验、代理检测、双向认证抓HTTPS数据</a></li>
+</ul>
+<p>更多关于Android安全的知识，可前往：<a target="_blank" rel="noopener" href="https://blog.csdn.net/ananasorangey/category11955914.html">https://blog.csdn.net/ananasorangey/category11955914.html</a></p>
+<p><img src="https://i.imgtg.com/2022/09/25/gdpGP.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><img src="https://i.imgtg.com/2022/09/21/gNXxK.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x01-HTTP-直连"><a href="#0x01-HTTP-直连" class="headerlink" title="0x01 HTTP 直连"></a>0x01 HTTP 直连</h1><p>httpstest APP 中使用的https访问组件是okhttp3，直接访问http协议的url 即可。不需要进行任何多余的配置，只需要配置好代理，http流量会被代理软件抓到</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">/*</span><br><span class="hljs-comment">* http协议</span><br><span class="hljs-comment">*/</span><br>button_http_connect.setOnClickListener(<span class="hljs-keyword">new</span> <span class="hljs-title class_">View</span>.OnClickListener() &#123;<br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">onClick</span><span class="hljs-params">(View v)</span> &#123;<br>        <span class="hljs-keyword">new</span> <span class="hljs-title class_">Thread</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Runnable</span>() &#123;<br>            <span class="hljs-meta">@RequiresApi(api = Build.VERSION_CODES.N)</span><br>            <span class="hljs-meta">@Override</span><br>            <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">run</span><span class="hljs-params">()</span> &#123;<br>                <span class="hljs-type">OkHttpClient</span> <span class="hljs-variable">mClient</span> <span class="hljs-operator">=</span> client.newBuilder().build();<br>                <span class="hljs-type">Request</span> <span class="hljs-variable">request</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Request</span>.Builder()<br>                        .url(<span class="hljs-string">&quot;http://www.vulnweb.com/&quot;</span>)<br>                        .build();<br>                <span class="hljs-type">Message</span> <span class="hljs-variable">message</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Message</span>();<br>                message.what = <span class="hljs-number">1</span>;<br>                <span class="hljs-keyword">try</span> (<span class="hljs-type">Response</span> <span class="hljs-variable">response</span> <span class="hljs-operator">=</span> mClient.newCall(request).execute()) &#123;<br>                    message.obj = <span class="hljs-string">&quot;http connect access vulnweb.com success&quot;</span>;<br>                    Log.d(TAG, <span class="hljs-string">&quot;http connect access vulnweb.com success return code:&quot;</span>+response.code());<br>                &#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>                    message.obj = <span class="hljs-string">&quot;http connect access vulnweb.com failed&quot;</span>;<br>                    Log.d(TAG, <span class="hljs-string">&quot;http connect access vulnweb.com failed&quot;</span>);<br>                    e.printStackTrace();<br>                &#125;<br>                mHandler.sendMessage(message);<br>            &#125;<br>        &#125;).start();<br>    &#125;<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+
+<p>打开Burp，并在Android 设备中配置好代理，然后打开APP后点击【HTTP CONNECT】按钮，APP成功访问，并在显示 <code>http connect access vulnweb.com success</code>，Burp也成功抓到信息，如下：</p>
+<p><img src="https://img-blog.csdnimg.cn/609c72ec78d048ff85942de0fa3fadf3.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><img src="https://img-blog.csdnimg.cn/9ff41c63ab644ed9a15774ec9442b52f.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x02-HOST校验"><a href="#0x02-HOST校验" class="headerlink" title="0x02 HOST校验"></a>0x02 HOST校验</h1><p>样本APK地址：<a target="_blank" rel="noopener" href="https://github.com/AndroidAppSec/vuls/releases/download/v2.1/vuls2.1.apk">https://github.com/AndroidAppSec/vuls/releases/download/v2.1/vuls2.1.apk</a></p>
+<p>对于开发者来说，在测试环境中，通常会使用自签名的证书。正常情况下是无法进行 https 通信的，于是很多开发者就会在代码中忽略证书错误。但是在上生产环境的时候，又忘记去掉相关的代码，就会出现 https 通信被中间人攻击的情况。</p>
+<p>以下是一段典型的忽略证书错误的写法，在 TrustManager 中不做任何校验，在 HostnameVerifier 中总是返回域名正确。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// 该方法检查客户端的证书，若不信任该证书则抛出异常</span><br><span class="hljs-meta">@Override</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">checkClientTrusted</span><span class="hljs-params">(X509Certificate[] chain, String authType)</span><br><span class="hljs-keyword">throws</span> CertificateException &#123;<br>    ... ...<br>&#125;<br><br><span class="hljs-comment">// 该方法检查服务器的证书，若不信任该证书同样抛出异常</span><br><span class="hljs-meta">@Override</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">checkServerTrusted</span><span class="hljs-params">(X509Certificate[] chain, String authType)</span><br><span class="hljs-keyword">throws</span> CertificateException &#123;<br>    ... ...<br>&#125;<br><br><span class="hljs-comment">// 返回受信任的X509证书数组</span><br><span class="hljs-meta">@Override</span><br><span class="hljs-keyword">public</span> X509Certificate[] getAcceptedIssuers() &#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">X509Certificate</span>[<span class="hljs-number">0</span>];<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/5b83f352e7404b78b7d060c34ef2b0b0.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">final</span> <span class="hljs-type">HostnameVerifier</span> <span class="hljs-variable">hostnameVerifier</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">HostnameVerifier</span>() &#123;@<br>    Override<br>    <span class="hljs-keyword">public</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">verify</span><span class="hljs-params">(String hostname, SSLSession session)</span> &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/52a3ec2c79464b5a9f55335b2d627141.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">new</span> <span class="hljs-title class_">Thread</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Runnable</span>() &#123;<br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">run</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-keyword">try</span> &#123;<br>            <span class="hljs-type">SSLContext</span> <span class="hljs-variable">sslContext</span> <span class="hljs-operator">=</span> SSLContext.getInstance(<span class="hljs-string">&quot;TLS&quot;</span>);<br>            sslContext.init(<span class="hljs-literal">null</span>, trustManagers, <span class="hljs-keyword">new</span> <span class="hljs-title class_">SecureRandom</span>());<br><br>            <span class="hljs-type">URL</span> <span class="hljs-variable">url</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">URL</span>(baidu);<br>            <span class="hljs-type">HttpsURLConnection</span> <span class="hljs-variable">connection</span> <span class="hljs-operator">=</span> (HttpsURLConnection) url.openConnection();<br>            connection.setSSLSocketFactory(sslContext.getSocketFactory());<br>            connection.setHostnameVerifier(hostnameVerifier);<br>            connection.setConnectTimeout(<span class="hljs-number">5000</span>);<br>            connection.setReadTimeout(<span class="hljs-number">10000</span>);<br>            connection.connect();<br><br>            <span class="hljs-type">int</span> <span class="hljs-variable">responseCode</span> <span class="hljs-operator">=</span> connection.getResponseCode();<br>            <span class="hljs-keyword">if</span> (<span class="hljs-number">200</span> == responseCode) &#123;<br>                runOnUiThread(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Runnable</span>() &#123;@<br>                    Override<br>                    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">run</span><span class="hljs-params">()</span> &#123;<br>                        Toast.makeText(HttpsURLConnectionActivity.<span class="hljs-built_in">this</span>, <span class="hljs-string">&quot;请求成功&quot;</span>, Toast.LENGTH_LONG).show();<br>                    &#125;<br>                &#125;);<br>            &#125;<br>            connection.disconnect();<br>        &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>            e.printStackTrace();<br>            runOnUiThread(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Runnable</span>() &#123;@<br>                Override<br>                <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">run</span><span class="hljs-params">()</span> &#123;<br>                    Toast.makeText(HttpsURLConnectionActivity.<span class="hljs-built_in">this</span>, <span class="hljs-string">&quot;请求失败&quot;</span>, Toast.LENGTH_LONG).show();<br>                &#125;<br>            &#125;);<br>        &#125;<br>    &#125;<br>&#125;).start();<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/c78a261c9ce34befa5db9421a10d6404.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>如上代码会造成APP，在进行 https 通信与 http 通信效果无异，都会受到中间人攻击</p>
+<p><img src="https://img-blog.csdnimg.cn/a10471482424421db5227effa70dcea3.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<hr>
+<p><strong>Android7 抓包问题解决</strong></p>
+<p>目前在Android 7.0或以上的系统有启用了对第三方证书的限制，但在Android 7.0以下依旧可以将Fiddler&#x2F;Charles&#x2F;Burp的证书安装在用户的CA集中抓取https请求</p>
+<p>将Burp或者Charles的证书作为系统级别的信任证书安装。建议重新生产burp证书并重启burp后再导出。系统级别的受信任证书以特殊格式存储在&#x2F;system&#x2F;etc&#x2F;security&#x2F;cacerts文件夹中。我们可以将Burp的证书写入此位置。</p>
+<p>导出一个Burp&#x2F;Charles证书之后，adb push到模拟器，然后修改后缀为crt直接安全，这种方式在Android 6及之前的版本可用，从Android 7.0开始，Android更改了信任用户安装的证书的默认行为，应用程序仅信任系统级CA。这样就导致安装证书后，如果尝试通过Burp或者Charlse代理访问https网站，系统会提示“该证书并非来自可信的授权中心”</p>
+<p>对于Android 7.0 (API 24) 之后，做了些改动，使得系统安全性增加了，导致：</p>
+<ul>
+<li>APP 默认不信任用户域的证书<ul>
+<li>之前把抓包工具的ssl证书，通过【从SD卡安装】安装到受信任的凭据 -&gt; 用户。就没用了，因为不再受信任了</li>
+<li>只信任（安装到）系统域的证书</li>
+<li>导致无法抓包https，抓出来的https的请求，都是加了密的，无法看到原文了</li>
+</ul>
+</li>
+</ul>
+<p>对此，总结出相关解决思路和方案：</p>
+<ul>
+<li>让系统信任抓包工具的ssl证书<ul>
+<li>作为app的开发者自己：改自己的app的配置，允许https抓包（得到或本身有app的源码，把证书放到受系统信任的系统证书中去）</li>
+<li>把证书放到受系统信任的系统证书中去（root权限）</li>
+</ul>
+</li>
+<li>绕开https不去校验<ul>
+<li>借助于其他（JustTrustMe等）工具绕开https的校验（例如XPosed、太极XPosed等框架）</li>
+</ul>
+</li>
+</ul>
+<p>Android7抓包问题，解决方法：</p>
+<ol>
+<li>导出Burp的证书后，使用openssl来做一些改动，最后上传到<code>/system/etc/security/cacerts</code></li>
+</ol>
+<p><img src="https://img-blog.csdnimg.cn/694f94eeffaa4fbeb875e32dbc2c4d88.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/76901ff90d3844138da6688d0aa1d5ff.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c">root@kali:~<span class="hljs-meta"># openssl x509 -inform DER -in cert-der.crt -out PortSwiggerCA.pem</span><br>root@kali:~<span class="hljs-meta"># openssl x509 -inform PEM -subject_hash_old -in PortSwiggerCA.pem|head -1</span><br>root@kali:~<span class="hljs-meta"># mv PortSwiggerCA.pem 9999.0</span><br></code></pre></td></tr></table></figure>
+
+
+<ol start="2">
+<li>adb传输文件报错<code>couldn‘t create file：Read-only file system</code>解决方法</li>
+</ol>
+<p><img src="https://img-blog.csdnimg.cn/b64fcf577bdb462db046a4312f7d43eb.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs c">D:\&gt;adb shell<br>VOG-AL00:/ <span class="hljs-meta"># mount -o remount -o rw /system</span><br>mount -o remount -o rw /system<br>VOG-AL00:/ <span class="hljs-meta"># exit;</span><br><span class="hljs-built_in">exit</span>;<br><br>D:\&gt;adb root<br>adbd is already running as root<br><br>D:\&gt;adb remount<br>remount succeeded<br><br>D:\&gt;adb push <span class="hljs-number">9999.0</span> /system/etc/security/cacerts<br><span class="hljs-number">330</span> KB/s (<span class="hljs-number">1330</span> bytes in <span class="hljs-number">0.003</span>s)<br><br>D:\&gt;adb shell chmod <span class="hljs-number">644</span> /system/etc/security/cacerts/<span class="hljs-number">9999.0</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/d0cdabdf3e184e598a4c99440796140d.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>再次输入adb push就能正常传输文件</p>
+<p><img src="https://img-blog.csdnimg.cn/9ae7fd12c74848999dc884f2dbf67f96.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><strong>Android10 抓包问题解决</strong></p>
+<p>Android10以上需要刷入Magisk,在模块里搜索move Cert ,安装模块，重启后证书就已经被移动到系统目录（system&#x2F;etc&#x2F;security&#x2F;cacerts），可以正常抓包了</p>
+<p>下载地址：<a target="_blank" rel="noopener" href="https://github.com/topjohnwu/Magisk">https://github.com/topjohnwu/Magisk</a></p>
+<hr>
+<ul>
+<li>为了测试域名校验，代码中存在以下校验代码：</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">final</span> <span class="hljs-type">HostnameVerifier</span> <span class="hljs-variable">hostnameVerifier</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">HostnameVerifier</span>() &#123;<br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">verify</span><span class="hljs-params">(String hostname, SSLSession session)</span> &#123;<br>        Log.e(<span class="hljs-string">&quot;NetAcitivty&quot;</span>, hostname);<br>        <span class="hljs-type">HostnameVerifier</span> <span class="hljs-variable">hv</span> <span class="hljs-operator">=</span> HttpsURLConnection.getDefaultHostnameVerifier();<br>        <span class="hljs-type">Boolean</span> <span class="hljs-variable">result</span> <span class="hljs-operator">=</span> hv.verify(<span class="hljs-string">&quot;www.google.com&quot;</span>, session);<br>        <span class="hljs-keyword">return</span> result;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/9e47b50385d045b99af915dee029ad11.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>绕过Host校验的方法，只需更改Burp 的请求的Host即可，如下：</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/9b0338248efb4370b80aa98063a62bda.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>配置好Burp为代码中要校验的Host后，点击【只校验host】按钮查看效果，如下：</p>
+<p><img src="https://img-blog.csdnimg.cn/8b387013766d42288dee12d9a05da406.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x03-HTTPS-忽略证书验证"><a href="#0x03-HTTPS-忽略证书验证" class="headerlink" title="0x03 HTTPS 忽略证书验证"></a>0x03 HTTPS 忽略证书验证</h1><p>httpstest APP在对HTTPS证书验证时，可以通过代码实现信任所有证书，以okhttp网络框架为例，发起一个忽略HTTPS证书校验的请求实现如下:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">/*</span><br><span class="hljs-comment">* https协议</span><br><span class="hljs-comment">* 忽略证书验证</span><br><span class="hljs-comment">*/</span><br>button_https_connect_without_ca.setOnClickListener(<span class="hljs-keyword">new</span> <span class="hljs-title class_">View</span>.OnClickListener() &#123;<br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">onClick</span><span class="hljs-params">(View v)</span> &#123;<br>        <span class="hljs-keyword">new</span> <span class="hljs-title class_">Thread</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Runnable</span>()&#123;<br>            <span class="hljs-meta">@RequiresApi(api = Build.VERSION_CODES.N)</span><br>            <span class="hljs-meta">@Override</span><br>            <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">run</span><span class="hljs-params">()</span> &#123;<br>                <span class="hljs-type">OkHttpClient</span> <span class="hljs-variable">mClient</span> <span class="hljs-operator">=</span> client.newBuilder().sslSocketFactory(HttpsTrustAllCerts.createSSLSocketFactory(),<span class="hljs-keyword">new</span> <span class="hljs-title class_">HttpsTrustAllCerts</span>()).hostnameVerifier(<span class="hljs-keyword">new</span> <span class="hljs-title class_">HttpsTrustAllCerts</span>.TrustAllHostnameVerifier()).build();<br>                <span class="hljs-type">Request</span> <span class="hljs-variable">request</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Request</span>.Builder()<br>                        .url(<span class="hljs-string">&quot;https://www.baidu.com/?q=trustAllCerts&quot;</span>)<br>                        .build();<br>                <span class="hljs-type">Message</span> <span class="hljs-variable">message</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Message</span>();<br>                message.what = <span class="hljs-number">1</span>;<br>                <span class="hljs-keyword">try</span> (<span class="hljs-type">Response</span> <span class="hljs-variable">response</span> <span class="hljs-operator">=</span> mClient.newCall(request).execute()) &#123;<br>                    message.obj = <span class="hljs-string">&quot;https connect without ca success&quot;</span>;<br>                    Log.d(TAG, <span class="hljs-string">&quot;https connect without ca success return code:&quot;</span>+response.code());<br>                &#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>                    message.obj = <span class="hljs-string">&quot;https connect without ca failed&quot;</span>;<br>                    Log.d(TAG, <span class="hljs-string">&quot;https connect without ca failed&quot;</span>);<br>                    e.printStackTrace();<br>                &#125;<br>                mHandler.sendMessage(message);<br>            &#125;<br>        &#125;).start();<br>    &#125;<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<p>HttpsTrustAllCerts对象实现如下，重写checkClientTrusted、checkServerTrusted方法，使其验证逻辑为空，重写域名验证器TrustAllHostnameVerifier 的verify方法，总是返回true，达到信任所有证书的效果:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">HttpsTrustAllCerts</span> <span class="hljs-keyword">implements</span> <span class="hljs-title class_">X509TrustManager</span> &#123;<br><br><br>    <span class="hljs-meta">@SuppressLint(&quot;TrustAllX509TrustManager&quot;)</span><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">checkClientTrusted</span><span class="hljs-params">(X509Certificate[] chain, String authType)</span> <span class="hljs-keyword">throws</span> CertificateException &#123;<br><br>    &#125;<br><br>    <span class="hljs-meta">@SuppressLint(&quot;TrustAllX509TrustManager&quot;)</span><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">checkServerTrusted</span><span class="hljs-params">(X509Certificate[] chain, String authType)</span> <span class="hljs-keyword">throws</span> CertificateException &#123; <span class="hljs-comment">// 验证服务端证书需要重写该函数</span><br><br>    &#125;<br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-keyword">public</span> X509Certificate[] getAcceptedIssuers() &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">X509Certificate</span>[<span class="hljs-number">0</span>]; <span class="hljs-comment">//返回长度为0的数组，相当于return null</span><br>    &#125;<br><br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> SSLSocketFactory <span class="hljs-title function_">createSSLSocketFactory</span><span class="hljs-params">()</span> &#123; <span class="hljs-comment">// SSLSocketFactory 创建器</span><br>        <span class="hljs-type">SSLSocketFactory</span> <span class="hljs-variable">sSLSocketFactory</span> <span class="hljs-operator">=</span> <span class="hljs-literal">null</span>;<br>        <span class="hljs-keyword">try</span> &#123;<br>            <span class="hljs-type">SSLContext</span> <span class="hljs-variable">sc</span> <span class="hljs-operator">=</span> SSLContext.getInstance(<span class="hljs-string">&quot;TLS&quot;</span>);<br>            sc.init(<span class="hljs-literal">null</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">TrustManager</span>[]&#123;<span class="hljs-keyword">new</span> <span class="hljs-title class_">HttpsTrustAllCerts</span>()&#125;,<span class="hljs-keyword">new</span> <span class="hljs-title class_">SecureRandom</span>());<br>            sSLSocketFactory = sc.getSocketFactory();<br>        &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>        &#125;<br>        <span class="hljs-keyword">return</span> sSLSocketFactory;<br>    &#125;<br><br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">TrustAllHostnameVerifier</span> <span class="hljs-keyword">implements</span> <span class="hljs-title class_">HostnameVerifier</span> &#123; <span class="hljs-comment">// 域名验证器</span><br>        <span class="hljs-meta">@Override</span><br>        <span class="hljs-keyword">public</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">verify</span><span class="hljs-params">(String s, SSLSession sslSession)</span> &#123;<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>忽略证书校验的https请求和使用http协议的请求报文一样，可以通过直接设置网络代理抓包解密明文。接下来打开Burp，并在Android 设备中配置好代理，然后打开APP后点击【HTTP CONNECT(忽略证书校验)】按钮，APP成功访问，并在显示 <code>http connect without ca success</code>，Burp也成功抓到信息，如下：</p>
+<p><img src="https://img-blog.csdnimg.cn/bbd3194675174345abce1050bfb2b7ce.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x04-HTTPS-系统证书校验"><a href="#0x04-HTTPS-系统证书校验" class="headerlink" title="0x04 HTTPS 系统证书校验"></a>0x04 HTTPS 系统证书校验</h1><p>httpstest APP 中使用的是okhttp3框架，okhttp3框架发起HTTPS请求时，默认就是使用的系统信任库证书链对服务端返回的证书进行验证，示例如下:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">/*</span><br><span class="hljs-comment">* https协议</span><br><span class="hljs-comment">* 默认证书链校验，只信任系统CA(根证书)</span><br><span class="hljs-comment">*</span><br><span class="hljs-comment">* tips: OKHTTP默认的https请求使用系统CA验证服务端证书（Android7.0以下还信任用户证书，Android7.0开始默认只信任系统证书）</span><br><span class="hljs-comment">*/</span><br>button_https_connect_with_system_ca.setOnClickListener(<span class="hljs-keyword">new</span> <span class="hljs-title class_">View</span>.OnClickListener() &#123;<br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">onClick</span><span class="hljs-params">(View v)</span> &#123;<br>        <span class="hljs-keyword">new</span> <span class="hljs-title class_">Thread</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Runnable</span>()&#123;<br>            <span class="hljs-meta">@RequiresApi(api = Build.VERSION_CODES.N)</span><br>            <span class="hljs-meta">@Override</span><br>            <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">run</span><span class="hljs-params">()</span> &#123;<br>                <span class="hljs-type">Request</span> <span class="hljs-variable">request</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Request</span>.Builder()<br>                        .url(<span class="hljs-string">&quot;https://www.baidu.com/?q=defaultCerts&quot;</span>)<br>                        .build();<br>                <span class="hljs-type">Message</span> <span class="hljs-variable">message</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Message</span>();<br>                message.what = <span class="hljs-number">1</span>;<br>                <span class="hljs-keyword">try</span> (<span class="hljs-type">Response</span> <span class="hljs-variable">response</span> <span class="hljs-operator">=</span> client.newCall(request).execute()) &#123;<br>                    message.obj = <span class="hljs-string">&quot;https connect with system ca success&quot;</span>;<br>                    Log.d(TAG, <span class="hljs-string">&quot;https connect with system ca success return code:&quot;</span>+response.code());<br>                &#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>                    message.obj = <span class="hljs-string">&quot;https connect with system ca failed&quot;</span>;<br>                    Log.d(TAG, <span class="hljs-string">&quot;https connect with system ca failed&quot;</span>);<br>                    e.printStackTrace();<br>                &#125;<br>                mHandler.sendMessage(message);<br>            &#125;<br>        &#125;).start();<br>    &#125;<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<p>设置系统代理，抓取该数据报文，会发现App报错<code>java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.</code>，抓包工具burp会提示certificate_unknown</p>
+<p><img src="https://img-blog.csdnimg.cn/611ff1a369cb4889857e5bee49c24b32.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>上图报错的原因在于Burp拦截https流量时，会同时充当客户端和服务端。在面向App时，此时Burp充当服务端，https协议握手过程中，Burp会将自己的证书发送给App，因为App使用系统信任库里面的证书进行校验，而Burp的证书不在系统信任库中，所以导致https握手失败，报错CertPathValidatorException</p>
+<p>根据上述分析，绕过系统证书校验的方式，只需要将抓包工具的证书安装到系统信任库里面即可正常抓包或反编译APK在<code>&lt;app&gt;\res\xml\network_security_config.xml</code>和<code>&lt;app&gt;\AndroidManifest.xml</code>中添加如下信息后重打包APK并签名就能抓到数据：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-meta">&lt;?xml version=<span class="hljs-string">&quot;1.0&quot;</span> encoding=<span class="hljs-string">&quot;utf-8&quot;</span>?&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">network-security-config</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">base-config</span>&gt;</span> <br>      <span class="hljs-tag">&lt;<span class="hljs-name">trust-anchors</span>&gt;</span><br>          <span class="hljs-comment">&lt;!-- 信任系统预置CA 证书 --&gt;</span><br>          <span class="hljs-tag">&lt;<span class="hljs-name">certificates</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;system&quot;</span> /&gt;</span><br>          <span class="hljs-comment">&lt;!-- 信任用户添加的 CA 证书，Charles 和 Fiddler 抓包工具安装的证书属于此类 --&gt;</span><br>          <span class="hljs-tag">&lt;<span class="hljs-name">certificates</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;user&quot;</span> /&gt;</span><br>      <span class="hljs-tag">&lt;/<span class="hljs-name">trust-anchors</span>&gt;</span><br>    <span class="hljs-tag">&lt;/<span class="hljs-name">base-config</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">network-security-config</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p>AndroidManifest.xml：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">application</span>  <span class="hljs-attr">android:networkSecurityConfig</span>=<span class="hljs-string">&quot;@xml/network_security_config&quot;</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>注</strong>：在Android 7.0以前，应用默认会信任系统证书和用户证书，Android 7.0开始，默认只信任系统证书，在root环境下，将证书导入系统目录的方法。只要想办法把证书弄到系统证书列表，就可以抓包解密明文数据，具体的证书安装到系统证书目录的方法，如下：</p>
+<p>目前在Android 7.0或以上的系统有启用了对第三方证书的限制，但在Android 7.0以下依旧可以将Fiddler&#x2F;Charles&#x2F;Burp的证书安装在用户的CA集中抓取https请求</p>
+<p>将Burp或者Charles的证书作为系统级别的信任证书安装。建议重新生产burp证书并重启burp后再导出。系统级别的受信任证书以特殊格式存储在&#x2F;system&#x2F;etc&#x2F;security&#x2F;cacerts文件夹中。我们可以将Burp的证书写入此位置。</p>
+<p>导出一个Burp&#x2F;Charles证书之后，adb push到模拟器，然后修改后缀为crt直接安全，这种方式在Android 6及之前的版本可用，从Android 7.0开始，Android更改了信任用户安装的证书的默认行为，应用程序仅信任系统级CA。这样就导致安装证书后，如果尝试通过Burp或者Charlse代理访问https网站，系统会提示“该证书并非来自可信的授权中心”</p>
+<p>对于Android 7.0 (API 24) 之后，做了些改动，使得系统安全性增加了，导致：</p>
+<ul>
+<li>APP 默认不信任用户域的证书<ul>
+<li>之前把抓包工具的ssl证书，通过【从SD卡安装】安装到受信任的凭据 -&gt; 用户。就没用了，因为不再受信任了</li>
+<li>只信任（安装到）系统域的证书</li>
+<li>导致无法抓包https，抓出来的https的请求，都是加了密的，无法看到原文了</li>
+</ul>
+</li>
+</ul>
+<p>对此，总结出相关解决思路和方案：</p>
+<ul>
+<li>让系统信任抓包工具的ssl证书<ul>
+<li>作为app的开发者自己：改自己的app的配置，允许https抓包（得到或本身有app的源码，把证书放到受系统信任的系统证书中去）</li>
+<li>把证书放到受系统信任的系统证书中去（root权限）</li>
+</ul>
+</li>
+<li>绕开https不去校验<ul>
+<li>借助于其他（JustTrustMe等）工具绕开https的校验（例如XPosed、太极XPosed等框架）</li>
+</ul>
+</li>
+</ul>
+<p>1） <strong>Android 7抓包问题解决方法</strong></p>
+<ol>
+<li>导出Burp的证书后，使用openssl来做一些改动，最后上传到<code>/system/etc/security/cacerts</code></li>
+</ol>
+<p><img src="https://img-blog.csdnimg.cn/99dc45ceb5354f4c89d02ce3081eb39a.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/ef63031c65654168ba399e1bb375d27f.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c">root@kali:~<span class="hljs-meta"># openssl x509 -inform DER -in cert-der.crt -out PortSwiggerCA.pem</span><br>root@kali:~<span class="hljs-meta"># openssl x509 -inform PEM -subject_hash_old -in PortSwiggerCA.pem|head -1</span><br>root@kali:~<span class="hljs-meta"># mv PortSwiggerCA.pem 9999.0</span><br></code></pre></td></tr></table></figure>
+
+
+<ol start="2">
+<li>adb传输文件报错<code>couldn‘t create file：Read-only file system</code>解决方法</li>
+</ol>
+<p><img src="https://img-blog.csdnimg.cn/0204afc2cdd447fba6d7a9d517b1c021.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs c">D:\&gt;adb shell<br>VOG-AL00:/ <span class="hljs-meta"># mount -o remount -o rw /system</span><br>mount -o remount -o rw /system<br>VOG-AL00:/ <span class="hljs-meta"># exit;</span><br><span class="hljs-built_in">exit</span>;<br><br>D:\&gt;adb root<br>adbd is already running as root<br><br>D:\&gt;adb remount<br>remount succeeded<br><br>D:\&gt;adb push <span class="hljs-number">9999.0</span> /system/etc/security/cacerts<br><span class="hljs-number">330</span> KB/s (<span class="hljs-number">1330</span> bytes in <span class="hljs-number">0.003</span>s)<br><br>D:\&gt;adb shell chmod <span class="hljs-number">644</span> /system/etc/security/cacerts/<span class="hljs-number">9999.0</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/36110586e86a46ccb78f36085f79ed9a.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>再次输入adb push就能正常传输文件</p>
+<p><img src="https://img-blog.csdnimg.cn/572d908ccf1a4a16a8cdfcf83655a4ed.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>2）<strong>Android10 抓包问题解决方法</strong></p>
+<p>Android10以上需要刷入Magisk,在模块里搜索move Cert ,安装模块，重启后证书就已经被移动到系统目录（system&#x2F;etc&#x2F;security&#x2F;cacerts），可以正常抓包了</p>
+<p>下载地址：<a target="_blank" rel="noopener" href="https://github.com/topjohnwu/Magisk">https://github.com/topjohnwu/Magisk</a></p>
+<h1 id="0x05-系统代理检测"><a href="#0x05-系统代理检测" class="headerlink" title="0x05 系统代理检测"></a>0x05 系统代理检测</h1><p>TCP协议在操作系统中完全被定死了，但是http协议都是各个开发者自己实现的，很多功能实现了多少，支持哪些细节都是开发人员自己决定的</p>
+<p><strong>例1</strong>：除了校验HTTPS证书防止中间人抓包以外，常见的方法还有通过检测系统代理防止抓包，其原理是检测到设备开启系统代理后，APP中通过代码实现禁用代理，以OkHttp框架为例，示列代码如下:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">/*</span><br><span class="hljs-comment">* 检测代理</span><br><span class="hljs-comment">* 目前仅限OkHttp发出的请求</span><br><span class="hljs-comment">*/</span><br>switch_check_proxy.setOnCheckedChangeListener(<span class="hljs-keyword">new</span> <span class="hljs-title class_">CompoundButton</span>.OnCheckedChangeListener() &#123;<br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">onCheckedChanged</span><span class="hljs-params">(CompoundButton buttonView, <span class="hljs-type">boolean</span> isChecked)</span> &#123;<br>        <span class="hljs-keyword">if</span>(isChecked)&#123;<br>            client = <span class="hljs-keyword">new</span> <span class="hljs-title class_">OkHttpClient</span>().newBuilder().proxy(Proxy.NO_PROXY).build();<br>        &#125;<span class="hljs-keyword">else</span> &#123;<br>            client = <span class="hljs-keyword">new</span> <span class="hljs-title class_">OkHttpClient</span>();<br>        &#125;<br>    &#125;<br>&#125;);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><strong>例2</strong>：很多APP中会设置如下检测</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-type">String</span> <span class="hljs-variable">property</span> <span class="hljs-operator">=</span> System.getProperty(<span class="hljs-string">&quot;https.proxyHost&quot;</span>);<br><span class="hljs-type">String</span> <span class="hljs-variable">property</span> <span class="hljs-operator">=</span> System.getProperty(<span class="hljs-string">&quot;https.proxyPort&quot;</span>);<br><span class="hljs-keyword">if</span>(!TextUtils.isEmpty(property))&#123;<br>	<span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Proxy</span>(Proxy,Type.HTTP, <span class="hljs-keyword">new</span> <span class="hljs-title class_">InetSockerAddress</span>(Property, Integer.parseInt(property2)))<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>为了绕过系统代理检测，可以使用iptables对请求进行强制转发或使用Proxy Droid，ProxyDroid全局代理工具就是通过iptables实现的，所以使用ProxyDroid开启代理，可以比较有效的绕过代理检测。手机root后，使用Proxy Droid 或Postern实现强制全局代理，让ssl代理证书生效，proxy Droid可以在UpToDown，ApkHere等的地方下载</p>
+<p>1）对ProxyDroid进⾏配置（基本配置）</p>
+<ul>
+<li>Auto Setting不勾选，⼿动进⾏配置<ul>
+<li>Host：输⼊代理服务器IP</li>
+<li>Port：输⼊代理服务器端⼝</li>
+</ul>
+</li>
+<li>Proxy Type选择代理服务器提供服务类型：选择HTTP</li>
+<li>Auto Connect为当2G&#x2F;3G&#x2F;WIFI⽹络开启时，⾃动开启代理服务。不勾选，⼿动启动，以获取最⼤灵活性</li>
+<li>Bypass Addresses：相当于⿊名单列表，选择排除代理的IP范围，有需要的可以⾃⼰⼿动设置</li>
+</ul>
+<p>2）认证信息配置</p>
+<ul>
+<li>Enable Authentication：如果代理服务器需要账户、密码认证，勾选</li>
+<li>User：认证账户名</li>
+<li>Password：认证密码</li>
+<li>NTLM Authentication：NTLM&#x2F; NTLM2，Windows早期的⼀种认证⽅式，不⽤勾选</li>
+</ul>
+<p>3） 特征设置</p>
+<ul>
+<li>Global Proxy：⼀定要勾选，即为全局代理，代理所有App</li>
+<li>Individual Proxy：单独代理所选App，勾选了第⼀条的不⽤管</li>
+<li>Bypass Mode：勾选了代表第⼆条中所选App不代理，勾选了第⼀条的不⽤管</li>
+<li>DNS Proxy：开启DNS代理。</li>
+</ul>
+<p>4）通知设置</p>
+<ul>
+<li>Ringtone：选择通知铃声</li>
+</ul>
+<p>5）都设置完成后，开启Proxy Switch即可。注意：如果使⽤ProxyDroid，⽆需在系统wifi处设置代理</p>
+<p>下载地址：<a target="_blank" rel="noopener" href="https://apkpure.com/proxydroid/org.proxydroid">https://apkpure.com/proxydroid/org.proxydroid</a></p>
+<p>Postern是Android系统里一款非常流行的代理&#x2F; 虚拟专用网络管理程序，是一个Android下的全局代理工具，可以说是安卓版surge，它可以添加规则，屏蔽广告。</p>
+<p>Postern支持的代理协议有:</p>
+<ul>
+<li>SSH隧道</li>
+<li>Shadowsocks</li>
+<li>SOCKS5代理</li>
+<li>HTTPS&#x2F;HTTP CONNECT method隧道</li>
+<li>gfw.press</li>
+</ul>
+<p>下载地址：<a target="_blank" rel="noopener" href="https://apkpure.com/postern/com.tunnelworkshop.postern">https://apkpure.com/postern/com.tunnelworkshop.postern</a></p>
+<p>上面说的是要root的情况下，免root的可以使用如下Drony 或 VProxid、Postern</p>
+<ul>
+<li>Drony</li>
+</ul>
+<p>Drony 支持 App 定向的 http,https 抓包。手机上装的 app 多了，会很多数据上来，要加过滤规则，正式环境测试环境都要加连上了代理，有些普通使用的 app （非抓包 app）会没法使用，会出现经常要设置代理，关闭代理，需要又要设置（有些手机会保存代理 ip 还好，不保存的还要每次手写）</p>
+<p>将手机上的所有流量都重定向到 drony 自身，这样 drony 就可以管理所有手机上的网络流量，然后对手机上不同 APP 的流量进行单独配置，再转发到 BurpSuite上</p>
+<p>Drony 可以解决上述痛点，不需要手机在 wifi 里设置代理。可以通过该 app 直接指定目标 app 才走代理，对其他 app 不可见</p>
+<p>下载地址：<a target="_blank" rel="noopener" href="https://www.apkshub.com/app/org.sandroproxy.drony">https://www.apkshub.com/app/org.sandroproxy.drony</a></p>
+<ul>
+<li>VProxid</li>
+</ul>
+<p>VProxid是Android平台上的Proxifier替代工具，VProxid允许不支持通过代理服务器工作的网络应用程序通过SOCKS或HTTP(S)代理进行操作。使用VProxid，可以轻松地将所选应用程序上的所有TCP连接隧道传输到不同的代理服务器，这意味着VProxid可以为每个应用程序设置不同的代理来抓取数据，配合Burp使用更佳</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-number">1.</span> 通过代理服务器运行任何网络应用程序<br><span class="hljs-number">2.</span> 该软件不需要特殊配置;整个过程是完全透明的<br><span class="hljs-number">3.</span> 同时为选定的应用程序设置不同的代理<br><span class="hljs-number">4.</span> 通过代理服务器网关从受限网络访问Internet<br><span class="hljs-number">5.</span> 绕过防火墙限制<br><span class="hljs-number">6.</span> 通过隐藏您的IP地址来保护隐私<br><span class="hljs-number">7.</span> 实时查看状态,公共IP,流量等信息<br><span class="hljs-number">8.</span> VProxid限制<br><span class="hljs-number">9.</span> 不支持UDP连接<br><span class="hljs-number">10.</span> 不支持https代&#123;过&#125;&#123;滤&#125;理<br></code></pre></td></tr></table></figure>
+
+<p>下载地址：<a target="_blank" rel="noopener" href="https://github.com/EasyLazyBean/VProxid">https://github.com/EasyLazyBean/VProxid</a></p>
+<h1 id="0x06-HTTPS-双向验证"><a href="#0x06-HTTPS-双向验证" class="headerlink" title="0x06 HTTPS 双向验证"></a>0x06 HTTPS 双向验证</h1><p>双向验证(或称为双向认证)，顾名思义就是客户端验证服务器端证书的正确性，服务器端也验证客户端的证书正确性（当服务器启用了证书双向认证之后，除了客户端去验证服务器端的证书外，服务器也同时需要验证客户端的证书，也就是会要求客户端提供自己的证书，如果没有通过验证，则会拒绝连接，如果通过验证，服务器获得用户的公钥）。所以基本原则上客户端要持有服务器端证书，服务端也要持有客户端的证书，对于Android APP来说打包发布的时候既要内置一个服务端证书也要生成一个客户端证书给服务器存储起来。这种双向认证非常可以做到非常高的安全性，但是同时服务端要想保持所有服务端的证书比较困难，因此这种方式只适用于某些点对点的高安全性需求的通信场合，对于Android APP来说可能是某类高机密性的内网业务才会使用这种双向HTTPS认证</p>
+<h2 id="6-1-单向认证流程"><a href="#6-1-单向认证流程" class="headerlink" title="6.1 单向认证流程"></a>6.1 单向认证流程</h2><p>单向认证流程中，服务器端保存着公钥证书和私钥两个文件，整个握手过程如下：</p>
+<p><img src="https://img-blog.csdnimg.cn/fc26ce5685b1403bb1a02f12c5f28f7d.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ol>
+<li>客户端发起建立HTTPS连接请求，将SSL协议版本的信息发送给服务器端</li>
+<li>服务器端将本机的公钥证书（server.crt）发送给客户端</li>
+<li>客户端读取公钥证书（server.crt），取出了服务端公钥</li>
+<li>客户端生成一个随机数（密钥R），用刚才得到的服务器公钥去加密这个随机数形成密文，发送给服务端</li>
+<li>服务端用自己的私钥（server.key）去解密这个密文，得到了密钥R</li>
+<li>服务端和客户端在后续通讯过程中就使用这个密钥R进行通信了</li>
+</ol>
+<h2 id="6-2-双向认证流程"><a href="#6-2-双向认证流程" class="headerlink" title="6.2 双向认证流程"></a>6.2 双向认证流程</h2><p><img src="https://img-blog.csdnimg.cn/df1fe5e8a0574210ba1c5b321a5be2f9.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ol>
+<li>客户端发起建立HTTPS连接请求，将SSL协议版本的信息发送给服务端</li>
+<li>服务器端将本机的公钥证书（server.crt）发送给客户端</li>
+<li>客户端读取公钥证书（server.crt），取出了服务端公钥</li>
+<li>客户端将客户端公钥证书（client.crt）发送给服务器端</li>
+<li>服务器端使用根证书（root.crt）解密客户端公钥证书，拿到客户端公钥</li>
+<li>客户端发送自己支持的加密方案给服务器端</li>
+<li>服务器端根据自己和客户端的能力，选择一个双方都能接受的加密方案，使用客户端的公钥加密<code>999</code>后发送给客户端</li>
+<li>客户端使用自己的私钥解密加密方案，生成一个随机数R，使用服务器公钥加密后传给服务器端</li>
+<li>服务端用自己的私钥去解密这个密文，得到了密钥R</li>
+<li>服务端和客户端在后续通讯过程中就使用这个密钥R进行通信了</li>
+</ol>
+<h2 id="6-3-HTTPS-单向验证-x2F-HTTPS-双向验证的区别"><a href="#6-3-HTTPS-单向验证-x2F-HTTPS-双向验证的区别" class="headerlink" title="6.3 HTTPS 单向验证&#x2F;HTTPS 双向验证的区别"></a>6.3 HTTPS 单向验证&#x2F;HTTPS 双向验证的区别</h2><p>单向验证过程中，客户端会验证自己访问的服务器，服务器对来访的客户端身份不做任何限制。如果服务器需要限制客户端的身份，则可以选择开启服务端验证，这就是双向验证。从这个过程中我们不难发现，使用单向验证还是双向验证，是服务器决定的。</p>
+<p>一般而言，我们的服务器都是对所有客户端开放的，所以服务器默认都是使用单向验证。如果你使用的是Tomcat服务器，在配置文件server.xml中，配置Connector节点的clientAuth属性即可。若为true，则使用双向验证，若为false，则使用单向验证。如果你的服务，只允许特定的客户端访问，那就需要使用双向验证了。</p>
+<p>双向验证基本过程与单向验证相同，不同在于：</p>
+<p>1）第二步服务器第一次回应客户端的SeverHello消息中，会要求客户端提供“客户端的证书”</p>
+<p>2）第三步客户端验证完服务器证书后的回应内容中，会增加两个信息：</p>
+<ul>
+<li>客户端的证书</li>
+<li>客户端证书验证消息（CertificateVerify message）：客户端将之前所有收到的和发送的消息组合起来，并用hash算法得到一个hash值，然后用客户端密钥库的私钥对这个hash进行签名，这个签名就是CertificateVerify message</li>
+</ul>
+<p>3）服务器收到客户端证书后：</p>
+<ul>
+<li>确认这个证书是否在自己的信任库中（当然也会校验是否过期等信息），如果验证不通过则会拒绝连接</li>
+<li>用客户端证书中的公钥去验证收到的证书验证消息中的签名。作用是为了确认证书确实是客户端的</li>
+</ul>
+<p>所以，在双向验证中，客户端需要用到密钥库，保存自己的私钥和证书，并且证书需要提前发给服务器，由服务器放到它的信任库中</p>
+<h2 id="6-4-HTTPS-单向验证-x2F-HTTPS-双向验证的总结"><a href="#6-4-HTTPS-单向验证-x2F-HTTPS-双向验证的总结" class="headerlink" title="6.4 HTTPS 单向验证&#x2F;HTTPS 双向验证的总结"></a>6.4 HTTPS 单向验证&#x2F;HTTPS 双向验证的总结</h2><p>HTTPS 单向验证：</p>
+<ul>
+<li>如果是你客户端，你需要拿到服务器的证书，并放到你的信任库中</li>
+<li>如果是服务端，你要生成私钥和证书，并将这两个放到你的密钥库中，并且将证书发给所有客户端。</li>
+</ul>
+<p>HTTPS 双向验证：</p>
+<ul>
+<li>如果你是客户端，你要生成客户端的私钥和证书，将它们放到密钥库中，并将证书发给服务端，同时，在信任库中导入服务端的证书</li>
+<li>如果你是服务端，除了在密钥库中保存服务器的私钥和证书，还要在信任库中导入客户端的证书</li>
+</ul>
+<h2 id="6-5-HTTPS-双向验证实例"><a href="#6-5-HTTPS-双向验证实例" class="headerlink" title="6.5 HTTPS 双向验证实例"></a>6.5 HTTPS 双向验证实例</h2><hr>
+<p><strong>补充知识</strong>：<br>如果想自己生成证书的话，可以通过以下命令生成证书：</p>
+<ul>
+<li>生成自签名服务器端证书：</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c">openssl genrsa -out server-key.key <span class="hljs-number">2048</span><br>openssl req -new -out server-req.csr -key server-key.key<br>openssl x509 -req -in server-req.csr -out server-cert.cer -signkey server-key.key  -CAcreateserial -days <span class="hljs-number">3650</span><br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>生成自签名客户端证书：</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c">openssl genrsa -out client-key.key <span class="hljs-number">2048</span><br>openssl req -new -out client-req.csr -key client-key.key<br>openssl x509 -req -in client-req.csr -out client-cert.cer -signkey client-key.key -CAcreateserial -days <span class="hljs-number">3650</span><br></code></pre></td></tr></table></figure>
+
+<p>生成客户端带密码的p12证书（双向认证的话，浏览器访问时候要导入该证书才行；可能某些Android系统版本请求的时候需要把它转成bks来请求双向认证，或某些设备用p12格式）：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">openssl pkcs12 -export -clcerts -in client-cert.cer -inkey client-key.key -out client.p12<br></code></pre></td></tr></table></figure>
+
+<p>需要使用的证书都在源码certs目录，对应证书密码如下：</p>
+<ul>
+<li>客户端证书client.p12密码：clientpassword</li>
+<li>服务端证书server密码：serverpassword</li>
+</ul>
+<hr>
+<p>APP解密的代码逻辑，一般步骤如下：</p>
+<ul>
+<li>客户端发送数据包</li>
+<li>去从app中读取这个证书文件，密码是以硬编码形式放在了代码中</li>
+<li>寻找到硬编码形式的这个代码，然后利用这个代码中的密码字段去解密证书文件，从中读取以后，再进行解密并回传给服务器端进行确认</li>
+<li>由此可寻找证书名称来获得证书密码</li>
+</ul>
+<p>证书后缀名一般为：</p>
+<ul>
+<li>.p12</li>
+<li>.bks</li>
+<li>.pfx</li>
+</ul>
+<p>SSL双向校验一般都将证书放到<code>&lt;app&gt;/asset</code>目录下, 也就是app的资源目录下, 也有可能放在<code>/res/raw</code>目录下，如果都不再就使用<code>*.p12、*.bks、.pfx</code>来快速定位位置</p>
+<p><img src="https://img-blog.csdnimg.cn/daf6f655d4284377a40c8ed0c8e99635.png" srcset="/img/loading.gif" lazyload></p>
+<p>反编译APK，通过关键词”PKCS12”能够定位到加载证书的位置，获得证书密码：clientpassword</p>
+<p><img src="https://img-blog.csdnimg.cn/e560eebf478a4ada83e3c05042f9ce45.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>或使用IDA加载dex文件，然后在String窗口搜索证书的名称，搜索后进入对应的类进行查找；有些APP为了安全性会把证书密码放到native层保护，如果想知道密码就要去找到对应的函数，查看具体加载的是哪个so文件（利用IDA工具）</p>
+<h3 id="6-5-1-实验开始之前"><a href="#6-5-1-实验开始之前" class="headerlink" title="6.5.1 实验开始之前"></a>6.5.1 实验开始之前</h3><p>在开始之前，我们通过PC 浏览器来验证一下概念，如下步骤：</p>
+<ul>
+<li>创建Python服务端代码，文件名保存为<code>server_https.py</code>：</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> os<br><span class="hljs-keyword">import</span> sys<br><span class="hljs-keyword">import</span> ssl<br><span class="hljs-keyword">from</span> http.server <span class="hljs-keyword">import</span> HTTPServer, BaseHTTPRequestHandler<br><br><span class="hljs-comment">#服务端证书和私钥</span><br>serverCerts = <span class="hljs-string">&quot;D:\\t\\httpstest-master\\certs\\server-cert.cer&quot;</span><br>serverKey = <span class="hljs-string">&quot;D:\\t\\httpstest-master\\certs\\server-key.key&quot;</span><br><span class="hljs-comment">#客户端证书</span><br>clientCerts = <span class="hljs-string">&quot;D:\\t\\httpstest-master\\certs\\client-cert.cer&quot;</span><br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">RequestHandler</span>(<span class="hljs-title class_ inherited__">BaseHTTPRequestHandler</span>):<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">_writeheaders</span>(<span class="hljs-params">self</span>):<br>        self.send_response(<span class="hljs-number">200</span>)<br>        self.send_header(<span class="hljs-string">&#x27;Content-type&#x27;</span>,<span class="hljs-string">&#x27;text/plain&#x27;</span>)<br>        self.end_headers()<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">do_GET</span>(<span class="hljs-params">self</span>):<br>        self._writeheaders()<br>        self.wfile.write(<span class="hljs-string">&quot;OK&quot;</span>.encode(<span class="hljs-string">&quot;utf-8&quot;</span>))<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">main</span>():<br>    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">len</span>(sys.argv) != <span class="hljs-number">2</span>):<br>        port = <span class="hljs-number">443</span><br>    <span class="hljs-keyword">else</span>:<br>        port = sys.argv[<span class="hljs-number">1</span>]<br>    server_address = (<span class="hljs-string">&quot;0.0.0.0&quot;</span>, <span class="hljs-built_in">int</span>(port))<br>    server = HTTPServer(server_address, RequestHandler)<br>    <span class="hljs-comment">#双向校验</span><br>    server.socket = ssl.wrap_socket(server.socket, certfile = serverCerts, server_side = <span class="hljs-literal">True</span>,  <br>                               keyfile = serverKey,<br>                               cert_reqs = ssl.CERT_REQUIRED,<br>                               ca_certs = clientCerts,<br>                               do_handshake_on_connect = <span class="hljs-literal">False</span><br>                               )<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;Starting server, listen at: %s:%s&quot;</span> % server_address)<br>    server.serve_forever()<br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:<br>    main()<br></code></pre></td></tr></table></figure>
+<ul>
+<li>物理机启动该python脚本：</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">python3  server_https.py<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>虚拟机Host文件需配置一下：</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c">格式：物理机的IP   www.test.com<br><span class="hljs-number">192.168</span><span class="hljs-number">.66</span><span class="hljs-number">.55</span>   www.test.com<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>将httpstest-master\certs 下的client.p12 拷贝到虚拟机并安装：</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/f3d86c22f1a84e2db50aa763bb181747.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>输入我们已知道的密码：clientpassword</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/085d245118384e65a920d0ce60922917.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>最后打开浏览器访问地址：<code>https://www.test.com</code></li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/2e3ef17bdb79455c8d03172c57b651ce.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>从上看到，访问test.com成功会返回OK字样的空白页，也输出ERROR错误，但还是访问成功了，报错的错误原因是证书为自签名证书，客户端并不想认可该证书。只需要手动确认即可打开对应的内容</p>
+<p><img src="https://img-blog.csdnimg.cn/e6c6b216b17f4b339c4db64cb29bf5ba.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/7f0c5b12a25042eaa28b5890d84983f3.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h3 id="6-5-2-实验正式开启"><a href="#6-5-2-实验正式开启" class="headerlink" title="6.5.2 实验正式开启"></a>6.5.2 实验正式开启</h3><p>1）需要做一些简单的配置：</p>
+<ul>
+<li>修改Android模拟器中的 hosts，将 <a target="_blank" rel="noopener" href="http://www.test.com/">www.test.com</a> 域名定向到正确IP（之前用的哪个Python脚本启动的服务端机器的IP）<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c">adb root<br>adb remount<br>adb pull /system/etc/hosts<br>adb push hosts /system/etc/hosts<br>adb shell<br>echo -e \\n &gt;&gt; /system/etc/hosts<br></code></pre></td></tr></table></figure></li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/2a0a4c2c66e94beeb9f08b705e541a1b.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>本地PC未开启代理软件</li>
+<li>APP 通过frida hook 模式启动</li>
+</ul>
+<p>client app包含server-cert.cer 对服务端证书PIN，这个过程需要验证服务端证书的签发单位是否为合法CA Issuer，但是我们的证书是自签名的，所以就算是不使用代理还是不能通过SSL PINNING，大概率是报错：</p>
+<p><code>Caused by: java.security.cert.CertificateException: java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.</code></p>
+<p><img src="https://img-blog.csdnimg.cn/f944fd3ff5894186b478de81d2131997.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>APP 通过frida hook 模式启动：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c">D:&gt;adb shell<br>root@VOG-AL00:/ <span class="hljs-meta">#  cd /data/local/tmp</span><br>root@VOG-AL00:/data/local/tmp # ./frida-server<span class="hljs-number">-15.1</span><span class="hljs-number">.21</span>-android-x86<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/e096f203164b4e619d97edd5ea1c09e7.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>JS脚本：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-comment">/*  Android ssl certificate pinning bypass script for various methods</span><br><span class="hljs-comment"></span><br><span class="hljs-comment">	Run with:</span><br><span class="hljs-comment">	frida -U -f [APP_ID] -l fridascript.js --no-pause</span><br><span class="hljs-comment">*/</span><br><span class="hljs-built_in">setTimeout</span>(<span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) &#123;<br><span class="hljs-title class_">Java</span>.<span class="hljs-title function_">perform</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-comment">// 绕过OpenSSLSocketImpl Conscrypt</span><br>    <span class="hljs-keyword">var</span> <span class="hljs-title class_">OpenSSLSocketImpl</span> = <span class="hljs-title class_">Java</span>.<span class="hljs-title function_">use</span>(<span class="hljs-string">&#x27;com.android.org.conscrypt.OpenSSLSocketImpl&#x27;</span>);<br>	<span class="hljs-title class_">OpenSSLSocketImpl</span>.<span class="hljs-property">verifyCertificateChain</span>.<span class="hljs-property">implementation</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params">certRefs, JavaObject, authMethod</span>) &#123;<br>	     <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;[+] Bypassing OpenSSLSocketImpl Conscrypt&#x27;</span>);<br>	&#125;;<br><br>&#125;);<br>&#125;, <span class="hljs-number">0</span>);<br></code></pre></td></tr></table></figure>
+
+<p>最后运行启动APP</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">frida -U -f com.example.httpstest -l D:\t\fridascript.js --no-paus<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/d390d1fa18ff49cdba0623e502db8838.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>2）都完成后，我们来查看查看当前APP 包名</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">adb shell <span class="hljs-string">&quot;dumpsys window | grep mCurrentFocus&quot;</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/200256a8f4274afd86eb81021502c18e.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>3）Frida 启动app，Android无配置抓包代理的情况下，点击【HTTPS双向验证】按钮，可以看到收到了一个请求，但此处我点击按钮后，会闪退，大家不用管，可能是我打包APK的时候出了一些问题</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">frida -U -f com.example.httpstest -l D:\t\fridascript.js --no-paus<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/61ce98f4391046e1a369bb20d8597e5b.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>4）接下来配置抓包代理，然后用Burp直接抓包，请求是抓到了，但并未返回信息，Burp能抓包HTTPS协议报文的原理是: Burp在中间即充当客户端，又充当服务端。在Burp冒充客户端时，因为服务端要求APP发送客户端证书进行验证，而burp没有客户端证书，所以导致握手失败（双向验证）：</p>
+<p><img src="https://img-blog.csdnimg.cn/26bc2d656ecc47ca8e226e1927fe7b31.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>5）此时，BurpSuite需要给代理软件加客户端证书，该证书在前面的哪个已经说过了，解压缩APK里面查找，加密的密码反编译或IDA动态调试获取密码，然后将客户端证书安装给Burp，如下：</p>
+<p><img src="https://img-blog.csdnimg.cn/4be244dd6a8b433491766a64445be33e.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/171655df828141b09c217b420b50f7e6.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>选择client.p12证书文件，证书文件密码为：clientpassword</p>
+<p><img src="https://img-blog.csdnimg.cn/9e16fbf6964e41f5a4754a2a8135a407.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/007bfd70ec2b43f3921c3768a9083040.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/bb0e55a69e744d1690af8bfc4116a611.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>接下来，再次重复之前的步骤，再Frida 打开APP以及设置Android Burp代理，可以成功的发送请求并返回信息，结果如下：</p>
+<p><img src="https://img-blog.csdnimg.cn/00d71420543a4e30866adea700e049f3.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><strong>参考链接</strong>：</p>
+<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/1546e606028b">https://www.jianshu.com/p/1546e606028b</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/lgxzzz/article/details/124645489">https://blog.csdn.net/lgxzzz/article/details/124645489</a></p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/A-bPf6uNGiEQVu-dFvHnVw">https://mp.weixin.qq.com/s/A-bPf6uNGiEQVu-dFvHnVw</a></p>
+<p><a target="_blank" rel="noopener" href="https://ch3nye.top/Android-HTTPS%E8%AE%A4%E8%AF%81%E7%9A%84N%E7%A7%8D%E6%96%B9%E5%BC%8F%E5%92%8C%E5%AF%B9%E6%8A%97%E6%96%B9%E6%B3%95%E6%80%BB%E7%BB%93/">https://ch3nye.top/Android-HTTPS%E8%AE%A4%E8%AF%81%E7%9A%84N%E7%A7%8D%E6%96%B9%E5%BC%8F%E5%92%8C%E5%AF%B9%E6%8A%97%E6%96%B9%E6%B3%95%E6%80%BB%E7%BB%93/</a></p>
+<hr>
+<p><strong>你以为你有很多路可以选择，其实你只有一条路可以走</strong></p>
+<hr>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/AndroidSecurity/">#AndroidSecurity</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>「干货」APP绕过直连、HOST校验、系统证书校验、代理检测、双向认证抓包限制，进行抓包</div>
+      <div>https://orangey.info/2022/09/23/124755818/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>橙留香</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年9月23日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/09/23/125047569/" title="关于Android Fragment 漏洞，你了解多少？">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">关于Android Fragment 漏洞，你了解多少？</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/09/23/124793802/" title="「干货」APP绕过WebView SSL Pinning抓包限制，进行抓包">
+                        <span class="hidden-mobile">「干货」APP绕过WebView SSL Pinning抓包限制，进行抓包</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  <article id="comments" lazyload>
+    
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1e96aec5ac46370916fa","clientSecret":"ee5e97a65cf34e9fe31e15ab0421a94968237f5e","repo":"ogGitalk","owner":"ananasOrangey","admin":["ananasOrangey"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '52cb810c1672dda668fceb2eaf51a13c'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+  </article>
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://orangey.blog.csdn.net" target="_blank" rel="nofollow noopener"><span>橙留香CSDN博客</span></a> <i class="iconfont icon-love"></i> <a href="https://i.imgtg.com/2022/09/21/gNXxK.png" target="_blank" rel="nofollow noopener"><span>橙留香微信公众号</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

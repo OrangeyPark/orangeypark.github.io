@@ -1,0 +1,973 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="橙留香">
+  <meta name="keywords" content="橙留香车联网安全技术博客">
+  
+    <meta name="description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  Android安全付费专栏长期更新，本篇最新内容请前往：  [车联网安全自学篇] Android安全之GDB动态调试APP  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;ananasorangey&#x2F;category">
+<meta property="og:type" content="article">
+<meta property="og:title" content="「干货」利用GDB动态调试Android APP应用程序">
+<meta property="og:url" content="https://orangey.info/2022/09/23/123843560/index.html">
+<meta property="og:site_name" content="车联网安全技术博客 | 橙留香">
+<meta property="og:description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  Android安全付费专栏长期更新，本篇最新内容请前往：  [车联网安全自学篇] Android安全之GDB动态调试APP  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;ananasorangey&#x2F;category">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/21/gNXxK.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/40b54db3410c422bb4818c160ab4392d.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8ed2d2a16eef4be8b2c687df62937975.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/29f635c6a7b6439eaef9e12f79599d39.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/77910154dd4a4f8987d59ea2fc1b28e2.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8f6d6e5113664e248f80c6435a52bb08.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/40554519079c4c7d9e15b49e686ca37c.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/4b317556cf264a268b5402d0534996c0.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/10cd24851fe946e8a51f0b13bcecb1e2.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/19017bd029204658a7c26a3d3e4b50d5.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/ca1678151bd74d7cbfe56865b6b58c3f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/776c128e81b04950adbcc74842606090.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_17,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/087f02257656466ab2dcc0967e4309e7.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8c6ca1558fb447308446d2cebde23a7b.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/fc82b7de8aa7415fa1ebbe2b43edba0e.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/66a261e839104b9193151208e197d94c.png">
+<meta property="article:published_time" content="2022-09-23T15:50:33.590Z">
+<meta property="article:modified_time" content="2022-09-24T16:44:26.125Z">
+<meta property="article:author" content="橙留香">
+<meta property="article:tag" content="AndroidSecurity">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+  
+  
+  
+  <title>「干货」利用GDB动态调试Android APP应用程序 - 车联网安全技术博客 | 橙留香</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"orangey.info","root":"/","version":"1.9.3","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"java"},"copy_btn":false,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>橙留香</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="「干货」利用GDB动态调试Android APP应用程序"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-09-23 23:50" pubdate>
+          2022年9月23日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          8.6k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          <!-- compatible with older versions-->
+          72 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">「干货」利用GDB动态调试Android APP应用程序</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <hr>
+<p><strong>也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大</strong></p>
+<p><strong>少走了弯路，也就错过了风景，无论如何，感谢经历</strong></p>
+<hr>
+<p>Android安全付费专栏长期更新，本篇最新内容请前往：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://orangey.blog.csdn.net/article/details/123843560">[车联网安全自学篇] Android安全之GDB动态调试APP</a></li>
+</ul>
+<p>更多关于Android安全的知识，可前往：<a target="_blank" rel="noopener" href="https://blog.csdn.net/ananasorangey/category11955914.html">https://blog.csdn.net/ananasorangey/category11955914.html</a></p>
+<p><img src="https://i.imgtg.com/2022/09/25/gdpGP.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><img src="https://i.imgtg.com/2022/09/21/gNXxK.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x01-前言"><a href="#0x01-前言" class="headerlink" title="0x01 前言"></a>0x01 前言</h1><p>由于 Android 原生程序的软件保护技术日趋成熟，很多软件和病毒都开始用加密和混淆技术强化自己，对此，静态分析已很难奏效，要用到动态调试</p>
+<p>用 C、C++ 开发的原生程序，其语言的先天特性决定其二进制代码的分析难度比 Java 开发的 DEX 高得多，加上高强度的代码加密和混淆技术，逆向分析更加困难。因此，使用调试器配合脚本自动化技术，实现原生程序的自动化分析、自动化去除混淆与动态脱壳，已成为逆向分析中必须掌握的技能</p>
+<h2 id="1-1-GDB远程调试原理图"><a href="#1-1-GDB远程调试原理图" class="headerlink" title="1.1 GDB远程调试原理图"></a>1.1 GDB远程调试原理图</h2><p><img src="https://img-blog.csdnimg.cn/40b54db3410c422bb4818c160ab4392d.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>如图上所示，我们需要使用gdbserver依附到要调试的进程上，gdb通过adbd和手机上的gdbserver 进行socket通信</p>
+<h2 id="1-2-什么是-GDB-调试器？"><a href="#1-2-什么是-GDB-调试器？" class="headerlink" title="1.2 什么是 GDB 调试器？"></a>1.2 什么是 GDB 调试器？</h2><p>Android NDK 早期只支持用 gcc 开发原生程序（现在只支持 Clang），那时原生程序的调试器主要是 gdb（The GNU Project Debugger，GNU 工程调试器），即使是现在，用 gdb 调试原生程序也是一种选择</p>
+<p>GDB是gnu组织开发的一个强大的unix程序调试工具，可以用它来调试Android上的C、C++代码</p>
+<p><strong>GDB主要做四件事情</strong>：</p>
+<ul>
+<li>随心所欲地启动你的程序</li>
+<li>设置断点，程序执行到断点处会停住（断点可以是表达式）</li>
+<li>程序被停住后，可以查看此时程序中发生的事</li>
+<li>动态改变程序的执行环境</li>
+</ul>
+<h2 id="1-3-Android-SDK-GDB-安装路径"><a href="#1-3-Android-SDK-GDB-安装路径" class="headerlink" title="1.3 Android SDK GDB 安装路径"></a>1.3 Android SDK GDB 安装路径</h2><p>使用gdb进行嵌入式调试的必需品，是gdb和gdbserver二进制文件，对于Android平台而言，Google已经提供了预编译的版本，所以无需自行编译它（非要自己手动去编译的，麻烦的一批，反正我放弃了），你可以在Android SDK的目录下找到它们(高版本已经被舍弃了，版本不要超过Android NDK r23 LTS)</p>
+<p>网上的一些教程是说通过Android Studio SDK Tools来安装，但默认会安装最新版本的，我们这里手动安装即可</p>
+<p><img src="https://img-blog.csdnimg.cn/8ed2d2a16eef4be8b2c687df62937975.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/29f635c6a7b6439eaef9e12f79599d39.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>windows 安装NDK-gdb(版本不要超过Android NDK r23 LTS（2021 年 8 月），在这个版本以上的默认去除了对GDB的支持)</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://developer.android.com/ndk/downloads/revision_history?hl=zh-cn">https://developer.android.com/ndk/downloads/revision_history?hl=zh-cn</a></p>
+<p><img src="https://img-blog.csdnimg.cn/77910154dd4a4f8987d59ea2fc1b28e2.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/8f6d6e5113664e248f80c6435a52bb08.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>Android SDK 工具包的gdb和不同系统版本下的gdbserver路径</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c">android_ndk_r23b/prebuilt/windows-x86_64/bin/gdb.exe<br><br>android_ndk_r23b/prebuilt/android-x86_64/gdbserver/gdbserver<br>android_ndk_r23b/prebuilt/android-x86/gdbserver/gdbserve<br>android_ndk_r23b/prebuilt/android-arm64/gdbserver/gdbserve<br>android_ndk_r23b/prebuilt/android-arm/gdbserver/gdbserve<br></code></pre></td></tr></table></figure>
+
+<p><strong>注</strong>：同时对Android手机需要做的准备工作，则是打开开发者选项以启用ADB调试，并且需要具有root权限。同时在某些机型上，SELinux可能会阻止gdbserver附加到目标进程，这种情况下建议暂时将SELinux改为宽容模式：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">adb shell setenforce <span class="hljs-number">0</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="1-4-NDK-GDB-脚本"><a href="#1-4-NDK-GDB-脚本" class="headerlink" title="1.4 NDK-GDB 脚本"></a>1.4 NDK-GDB 脚本</h2><p>在 Android NDK 目录下有个 ndk-gdb 脚本，它是由 Android NDK 提供且经过配置的 gdb 调试器的启动器，内容如下：</p>
+<p><img src="https://img-blog.csdnimg.cn/40554519079c4c7d9e15b49e686ca37c.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li><p>ndk-gdb 对应 ndk-gdb.py，ndk-gdb.py 主要执行了如下操作：</p>
+<ul>
+<li>解析 Android NDK 工程的工程信息。读取项目的 AndroidManifest.xml，解析原生程序的包名和由 APK 启动的 Activity</li>
+<li>解析 Android NDK 工程的 ABI 信息。读取原生程序支持的 ABI，将其与当前连接到计算机中的设备的 ABI 进行比对，找出适合当前设备的 ABI 版本的原生程序</li>
+<li>设置调试器的 stl_pretty_printer。当 APP_STL 为 stlport 或 gnustl 时，为 gdb 设置不同的 stl_pretty_printer</li>
+<li>获取已安装的原生程序在设备上的数据目录和 gdbserver 的位置</li>
+<li>以调试模式启动原生程序所在 APK 的主 Activity</li>
+<li>从设备上拉取（pull）一些调试中要用的系统动态库和原生程序</li>
+<li>启动 gdbserver</li>
+<li>启动 gdb，连接待调试的进程，开始调试</li>
+</ul>
+</li>
+<li><p>从以上步骤可看出，用 ndk-gdb 动态调试原生程序时有如下限制：</p>
+<ul>
+<li>独立的原生程序无法调试。原生程序必须和 APK “绑定”，且 APK 必须包含主 Activity</li>
+<li>包含原生程序的 APK 必须是可调试的，且要先安装到设备上</li>
+<li>无法便携设置 gdb 调试器前端</li>
+</ul>
+</li>
+</ul>
+<h1 id="0x02-GDB-调试器命令"><a href="#0x02-GDB-调试器命令" class="headerlink" title="0x02 GDB 调试器命令"></a>0x02 GDB 调试器命令</h1><ul>
+<li>gdb 尚在不断更新（变化），要想掌握其使用方法，最好的办法是去 gdb 官网查看其手册（gdb 用户手册）</li>
+<li>gdb 调试器成功连接 gdbserver 后，会进入以 (gdb) 显示的 Shell 环境，在这里，既可执行 gdb 提供的所有命令，以驱动 gdb 调试 Android 原生程序，也可执行 help 命令，查看所有可用的命令。在调试场景中按 Tab 键，gdb 会显示当前所有可用命令</li>
+</ul>
+<h2 id="2-1-断点（BreakPoint）"><a href="#2-1-断点（BreakPoint）" class="headerlink" title="2.1 断点（BreakPoint）"></a>2.1 断点（BreakPoint）</h2><p>在代码的指定位置中断，这个是我们用得最多的一种。设置断点的命令是break，它通常有如下方式：</p>
+<ul>
+<li><code>break &lt;function&gt; </code>在进入指定函数时停住</li>
+<li><code>break &lt;linenum&gt; </code>在指定行号停住。</li>
+<li><code>break +/-offset </code>在当前行号的前面或后面的offset行停住。offiset为自然数。</li>
+<li><code>break filename:linenum </code>在源文件filename的linenum行处停住。</li>
+<li><code>break ... if &lt;condition&gt;    ... </code>可以是上述的参数，condition表示条件，在条件成立时停住。比如在循环境体中，可以设置break if i&#x3D;100，表示当i为100时停住程序</li>
+</ul>
+<p>可以通过<code>info breakpoints [n] </code>命令查看当前断点信息。此外，还有如下几个配套的常用命令：</p>
+<ul>
+<li><code>delete </code>删除所有断点</li>
+<li><code>delete breakpoint [n] </code>删除某个断点</li>
+<li><code>disable breakpoint [n] </code>禁用某个断点</li>
+<li><code>enable breakpoint [n] </code>使能某个断点</li>
+</ul>
+<h2 id="2-2-观察点（WatchPoint）"><a href="#2-2-观察点（WatchPoint）" class="headerlink" title="2.2 观察点（WatchPoint）"></a>2.2 观察点（WatchPoint）</h2><p>在变量读、写或变化时中断，这类方式常用来定位bug</p>
+<ul>
+<li><code>watch &lt;expr&gt; </code>变量发生变化时中断</li>
+<li><code>rwatch &lt;expr&gt; </code>变量被读时中断</li>
+<li><code>awatch &lt;expr&gt; </code>变量值被读或被写时中断</li>
+</ul>
+<p>可以通过<code>info watchpoints [n]  </code>命令查看当前观察点信息</p>
+<h2 id="2-3-捕捉点（CatchPoint）"><a href="#2-3-捕捉点（CatchPoint）" class="headerlink" title="2.3 捕捉点（CatchPoint）"></a>2.3 捕捉点（CatchPoint）</h2><p>捕捉点用来补捉程序运行时的一些事件。如：载入共享库（动态链接库）、C++的异常等。通常也是用来定位bug</p>
+<p>捕捉点的命令格式是：<code>catch &lt;event&gt;，event </code>可以是下面的内容</p>
+<ul>
+<li><code>throw </code>C++抛出的异常时中断</li>
+<li><code>catch </code>C++捕捉到的异常时中断</li>
+<li><code>exec </code>调用系统调用exec时（只在某些操作系统下有用）</li>
+<li><code>fork </code>调用系统调用fork时（只在某些操作系统下有用）</li>
+<li><code>vfork </code>调用系统调用vfork时（只在某些操作系统下有用）</li>
+<li><code>load 或 load &lt;libname&gt; </code>载入共享库时（只在某些操作系统下有用）</li>
+<li><code>unload 或 unload &lt;libname&gt; </code>卸载共享库时（只在某些操作系统下有用）</li>
+</ul>
+<p>另外，还有一个tcatch <event>，功能类似，不过它只设置一次捕捉点，当程序停住以后，应点被自动删除。捕捉点信息的查看方式和代码断点的命令是一样的</p>
+<h2 id="2-4-在特定线程中中断"><a href="#2-4-在特定线程中中断" class="headerlink" title="2.4 在特定线程中中断"></a>2.4 在特定线程中中断</h2><p>你可以定义你的断点是否在所有的线程上，或是在某个特定的线程。GDB很容易帮你完成这一工作</p>
+<ul>
+<li><code>break &lt;linespec&gt; thread &lt;threadno&gt; </code></li>
+<li><code>break &lt;linespec&gt; thread &lt;threadno&gt; if ... </code></li>
+</ul>
+<p>linespec指定了断点设置在的源程序的行号。threadno指定了线程的ID，注意，这个ID是GDB分配的，你可以通过”info threads”命令来查看正在运行程序中的线程信息。如果你不指定<code>thread &lt;threadno&gt; </code>则表示你的断点设在所有线程上面。还可以为某线程指定断点条件，如：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">(gdb) <span class="hljs-keyword">break</span> frik.c:<span class="hljs-number">13</span> thread <span class="hljs-number">28</span> <span class="hljs-keyword">if</span> bartab &gt; lim<br></code></pre></td></tr></table></figure>
+
+<p>当你的程序被GDB停住时，所有的运行线程都会被停住。这方便你你查看运行程序的总体情况。而在你恢复程序运行时，所有的线程也会被恢复运行。那怕是主进程在被单步调试时。</p>
+<h2 id="2-5-恢复程序运行和单步调试"><a href="#2-5-恢复程序运行和单步调试" class="headerlink" title="2.5 恢复程序运行和单步调试"></a>2.5 恢复程序运行和单步调试</h2><p>在gdb中，和调试步进相关的命令主要有如下几条：</p>
+<ul>
+<li><code>continue </code>：继续运行程序直到下一个断点（类似于VS里的F5）</li>
+<li><code>next </code>：逐过程步进，不会进入子函数（类似VS里的F10）</li>
+<li><code>setp </code>：逐语句步进，会进入子函数（类似VS里的F11）</li>
+<li><code>until </code>：运行至当前语句块结束</li>
+<li><code>finish </code>：运行至函数结束并跳出，并打印函数的返回值（类似VS的Shift+F11）</li>
+</ul>
+<h2 id="2-6-常用的GDB命令"><a href="#2-6-常用的GDB命令" class="headerlink" title="2.6 常用的GDB命令"></a>2.6 常用的GDB命令</h2><ul>
+<li>常用的 gdb 命令（按功能区分）：<ul>
+<li>与断点相关的命令<ul>
+<li>break：如<code>break printf </code>表示在<code>printf() </code>上设置断点</li>
+<li>rbreak：用正则表达式的方式设置断点</li>
+<li>tbreak：设置临时断点</li>
+<li>delete：如<code>delete n </code>表示删除第 n 个断点</li>
+<li>disable：如<code>disable n </code>表示禁用第 n 个断点</li>
+<li>enable：如<code>enable n </code>表示启用第 n 个断点</li>
+<li>save：如<code>save breakpoints </code>表示将当前断点信息保存为脚本文件</li>
+<li>info：如<code>info break </code>用于查看所有断点信息</li>
+<li>watch：设置监视点（需要硬件支持）。在没有源码的情况下，可对内存地址进行监视，功能类似 OllyDbg（Windows 平台调试器）的硬件读写断点</li>
+<li>catch：如<code>catch syscall </code>用于捕获所有系统调用</li>
+</ul>
+</li>
+<li>与调试相关的命令<ul>
+<li>stepi：单步步入。当遇到函数调用时，可进入此函数体</li>
+<li>nexti：单步步过。当遇到函数调用时，不进入此函数体</li>
+<li>until：快速退出循环</li>
+<li>finish：执行程序，直到当前函数执行结束后返回</li>
+<li>continue：继续运行被断点中断的程序</li>
+<li>run：运行程序</li>
+<li>kill：强行终止当前正在调试的程序</li>
+<li>quit：退出 gdb</li>
+</ul>
+</li>
+<li>与寄存器相关的命令<ul>
+<li>info：如<code>info registers、info all-registers </code>可用于查看所有寄存器的信息；<code>info registers x0 </code>可用于查看 x0 寄存器的值</li>
+<li>print：如<code>print/x $pc </code>表示以十六进制形式显示 pc 寄存器的值</li>
+<li>set：如<code>set $sp += 4 </code>用于将栈指针的值加<code>4；set $x0 = 0 </code>用于将<code>x0 </code>寄存器的值设为 0</li>
+</ul>
+</li>
+<li>与堆栈相关的命令<ul>
+<li>info：如<code>info frame </code>用于打印当前栈帧的信息</li>
+<li>backtrace：打印所有栈帧的信息</li>
+<li>down：选择并打印下一个栈帧的信息</li>
+<li>up：选择并打印上一个栈帧的信息</li>
+<li>frame：选择并打印指定栈帧的信息</li>
+<li>return：将所选栈帧返回调用者</li>
+</ul>
+</li>
+<li>与数据相关的命令<ul>
+<li>append：如<code>append memory </code>用于将内存中的数据添加到指定文件的最后</li>
+<li>call：调用一个函数，功能类似 IDA 的 AppCall</li>
+<li>disassemble：反汇编当前栈帧的函数</li>
+<li>display：每次程序停止运行时打印表达式的值</li>
+<li>dump：读取内存中的数据和代码，并将其保存到文件中。如<code>dump binary memory </code>用于将指定内存中的数据保存到文件中</li>
+<li>explore：打印表达式的值（gdb 要能识别它的类型）</li>
+<li>find：在内存中查找数据</li>
+<li>print：打印表达式的值</li>
+<li>printf：不仅和 print 一样可用于打印表达式的值，还可用于指定格式化字符串</li>
+<li>set：修改表达式的值</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h1 id="0x03-GDB调试实例"><a href="#0x03-GDB调试实例" class="headerlink" title="0x03 GDB调试实例"></a>0x03 GDB调试实例</h1><p>1）在手机或模拟机启动gdbserver并attach想调试的进程，并指定监听调试命令的端口</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c"># 注意这里的路径，第一个需在当前目录下，否则需带绝对路径，第二个可自己选择<br>adb push gdbserver /system/bin <br></code></pre></td></tr></table></figure>
+
+<p><strong>注</strong>：push到&#x2F;system&#x2F;bin可能会报错，需确保手机或模拟机已经root，输入命令: adb remount,然后再push进去，同样，下面的chmod权限赋予如果报错，可以使用su命令</p>
+<ul>
+<li>push到&#x2F;system&#x2F;bin可能会报错，赋予gdbserver权限</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c">adb shell<br>su<br>chmod <span class="hljs-number">777</span> /system/bin<br></code></pre></td></tr></table></figure>
+
+<p>或使用mount命令查看，然后更改权限(将&#x2F;system 从挂载“ro”权限变为挂载“rw”权限)</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c">mount<br>mount -o rw,remount /dev/block/sda6 /system<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/4b317556cf264a268b5402d0534996c0.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>有可能上传的时候又会出现如下错误，使用如下命令：</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c">adb remount<br>adb push gdbserver /system/bin <br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/10cd24851fe946e8a51f0b13bcecb1e2.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>2）使用adb做端口映射，将pc机上的端口定向到手机上gdbserver监听的端口</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">adb forward tcp:<span class="hljs-number">54321</span> tcp:<span class="hljs-number">54321</span>   #端口映射，将pc机的<span class="hljs-number">1234</span>端口映射到手机的<span class="hljs-number">1234</span>端口<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c">$ adb shell<br><span class="hljs-meta"># ps   #查看要调试进程的PID</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/19017bd029204658a7c26a3d3e4b50d5.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>3）gdbserver附加进程方式</p>
+<p>在手机上启动gdbserver并附加到目标进程</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">./gdbserver :<span class="hljs-number">54321</span> --attach $(pidof process_name)<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>在PC上启动gdb</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c">$ gdb<br>(gdb) target remote <span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span>:<span class="hljs-number">54321</span><br></code></pre></td></tr></table></figure>
+
+<p>4）自行启动进程方式</p>
+<ul>
+<li>有时因为某些原因，需要自行启动一个进程进行调试，而不是直接附加到现有进程，参数就直接附加在后面，就像正常启动进程一样</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">./gdbserver :<span class="hljs-number">54321</span> elf_name[文件名]  params[参数]<br></code></pre></td></tr></table></figure>
+
+<p>5）在PC上启动gdb的方法是相同的</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c">$ gdb<br>(gdb) target remote <span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span>:<span class="hljs-number">54321</span><br></code></pre></td></tr></table></figure>
+
+<p>6）启动gdb向指定的pc机端口发信息开始调试，运行gdbserver 两种方法</p>
+<p><strong>方法1</strong>：adb shell; 命令: cd gdbserver路径; 命令: .&#x2F;gdbserver</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">./gdbserver :<span class="hljs-number">54321</span> --attach <span class="hljs-number">1419</span>   #:<span class="hljs-number">54321</span>是端口号，<span class="hljs-number">1419</span> 是进程ID<br></code></pre></td></tr></table></figure>
+
+<p><strong>方法2</strong>: 命令 adb shell gdbserver (适用于将gdbserver放在&#x2F;system&#x2F;bin下的情况)</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">adb shell gdbserver :<span class="hljs-number">23946</span> –attach [PID]（PID可以在adb shell中使用 ps命令查询）<br></code></pre></td></tr></table></figure>
+
+<p>我们这里选择方法1：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c">adb shell<br>cd /system/bin<br>chmod <span class="hljs-number">777</span> gdbserver<br>./gdbserver gdbserver :<span class="hljs-number">54321</span> –attach <span class="hljs-number">1419</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>注</strong>：要使用项目下的gdb客户端去连接gdbserver，gdb的类型要选择针对手机或模拟器平台的，版本要和gdbserver一致</p>
+<ul>
+<li>gdb客户端执行远程链接，成功监听如下所示：</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c">$ gdb<br>(gdb) target remote <span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span>:<span class="hljs-number">54321</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/ca1678151bd74d7cbfe56865b6b58c3f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>列出当前进程的所有寄存器</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">info registers<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/776c128e81b04950adbcc74842606090.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_17,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="3-1-设置断点"><a href="#3-1-设置断点" class="headerlink" title="3.1 设置断点"></a>3.1 设置断点</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">break</span> 命令设置断点，简写b <br><span class="hljs-keyword">break</span> main   在main()函数的入口处设置断点<br><span class="hljs-keyword">break</span> <span class="hljs-number">5</span>      在源代码的第<span class="hljs-number">5</span>行设置断点<br><span class="hljs-keyword">break</span> hello.c:<span class="hljs-number">5</span>  指定源码文件的代码第<span class="hljs-number">5</span>行设置断点<br></code></pre></td></tr></table></figure>
+
+<p>单个断点：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c">b+设置断点所在行：设置断点<br>b+函数名：函数名处设定断点<br>b+文件名：行号/函数名：在别的函数设置断点<br></code></pre></td></tr></table></figure>
+
+<p>无效断点：对于函数中的，大括号和注释，设置的断点是无效的。看断点是否有效，看Enb这个项（如下图），y就是有效。其中Num为断点的标号</p>
+<p><img src="https://img-blog.csdnimg.cn/087f02257656466ab2dcc0967e4309e7.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>在main()函数的入口处设置断点<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">b main<br></code></pre></td></tr></table></figure></li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/8c6ca1558fb447308446d2cebde23a7b.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>条件断点：<code>b+ </code>行号<code>+if </code>变量<code>==var </code>：当某行的变量等于某个值的时候停止</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">b <span class="hljs-number">19</span> <span class="hljs-keyword">if</span> i==<span class="hljs-number">5</span><br></code></pre></td></tr></table></figure>
+
+
+<h2 id="3-2-查看断点"><a href="#3-2-查看断点" class="headerlink" title="3.2 查看断点"></a>3.2 查看断点</h2><p><code>info breakpoints </code>，显示当前全部的断点，简写为<code>i b </code></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">i b<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/fc82b7de8aa7415fa1ebbe2b43edba0e.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="3-3-清除断点"><a href="#3-3-清除断点" class="headerlink" title="3.3 清除断点"></a>3.3 清除断点</h2><p>单个删除：每个断点号用空格隔开；<code>delete + </code>断点的数值标识符，<code>delete 1 </code>，删除第1个断点，简写为<code>d 1 </code></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">d <span class="hljs-number">1</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/66a261e839104b9193151208e197d94c.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>连续删除：断点号范围表示，例如4-7；<code>d+ </code>断点号范围 </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">d <span class="hljs-number">4</span><span class="hljs-number">-7</span><br></code></pre></td></tr></table></figure>
+
+
+<figure class="highlight plaintext"><figcaption><span>+  函数名 、 +行号、+文件名:行号 ```，清除断点main()函数处的断点：```clear main ```或者```clear 5 ```（本质是main函数的第一条语句所在）</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><code class="hljs clear"><br><br>![在这里插入图片描述](https://img-blog.csdnimg.cn/75bc98f8365f44188fbcf5b968a339c4.png)<br><br><br><br>## 3.4 启用与禁用断点<br><br>- ```disable +  ```断点的数值标识符，```disable 1： ```禁用第1个断点，简写为```dis+ ```断点号<br>- ```enable +  ```断点的数值标识符，```enable 1： ```启用第1个断点，简写为```enb+ ```断点号<br>- Enb字段，表明断点是禁用(n)还是启用(y)的<br><br>![在这里插入图片描述](https://img-blog.csdnimg.cn/ef762eb282614e4ba988862d65622323.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16)<br><br><br>## 3.5 单步调试<br><br>- ```next，n ```，越过 函数调用（函数会在背地里自己悄悄运行完），单步执行<br>- ```step，s ```，进入 函数体内部，单步执行<br><br>## 3.6 恢复执行<br><br>- ```continue ```，c，恢复执行，直到遇到下一个断点<br>- ```continue ```命令执行期间，按下CTRL-C瞬间停止<br><br>## 3.7 查看变量<br><br>- disp，使得每次有暂停，都会输出指定的变量的值；<br>- print，p，只显示一次变量的值；<br>- 要求变量名在当前的域是可见的，比如某个变量i是函数foo()的局部变量，那么只有是在进入到这个函数的里面时才可以使用print i 或者 disp i，不然gdb也不知道i是谁；<br><br><br>## 3.8 TUI模式，双开 汇编代码 窗口<br><br>- ```Ctrl + X + A ```进入TUI模式<br>- ```(gdb) list ```：显示10行C源码<br>- ```(gdb) layout split ```：同时显示C源码以及汇编源码<br>- ```(gdb) info registers ```：显示使用到的寄存器信息<br>- ```(gdb) set disassembly-flavor intel ```：改变显示的汇编语法<br>- ```再次输入(gdb) layout split ```：使语法改变生效<br><br>```c<br>set disassembly-flavor intel<br>set disassembly-flavor att<br></code></pre></td></tr></table></figure>
+
+<h2 id="3-9-查看文件信息"><a href="#3-9-查看文件信息" class="headerlink" title="3.9 查看文件信息"></a>3.9 查看文件信息</h2><p>查看当前文件：</p>
+<ul>
+<li><code>l </code>:查看当前文件的调试信息，默认10行</li>
+<li><code>l+ </code>行号：显示特定行号的上下文</li>
+<li><code>l + </code>函数名：查看当前文件特定函数</li>
+</ul>
+<p>查看当前文件：</p>
+<ul>
+<li><code>l + </code>文件名：行号：查看文件信息</li>
+<li><code>l + </code>文件名：函数名：查看特定函数的信息</li>
+</ul>
+<p>设置显示行数：</p>
+<ul>
+<li><code>show listsize </code>：显示输出行</li>
+<li><code>set listsize （number） </code>：设置输出行号</li>
+</ul>
+<p><strong>参考链接</strong>：</p>
+<p><a target="_blank" rel="noopener" href="http://beej.us/guide/bggdb/">http://beej.us/guide/bggdb/</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/zlmm741/article/details/105511833">https://blog.csdn.net/zlmm741/article/details/105511833</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_46185705/article/details/114498377">https://blog.csdn.net/weixin_46185705/article/details/114498377</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_46185705/article/details/114498377">https://blog.csdn.net/weixin_46185705/article/details/114498377</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/TianFang/archive/2013/01/20/2868889.html">https://www.cnblogs.com/TianFang/archive/2013/01/20/2868889.html</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/8a5aade09ec0?utm_campaign=maleskine&amp;utm_content=note&amp;utm_medium=seo_notes&amp;utm_source=recommendation">https://www.jianshu.com/p/8a5aade09ec0?utm_campaign=maleskine&amp;utm_content=note&amp;utm_medium=seo_notes&amp;utm_source=recommendation</a></p>
+<hr>
+<p><strong>你以为你有很多路可以选择，其实你只有一条路可以走</strong></p>
+<hr>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/AndroidSecurity/">#AndroidSecurity</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>「干货」利用GDB动态调试Android APP应用程序</div>
+      <div>https://orangey.info/2022/09/23/123843560/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>橙留香</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年9月23日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/09/23/124431951/" title="「干货」关于Android 数据存储与数据安全，你了解多少？">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">「干货」关于Android 数据存储与数据安全，你了解多少？</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/09/23/123877083/" title="「干货」利用JDB调试Android应用程序(动态代码注入技术)">
+                        <span class="hidden-mobile">「干货」利用JDB调试Android应用程序(动态代码注入技术)</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  <article id="comments" lazyload>
+    
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1e96aec5ac46370916fa","clientSecret":"ee5e97a65cf34e9fe31e15ab0421a94968237f5e","repo":"ogGitalk","owner":"ananasOrangey","admin":["ananasOrangey"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '48fb0e060890ea350dfacbfb1a21be0c'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+  </article>
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://orangey.blog.csdn.net" target="_blank" rel="nofollow noopener"><span>橙留香CSDN博客</span></a> <i class="iconfont icon-love"></i> <a href="https://i.imgtg.com/2022/09/21/gNXxK.png" target="_blank" rel="nofollow noopener"><span>橙留香微信公众号</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

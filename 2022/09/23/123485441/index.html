@@ -1,0 +1,1050 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="橙留香">
+  <meta name="keywords" content="橙留香车联网安全技术博客">
+  
+    <meta name="description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  Android安全付费专栏长期更新，本篇最新内容请前往：  [车联网安全自学篇] Android安全之常用逆向工具汇总  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;ananasorangey&#x2F;category11">
+<meta property="og:type" content="article">
+<meta property="og:title" content="「干货」Android 常用逆向工具汇总">
+<meta property="og:url" content="https://orangey.info/2022/09/23/123485441/index.html">
+<meta property="og:site_name" content="车联网安全技术博客 | 橙留香">
+<meta property="og:description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  Android安全付费专栏长期更新，本篇最新内容请前往：  [车联网安全自学篇] Android安全之常用逆向工具汇总  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;ananasorangey&#x2F;category11">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/21/gNXxK.png">
+<meta property="article:published_time" content="2022-09-23T15:50:33.575Z">
+<meta property="article:modified_time" content="2022-09-24T16:43:21.500Z">
+<meta property="article:author" content="橙留香">
+<meta property="article:tag" content="AndroidSecurity">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+  
+  
+  
+  <title>「干货」Android 常用逆向工具汇总 - 车联网安全技术博客 | 橙留香</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"orangey.info","root":"/","version":"1.9.3","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"java"},"copy_btn":false,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>橙留香</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="「干货」Android 常用逆向工具汇总"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-09-23 23:50" pubdate>
+          2022年9月23日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          8.7k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          <!-- compatible with older versions-->
+          73 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">「干货」Android 常用逆向工具汇总</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <hr>
+<p><strong>也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大</strong></p>
+<p><strong>少走了弯路，也就错过了风景，无论如何，感谢经历</strong></p>
+<hr>
+<p>Android安全付费专栏长期更新，本篇最新内容请前往：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://orangey.blog.csdn.net/article/details/123485441">[车联网安全自学篇] Android安全之常用逆向工具汇总</a></li>
+</ul>
+<p>更多关于Android安全的知识，可前往：<a target="_blank" rel="noopener" href="https://blog.csdn.net/ananasorangey/category11955914.html">https://blog.csdn.net/ananasorangey/category11955914.html</a></p>
+<p><img src="https://i.imgtg.com/2022/09/25/gdpGP.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><img src="https://i.imgtg.com/2022/09/21/gNXxK.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<hr>
+<p>博主同学不定期更新工具集，敬请期待… …</p>
+<hr>
+<h1 id="0x01-静态分析工具"><a href="#0x01-静态分析工具" class="headerlink" title="0x01 静态分析工具"></a>0x01 静态分析工具</h1><ul>
+<li>apktool</li>
+</ul>
+<p>apktool是一款功能强大且操作简单的apk反编译破解工具，能够将反编译的apk文件保存到同名目录中，还能帮用户将反编译的dex、odex 重新编译成dex文件。除此之外，apktool还可以支持编译、反编译、签名等多项功能</p>
+<p>下载地址：<a target="_blank" rel="noopener" href="https://ibotpeaches.github.io/Apktool">https://ibotpeaches.github.io/Apktool</a></p>
+<ul>
+<li>basksmali</li>
+</ul>
+<p>将dex文件反汇编成smali代码</p>
+<p>下载地址：<a target="_blank" rel="noopener" href="https://github.com/JesusFreke/smali">https://github.com/JesusFreke/smali</a></p>
+<ul>
+<li>smail</li>
+</ul>
+<p>将smali代码汇编生成dex文件（android的可执行文件）</p>
+<p>下载地址：<a target="_blank" rel="noopener" href="https://bitbucket.org/JesusFreke/smali/downloads/">https://bitbucket.org/JesusFreke/smali/downloads/</a></p>
+<ul>
+<li>dex2jar+jd-gui</li>
+</ul>
+<p>将dex文件转化为java jar包，因为转成jar包之后，方便使用JD-GUI工具反编译成java源码</p>
+<p>下载地址：<a target="_blank" rel="noopener" href="https://sourceforge.net/projects/dex2jar">https://sourceforge.net/projects/dex2jar</a><br>下载地址：<a target="_blank" rel="noopener" href="http://java-decompiler.github.io/">http://java-decompiler.github.io/</a></p>
+<ul>
+<li>JEB</li>
+</ul>
+<p>JEB是一款为安全专业人士设计的功能强大的Android应用程序反编译工具。用于逆向工程或审计APK文件，可以提高效率，减少工程师的分析时间</p>
+<p>下载地址：<a target="_blank" rel="noopener" href="https://www.pnfsoftware.com/">https://www.pnfsoftware.com</a><br>下载地址：<a target="_blank" rel="noopener" href="https://down.52pojie.cn/?query=JEB">https://down.52pojie.cn/?query=JEB</a></p>
+<ul>
+<li>Jadx</li>
+</ul>
+<p>jadx - Dex 到 Java 反编译器，相对于dex2jar 和 jd-gui组合工具</p>
+<p>用于从 Android Dex 和 Apk 文件生成 Java 源代码的命令行和 GUI 工具</p>
+<p>下载地址：<a target="_blank" rel="noopener" href="https://github.com/skylot/jadx">https://github.com/skylot/jadx</a></p>
+<ul>
+<li>IDA</li>
+</ul>
+<p>1）IDA FLIRT Signature Database：用于识别静态编译的可执行文件中的库函数</p>
+<p>下载地址：<a target="_blank" rel="noopener" href="https://github.com/push0ebp/sig-database">https://github.com/push0ebp/sig-database</a></p>
+<p>2）IDA signsrch：寻找二进制文件所使用的加密、压缩算法</p>
+<p>下载地址：<a target="_blank" rel="noopener" href="https://sourceforge.net/projects/idasignsrch">https://sourceforge.net/projects/idasignsrch</a></p>
+<p>3）IDA scope：自动识别windows函数和压缩、加密算法</p>
+<p>下载地址：<a target="_blank" rel="noopener" href="https://bitbucket.org/daniel_plohmann/simplifire.idascope/">https://bitbucket.org/daniel_plohmann/simplifire.idascope/</a></p>
+<p>4）Ponce：污点分析和符号化执行工具</p>
+<p>下载地址：<a target="_blank" rel="noopener" href="https://github.com/illera88/Ponce">https://github.com/illera88/Ponce</a></p>
+<p>5）snowman decompiler：C&#x2F;C++反汇编插件（F3 进行反汇编）</p>
+<p>下载地址：<a target="_blank" rel="noopener" href="http://derevenets.com/">http://derevenets.com/</a></p>
+<p>6）keystone：二进制文件修改工具，可以直接修改汇编</p>
+<p>下载地址：<a target="_blank" rel="noopener" href="https://github.com/keystone-engine/keypatch">https://github.com/keystone-engine/keypatch</a></p>
+<p>7）CodeXplorer：自动类型重建以及对象浏览（C++）（jump to disasm)</p>
+<p>下载地址：<a target="_blank" rel="noopener" href="https://github.com/REhints/HexRaysCodeXplorer">https://github.com/REhints/HexRaysCodeXplorer</a></p>
+<p>8）IDA Ref：汇编指令注释（支持arm，x86，mips）</p>
+<p>下载地址：<a target="_blank" rel="noopener" href="https://github.com/nologic/idaref">https://github.com/nologic/idaref</a></p>
+<p>9）Hexlight：大括号高亮匹配及跳转（B跳转到匹配括号）</p>
+<p>下载地址：<a target="_blank" rel="noopener" href="https://www.hex-rays.com/contests/2016/hexlight/hexrays_hlight.py">https://www.hex-rays.com/contests/2016/hexlight/hexrays_hlight.py</a></p>
+<p>10）IDA Pro逆向分析常用方法：</p>
+<p>1、利用ida scope脚本识别加密、编码算法，file-&gt;script file-&gt;IDAscope.py</p>
+<p>2、利用signsrch插件识别加密、编码算法 edit-&gt;plugins-&gt;Signsrch</p>
+<h1 id="0x02-动态分析工具"><a href="#0x02-动态分析工具" class="headerlink" title="0x02 动态分析工具"></a>0x02 动态分析工具</h1><ul>
+<li>DDMS</li>
+</ul>
+<p>DDMS的全称是Dalvik Debug Monitor Service。可以实现IDE与连接终端设备(包含仿真器与真机)的调试，DDMS可以实现查询终端设备运行状态，终端设备进程状态，线程状态，文件系统，日志信息(logcat)等。以及控制终端设备，完成一些操作。</p>
+<p>总的来说它是一款性能分析工具，可以帮助开发者快速了APP的运行情况</p>
+<p>下载地址：<a target="_blank" rel="noopener" href="https://developer.android.google.cn/studio/#downloads">https://developer.android.google.cn/studio/#downloads</a></p>
+<ul>
+<li>gdb</li>
+</ul>
+<p>GDB是一个由GNU开源组织发布的、UNIX&#x2F;LINUX操作系统下的、基于命令行的、功能强大的程序调试工具。 对于一名Linux下工作的c&#x2F;c++程序员，gdb是必不可少的工具；</p>
+<p>下载地址：<a target="_blank" rel="noopener" href="https://github.com/cs01/gdbgui">https://github.com/cs01/gdbgui</a></p>
+<ul>
+<li>IDA Pro</li>
+</ul>
+<p>IDA Pro破解版最新版是一款非常专业的交互式反汇编工具。它不仅能够在众所周知的C&#x2F;C++ 反编译问题中取得突破性的进展，还为二进制分析领域的未来发展奠定了坚实的基础，提供语法高亮、代码折叠、编译错误提示等功能</p>
+<p>下载地址：</p>
+<p><a target="_blank" rel="noopener" href="https://hex-rays.com/">https://hex-rays.com/</a></p>
+<p><a target="_blank" rel="noopener" href="https://down.52pojie.cn/Tools/Disassemblers/IDA.txt">https://down.52pojie.cn/Tools/Disassemblers/IDA.txt</a></p>
+<p>1）IDA sploiter：漏洞利用开发工具，寻找gadget</p>
+<p>下载地址：<a target="_blank" rel="noopener" href="http://thesprawl.org/projects/ida-sploiter/">http://thesprawl.org/projects/ida-sploiter/</a></p>
+<p>2）DIE：动态调试增强工具，保存函数调用上下文信息</p>
+<p>下载地址：<a target="_blank" rel="noopener" href="https://github.com/ynvb/DIE">https://github.com/ynvb/DIE</a></p>
+<p>3）sk3wldbg：IDA动态调试器，支持多平台</p>
+<p>下载地址：<a target="_blank" rel="noopener" href="https://github.com/cseagle/sk3wldbg">https://github.com/cseagle/sk3wldbg</a></p>
+<p>4）IDA Pro逆向分析常用方法：</p>
+<p>1、利用ida scope脚本识别加密、编码算法，file-&gt;script file-&gt;IDAscope.py</p>
+<p>2、利用signsrch插件识别加密、编码算法 edit-&gt;plugins-&gt;Signsrch</p>
+<ul>
+<li>Drozer</li>
+</ul>
+<p>drozer是一款针对Android系统的安全测试框架。drozer可以帮助App和设备变得更安全，其提供了很多Android平台下的渗透测试exploit供你使用和分享。对于远程的exploit，它可以生成shellcode帮助你进行远程设备管理</p>
+<p>下载地址：</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/FSecureLABS/drozer">https://github.com/FSecureLABS/drozer</a></p>
+<h1 id="0x03-挂钩框架"><a href="#0x03-挂钩框架" class="headerlink" title="0x03 挂钩框架"></a>0x03 挂钩框架</h1><ul>
+<li>Xposed框架(HooK神器)</li>
+</ul>
+<p>Xposed 是国外大牛开发的一个工具，Xposed通过拦截安卓程序运行过程来达到修改程序行为的目的。不需要修改安卓源文件，而是通过分析程序运行来拦截并影响运行情况。具体需要把安卓apk逆向后然后分析代码，定位到具体的类，方法等，然后通过xposed来拦截修改方法等</p>
+<p>下载地址：</p>
+<p>下面这个仅适用于 Android 4.0.3 至 Android 4.4 上的 root 访问<br><a target="_blank" rel="noopener" href="https://repo.xposed.info/module/de.robv.android.xposed.installer">https://repo.xposed.info/module/de.robv.android.xposed.installer</a></p>
+<p>对于 Android 5.0 或更高版本改用下面这个<br><a target="_blank" rel="noopener" href="https://forum.xda-developers.com/t/official-xposed-for-lollipop-marshmallow-nougat-oreo-v90-beta3-2018-01-29.3034811/">https://forum.xda-developers.com/t/official-xposed-for-lollipop-marshmallow-nougat-oreo-v90-beta3-2018-01-29.3034811/</a></p>
+<ul>
+<li>EdXposed</li>
+</ul>
+<p>基于 Riru 的 ART hook 框架 (最初用于 Android Pie) ，提供与原版 Xposed 相同的 API, 使用 YAHFA (或 SandHook) 进行 hook, supports Android 8.0 ~ 11</p>
+<p>Xposed 框架是一套开放源代码的、在Android高权限模式下运行的框架服务，可以在不修改APK文件的情况下修改程序的运行，基于它可以制作出许多功能强大的模块，且在功能不冲突的情况下同时运作</p>
+<p>下载地址：<br><a target="_blank" rel="noopener" href="https://github.com/ElderDrivers/EdXposed">https://github.com/ElderDrivers/EdXposed</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/RikkaApps/Riru/releases">https://github.com/RikkaApps/Riru/releases</a></p>
+<ul>
+<li>VirtualXposed</li>
+</ul>
+<p>VirtualXposed 是基于VirtualApp 和 epic 在非ROOT环境下运行Xposed模块的实现（支持5.0~10.0)。</p>
+<p>与 Xposed 相比，目前 VirtualXposed 有两个限制：</p>
+<blockquote>
+不支持修改系统（可以修改普通APP中对系统API的调用），因此重力工具箱，应用控制器等无法使用
+<br><br>
+暂不支持资源HOOK，因此资源钩子不会起任何作用；使用资源HOOK的模块，相应的功能不会生效
+</blockquote>
+
+<p>下载地址：<br><a target="_blank" rel="noopener" href="https://github.com/android-hacker/VirtualXposed">https://github.com/android-hacker/VirtualXposed</a></p>
+<ul>
+<li>GDA（反编译工具）</li>
+</ul>
+<p>国人开发的字节码反编译工具，支持 APK、DEX、ODEX、oat</p>
+<p>下载地址：</p>
+<p><a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000040012580">https://segmentfault.com/a/1190000040012580</a></p>
+<ul>
+<li>MT管理器</li>
+</ul>
+<p>MT管理器是一款强大的文件管理工具和APK逆向修改神器。如果你喜欢它的双窗口操作风格，可以单纯地把它当成文件管理器使用。如果你对修改APK有深厚的兴趣，那么你可以用它做许许多多的事，例如汉化应用、替换资源、修改布局、修改逻辑代码、资源混淆、去除签名校验等</p>
+<p>下载地址：<br><a target="_blank" rel="noopener" href="https://binmt.lanzoui.com/b01bivkzc">https://binmt.lanzoui.com/b01bivkzc</a><br><a target="_blank" rel="noopener" href="https://blog.mt2.cn/mt-update-history/">https://blog.mt2.cn/mt-update-history/</a></p>
+<ul>
+<li>NP管理器</li>
+</ul>
+<p>NP管理器是一款手机多功能的文件管理器，功能和MT管理器类似，都提供了反编译等安卓上逆向的功能。主要是对Apk、Dex、Jar、Smali、Pdf、视频和音频文件的简单应用，所有功能都是免费的（未开放源码，但功能看着挺强大的）</p>
+<p>下载地址：<br><a target="_blank" rel="noopener" href="https://github.com/githubXiaowangzi/NP-Manager">https://github.com/githubXiaowangzi/NP-Manager</a></p>
+<ul>
+<li>Native Hook神器 Cydia Substrate</li>
+</ul>
+<p>Cydia Substrate是一个基于Hook的代码修改框架，其可以在Android、iOS平台使用，并实现修改系统默认代码</p>
+<p>下载地址：</p>
+<p><a target="_blank" rel="noopener" href="http://www.cydiasubstrate.com/">http://www.cydiasubstrate.com</a></p>
+<ul>
+<li>Frida</li>
+</ul>
+<p>frida 是一款基于 python+javascript 的 hook 框架，可运行在 android、ios、linux、win等各个平台，主要使用的动态二进制插桩技术</p>
+<p>下载地址：</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/frida/frida">https://github.com/frida/frida</a></p>
+<ul>
+<li>Diff-GUI</li>
+</ul>
+<p>JavaScript 注入</p>
+<p>下载地址：</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/antojoseph/diff-gui">https://github.com/antojoseph/diff-gui</a></p>
+<ul>
+<li>FART</li>
+</ul>
+<p>ART环境下自动化脱壳方案；支持6.0到8.0，理论支持任意ART系统，需要刷机；更多的脱壳机镜像AndroidSecurityStudy</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/hanbinglengyue/FART">https://github.com/hanbinglengyue/FART</a></p>
+<ul>
+<li>BlackDex脱壳</li>
+</ul>
+<p>BlackDex是一个运行在Android手机上的脱壳工具，支持5.0～12，无需依赖任何环境任何手机都可以使用，包括模拟器。只需几秒，即可对已安装包括未安装的APK进行脱壳</p>
+<p>下载地址：</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/CodingGay/BlackDex">https://github.com/CodingGay/BlackDex</a></p>
+<ul>
+<li>FDex2</li>
+</ul>
+<p>安卓xposed脱壳工具；通过Hook ClassLoader的loadClass方法，反射调用getDex方法取得Dex(com.android.dex.Dex类对象)，再将里面的dex写出；安卓4.4以上的手机或模拟器；其它看软件提示</p>
+<p>下载地址：</p>
+<p><a target="_blank" rel="noopener" href="https://bbs.pediy.com/thread-224105.htm">https://bbs.pediy.com/thread-224105.htm</a></p>
+<ul>
+<li>Frida-Unpack</li>
+</ul>
+<p>firda-unpack 原理是利用frida hook libart.so中的OpenMemory方法，拿到内存中dex的地址，计算出dex文件的大小，从内存中将dex导出，可查看项目中的 OpenMemory.js 文件中的代码更清晰直观地了解</p>
+<p>下载地址：</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/GuoQiang1993/Frida-Apk-Unpack">https://github.com/GuoQiang1993/Frida-Apk-Unpack</a></p>
+<ul>
+<li>FRIDA-DEXDump</li>
+</ul>
+<p>在内存上快速搜索和转储 dex，脱壳后的dex文件保存在PC端main.py同一目录下，以包名为文件名</p>
+<p>下载地址：</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/hluwa/FRIDA-DEXDump">https://github.com/hluwa/FRIDA-DEXDump</a></p>
+<ul>
+<li>frida_dump</li>
+</ul>
+<p>文件头搜索dex，来脱壳</p>
+<p>下载地址：</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/lasting-yang/frida_dump">https://github.com/lasting-yang/frida_dump</a></p>
+<ul>
+<li>Ghidra</li>
+</ul>
+<p>由美国国家安全局（NSA）研究部门开发的软件逆向工程（SRE）套件；支持Windows、Mac OS和Linux 功能包括反汇编，汇编，反编译，绘图和脚本等</p>
+<p>下载地址：</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/NationalSecurityAgency/ghidra">https://github.com/NationalSecurityAgency/ghidra</a></p>
+<ul>
+<li>unicorn</li>
+</ul>
+<p>一款非常优秀的跨平台模拟执行框架<br>该框架可以跨平台执行Arm, Arm64 (Armv8), M68K, Mips, Sparc, &amp; X86 (include X86_64)等指令集的原生程序</p>
+<p>下载地址：</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/unicorn-engine/unicorn">https://github.com/unicorn-engine/unicorn</a></p>
+<h1 id="0x04-其它逆向工具"><a href="#0x04-其它逆向工具" class="headerlink" title="0x04 其它逆向工具"></a>0x04 其它逆向工具</h1><ul>
+<li>WinHex</li>
+</ul>
+<p>WinHex是在Windows下执行的功能强大的十六进制编辑软件</p>
+<p>下载地址：</p>
+<p><a target="_blank" rel="noopener" href="http://www.winhex.com/winhex/hex-editor.html">http://www.winhex.com/winhex/hex-editor.html</a></p>
+<ul>
+<li>PEditor</li>
+</ul>
+<p>PEditor一款很好的PE文件编辑工具，其功能有转存进程、在SoftICE中插入中断、编辑PE文件的导入表、节表、重建校验和、重建程序等（这款软件很老了，但确实一款相当方便的PE文件头编辑工具）</p>
+<p>下载地址：</p>
+<p><a target="_blank" rel="noopener" href="https://tool.pediy.com/index-detail-25.htm">https://tool.pediy.com/index-detail-25.htm</a></p>
+<ul>
+<li>Source Insight</li>
+</ul>
+<p>sourceinsight 是专为大型、高要求的现实编程项目而设计的。<br>集成了：代码分析、调用图表、类继承显示、居于范围的关键字搜索、查找引用、智能重命名、符号自动完成、自动显示声明、上下文语法格式、自动参考高亮显示，等等… …</p>
+<p>下载地址：</p>
+<p><a target="_blank" rel="noopener" href="https://www.sourceinsight.com/download/">https://www.sourceinsight.com/download/</a></p>
+<ul>
+<li>HexCmp</li>
+</ul>
+<p>HexCmp 是一个可视化的二进制文件比较编辑工具，程序可以帮助你快速的轻松的比较两个文件，并可以对你进行编辑操作，程序还拥有强大的搜索功能，可以执行基于十六进制或者字符的搜索操作。用于编辑和比较并和hex文件是非常有效的修复DVD</p>
+<p>下载地址：</p>
+<p><a target="_blank" rel="noopener" href="https://www.fairdell.com/hexcmp/">https://www.fairdell.com/hexcmp/</a></p>
+<ul>
+<li>keystone-engine</li>
+</ul>
+<p>ARM—HEX转换工具，keystone-engine是一个将汇编指令转换为Hex机器码的工具</p>
+<p>下载地址：</p>
+<p><a target="_blank" rel="noopener" href="http://www.keystone-engine.org/download/">http://www.keystone-engine.org/download/</a></p>
+<ul>
+<li>Apk Helper</li>
+</ul>
+<p>Apk Helper是一款apk信息查看器。可以查看apk的全部信息，如：安装包名、软件名称、APK证书、真实版本号、要求的手机版本、系统权限、以及证书和文件的MD5信息，用来查看是不是官方apk包，避免安装非原版apk或流氓软件</p>
+<p>下载地址：</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/Harbour8643/APKHelper">https://github.com/Harbour8643/APKHelper</a></p>
+<ul>
+<li>BombAPK</li>
+</ul>
+<p>此脚本使用Python集成了Android逆向中常用的一些工具，力求省去各自繁琐的命令，方便自写脚本的整合，最终在一个终端下完成各种工具的调用</p>
+<p>下载地址：</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/SewellDinG/BombAPK">https://github.com/SewellDinG/BombAPK</a></p>
+<ul>
+<li>AXMLPrinter</li>
+</ul>
+<p>XML浏览工具</p>
+<p>下载地址：</p>
+<p><a target="_blank" rel="noopener" href="https://www.nuget.org/packages/axmlprinter">https://www.nuget.org/packages/axmlprinter</a></p>
+<ul>
+<li>AXmlPrinter2</li>
+</ul>
+<p>反编译Androidmanifest.xml的工具，反编译后的结果会输出到控制台，当前已经很少使用了</p>
+<p>下载地址：</p>
+<p><a target="_blank" rel="noopener" href="http://code.google.com/p/android4me/downloads/list">http://code.google.com/p/android4me/downloads/list</a></p>
+<ul>
+<li>androguard</li>
+</ul>
+<p>使用DAD作为反编译器，可以分析恶意软件的可视化软件，有python api，可以写扩展</p>
+<p>下载地址：</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/androguard/androguard">https://github.com/androguard/androguard</a></p>
+<ul>
+<li>ClassyShark</li>
+</ul>
+<p>Google官方dex&#x2F;apk&#x2F;jar&#x2F;class&#x2F;aar浏览工具，可以分析出apk的结构以及依赖信息</p>
+<p>下载地址：</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/google/android-classyshark">https://github.com/google/android-classyshark</a></p>
+<ul>
+<li>Smali2Java</li>
+</ul>
+<p>APK图形化浏览工具</p>
+<p>下载地址：</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/JesusFreke/smalidea">https://github.com/JesusFreke/smalidea</a></p>
+<ul>
+<li>bytecodeviewer</li>
+</ul>
+<p>集成了J-RET,JHexPane, Dex2Jar等多个反编译工具</p>
+<p>下载地址：</p>
+<p><a target="_blank" rel="noopener" href="https://bytecodeviewer.com/">https://bytecodeviewer.com/</a></p>
+<ul>
+<li>RADARE2</li>
+</ul>
+<p>可以反汇编、调试、分析和操作二进制文件</p>
+<p>下载地址：</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/radareorg/radare2">https://github.com/radareorg/radare2</a></p>
+<ul>
+<li>simplify</li>
+</ul>
+<p>Android 虚拟机和反混淆工具</p>
+<ul>
+<li>JAD</li>
+</ul>
+<p>Java反编译工具</p>
+<p>下载地址：</p>
+<p><a target="_blank" rel="noopener" href="https://varaneckas.com/jad/">https://varaneckas.com/jad/</a></p>
+<ul>
+<li>ApkStudio</li>
+</ul>
+<p>开源、跨平台的基于Qt的 IDE，用于对Android应用程序包进行逆向工程。它具有友好的类似 IDE 的布局，包括代码编辑器，支持 *.smali 代码文件的语法高亮显示</p>
+<p>下载地址：</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/vaibhavpandeyvpz/apkstudio">https://github.com/vaibhavpandeyvpz/apkstudio</a></p>
+<ul>
+<li>APK DeGuard</li>
+</ul>
+<p>在线Android反编译工具</p>
+<p>下载地址：</p>
+<p><a target="_blank" rel="noopener" href="http://apk-deguard.com/">http://apk-deguard.com/</a></p>
+<ul>
+<li>DDI 监控跟踪工具</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://github.com/crmulliner/ddi">https://github.com/crmulliner/ddi</a></p>
+<ul>
+<li>ADBI 监控跟踪工具</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://github.com/samsung/adbi">https://github.com/samsung/adbi</a></p>
+<ul>
+<li>codeinspect</li>
+</ul>
+<p>支持调试，可以IDE中编辑反编译后文件</p>
+<p>下载地址：</p>
+<p><a target="_blank" rel="noopener" href="http://sseblog.ec-spride.de/tools/codeinspect/">http://sseblog.ec-spride.de/tools/codeinspect/</a></p>
+<ul>
+<li>enjarfy</li>
+</ul>
+<p>google的反编译工具，可以将dalvik bytecode转化为java bytecode，比dex2jar支持case更多</p>
+<p>下载地址：</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/google/enjarify">https://github.com/google/enjarify</a></p>
+<ul>
+<li>smali&#x2F;baksmali&#x2F;smalidea</li>
+</ul>
+<p>将dex反编译成smali，将smali回编译成dex，AndroidStudio调试smali代码</p>
+<p>下载地址：</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/JesusFreke/smali">https://github.com/JesusFreke/smali</a></p>
+<ul>
+<li>icodetools</li>
+</ul>
+<p>动态插入log代码到apk中的每个方法中的工具，只支持JDK1.7以及以下版本编译器</p>
+<p>下载地址：</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/fourbrother/icodetools">https://github.com/fourbrother/icodetools</a></p>
+<ul>
+<li>uber-apk-signer</li>
+</ul>
+<p>签名辅助工具，集成了签名相关的常用操作 &#x2F; A tool that helps signing, zip aligning and verifying multiple Android application packages (APKs) with either debug or provided release certificates (or multiple)</p>
+<p>支持安卓v1、v2和v3签名 &#x2F; supports v1, v2 and v3 android apk singing scheme</p>
+<p>下载地址：</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/patrickfav/uber-apk-signer">https://github.com/patrickfav/uber-apk-signer</a></p>
+<ul>
+<li>java2smali</li>
+</ul>
+<p>Android Studio插件，支持将java和Kotlin文件编译成smali文件</p>
+<p>下载地址：</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/ollide/intellij-java2smali">https://github.com/ollide/intellij-java2smali</a></p>
+<h1 id="0x05-游戏逆向工具"><a href="#0x05-游戏逆向工具" class="headerlink" title="0x05 游戏逆向工具"></a>0x05 游戏逆向工具</h1><ul>
+<li><p>wpe封包综合工具</p>
+</li>
+<li><p>Reflector9.3</p>
+</li>
+<li><p>ILSpy3.1</p>
+</li>
+<li><p>dnSpy</p>
+</li>
+<li><p>Cheat Engine</p>
+</li>
+<li><p>AssetStudio</p>
+</li>
+</ul>
+<h1 id="0x06-Android-漏洞查询"><a href="#0x06-Android-漏洞查询" class="headerlink" title="0x06 Android 漏洞查询"></a>0x06 Android 漏洞查询</h1><ul>
+<li>安卓漏洞</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="http://androidvulnerabilities.org/">http://androidvulnerabilities.org/</a></p>
+<ul>
+<li>Android CVE 详细信息</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="http://www.cvedetails.com/vulnerability-list/vendor_id-1224/product_id-19997/Google-Android.html">http://www.cvedetails.com/vulnerability-list/vendor_id-1224/product_id-19997/Google-Android.html</a></p>
+<p><strong>参考链接</strong>：</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/weixinbao/ReverseTool">https://github.com/weixinbao/ReverseTool</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/WuFengXue/android-reverse">https://github.com/WuFengXue/android-reverse</a></p>
+<hr>
+<p><strong>你以为你有很多路可以选择，其实你只有一条路可以走</strong></p>
+<hr>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/AndroidSecurity/">#AndroidSecurity</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>「干货」Android 常用逆向工具汇总</div>
+      <div>https://orangey.info/2022/09/23/123485441/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>橙留香</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年9月23日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/09/23/123877083/" title="「干货」利用JDB调试Android应用程序(动态代码注入技术)">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">「干货」利用JDB调试Android应用程序(动态代码注入技术)</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/09/23/123582115/" title="「干货」Android APP动态调试的三种Smali注入小技巧">
+                        <span class="hidden-mobile">「干货」Android APP动态调试的三种Smali注入小技巧</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  <article id="comments" lazyload>
+    
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1e96aec5ac46370916fa","clientSecret":"ee5e97a65cf34e9fe31e15ab0421a94968237f5e","repo":"ogGitalk","owner":"ananasOrangey","admin":["ananasOrangey"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '5ef9ebeb693a5b1552bdfb5f97db411a'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+  </article>
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://orangey.blog.csdn.net" target="_blank" rel="nofollow noopener"><span>橙留香CSDN博客</span></a> <i class="iconfont icon-love"></i> <a href="https://i.imgtg.com/2022/09/21/gNXxK.png" target="_blank" rel="nofollow noopener"><span>橙留香微信公众号</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

@@ -1,0 +1,1229 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="橙留香">
+  <meta name="keywords" content="橙留香车联网安全技术博客">
+  
+    <meta name="description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  Android安全付费专栏长期更新，本篇最新内容请前往：  [车联网安全自学篇] Android安全之Android Studion 动态调试APK的两种方法  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;anan">
+<meta property="og:type" content="article">
+<meta property="og:title" content="「干货」动态调试APP的一些技巧「Android Studio调试」">
+<meta property="og:url" content="https://orangey.info/2022/09/23/123787445/index.html">
+<meta property="og:site_name" content="车联网安全技术博客 | 橙留香">
+<meta property="og:description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  Android安全付费专栏长期更新，本篇最新内容请前往：  [车联网安全自学篇] Android安全之Android Studion 动态调试APK的两种方法  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;anan">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/21/gNXxK.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/9c241c74e36b4517a068f5d1bae961dd.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/de037df2eda144a28b569865273c19b0.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_18,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/47b791245af349d7a67d7de6cacbd10e.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/299f16ded23e49df864c6d1510fbafa8.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/6d899d52b65d4dac81968d403b09ed54.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/75c60bc1ddc247788bbf3e9c153c661b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c05f7d0c57f64d54b99cf69e93a11d33.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/fe9a210a4e4744e09183ad97fb2b55e1.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/a3d492095a6e4999a9a80d12af310fc7.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c6c72a1b9b6d4563bd04b5f96bc21373.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/ae1d6b89dc3d44368010c0f970e437e4.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/4c4c393b823f43c9a522cd6daf4f7622.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_17,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c333e5cce5484dbd8ea17e380197e69c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/9fa734e2203346e2856891f9c1378d5a.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/253f6aee4c514cd286a30941a0fb1869.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/057b4c73246540ef9500c5f48bdb4579.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/4dcb4d7d2e654bbeba3d066346e689b3.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/b6bd4e694f6f4b2684d2f67115248ba8.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_18,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/05c46069cdba408fa13aded56f7b3c83.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_18,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c9597beac3924f74b062827754edd711.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/dafb4fa03d714ee58ff64514cc428359.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/1e05dfbcfe8e4cc482eedf777b88e0e2.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e838fe215ae441db99c00e7e8716417f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/44026e8e14344db1a45d932555a86160.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e1352314787e4476a839b294d1a845db.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/f3df688bed744d45aa84b3c0d1e73f08.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/de4677a37f92426e972117ae5b4d47cf.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/7a6a2d9cabb84bd7b10cd82d30a4d542.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/7abc0496f21348cab323c31254e7531b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/ee198bb9b5a34079ad0c844f01265372.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/b325c278a1614bc68280826bc6262f50.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/43f1eb49ebeb484db1f159cb14525497.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c78605c77d48446d946dbd2adf8f4b60.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/27d4862e05234fd68fb54517d2573194.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/4b73a500e32043c4a3485bc3d8255b19.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c6452c0596de407488d5a505a8dd9867.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5bf5c9f748ef4e08beddae244f4153ba.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/9060fb0f25d5408c9905e00ea4bdc427.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_19,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8dd37c99f2da4a58994b8e97b41722f8.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/b924839c93f2435a8528a1f262cad67b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_17,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/f01b1a7eec424f6ea382f1224ff375c1.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/93a4d17e9eb74257923209ed0877a34d.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_11,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/0a726496344b470e9ebb4778e476fcfd.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2100f48c5db747b1be968214d1f31766.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/ba8819626d9d45f6a7b3453fa28bba80.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c9865171311e4ce88af6fdb754956ebb.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d75bda219eb8499ca87b879c7f2ef554.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/6b60d4c554a64fe7bc93543a1ef65033.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/69b6c43e12ad4f139dbd95f77e196014.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/137828acee80461aa355fcbcd586ba52.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d5b0d33129f740b6829852ebcc924ac7.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d73db3367b2b47f4908927e0073aeb0b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/ebd261f14fdf4fca95ebf9cbd67c6ae8.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/68fd88aaf76f4a0f80646037ef4f2e3b.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d03422576cdb4e618ac577ddebef7413.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/889de582a08345ba923d5ce6b28e56f0.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/cc2e052c58ca4539bf3ddaf11f72d7f7.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/6bdb3a21d6844ec0a8e38e9c04f53736.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/11d2a7ebf8184d58b15080b1b009377d.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/4cc4f7019144439e9d19ee4910a28554.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/fb5f6e3ad3484bcb97c667eee81d5c2b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/7aec904c2db647b7b7aaf9cfc2155212.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/7c7f563df8ec443cb0cc86adda5f78b9.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/fa5f8e1508c54983a095c6ff8ebc3482.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/f69efa7d938e4999abbe9d3828716fe7.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e811c453aa97417b934679e065da1c38.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/b64fabed4b934f4d949b67a6a9da9e5c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/883e97a40bd7483db1a572efaa37bffd.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5fc31aa19ff64b938b6282b4cb337603.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_10,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/48e64ce74a254740a1048f6a6c0d6452.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/4edeb684c90d4f898682b421857c9c9c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/b547ac7a1ae74846b942f3f592d0d435.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/a5b2cca469bb45d597bdaf78bf81163b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/67db58e8db104faaa065403833c426a3.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/1eb40d2a0b9e476b87b47a90f7472009.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_17,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/0db0e332bcde4b08b9425312f43591ed.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e3b437c6245e41c7988914c92215876a.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/86172b1195c6432399296ee624f95ffe.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/1f7ece8bad2849319721197ba32f1d96.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/548ecb5809cb41d89ba05af58bcd8f2e.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/3854d1535fe444f2aa3cf9aa5d51d25e.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8aed3e8635b4401d8f7a0f26a3dca590.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/613adf78aa1c43e9bf5622aba9169dc5.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/4a1dedb631d54e7c9107946a17e01491.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/ab4411eabff741cba1db7a2e017e0a3e.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/30ef1afc32ef47538f5b1ea6afd5a0a6.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/755b27db80804248a66800d1c8034af6.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/6d6d2e73ca674589b43f4457ec21416f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/b789432fbe4b42418333bda72fbe3812.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/b7008020d2a14521967d696b667c03cd.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/bd81600c4b4f4030ac5a6a42b3a41e2e.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/034606126ee7499c9861a5bbe8c95402.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8b7d068d623e40209fe8380bdc08fa65.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/6256243a31ca4dd6b2f780fcacc809c5.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/a9515c5be7e240b6861c8f21aa4cc3f0.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8204dd5ee4a04108a8cee406a0416788.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/06f981e631bc48fe9550696a86073dc0.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/73454dca72d542d3902d678573596bf3.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5974517657804b6cb59f08dd7b54bd4e.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/48e6070ca4a24782a2084fbc8d58e444.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/1bd945be59c947a480ca60f1added5d1.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2a96cf5c616b47b7989b20566a59464b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/96eda85c08dd4f6c8cd51570e773c10a.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/9d3207e3af6d49caa1f5e9a44e832c28.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d28e55f912b74d79a64ba2ba9e48f216.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/3b3d5cc16c2542ae896e5753307195aa.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/46d7199721b6401da7decbf73d304178.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_10,color_FFFFFF,t_70,g_se,x_16">
+<meta property="article:published_time" content="2022-09-23T15:50:33.575Z">
+<meta property="article:modified_time" content="2022-09-24T16:44:18.980Z">
+<meta property="article:author" content="橙留香">
+<meta property="article:tag" content="AndroidSecurity">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+  
+  
+  
+  <title>「干货」动态调试APP的一些技巧「Android Studio调试」 - 车联网安全技术博客 | 橙留香</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"orangey.info","root":"/","version":"1.9.3","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"java"},"copy_btn":false,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>橙留香</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="「干货」动态调试APP的一些技巧「Android Studio调试」"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-09-23 23:50" pubdate>
+          2022年9月23日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          14k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          <!-- compatible with older versions-->
+          117 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">「干货」动态调试APP的一些技巧「Android Studio调试」</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <hr>
+<p><strong>也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大</strong></p>
+<p><strong>少走了弯路，也就错过了风景，无论如何，感谢经历</strong></p>
+<hr>
+<p>Android安全付费专栏长期更新，本篇最新内容请前往：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://orangey.blog.csdn.net/article/details/123787445">[车联网安全自学篇] Android安全之Android Studion 动态调试APK的两种方法</a></li>
+</ul>
+<p>更多关于Android安全的知识，可前往：<a target="_blank" rel="noopener" href="https://blog.csdn.net/ananasorangey/category11955914.html">https://blog.csdn.net/ananasorangey/category11955914.html</a></p>
+<p><img src="https://i.imgtg.com/2022/09/25/gdpGP.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><img src="https://i.imgtg.com/2022/09/21/gNXxK.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x01-前言"><a href="#0x01-前言" class="headerlink" title="0x01 前言"></a>0x01 前言</h1><p>通过之前的文章了解，同学们应该都知道了APK调试的前提条件是app可调试的状态，但一般开发人员在发版的时候，会发release版。因为在一般的手机上，release版本的应用是不可以被调试的，相对来说起到了保护app的作用</p>
+<p><strong>PS</strong>：在最初的时候，开发Android是没有gradle的，那时候发release版不像现在在gradle配置好就行了，是直接操作AndroidManifest.xml文件中 <code>&lt;application&gt; </code>标签的属性 <code>android:debuggable=&quot;true&quot; </code></p>
+<p>Android系统会通过APP的AndroidManifest文件中设置android:debuggable 属性，去验证App可不可以调试。假如想关掉这个系统验证，一种是重新刷入boot.img 修改方法，另一种是通过hook修改</p>
+<p>一般大多数情况下，大家都是通过android:debuggable&#x3D;”true”来进行调试</p>
+<p>APK可调试必须具备的两个调试，如下：</p>
+<ul>
+<li>AndroidManifest.xml中的Application标签必须包含属性<code>android:debuggable=&quot;true&quot; </code></li>
+<li><code>./default.prop </code>中ro.debuggable的值必须为1；</li>
+</ul>
+<p>[车联网安全自学篇] Android安全之Android中allowBackup属性浅析【案例讲解】</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://orangey.blog.csdn.net/article/details/122151416">https://orangey.blog.csdn.net/article/details/122151416</a></li>
+</ul>
+<p>[车联网安全自学篇] Android安全之不反编译APK情况下添加android:debuggable属性</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://orangey.blog.csdn.net/article/details/123488541">https://orangey.blog.csdn.net/article/details/123488541</a></li>
+</ul>
+<p><strong>假设：android:debuggable&#x3D;”false” 怎么办？</strong></p>
+<p>首先，一般情况下发行版的APP都会将<code>android:debuggable=&quot;&quot; </code>设置为 false，使第三方不能直接调试分析APP，这也是厂商出于安全的考虑。</p>
+<p>此时同学们，可能会想到，需要反编译Apk并将<code>android:debuggable=&quot;&quot; </code>设置为true。修改完成后进行回编译APK且签名。</p>
+<p>重打包APK可能会遇到繁杂的代码、诡异的反抓包，so层的加密……等奇奇怪怪的反重打包技术，而如果对APP进行重打包，那就要面对APP额外的保护措施，例如重打包失败，签名验证等。</p>
+<p><strong>假设：<code>./default.prop中ro.debuggable </code>的值为0，怎么办？</strong></p>
+<p>直接修改这个值是成功不了的？这个在之前的文章里面有提到过，因为ro开头的属性是不允许后期修改的，这个值只在系统启动时，也就是开机时才会读取和加载一次。那重启？但每次重启，这个值就会恢复默认，所以就造成了一个死循环。</p>
+<p>修改上面说的系统属性值的三种方式：</p>
+<ul>
+<li>直接修改default.prop文件中的值，然后重启设备<ul>
+<li>修改完成需要重启设备的，需要让init进程重新解析属性文件，把属性信息加载内存中方可起作用的（可能会出现设备死机）</li>
+</ul>
+</li>
+<li>改写系统文件，重新编译系统镜像文件，然后刷入到设备中<ul>
+<li>修改boot.img中的这个属性（default.prop文件），修改系统文件，然后重新编译镜像文件，最后再刷到设备中</li>
+</ul>
+</li>
+<li>注入init进程，修改内存中的属性值<ul>
+<li>使用ptrace注入到init进程，修改内存中的这些属性值，只要init进程不重启的话，那么这些属性值就会起效（如果init进程挂了重启的话，那么设置就没有任何效果了）</li>
+</ul>
+</li>
+</ul>
+<p>ES文件浏览器查看内存中的debuggable</p>
+<p><img src="https://img-blog.csdnimg.cn/9c241c74e36b4517a068f5d1bae961dd.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/de037df2eda144a28b569865273c19b0.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_18,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>或getprop命令查看内存中的debuggable</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">getprop ro.debuggable<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/47b791245af349d7a67d7de6cacbd10e.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>BDopener 来开启调试的</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/299f16ded23e49df864c6d1510fbafa8.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="1-1-Android-Studio-断点调试和高级调试"><a href="#1-1-Android-Studio-断点调试和高级调试" class="headerlink" title="1.1 Android Studio 断点调试和高级调试"></a>1.1 Android Studio 断点调试和高级调试</h2><ul>
+<li>点击debug模式运行</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/6d899d52b65d4dac81968d403b09ed54.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>查看调试面板</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/75c60bc1ddc247788bbf3e9c153c661b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h3 id="1-1-1-断点基础调试"><a href="#1-1-1-断点基础调试" class="headerlink" title="1.1.1 断点基础调试"></a>1.1.1 断点基础调试</h3><ul>
+<li>step into：一步步往下走</li>
+</ul>
+<p>点击单步调试按钮或按快捷键F8</p>
+<p><img src="https://img-blog.csdnimg.cn/c05f7d0c57f64d54b99cf69e93a11d33.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>切换到logcat查看日志，我打印出的i的值</p>
+<ul>
+<li>step into：看到方法往里走</li>
+</ul>
+<p>比如我们的for循环当中调用了一个stepNext(int i)方法，当我们走到这里想看看这个方法里面的运行过程的时候我们可以这样，当走到这个方法的时候我们可以按下F7或如下图的图标</p>
+<p><img src="https://img-blog.csdnimg.cn/fe9a210a4e4744e09183ad97fb2b55e1.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>force step into :所有方法看完整</li>
+</ul>
+<p>可以让我们看到程序现在所调用的所有方法的实现会让你跟着它走一遍，研究源码使用非常方便</p>
+<p><img src="https://img-blog.csdnimg.cn/a3d492095a6e4999a9a80d12af310fc7.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>step out ：有断点下一个，走完断点继续走</li>
+</ul>
+<p>例如，如果我们的一个流程当中，包括调用的方法，如果有断点走到下一个断点，如果没有断点，而是在一个调用的方法当中，会跳出这个方法，继续走</p>
+<p><img src="https://img-blog.csdnimg.cn/c6c72a1b9b6d4563bd04b5f96bc21373.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>run to Cursor ：下个断点再次相见</li>
+</ul>
+<p>会很快执行到下一个断点的位置，而且可以静如任何调用的方法</p>
+<p><img src="https://img-blog.csdnimg.cn/ae1d6b89dc3d44368010c0f970e437e4.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h3 id="1-1-2-断点高级调试"><a href="#1-1-2-断点高级调试" class="headerlink" title="1.1.2 断点高级调试"></a>1.1.2 断点高级调试</h3><ul>
+<li>跨断点调试</li>
+</ul>
+<p>如果设置了多个断点，但现在需要直接跳转到下一个断点，那么直接点击下图图标即可</p>
+<p><img src="https://img-blog.csdnimg.cn/4c4c393b823f43c9a522cd6daf4f7622.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_17,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>观察变量</li>
+</ul>
+<p>如果想观察1个或者几个变量的值的变化；如果在Variables显示面版中观察；如果程序这里有太多太多的自定义变量和系统变量了，那么就难观察了。</p>
+<p>此时，可以点击Watches、点击＋号，然后输入变量的名称回车就OK了，而且还会有历史记录</p>
+<p><img src="https://img-blog.csdnimg.cn/c333e5cce5484dbd8ea17e380197e69c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>或者选择［Variables］中的变量名然后点击［右键］，选择［Add to Watches]，然后Watches面板中就有了</p>
+<p><img src="https://img-blog.csdnimg.cn/9fa734e2203346e2856891f9c1378d5a.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>设置变量的值</li>
+</ul>
+<p>在程序中有很多的条件语句和循环语句，调试也是比较耗时的，我们可以通过快速设置变量的值来加快调试速度</p>
+<p>此时，可以选择［Variables］中的变量名然后点击［右键］，选择［Set Value..]或者选择之后直接F2（下图为Variables面板）</p>
+<p><img src="https://img-blog.csdnimg.cn/253f6aee4c514cd286a30941a0fb1869.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>查看断点</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/057b4c73246540ef9500c5f48bdb4579.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>点击之后，可以看到所有的断点，以及位置代码，也可以设置一些属性</p>
+<ul>
+<li>停止调试</li>
+</ul>
+<p>［停止调试］不是让程序停止，而是跳过所有调试</p>
+<p><img src="https://img-blog.csdnimg.cn/4dcb4d7d2e654bbeba3d066346e689b3.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x02-工具"><a href="#0x02-工具" class="headerlink" title="0x02 工具"></a>0x02 工具</h1><ul>
+<li>ES文件浏览器</li>
+</ul>
+<p>下载地址：<a target="_blank" rel="noopener" href="https://pan.baidu.com/s/1DqQtBGJxbHIfp4_HoCaiDQ">https://pan.baidu.com/s/1DqQtBGJxbHIfp4_HoCaiDQ</a><br>提取码：0f60</p>
+<ul>
+<li>BDOpener 开启APK调试与备份选项的Xposed模块</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://security.tencent.com/index.php/opensource/detail/17">https://security.tencent.com/index.php/opensource/detail/17</a></p>
+<ul>
+<li>Xinstall 如何不重打包调试Android应用</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://www.open-open.com/lib/view/open1426304176732.html">https://www.open-open.com/lib/view/open1426304176732.html</a></p>
+<ul>
+<li>BuildProp 增强器（BuildProp Enhancer Make all application attribute android:debuggable&#x3D;”true”）</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://repo.xposed.info/module/com.jecelyin.buildprop">https://repo.xposed.info/module/com.jecelyin.buildprop</a></p>
+<ul>
+<li>XDebug make all app on your phone debuggable</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://github.com/deskid/XDebug">https://github.com/deskid/XDebug</a></p>
+<ul>
+<li>smalidea插件</li>
+</ul>
+<p>配置到Android studio的，配置了才能方便看smali文件</p>
+<p>安装ideasmali插件，选择File-&gt;Settings-&gt;Plugins，安装之前下载的ideasmali插件</p>
+<p><a target="_blank" rel="noopener" href="https://bitbucket.org/JesusFreke/smali/downloads/">https://bitbucket.org/JesusFreke/smali/downloads/</a></p>
+<ul>
+<li>Detect-It-Easy</li>
+</ul>
+<p>Detect It Easy简称Die，是一款专业查壳工具，比PEID强大得多，能查一次查到底。并支持超大文件读取，其他查壳工具无法打开的程序，这个都能读取。虽然没有PEID出名，但是相当的强大，完全可以替代PEID</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/horsicq/Detect-It-Easy">https://github.com/horsicq/Detect-It-Easy</a></p>
+<ul>
+<li>ApkMessenger（ApkMessenger）</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://github.com/sulab999/ApkMessenger">https://github.com/sulab999/ApkMessenger</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.ghxi.com/apkinfo.html">https://www.ghxi.com/apkinfo.html</a></p>
+<h1 id="0x03-无需修改原apk文件"><a href="#0x03-无需修改原apk文件" class="headerlink" title="0x03 无需修改原apk文件"></a>0x03 无需修改原apk文件</h1><ul>
+<li>启Fiddler抓包工具后，打开App</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/b6bd4e694f6f4b2684d2f67115248ba8.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_18,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>点击两条博客</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/05c46069cdba408fa13aded56f7b3c83.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_18,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>查看Fiddler，根据数据包大小和内容找到需要的那一条</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/c9597beac3924f74b062827754edd711.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>对比A博客和B博客内容的数据包</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/dafb4fa03d714ee58ff64514cc428359.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/1e05dfbcfe8e4cc482eedf777b88e0e2.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c">deviceid、appver、appid、chno的参数值是固定不变的<br>is_default 是非必填项<br>login_uid  登录后获取的值<br>article_id 每篇文章的id<br>sign 它是<span class="hljs-number">64</span>位十六进制数，猜测是两个md5拼接，可以理解为它可能是加密的内容<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>使用Jadx反编译Apk，搜索url链接的末尾部分，即get_article_info.php</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/e838fe215ae441db99c00e7e8716417f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>在APP里面，开发人员为了复用性，很多时候APP会将BASE_URL，也就是域名+域名后面的虚拟目录&#x2F;请求参数拆分开来</p>
+<p>将APK后缀改为zip，里面有两个classes.dex 文件</p>
+<p><img src="https://img-blog.csdnimg.cn/44026e8e14344db1a45d932555a86160.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/e1352314787e4476a839b294d1a845db.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>dex2jar 反编译为Java代码</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c">d2j-dex2jar.bat classes.dex<br>d2j-dex2jar.bat classes2.dex<br></code></pre></td></tr></table></figure>
+
+<p>jadx 依次打开classes-dex2jar.jar、classes2-dex2jar.jar</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">get_article_info.php<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/f3df688bed744d45aa84b3c0d1e73f08.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/de4677a37f92426e972117ae5b4d47cf.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>从上面的搜索当中，可以看出只有m字符串是符合要求的，双击代码进去看一下，在这个config(配置)包里，以类变量的方式存放着大量的字符串，如果想引用它，就是b.m</p>
+<p><img src="https://img-blog.csdnimg.cn/7a6a2d9cabb84bd7b10cd82d30a4d542.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>右键查看用例，看一下这个url在哪儿被使用了，发现只有一处</p>
+<p><img src="https://img-blog.csdnimg.cn/7abc0496f21348cab323c31254e7531b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>双击第二行的代码，查看详细引用</p>
+<p><img src="https://img-blog.csdnimg.cn/ee198bb9b5a34079ad0c844f01265372.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>它包装了一个a方法来取我们的目标URL，再次查找用例</p>
+<p><img src="https://img-blog.csdnimg.cn/b325c278a1614bc68280826bc6262f50.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>我们这里点开<code>com.sina.sinablog.network.d.a </code>，可以发现其实它就是a方法上面的那个方法</p>
+<p><img src="https://img-blog.csdnimg.cn/43f1eb49ebeb484db1f159cb14525497.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>由上述的消息，我们知道APP发送的网络请求，首先要进行字段的获取和拼接，但在Java中往往由集合map完成，格式类似于{”id“:3,“name”:“lilac”}，PUT存入、GET取出，这儿就是一个典型的Hashmap。</p>
+<blockquote>
+注：什么是Map集合？
+<br><br>
+Map用于保存具有映射关系的数据，Map集合里保存着两组值，一组用于保存Map的ley，另一组保存着Map的value
+<br><br>
+和查字典类似，通过key找到对应的value，通过页数找到对应的信息。用学生类来说，key相当于学号，value对应name，age，sex等信息。用这种对应关系方便查找
+</blockquote>
+
+
+<p>那么在APK中，它的第一步是初始化一个map，之后存入了对应的消息，看着和我们在Fiddler 抓包APP GET请求中的字段一致。</p>
+<p>接下来，我们用Smali动态调试跟踪一下集合m从初始化到存入数据的全部过程，但是其实接下来的演示操作不用动态调试也是完全可以的达到最终，但为了更好的观察APP在动态调试时的参数调用以及动态调试操作的过程，我们依然选择用动态调试来做演示。</p>
+<ul>
+<li>反编译APK获取Smali代码，因为调试是基于Smali的</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java">java -jar apktool.jar d -f xlblog.apk -o xlblog<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/c78605c77d48446d946dbd2adf8f4b60.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li><code>.method </code>和<code>.end method </code>分别是方法开始和结束的地方</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/27d4862e05234fd68fb54517d2573194.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><strong>注</strong>：d.smali 我们需要关注的关键代码，如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><code class="hljs java"># virtual methods<br>.method <span class="hljs-keyword">protected</span> <span class="hljs-title function_">a</span><span class="hljs-params">()</span>Ljava/lang/String;<br>    .locals <span class="hljs-number">1</span><br><br>    .prologue<br>    .line <span class="hljs-number">27</span><br>    const-string v0, <span class="hljs-string">&quot;http://app.blog.sina.com.cn/api/article/get_article_info.php&quot;</span><br><br>    <span class="hljs-keyword">return</span>-object v0<br>.end method<br><br>.method <span class="hljs-keyword">public</span> <span class="hljs-title function_">a</span><span class="hljs-params">(Lcom/sina/sinablog/network/d$a;Ljava/lang/String;Ljava/lang/String;I)</span>V<br>    .locals <span class="hljs-number">4</span><br><br>    .prologue<br>    const/<span class="hljs-number">4</span> v3, <span class="hljs-number">0x0</span><br><br>    .line <span class="hljs-number">14</span><br>    invoke-<span class="hljs-keyword">static</span> &#123;&#125;, Lcom/sina/sinablog/network/d;-&gt;m()Ljava/util/HashMap;<br><br>    move-result-object v0<br><br>    .line <span class="hljs-number">15</span><br>    const-string v1, <span class="hljs-string">&quot;article_id&quot;</span><br><br>    invoke-virtual &#123;v0, v1, p2&#125;, Ljava/util/HashMap;-&gt;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;<br><br>    .line <span class="hljs-number">16</span><br>    const-string v1, <span class="hljs-string">&quot;blog_uid&quot;</span><br><br>    invoke-virtual &#123;v0, v1, p3&#125;, Ljava/util/HashMap;-&gt;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;<br><br>    .line <span class="hljs-number">17</span><br>    const-string v1, <span class="hljs-string">&quot;is_default&quot;</span><br><br>    invoke-<span class="hljs-keyword">static</span> &#123;v3&#125;, Ljava/lang/String;-&gt;valueOf(I)Ljava/lang/String;<br><br>    move-result-object v2<br><br>    invoke-virtual &#123;v0, v1, v2&#125;, Ljava/util/HashMap;-&gt;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;<br><br>    .line <span class="hljs-number">18</span><br>    invoke-virtual &#123;p1, v0&#125;, Lcom/sina/sinablog/network/d$a;-&gt;setParams(Ljava/util/HashMap;)V<br><br>    .line <span class="hljs-number">19</span><br>    invoke-virtual &#123;p0&#125;, Lcom/sina/sinablog/network/d;-&gt;a()Ljava/lang/String;<br><br>    move-result-object v0<br><br>    invoke-virtual &#123;p1, v0&#125;, Lcom/sina/sinablog/network/d$a;-&gt;setUrl(Ljava/lang/String;)V<br><br>    .line <span class="hljs-number">20</span><br>    invoke-<span class="hljs-keyword">static</span> &#123;&#125;, Ljava/lang/System;-&gt;currentTimeMillis()J<br><br>    move-result-wide v0<br><br>    invoke-virtual &#123;p1, v0, v1&#125;, Lcom/sina/sinablog/network/d$a;-&gt;setRequestTime(J)V<br><br>    .line <span class="hljs-number">21</span><br>    invoke-virtual &#123;p1, v3&#125;, Lcom/sina/sinablog/network/d$a;-&gt;setIsMainThread(Z)V<br><br>    .line <span class="hljs-number">22</span><br>    invoke-virtual &#123;p0, p1&#125;, Lcom/sina/sinablog/network/d;-&gt;a(Lcom/sina/sinablog/network/bf;)V<br><br>    .line <span class="hljs-number">23</span><br>    <span class="hljs-keyword">return</span>-<span class="hljs-keyword">void</span><br>.end method<br></code></pre></td></tr></table></figure>
+
+<p>对比jadx反编译的结果与d.smali的内容的关键节点是一样的，由此确认就是这个smali文件</p>
+<p><img src="https://img-blog.csdnimg.cn/4b73a500e32043c4a3485bc3d8255b19.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>接下来Android Studio 安装smalidea插件，因为我们要开始动态调试，需要打断点因此要安装Smalidea工具</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/c6452c0596de407488d5a505a8dd9867.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>调试工具的话，几乎所有的主流Java IDE配上smalidea插件都可以对Smali进行动态调试，除此之外，JEB也可以直接调试Smali，IDA也有调试DEX的能力，还有Qtrace等等工具，但调试Smali，建议使用Android Studio+smalidea插件这个组合，操作简单，功能强大，效果也很稳定</p>
+<p>打开Android Studio工具，点击File,选择Settings,点击Plugin，再点击installplugin from disk。找到之前下载的smalidea插件选中点击OK，插件就添加成功了，会弹出弹窗，提示重启AndroidStudio，点击重启</p>
+<p><img src="https://img-blog.csdnimg.cn/5bf5c9f748ef4e08beddae244f4153ba.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>android studio smalidea plugin导入版本低的smalide 会报错，在新版的Android studio 中已经不支持了，会出现如下报错：</p>
+<p><img src="https://img-blog.csdnimg.cn/9060fb0f25d5408c9905e00ea4bdc427.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_19,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>解决办法如下：</p>
+<p>smalidea v0.06 版本修复了新版的Android studio 中不支持的这个问题，下载地址：<a target="_blank" rel="noopener" href="https://bitbucket.org/JesusFreke/smalidea/downloads/">https://bitbucket.org/JesusFreke/smalidea/downloads/</a> </p>
+<p>更新日志<a target="_blank" rel="noopener" href="https://github.com/JesusFreke/smalidea">https://github.com/JesusFreke/smalidea</a></p>
+<p><img src="https://img-blog.csdnimg.cn/8dd37c99f2da4a58994b8e97b41722f8.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>打开项目【Open an existing Android Studio Project】，选择xlblog文件夹，等待其加载</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/b924839c93f2435a8528a1f262cad67b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_17,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><strong>注</strong>：Android Studio 支持导入apk，启动 Android Studio 或者 点击File 是否有 Profile or Debug APK 这个选项，然后导入APK</p>
+<p><img src="https://img-blog.csdnimg.cn/f01b1a7eec424f6ea382f1224ff375c1.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><img src="https://img-blog.csdnimg.cn/93a4d17e9eb74257923209ed0877a34d.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_11,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><img src="https://img-blog.csdnimg.cn/0a726496344b470e9ebb4778e476fcfd.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/2100f48c5db747b1be968214d1f31766.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>调试环境配置</li>
+</ul>
+<p>在Android Studio工程中右键点击smali文件夹，设定MarkDirectory as -&gt; Sources Root</p>
+<p><img src="https://img-blog.csdnimg.cn/ba8819626d9d45f6a7b3453fa28bba80.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>打开Android Studio的File-&gt; Project Structure选择，选择对应的JDK</p>
+<p><img src="https://img-blog.csdnimg.cn/c9865171311e4ce88af6fdb754956ebb.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><img src="https://img-blog.csdnimg.cn/d75bda219eb8499ca87b879c7f2ef554.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>配置远程调试的选项，选择Run–&gt;EditConfigurations选项，点击“+”号，新建remote类型调试器，设置Name，修改端口号，可以选择未被占用的任意端口，这里设置为8700</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/6b60d4c554a64fe7bc93543a1ef65033.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/69b6c43e12ad4f139dbd95f77e196014.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>注：Android Studio 连接模拟器会出现失败现象，因为在SDK默认的路径路面，已经有一个adb了，但连接模拟器需要对应的adb，我这里以逍遥游模拟器为例，将下图标注丢到SDK路径下即可解决逍遥游报错的问题</p>
+<p><img src="https://img-blog.csdnimg.cn/137828acee80461aa355fcbcd586ba52.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/d5b0d33129f740b6829852ebcc924ac7.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>开启系统调试（博主这里的虚拟机是x86，所有对应的mprop要是对应的版本格式）</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c">adb push mprop /data/local/tmp/<br>adb shell<br>chmod +x /data/local/tmp/mprop<br>su<br>cd /data/local/tmp/mprop<br>./mprop ro.debuggable <span class="hljs-number">1</span><br>setprop ro.debuggable <span class="hljs-number">1</span><br>getprop ro.debuggable<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/d73db3367b2b47f4908927e0073aeb0b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>查看APP进程并映射端口（不修改源码动态调式，此步骤省略）</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c">调试模式启动app<br>adb shell am start -D -n 包名/.你要调试的界面<br>例如：<br>adb shell am start -D -n com.sina.sinablog/.MainActivity<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c">查看进程号<br>adb shell ps | findstr 包名<br>例如：<br>adb shell ps | findstr com.sina.sinablog<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/ebd261f14fdf4fca95ebf9cbd67c6ae8.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c">端口映射（使用 jdwp 转发端口）<br>adb forward tcp:调试端口号 jdwp:进程号<br>例如：<br>adb forward tcp:<span class="hljs-number">8700</span> jdwp:<span class="hljs-number">6549</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/68fd88aaf76f4a0f80646037ef4f2e3b.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>下断点并启动调试</li>
+</ul>
+<p>显然Smali代码更长的那个才是我们需要的重载方法，在代码左边空白处单击即可下断点</p>
+<p><img src="https://img-blog.csdnimg.cn/d03422576cdb4e618ac577ddebef7413.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/889de582a08345ba923d5ce6b28e56f0.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>正式开始断点调试之前，首先同学们来了解一下，下面这行代码，不熟悉的可以去看博主同学之前的Smali语法总结的文章，下面的smali语法大致的意思是调用m()方法初始化HashMap并将其值赋给v0(或存储到寄存器v0中)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs java">.line <span class="hljs-number">14</span><br>invoke-<span class="hljs-keyword">static</span> &#123;&#125;, Lcom/sina/sinablog/network/d;-&gt;m()Ljava/util/HashMap;<br><br>move-result-object v0<br></code></pre></td></tr></table></figure>
+
+<p>接下来，等程序运行完move-result-object v0 这一行后，在Watches监视器中添加v0，如下图所示：</p>
+<p><img src="https://img-blog.csdnimg.cn/cc2e052c58ca4539bf3ddaf11f72d7f7.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>随后按F8快捷键或点击Step Over 图标来一步步看着程序往下一步走时v0的变化，可以看到程序在初始化HashMap时，把方法已经塞进去五个字段了，一步步F8，会发现v0里的字段越来越多，没过多久，Get请求的九个字段就全部存储到寄存器v0中了</p>
+<p><img src="https://img-blog.csdnimg.cn/6bdb3a21d6844ec0a8e38e9c04f53736.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/11d2a7ebf8184d58b15080b1b009377d.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>光靠F8一行一行走是没办法得知的，可以退出调试模式，更加精细的看一下，F7进入到子方法，在m方法中，获得了5个字段，然后Shift+F8跳出方法，返回之前进入子方法停留的地方</p>
+<p><img src="https://img-blog.csdnimg.cn/4cc4f7019144439e9d19ee4910a28554.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>出了m方法后，得到了三个字段</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/fb5f6e3ad3484bcb97c667eee81d5c2b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><img src="https://img-blog.csdnimg.cn/7aec904c2db647b7b7aaf9cfc2155212.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/7c7f563df8ec443cb0cc86adda5f78b9.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>在到达setParams方法时按F7进入子方法，就可以看到smali中的sign值了</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/fa5f8e1508c54983a095c6ff8ebc3482.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x04-Android-Studio-普通模式调试APK"><a href="#0x04-Android-Studio-普通模式调试APK" class="headerlink" title="0x04 Android Studio 普通模式调试APK"></a>0x04 Android Studio 普通模式调试APK</h1><p>需要安装smalidea工具，此处不介绍了，请往前面翻看即可</p>
+<p>案例APK：AliCrackme_1.apk</p>
+<p><img src="https://img-blog.csdnimg.cn/f69efa7d938e4999abbe9d3828716fe7.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>反编译APK</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java">java -jar apktool.jar d -f AliCrackme_1.apk -o AliCrackme<br></code></pre></td></tr></table></figure>
+
+<p><strong>注</strong>：-d参数，代表反编译得到的smali是Java文件，这里指文件后缀名是Java。如果不带这个参数，后缀名是smali的，否则后最美是java的（其实只是后缀名变了，里面的内容还是smali）</p>
+<ul>
+<li>检查android:debuggable 调试属性是否ture，不为ture自行更改或没有android:debuggable 属性自行添加</li>
+</ul>
+<p>在AndroidManifest.xml的application添加属性：<code>android:debuggable=&quot;true&quot; </code>；<code>android:debuggable=&quot;true&quot; </code>它表示该APP应用是否是Debug版本，这将会影响到该APP应用是否能被调试，所以为了调试必须设置为true</p>
+<p><img src="https://img-blog.csdnimg.cn/e811c453aa97417b934679e065da1c38.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>Android Studio 导入反编译好的smali代码</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/b64fabed4b934f4d949b67a6a9da9e5c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>一路默认即可</p>
+<p><img src="https://img-blog.csdnimg.cn/883e97a40bd7483db1a572efaa37bffd.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>导入成功后，我们主要关注的smali文件</p>
+<p><img src="https://img-blog.csdnimg.cn/5fc31aa19ff64b938b6282b4cb337603.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_10,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>在AndroidStudio工程中右键点击smali文件夹，设定MarkDirectory as -&gt; Sources Root</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/48e64ce74a254740a1048f6a6c0d6452.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>打开AndroidStudio的File-&gt; Project Structure选择，选择对应的JDK</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/4edeb684c90d4f898682b421857c9c9c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>配置远程调试的选项，选择Run–&gt;EditConfigurations选项，点击“+”号，新建remote类型调试器，设置Name，修改端口号，可以选择未被占用的任意端口，这里设置为8700</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/b547ac7a1ae74846b942f3f592d0d435.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><img src="https://img-blog.csdnimg.cn/a5b2cca469bb45d597bdaf78bf81163b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>重新打包生成apk并签名(需卸载原来的apk)</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs java">apktool b -d out -o <span class="hljs-number">3.</span>apk<br>或<br>apktool b -d out<br></code></pre></td></tr></table></figure>
+
+<p>安装后打开apk，发现是空白，这里是进入了调试状态，并不是出现错误</p>
+<ul>
+<li>打开Android Studion</li>
+</ul>
+<p>打开eclipse–&gt;新建java project(第一次打开在project中找)–&gt;更改默认路径为 out目录–&gt;选择smali–&gt;finished</p>
+<ul>
+<li>adb 找不到设备用如下办法</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c">adb kill-server <br>adb start-server <br>adb remount<br></code></pre></td></tr></table></figure>
+
+<p><strong>PS</strong>：也能是adb版本跟Android Studion默认的adb版本有冲突，把模拟器的adb覆盖到Android Studio SDK目录下即可</p>
+<ul>
+<li>找到关键点，然后打断点</li>
+</ul>
+<p>设置断点(可在OnCreate函数或OnClick函数等的下一语句下断点)，这里需要首先分析源代码，找出自己想要下断点的地方，我们通过运行程序知道此次是需要破解密码，那入手点是否能从按钮处寻求突破，通过查看activity_main.xml 文件知道button按钮定义的是<code>@+id/button </code>这个值</p>
+<p><img src="https://img-blog.csdnimg.cn/67db58e8db104faaa065403833c426a3.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>然后全局搜索button，一个个找，查找我们想要的button的关键节点，此处直接给出了有关联的button的地方，如下：</p>
+<p><img src="https://img-blog.csdnimg.cn/1eb40d2a0b9e476b87b47a90f7472009.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_17,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>从上图中，可以发现我们从values&#x2F;public.xml（这个文件很重要，是我们在寻找突破口的重要关键，比如我们有时候需要通过字符串内容来定位到关键点）文件中发现了button的这个值，然后通过这个值确认了button在smali里面关键代码处的位置</p>
+<p>MainActivity 中使用了findViewById()方法来获得其中的Button元素，然后给Button创建了一个点击监听事件，如下：</p>
+<p><img src="https://img-blog.csdnimg.cn/0db0e332bcde4b08b9425312f43591ed.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>到内部类MainActivity$1，搜搜看，肯定实现了OnClickListener接口，那么直接搜onClick方法</p>
+<p><img src="https://img-blog.csdnimg.cn/e3b437c6245e41c7988914c92215876a.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/86172b1195c6432399296ee624f95ffe.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>运行程序，设置远程调试工程【1】（此处可跳过，非必须步骤）</li>
+</ul>
+<p>在调试服务端这里会看到两个端口号：8600&#x2F;8700，首先在这里的端口号，代表的是，远程调试服务器端的端口，下面简单来看一下，Java中的调试系统：</p>
+<p><img src="https://img-blog.csdnimg.cn/1f7ece8bad2849319721197ba32f1d96.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>为了更好的了解远程调试，这里顺带讲一下DDMS，它的三个角色：</p>
+<p><img src="https://img-blog.csdnimg.cn/548ecb5809cb41d89ba05af58bcd8f2e.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>1）JDB Client端(被调试的客户端)，这里我们可以认为我们需要破解的程序就是客户端，如果一个程序可以被调试，当启动的时候，会有一个jdwp线程用来和远程调试服务端进行通信</p>
+<p><img src="https://img-blog.csdnimg.cn/3854d1535fe444f2aa3cf9aa5d51d25e.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>需要破解的程序启动了JDWP线程，注意这个线程也只有当程序是debug模式下才有的，也就是AndroidManifest.xml中的debug属性值必须是true的时候，也就是一开始为什么一开始时要修改这个值的原因</p>
+<p>2）JDWP协议(用于传输调试信息的，比如调试的行号，当前的局部变量的信息等)，这个就可以说明，为什么我们在一开始的时候，反编译成java文件，因为为了Eclipse导入能够识别的Java文件，然后为什么能够调试呢？因为smali文件中有代码的行号和局部变量等信息，所以可以进行调试的</p>
+<p>3）JDB Server端(远程调试的服务端，一般是有JVM端)，就是开启一个JVM程序来监听调试端，这里就可以认为是本地的PC机，当然这里必须有端口用来监听，那么上面的8600端口就是这个作用，而且这里端口是从8600开始，后续的程序端口后都是依次加1的，比如其他调试程序</p>
+<p><strong>注</strong>：也可以使用<code>adb jdwp </code>命令查看，当前设备中可以被调试的程序的进程号信息</p>
+<p><img src="https://img-blog.csdnimg.cn/8aed3e8635b4401d8f7a0f26a3dca590.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>使用adb通过静态获取当前界面调用的文件（此处可跳过，非必须步骤）</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">adb shell dumpsys activity top<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>运行程序，设置远程调试工程【2】</li>
+</ul>
+<p>打上断点，点击右上方的小绿色虫子</p>
+<p><img src="https://img-blog.csdnimg.cn/613adf78aa1c43e9bf5622aba9169dc5.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><img src="https://img-blog.csdnimg.cn/4a1dedb631d54e7c9107946a17e01491.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>使用F6单步调试，F5单步跳入，F7单步跳出进行操作，发现该APP使用v3变量保存了输入的密码</p>
+<p><img src="https://img-blog.csdnimg.cn/ab4411eabff741cba1db7a2e017e0a3e.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>F7 继续往下走，这里看到调用了MainActivity的getTableFromPic方法，获取一个String字符串，从变量的值来看，貌似不是规则的字符串内容，应该是做了加密处理</p>
+<p><img src="https://img-blog.csdnimg.cn/30ef1afc32ef47538f5b1ea6afd5a0a6.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>接下来又遇到一个关键点getPwdFromPic，从字面意义上看，应该是获取正确的密码，用于后面的密码字符串比对</p>
+<p><img src="https://img-blog.csdnimg.cn/755b27db80804248a66800d1c8034af6.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>在这里好像对密码做了一次验证的样子，但密码的内容，依然貌似是一个不规则的字符串，跟之前获取的table字符串内容格式很小，继续往下一步走</p>
+<p><img src="https://img-blog.csdnimg.cn/6d6d2e73ca674589b43f4457ec21416f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><img src="https://img-blog.csdnimg.cn/b789432fbe4b42418333bda72fbe3812.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>调用了系统的Log打印，log的tag就是v6保存的值：lil</p>
+<p><img src="https://img-blog.csdnimg.cn/b7008020d2a14521967d696b667c03cd.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>看到v3是保存的我们输入的密码内容，这里使用utf-8获取他的字节数组，然后传递给access$0方法，使用F7进入这个方法：</p>
+<p><img src="https://img-blog.csdnimg.cn/bd81600c4b4f4030ac5a6a42b3a41e2e.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><img src="https://img-blog.csdnimg.cn/034606126ee7499c9861a5bbe8c95402.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>就是把传递进来的字节数组，循环遍历，取出字节值，然后转化成int类型，然后在调用上面获取到的table字符串的chatAt来获取指定的字符，使用StringBuilder进行拼接，然后返回即可</p>
+<p><img src="https://img-blog.csdnimg.cn/8b7d068d623e40209fe8380bdc08fa65.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><img src="https://img-blog.csdnimg.cn/6256243a31ca4dd6b2f780fcacc809c5.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>v2就是我们拼接加密之后的内容，如下：</p>
+<p><img src="https://img-blog.csdnimg.cn/a9515c5be7e240b6861c8f21aa4cc3f0.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>Shift+F8 跳出，查看，我们返回来加密的内容是：123456，也就是说123456&#x3D;&gt;么广亡门义之，密码就不对了，我们输入的内容加密后是v2跟正确的密码v4对比，显示是错误的</p>
+<p><img src="https://img-blog.csdnimg.cn/8204dd5ee4a04108a8cee406a0416788.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/06f981e631bc48fe9550696a86073dc0.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>再往下面就是密码比对了… …</p>
+<p>梳理一下流程：</p>
+<ul>
+<li>调用MainActivity中的getTableFromPic方法，获取一个table字符串</li>
+<li>通过MainActivity中的getPwdFromPic方法，获取正确的密码内容</li>
+<li>获取我们输入内容的utf-8的字节码，然后调用<code>access$0 </code>方法，获取加密之后的内容</li>
+<li><code>access$0 </code>方法中在调用bytesToAliSmsCode方法，获取加密之后的内容</li>
+</ul>
+<p>通过上面的分析之后知道了获取加密之后的输入内容和正确的密码内容做比较，那现在我们已经掌握了该APP的：密钥库字符串和正确的加密之后的密码，以及加密的逻辑</p>
+<p>破解思路：已知道加密之后的字符组成的字符串，可以通过遍历加密之后的字符串，循环遍历，获取字符，然后再去密钥库找到指定的index，然后再转成byte保存到字节数组，最后用utf-8获取一个字符串，最后得出的结果即是破解的密码，如下：</p>
+<p><img src="https://img-blog.csdnimg.cn/73454dca72d542d3902d678573596bf3.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><img src="https://img-blog.csdnimg.cn/5974517657804b6cb59f08dd7b54bd4e.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">package</span> com.java.poc;<br><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">AliCrackme_P</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> &#123;<br>        <span class="hljs-comment">// 密钥字符串内容(汉字)</span><br>        <span class="hljs-type">String</span> <span class="hljs-variable">tableStr</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;一乙二十丁厂七卜人入八九几儿了力乃刀又三于干亏士工土才寸下大丈与万上小口巾山千乞川亿个勺久凡及夕丸么广亡门义之尸弓己已子卫也女飞刃习叉马乡丰王井开夫天无元专云扎艺木五支厅不太犬区历尤友匹车巨牙屯比互切瓦止少日中冈贝内水见午牛手毛气升长仁什片仆化仇币仍仅斤爪反介父从今凶分乏公仓月氏勿欠风丹匀乌凤勾文六方火为斗忆订计户认心尺引丑巴孔队办以允予劝双书幻玉刊示末未击打巧正扑扒功扔去甘世古节本术可丙左厉右石布龙平灭轧东卡北占业旧帅归且旦目叶甲申叮电号田由史只央兄叼叫另叨叹四生失禾丘付仗代仙们仪白仔他斥瓜乎丛令用甩印乐&quot;</span>;<br>        <span class="hljs-comment">// 程序内部正确的密码（汉字）</span><br>        <span class="hljs-type">String</span> <span class="hljs-variable">passwordStr</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;义弓么丸广之&quot;</span>;<br>        <span class="hljs-type">char</span>[] passwordIndex = <span class="hljs-keyword">new</span> <span class="hljs-title class_">char</span>[passwordStr.length()];<br>        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i&lt;passwordIndex.length;i++)&#123;<br>            <span class="hljs-type">int</span> <span class="hljs-variable">index</span> <span class="hljs-operator">=</span> tableStr.indexOf(passwordStr.charAt(i)); <span class="hljs-comment">// 返回passwordStr字符串值，并在字符串中首次出现的位置第一个字符，每次+1循环计算是否匹配APP正确的密码</span><br>            passwordIndex[i] = (<span class="hljs-type">char</span>)(index);<br>        &#125;<br>        System.out.println(<span class="hljs-string">&quot;Password：&quot;</span>+<span class="hljs-keyword">new</span> <span class="hljs-title class_">String</span>(passwordIndex));<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h1 id="0x05-Android-Studio-调试模式调试APK"><a href="#0x05-Android-Studio-调试模式调试APK" class="headerlink" title="0x05 Android Studio 调试模式调试APK"></a>0x05 Android Studio 调试模式调试APK</h1><ul>
+<li>直接不插入等待调试代码的方法</li>
+</ul>
+<p>定位当前界面</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">adb shell dumpsys activity top<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">adb shell am start -D -n com.example.simpleencryption/.MainActivity<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/48e6070ca4a24782a2084fbc8d58e444.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><img src="https://img-blog.csdnimg.cn/1bd945be59c947a480ca60f1added5d1.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>点击绿色小虫子</p>
+<p><img src="https://img-blog.csdnimg.cn/2a96cf5c616b47b7989b20566a59464b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>接下来就是一步步的调试了，后续步骤跟普通调试差不多</p>
+<p><img src="https://img-blog.csdnimg.cn/96eda85c08dd4f6c8cd51570e773c10a.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>插入等待调试代码的方法<ul>
+<li>在入口处添加waitForDebugger代码进行调试</li>
+</ul>
+</li>
+</ul>
+<p>以前旧的方法中会在最初的入口处添加waitForDebugger代码进行调试或者使用<code>adb shell am start -D -n com.example.simpleencryption/.MainActivity </code>来以Debug模式启动应用，但在新的动态调试方法中 Android Studio(3.x以上版本)即使没有添加android.os.Debug.waitForDebugger()，一样可以打断点调试，但是如果添加了android.os.Debug.waitForDebugger()，一样的可以，启动APP的时候会出现一个Wait debug的对话框，但我这里是出现一个白板（如下图），但不影响实际的调试操作</p>
+<p><img src="https://img-blog.csdnimg.cn/9d3207e3af6d49caa1f5e9a44e832c28.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>一般的入口Activity，就是程序启动的地方。查找这个Activity的话，方法太多。例如在AndroidManifest.xml中找到，因为入口Activity的action.MAIN和category是固定的，或者aapt查看apk的内容方式，以及用ADB 查看apk 当前的activity（<code>adb dumpsys activity top </code>）</p>
+<p>添加调试语句设置断点，在主入口Activity的OnCreate函数的第一行添加waitForDebugger代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java">invoke-<span class="hljs-keyword">static</span> &#123;&#125;, Landroid/os/Debug;-&gt;waitForDebugger()V<br></code></pre></td></tr></table></figure>
+<p>对应的JAVA代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java">android.os.Debug.waitForDebugger()<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>查看启动APP的进程PID，然后进行端口转发</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">adb shell ps<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/d28e55f912b74d79a64ba2ba9e48f216.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">adb forward tcp:<span class="hljs-number">8700</span> jdwp:<span class="hljs-number">1206</span><br></code></pre></td></tr></table></figure>
+
+<p>其中的“tcp”是之前配置调试环境时指定的端口号，“jdwp”这里指的是我们要调试的程序的进程pid。这里是将本地端口(PC端口)映射到远程端口(手机端口)，之后PC端访问8700端口的数据包，会自动转发到手机的1206端口</p>
+<p><img src="https://img-blog.csdnimg.cn/3b3d5cc16c2542ae896e5753307195aa.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><img src="https://img-blog.csdnimg.cn/46d7199721b6401da7decbf73d304178.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_10,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>后续步骤跟直接不插入等待调试代码的方法一样</p>
+<p><strong>参考链接</strong>：</p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/lsgxeva/p/13490827.html">https://www.cnblogs.com/lsgxeva/p/13490827.html</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/ming54ming/article/details/115049718">https://blog.csdn.net/ming54ming/article/details/115049718</a></p>
+<p><a target="_blank" rel="noopener" href="http://www.520monkey.com/archives/619">http://www.520monkey.com/archives/619</a></p>
+<hr>
+<p><strong>你以为你有很多路可以选择，其实你只有一条路可以走</strong></p>
+<hr>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/AndroidSecurity/">#AndroidSecurity</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>「干货」动态调试APP的一些技巧「Android Studio调试」</div>
+      <div>https://orangey.info/2022/09/23/123787445/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>橙留香</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年9月23日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/09/23/123582115/" title="「干货」Android APP动态调试的三种Smali注入小技巧">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">「干货」Android APP动态调试的三种Smali注入小技巧</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/09/23/123520495/" title="「干货」静态逆向APK应用浅析「手动注入smali」+「IDA Pro静态分析so文件」+「IDA Pro基础使用讲解」">
+                        <span class="hidden-mobile">「干货」静态逆向APK应用浅析「手动注入smali」+「IDA Pro静态分析so文件」+「IDA Pro基础使用讲解」</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  <article id="comments" lazyload>
+    
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1e96aec5ac46370916fa","clientSecret":"ee5e97a65cf34e9fe31e15ab0421a94968237f5e","repo":"ogGitalk","owner":"ananasOrangey","admin":["ananasOrangey"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '19d7d5b16865a4332d47183e4ce15016'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+  </article>
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://orangey.blog.csdn.net" target="_blank" rel="nofollow noopener"><span>橙留香CSDN博客</span></a> <i class="iconfont icon-love"></i> <a href="https://i.imgtg.com/2022/09/21/gNXxK.png" target="_blank" rel="nofollow noopener"><span>橙留香微信公众号</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

@@ -1,0 +1,881 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="橙留香">
+  <meta name="keywords" content="橙留香车联网安全技术博客">
+  
+    <meta name="description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;ananasorangey&#x2F;category11955914.html   0x01 前言3.0 跟2.x版本框架方面有所改变，本次审计主要是基于之前网上大佬们的文章来做">
+<meta property="og:type" content="article">
+<meta property="og:title" content="「Java代码审计」华夏ERP3.0代码审计">
+<meta property="og:url" content="https://orangey.info/2022/09/24/120340010/index.html">
+<meta property="og:site_name" content="车联网安全技术博客 | 橙留香">
+<meta property="og:description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;ananasorangey&#x2F;category11955914.html   0x01 前言3.0 跟2.x版本框架方面有所改变，本次审计主要是基于之前网上大佬们的文章来做">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/21/gNXxK.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/ea1087bf94d544ce9a9cb05fc2b23b0e.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e956f9853ea64ce7b62a1b51d1ab30b6.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_18,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/4278cd18940749dcb7914ef26532b134.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e339782e77684d5a9446850f18e29305.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/cc633691a45942498ade6630e1707cdc.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/a287805a5fd84b74ac2934d2b47a68a8.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/566a066915394c85ab64fb6317691751.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/32c72ccf135b49ffb818eda6bf4cf24f.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c3ecb7d8bf554088bc542269ad0b6041.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/fe683e12106442fa95ba0c8ed616645c.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/f7e2040f5dcf4585a4dd3e874a1ffcc2.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/9fd0f9179b454ee4aa6a5877d1472a86.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/054bd5f65f5a446ab270c5faad5d79d8.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/ebbf71cfa9804624b1850ce33322a14a.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/bf6d8c862939420cb8035789e7d5c987.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5f9c94abce2546e690ccdc18819b1638.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/94fbafd48bcc4d7aa0e221414beefbd0.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/70b5879a2ad043faa9093532d08ad898.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c68df91cbf584c6b904063bfdda5b9ee.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2e1a3bab0e3249319438b111a8776d05.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/14d45bb16799408daf4b8ca9d621f590.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/323b1f58d96646798cba28b75b6f0a21.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/b466067567ca46ffa008fe68298274fa.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/b0724502cc0d4809ae787829f9c31d3d.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/981a2c680f0d4c7d8c829f0cb822e080.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/9eebd04015e14b9f8853c6f16397c6b4.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/489addec8c904686ac4d6ab62cdbbda3.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/797fe765330446efbc567ebd96650b07.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5bdc1a20ba004cd784acdc2a7b88f86d.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/321372ceb1674ad191122b9be6ca8d3f.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/6a1db569afd34f31a08d6253e3f13780.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/f300415f7681477cae0148a529350745.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/61ff46a4c7794d00974810b5f1f7190c.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5588e1f4db744b779712456a0e0b8983.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/b016e9194b1d4844a36ba4e184891cbb.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/078022a13e154bda910aa19178bbc679.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5dc4320b9f844c44bd177e5770b093e9.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="article:published_time" content="2022-09-24T13:35:10.180Z">
+<meta property="article:modified_time" content="2022-09-24T16:36:34.045Z">
+<meta property="article:author" content="橙留香">
+<meta property="article:tag" content="Java代码审计">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+  
+  
+  
+  <title>「Java代码审计」华夏ERP3.0代码审计 - 车联网安全技术博客 | 橙留香</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"orangey.info","root":"/","version":"1.9.3","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"java"},"copy_btn":false,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>橙留香</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="「Java代码审计」华夏ERP3.0代码审计"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-09-24 21:35" pubdate>
+          2022年9月24日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          11k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          <!-- compatible with older versions-->
+          90 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">「Java代码审计」华夏ERP3.0代码审计</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <hr>
+<p><strong>也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大</strong></p>
+<p><strong>少走了弯路，也就错过了风景，无论如何，感谢经历</strong></p>
+<hr>
+<p>更多关于Android安全的知识，可前往：<a target="_blank" rel="noopener" href="https://blog.csdn.net/ananasorangey/category11955914.html">https://blog.csdn.net/ananasorangey/category11955914.html</a></p>
+<p><img src="https://i.imgtg.com/2022/09/25/gdpGP.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><img src="https://i.imgtg.com/2022/09/21/gNXxK.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x01-前言"><a href="#0x01-前言" class="headerlink" title="0x01 前言"></a>0x01 前言</h1><p>3.0 跟2.x版本框架方面有所改变，本次审计主要是基于之前网上大佬们的文章来做的，基本上都是之前2.x 就存在的漏洞，因为时间有限，近期又要学习JAVA代码审计与工作上的安排，没有细致的审计，后续可能会找一些开源的JAVA靶场来做审计，节约审计的时间成本，之前无JAVA审计基础，写的浅的地方，往师傅们海涵。</p>
+<p>顺路自己也学习一波，以及一些JAVA漏洞分析的文章，后续会输出。<br><img src="https://img-blog.csdnimg.cn/ea1087bf94d544ce9a9cb05fc2b23b0e.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>通过之前简单的过了一遍基础功能点，无发现啥特别漏洞，xray也无建工，看来只能手动挖掘看看了</p>
+<p><img src="https://img-blog.csdnimg.cn/e956f9853ea64ce7b62a1b51d1ab30b6.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_18,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>分析之前已获取的数据包，发现当前JAVA 系统存在FastJson ，但无Burp 的插件提示该FastJson可以出网</p>
+<p>fastjson能dnslog但是不能rce的原因，可能是Fastjson远古版本自动开启autotype，后来的后面几个版本默认关闭。然后就算项目中可以使用autotype，如果是比较新的版本需要其他的能够构造rce链的第三方jar包支持，如果没有这些也不行。还有就是JDK版本跟目标系统不一致的也无法利用，高版本的jdk8不支持远程调用rmi等协议也是造成无法利用成功的一个原因。略早期的可以尝试使在@type的值第一位添加L或者LL尝试绕过fastjson的黑名单限制，后面会出专门的文章对序列化楼的进行分析，之前也是不太明白，后面准备好好研究研究。</p>
+<p>该系统search参数可以出网，我本地的jdk版本比较高，也没有细的测试，后面会有文章专门针对反序列化文章。</p>
+<p>首先先到代码pom.xml文件里面看看，该文件用于管理：源代码、配置文件、开发者的信息和角色、问题追踪系统、组织信息、项目授权、项目的url、项目的依赖关系等等。</p>
+<p>Ctril+F 查找fastjson 关键字，发现是SpringBoot框架，且FastJson为1.2.55版本</p>
+<p><img src="https://img-blog.csdnimg.cn/4278cd18940749dcb7914ef26532b134.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>网上爆出1.2.55～1.2.68以下存在FastJson 绕过导致反序列化漏洞</p>
+<p><img src="https://img-blog.csdnimg.cn/e339782e77684d5a9446850f18e29305.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><img src="https://img-blog.csdnimg.cn/cc633691a45942498ade6630e1707cdc.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>SpringBoot的执行流程和SSM大致相同，不过SpringBoot搭建的Web项目里简化了许多配置文件</p>
+<blockquote>
+Spring Boot使用了一个全局的配置文件application.properties，放在src/main/resources目录下或者类路径的/config下。Sping Boot的全局配置文件的作用是对一些默认配置的配置值进行修改，用来配置一些可以手动修改而且不用编译的变量，这样的作用在于，打成war包或者jar包用于生产环境时，我们可以手动修改环境变量而不用再重新编译。
+
+<p>看到一些配置信息、数据库连接串、Redis连接串，此处登陆超时时间有些过长，设置为了30多秒，配置人员把连接超时时间(server.tomcat.connection-timeout)的单位，理解为秒，实际上是毫秒。</p>
+<p>例如配置的值为 6，如果建立客户端连接的过程中，恰好碰到调用System.gc()触发Full GC，并且加上GC的暂停时间总共达到6ms以上，Tomcat一看，超时了，就会导致建立连接失败，然后Nginx给客户端返回502错误。<br>所以，过短，请求还未处理完成，你就急不可待了；过长，请求早已超出正常响应时间而挂了。</p>
+</blockquote>
+
+<p>使用Mybatis框架，MyBatis是一个优秀的持久层框架，它对jdbc的操作数据库的过程进行封装，使开发者只需要关注 SQL 本身，而不需要花费精力去处理例如注册驱动、创建connection、创建statement、手动设置参数、结果集检索等jdbc繁杂的过程代码。</p>
+<p>Mybatis通过xml或注解的方式将要执行的各种statement（statement、preparedStatemnt、CallableStatement）配置起来，并通过java对象和statement中的sql进行映射生成最终执行的sql语句，最后由mybatis框架执行sql并将结果映射成java对象并返回。</p>
+<p>通过下图可发现：</p>
+<p>1、配置登陆连接时间等待过长<br>2、数据库连接也是以弱密码和明文</p>
+<p><img src="https://img-blog.csdnimg.cn/a287805a5fd84b74ac2934d2b47a68a8.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><img src="https://img-blog.csdnimg.cn/566a066915394c85ab64fb6317691751.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>利用代码里面的弱密码成功登陆，在实际测试过程中，也可以尝试一波，可能会有意想不到的结果，虽然不一定会有意想不到的收获</p>
+<p><img src="https://img-blog.csdnimg.cn/32c72ccf135b49ffb818eda6bf4cf24f.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x02-Springboot-信息泄露"><a href="#0x02-Springboot-信息泄露" class="headerlink" title="0x02 Springboot 信息泄露"></a>0x02 Springboot 信息泄露</h1><p><a target="_blank" rel="noopener" href="http://127.0.0.1:3000/jshERP-boot/v2/api-docs">http://127.0.0.1:3000/jshERP-boot/v2/api-docs</a></p>
+<p>有些程序员会自定义 &#x2F;manage、&#x2F;management、项目 App 相关名称为 spring 根路径 Spring Boot Actuator 1.x 版本默认内置路由的起始路径为 &#x2F;</p>
+<p>Spring Boot Actuator 2.x 版本则统一以 &#x2F;actuator为起始路径 Spring Boot Actuator 默认的内置路由名字，如 &#x2F;env有时候也会被程序员修改，比如修改成 &#x2F;appenv</p>
+<p><img src="https://img-blog.csdnimg.cn/c3ecb7d8bf554088bc542269ad0b6041.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>路由地址及接口调用详情泄漏开发人员没有意识到地址泄漏会导致安全隐患或者开发环境切换为线上生产环境时，相关人员没有更改配置文件，忘记切换环境配置等。</p>
+<p><img src="https://img-blog.csdnimg.cn/fe683e12106442fa95ba0c8ed616645c.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>一般来讲，直到 spring boot 应用的相关接口和传参信息并不能算是漏洞，但是可以检查暴露的接口是否存在未授权访问、越权或者其他业务型漏洞。</p>
+<h2 id="2-1-防御措施"><a href="#2-1-防御措施" class="headerlink" title="2.1 防御措施"></a>2.1 防御措施</h2><p>上线时需要修改&#x2F;切换生产环境的配置</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><code class="hljs bash">/actuator <br>/auditevents <br>/autoconfig <br>/beans <br>/caches <br>/conditions <br>/configprops <br>/docs <br>/dump <br>/env <br>/flyway <br>/health <br>/heapdump <br>/httptrace <br>/info <br>/intergrationgraph <br>/jolokia <br>/logfile <br>/loggers <br>/liquibase <br>/metrics <br>/mappings <br>/prometheus <br>/refresh <br>/scheduledtasks <br>/sessions <br>/shutdown <br>/trace <br>/threaddump <br>/actuator/auditevents <br>/actuator/beans <br>/actuator/health <br>/actuator/conditions <br>/actuator/configprops <br>/actuator/env <br>/actuator/info <br>/actuator/loggers <br>/actuator/heapdump <br>/actuator/threaddump <br>/actuator/metrics <br>/actuator/scheduledtasks <br>/actuator/httptrace <br>/actuator/mappings <br>/actuator/jolokia <br>/actuator/hystrix.stream<br><br></code></pre></td></tr></table></figure>
+
+
+<p>其中对寻找漏洞比较重要接口的有：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs bash"><br>/env、/actuator/env：GET 请求 /env 会泄露环境变量信息，或者配置中的一些用户名，当程序员的属性名命名不规范 (例如 password 写成 psasword、<span class="hljs-built_in">pwd</span>) 时，会泄露密码明文；同时有一定概率可以通过 POST 请求 /env 接口设置一些属性，触发相关 RCE 漏洞。<br><br>/jolokia：通过 /jolokia/list 接口寻找可以利用的 MBean，触发相关 RCE 漏洞；<br><br>/trace：一些 http 请求包访问跟踪信息，有可能发现有效的 cookie 信息<br><br></code></pre></td></tr></table></figure>
+
+
+<h2 id="2-2-利用思路"><a href="#2-2-利用思路" class="headerlink" title="2.2 利用思路"></a>2.2 利用思路</h2><ul>
+<li>利用env加refresh进行getshell</li>
+<li>利用mappings，寻找未授权接口</li>
+<li>利用trace，获取认证信息（Cookie、tooken、Session），利用认证信息访问接口</li>
+<li>env有可能泄露的数据库账号密码（mangodb），当然得开放外网，可能性较小</li>
+</ul>
+<h2 id="2-3-Web漏洞发现方式"><a href="#2-3-Web漏洞发现方式" class="headerlink" title="2.3 Web漏洞发现方式"></a>2.3 Web漏洞发现方式</h2><p>通常识别当前 web 应用使用的框架为 springboot 框架。主要有两个方法判断：</p>
+<ul>
+<li><p>通过 web 应用程序网页标签的图标（favicon.ico）；如果 web 应用开发者没有修改 springboot web 应用的默认图标，那么进入应用首页后可以看到如下默认的绿色小图标：</p>
+</li>
+<li><p>通过 springboot 框架默认报错页面；如果 web 应用开发者没有修改 springboot web 应用的默认 4xx、5xx 报错页面，那么当 web 应用程序出现 4xx、5xx 错误时，会报错如下（此处仅以 404 报错页面为例）：访问一个随便构造的路径，比如：http:&#x2F;172.26.2.24:8090&#x2F;index，出现如下报错页面说明web网站使用了springboot框架（在实际中遇到的大多数都是此类情况）</p>
+</li>
+<li><p>综合以上两个途径来判断当前 web 应用是否是 springboot 框架，就是通过访问不同的目录，看是否有小绿叶图标，然后就是想办法在不同目录下触发应用程序的 4xx 或 5xx 错误，看是否有 Whitelabel Error Page 报错。</p>
+</li>
+</ul>
+<h2 id="2-4-修复方式"><a href="#2-4-修复方式" class="headerlink" title="2.4 修复方式"></a>2.4 修复方式</h2><p>在项目的pom.xml文件下引入spring-boot-starter-security依赖</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-security<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br><br></code></pre></td></tr></table></figure>
+
+<p>然后在application.properties中开启security功能，配置访问账号密码，重启应用即可弹出。</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">management.<span class="hljs-keyword">security</span>.enabled=<span class="hljs-keyword">true</span><br><span class="hljs-keyword">security</span>.<span class="hljs-keyword">user</span>.name=<span class="hljs-keyword">admin</span><br><span class="hljs-keyword">security</span>.<span class="hljs-keyword">user</span>.<span class="hljs-keyword">password</span>=<span class="hljs-keyword">admin</span><br></code></pre></td></tr></table></figure>
+
+<p>禁用接口，则可设置如下（如禁用env接口）：</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs ini"><span class="hljs-attr">endpoints.env.enabled</span>= <span class="hljs-literal">false</span><br><br></code></pre></td></tr></table></figure>
+
+<h2 id="2-5-以往漏洞案例复现手法"><a href="#2-5-以往漏洞案例复现手法" class="headerlink" title="2.5 以往漏洞案例复现手法"></a>2.5 以往漏洞案例复现手法</h2><p><a target="_blank" rel="noopener" href="https://github.com/jas502n/SpringBoot_Actuator_RCE">https://github.com/jas502n/SpringBoot_Actuator_RCE</a></p>
+<p><a target="_blank" rel="noopener" href="https://misakikata.github.io/2020/04/Spring-%E6%A1%86%E6%9E%B6%E6%BC%8F%E6%B4%9E%E9%9B%86%E5%90%88/">https://misakikata.github.io/2020/04/Spring-%E6%A1%86%E6%9E%B6%E6%BC%8F%E6%B4%9E%E9%9B%86%E5%90%88/</a></p>
+<h1 id="0x03-未授权访问访问敏感信息-绕过权限"><a href="#0x03-未授权访问访问敏感信息-绕过权限" class="headerlink" title="0x03 未授权访问访问敏感信息(绕过权限)"></a>0x03 未授权访问访问敏感信息(绕过权限)</h1><p>该项目利用filter做登录判断：</p>
+<p>com.jsh.erp.filter.LogCostFilter</p>
+<p>查看一下Spring Boot 的过滤器器，看看过滤了哪些Spring Boot 下的@WebFilter 用于将一个类声明为过滤器，该注解将会在部署时被容器处理，容器将根据具体的属性配置将相应的类部署为过滤器。该注解具有下表给出的一些常用属性 ( 以下所有属性均为可选属性，但是 value、urlPatterns、servletNames 三者必需至少包含一个，且 value 和 urlPatterns 不能共存，如果同时指定，通常忽略 value 的取值 )</p>
+<p><img src="https://img-blog.csdnimg.cn/f7e2040f5dcf4585a4dd3e874a1ffcc2.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>这里看到，对ignoredUrl及filterPath的value内的字段做请求时不会进行拦截</p>
+<p><img src="https://img-blog.csdnimg.cn/9fd0f9179b454ee4aa6a5877d1472a86.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>1）这里从session里取user的值，判断是否登录，如果已登录就不需要认证此请求</p>
+<p>判断URL 中是否存在&#x2F;doc.html、&#x2F;register.html、&#x2F;login.html，如果有就不需要认证此请求</p>
+<p>将ignoredList 传入verify 方法中，从ignoredList中遍历取值后根据正则表达式来判断是否在URL中，如果存在就返回true，切不需要认证该请求</p>
+<p>遍历取出allowUrls 的值，判断URL中是否以 </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs bash">/jshERP-boot/user/login<br>/jshERP-boot/user/registerUser<br>/jshERP-boot/user/randomImage<br>/jshERP-boot/platformConfig/getPlatform<br>/jshERP-boot/v2/api-docs<br>/jshERP-boot/webjars<br>/jshERP-boot/systemConfig/static<br><br>上面这些开头，如果是就不需要认证该请求<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/054bd5f65f5a446ab270c5faad5d79d8.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>由上述分析总结出触发认证绕过的场景：</p>
+<blockquote>
+
+<ol>
+<li><p>requestUrl中如果存在&#x2F;doc.html，&#x2F;register.html，&#x2F;login.html字段就可以绕过</p>
+</li>
+<li><p>requestUrl中如果存在..&#x2F;a.ico&#x2F;..&#x2F; (V2.0版本可以..&#x2F;a.css&#x2F;..&#x2F;，..&#x2F;a.png&#x2F;..&#x2F;），也可以绕过认证请求</p>
+</li>
+<li><p>requestUrl中如果以&#x2F;jshERP-boot&#x2F;user&#x2F;login、&#x2F;jshERP-boot&#x2F;user&#x2F;registerUser、&#x2F;jshERP-boot&#x2F;user&#x2F;randomImage、&#x2F;jshERP-boot&#x2F;platformConfig&#x2F;getPlatform、&#x2F;jshERP-boot&#x2F;v2&#x2F;api-docs、&#x2F;jshERP-boot&#x2F;webjars、&#x2F;jshERP-boot&#x2F;systemConfig&#x2F;static等字符开头的时候，也可以绕过认证请求</p>
+</li>
+</ol>
+<p>				</p>
+</blockquote>		
+
+
+<h2 id="3-1-绕过认证"><a href="#3-1-绕过认证" class="headerlink" title="3.1 绕过认证"></a>3.1 绕过认证</h2><p><img src="https://img-blog.csdnimg.cn/ebbf71cfa9804624b1850ce33322a14a.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><img src="https://img-blog.csdnimg.cn/bf6d8c862939420cb8035789e7d5c987.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>成功绕过</p>
+<p><img src="https://img-blog.csdnimg.cn/5f9c94abce2546e690ccdc18819b1638.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">GET</span> /a.ico/../jshERP-boot/role/list?_t=<span class="hljs-number">1631849650</span>&amp;search=%<span class="hljs-number">7</span>B%<span class="hljs-number">22</span>name%<span class="hljs-number">22</span>:%<span class="hljs-number">22</span>%<span class="hljs-number">22</span>%<span class="hljs-number">7</span>D&amp;column=createTime&amp;order=desc&amp;field=id,,,name,type,description,action&amp;currentPage=<span class="hljs-number">1</span>&amp;pageSize=<span class="hljs-number">10</span> HTTP/<span class="hljs-number">1</span>.<span class="hljs-number">1</span><br><span class="hljs-attribute">Host</span>: <span class="hljs-number">192</span>.<span class="hljs-number">168</span>xx:<span class="hljs-number">3000</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/94fbafd48bcc4d7aa0e221414beefbd0.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>其他几个路径也是一样的，只要在前面加上对应路径，再..&#x2F; 返回到添加了几个路径，就加几个..&#x2F;</p>
+<p>可绕过的路径有这些</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs awk"><span class="hljs-regexp">/a.ico/</span>../<br><span class="hljs-regexp">/jshERP-boot/</span>doc.html<span class="hljs-regexp">/../</span>../<br><span class="hljs-regexp">/jshERP-boot/</span>register.html<span class="hljs-regexp">/../</span>../<br><span class="hljs-regexp">/jshERP-boot/</span>login.html<span class="hljs-regexp">/../</span>../<br><span class="hljs-regexp">/jshERP-boot/u</span>ser<span class="hljs-regexp">/login/</span>..<span class="hljs-regexp">/../</span>../<br><span class="hljs-regexp">/jshERP-boot/u</span>ser<span class="hljs-regexp">/registerUser/</span>..<span class="hljs-regexp">/../</span>../<br><span class="hljs-regexp">/jshERP-boot/u</span>ser<span class="hljs-regexp">/randomImage/</span>..<span class="hljs-regexp">/../</span>../<br><span class="hljs-regexp">/jshERP-boot/</span>platformConfig<span class="hljs-regexp">/getPlatform/</span>..<span class="hljs-regexp">/../</span>../<br><span class="hljs-regexp">/jshERP-boot/</span>v2<span class="hljs-regexp">/api-docs/</span>..<span class="hljs-regexp">/../</span>../<br><span class="hljs-regexp">/jshERP-boot/</span>webjars<span class="hljs-regexp">/../</span>../<br><span class="hljs-regexp">/jshERP-boot/</span>systemConfig<span class="hljs-regexp">/static/</span>..<span class="hljs-regexp">/../</span>../<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/70b5879a2ad043faa9093532d08ad898.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="3-2-防御思路"><a href="#3-2-防御思路" class="headerlink" title="3.2 防御思路"></a>3.2 防御思路</h2><p>Java Web权限认证框架，比如Shiro或Spring Security</p>
+<h1 id="0x04-暴力破解"><a href="#0x04-暴力破解" class="headerlink" title="0x04 暴力破解"></a>0x04 暴力破解</h1><p>从登陆的方法处能发现，并没有做暴力破解方面的安全防护措施</p>
+<p><img src="https://img-blog.csdnimg.cn/c68df91cbf584c6b904063bfdda5b9ee.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>观察用户登录时的判断逻辑，是否是简单判断，有没有做限制措施，比如次数锁定。</p>
+<p><img src="https://img-blog.csdnimg.cn/2e1a3bab0e3249319438b111a8776d05.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>看着很像MD5</p>
+<p><img src="https://img-blog.csdnimg.cn/14d45bb16799408daf4b8ca9d621f590.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>看来的却和我们想的一样，是MD5 加密后的密码</p>
+<p><img src="https://img-blog.csdnimg.cn/323b1f58d96646798cba28b75b6f0a21.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/b466067567ca46ffa008fe68298274fa.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="4-1-验证"><a href="#4-1-验证" class="headerlink" title="4.1 验证"></a>4.1 验证</h2><p>打开Burp测试</p>
+<p><img src="https://img-blog.csdnimg.cn/b0724502cc0d4809ae787829f9c31d3d.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>成功爆破</p>
+<p><img src="https://img-blog.csdnimg.cn/981a2c680f0d4c7d8c829f0cb822e080.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="4-2-防御思路"><a href="#4-2-防御思路" class="headerlink" title="4.2 防御思路"></a>4.2 防御思路</h2><ul>
+<li>加入token机制，每次登录页面都会随机生成Token字串</li>
+<li>加强敏感字段的加密方式，比如使用SHA-256、SHA-384、SHA-512代替MD5，或者MD5加其他字段</li>
+<li>账户锁定，因为暴力破解程序在5-6次的探测中猜出密码的可能性很小。但是同时也拒绝了正常用户的使用。如果攻击者的探测是建立在用户名探测成功之后的行为，那么会造成严重的拒绝服务攻击。对于对大量用户名只用一个密码的探测攻击账户锁定无效。如果对已经锁定的账户并不返回任何信息，可能迷惑攻击者</li>
+<li>不管结果如何都返回成功的信息，破解软件就会停止攻击。但是对人来说很快就会被识破</li>
+<li>产生登录错的的时候就跳到另一个页面要求重新登录。比如126和校内网都是这样做的。局限性在于不能总是跳转页面，一般只在第一次错误的时候跳转，但是第一次之后又可以继续暴力探测了</li>
+<li>检查密码的时候适当的插入一些暂停，可以减缓攻击，但是可能对用户造成一定的影响</li>
+<li>封锁多次登录的IP地址，这种方法也是有缺点的，因为攻击者可以定时更换自己的IP</li>
+<li>验证码，验证码是阻止暴力攻击的好方法，但设计不好的验证码是可以绕过的，而且对于特定目标的手工探测来说验证码是没有作用的</li>
+</ul>
+<h1 id="0x05-越权重置密码"><a href="#0x05-越权重置密码" class="headerlink" title="0x05 越权重置密码"></a>0x05 越权重置密码</h1><p>service层具体查看一下resetPwd函数，明显看到这里只禁止重置admin超管密码，但是并没有对当前重置密码的用户身份做判断，导致存在越权重置他人密码，这里来验证一下</p>
+<p>getLoginName()方法获取id对应用户在数据库中保存的liginname信息,如果loginname是admin用户的话,就打印错误信息,禁止重置超管密码</p>
+<p>通过调用getUser()方法在数据库中根据id查找对应的用户信息</p>
+<p><img src="https://img-blog.csdnimg.cn/9eebd04015e14b9f8853c6f16397c6b4.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>结合认证绕过，可以根据用户id未授权重置用户密码</p>
+<h2 id="5-1-验证"><a href="#5-1-验证" class="headerlink" title="5.1 验证"></a>5.1 验证</h2><figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs http"><span class="hljs-keyword">POST</span> <span class="hljs-string">/jshERP-boot/user/resetPwd</span> <span class="hljs-meta">HTTP/1.1</span><br><span class="hljs-attribute">Host</span><span class="hljs-punctuation">: </span>192.168.xxx:3000<br><span class="hljs-attribute">Content-Length</span><span class="hljs-punctuation">: </span>10<br><span class="hljs-attribute">Accept</span><span class="hljs-punctuation">: </span>application/json, text/plain, */*<br><span class="hljs-attribute">X-Access-Token</span><span class="hljs-punctuation">: </span>b7c044358aef4170a83887267da71b09_63<br><span class="hljs-attribute">User-Agent</span><span class="hljs-punctuation">: </span>Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Safari/537.36<br><span class="hljs-attribute">Content-Type</span><span class="hljs-punctuation">: </span>application/json;charset=UTF-8<br><span class="hljs-attribute">Origin</span><span class="hljs-punctuation">: </span>http://192.168.xxx:3000<br><span class="hljs-attribute">Referer</span><span class="hljs-punctuation">: </span>http://192.168.xxxx:3000/system/user<br><span class="hljs-attribute">Accept-Encoding</span><span class="hljs-punctuation">: </span>gzip, deflate<br><span class="hljs-attribute">Accept-Language</span><span class="hljs-punctuation">: </span>zh-CN,zh;q=0.9<br><span class="hljs-attribute">Cookie</span><span class="hljs-punctuation">: </span>Hm_lvt_1cd9bcbaae133f03a6eb19da6579aaba=1631759117; Hm_lpvt_1cd9bcbaae133f03a6eb19da6579aaba=1632215458<br><span class="hljs-attribute">Connection</span><span class="hljs-punctuation">: </span>close<br><br><span class="language-json"><span class="hljs-punctuation">&#123;</span><span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">280</span><span class="hljs-punctuation">&#125;</span></span><br></code></pre></td></tr></table></figure>
+
+<p>通过普通用户账号的Toke 越权重置其它用户的密码为默认密码：123456</p>
+<p><img src="https://img-blog.csdnimg.cn/489addec8c904686ac4d6ab62cdbbda3.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>成功重置test2密码为123456，并登陆成功</p>
+<p><img src="https://img-blog.csdnimg.cn/797fe765330446efbc567ebd96650b07.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="5-2-修复方式"><a href="#5-2-修复方式" class="headerlink" title="5.2 修复方式"></a>5.2 修复方式</h2><p>对用户操作进行鉴权，防止通过修改参数进入未授权页面及进行非法操作，建议在服务端对请求的数据和当前用户身份做校验检查。<br>例如： </p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">登陆时将用户名存入<span class="hljs-keyword">session</span> <br><span class="hljs-keyword">session</span>.setAttribute(&quot;username&quot;,username);<br>在相关页面判断<br><span class="hljs-keyword">if</span>((String)<span class="hljs-keyword">session</span>.getAttribute(&quot;username&quot;)!=<span class="hljs-keyword">admin</span>)&#123;<br>(response.sendRedirect(&quot;XXX.jsp&quot;));<br>注意： xxx.jsp为自定义的错误页面<br></code></pre></td></tr></table></figure>
+
+<h1 id="0x06-越权删除"><a href="#0x06-越权删除" class="headerlink" title="0x06 越权删除"></a>0x06 越权删除</h1><p>batDeleteUser传入参数ids，使用逗号，分割，接着调用UserMapperEx.batDeleteOrUpdateUser()方法将ids参数拼接进sql语句进行删除，这里没有对当前执行删除用户操作的用户身份做判断，甚至没有禁止删除超级管理员，导致存在越权删除任意用户信息(包括管理员)</p>
+<p><img src="https://img-blog.csdnimg.cn/5bdc1a20ba004cd784acdc2a7b88f86d.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><img src="https://img-blog.csdnimg.cn/321372ceb1674ad191122b9be6ca8d3f.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="6-1-验证"><a href="#6-1-验证" class="headerlink" title="6.1 验证"></a>6.1 验证</h2><figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">DELETE</span> /jshERP-boot/user/delete?id=<span class="hljs-number">280</span> HTTP/<span class="hljs-number">1</span>.<span class="hljs-number">1</span><br><span class="hljs-attribute">Host</span>: <span class="hljs-number">192</span>.<span class="hljs-number">168</span>.xxx:<span class="hljs-number">3000</span><br><span class="hljs-attribute">Accept</span>: application/json, text/plain, */*<br><span class="hljs-attribute">X</span>-Access-Token: <span class="hljs-number">5</span>b19a4a133904b5eaf4cdf090f6d511f_63<br><span class="hljs-attribute">User</span>-Agent: Mozilla/<span class="hljs-number">5</span>.<span class="hljs-number">0</span> (Macintosh; Intel Mac OS X <span class="hljs-number">10</span>_15_7) AppleWebKit/<span class="hljs-number">537</span>.<span class="hljs-number">36</span> (KHTML, like Gecko) Chrome/<span class="hljs-number">93</span>.<span class="hljs-number">0</span>.<span class="hljs-number">4577</span>.<span class="hljs-number">82</span> Safari/<span class="hljs-number">537</span>.<span class="hljs-number">36</span><br><span class="hljs-attribute">Origin</span>: http://<span class="hljs-number">192</span>.<span class="hljs-number">168</span>.xxx:<span class="hljs-number">3000</span><br><span class="hljs-attribute">Referer</span>: http://<span class="hljs-number">192</span>.<span class="hljs-number">168</span>.xxx:<span class="hljs-number">3000</span>/system/user<br><span class="hljs-attribute">Accept</span>-Encoding: gzip, deflate<br><span class="hljs-attribute">Accept</span>-Language: zh-CN,zh;q=<span class="hljs-number">0</span>.<span class="hljs-number">9</span><br><span class="hljs-attribute">Cookie</span>: Hm_lvt_1cd9bcbaae133f03a6eb19da6579aaba=<span class="hljs-number">1631759117</span>; Hm_lpvt_1cd9bcbaae133f03a6eb19da6579aaba=<span class="hljs-number">1632217815</span><br><span class="hljs-attribute">Connection</span>: close<br></code></pre></td></tr></table></figure>
+
+<p>通过普通用户账号的Toke 越权删除其它用户</p>
+<p><img src="https://img-blog.csdnimg.cn/6a1db569afd34f31a08d6253e3f13780.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>成功删除</p>
+<p><img src="https://img-blog.csdnimg.cn/f300415f7681477cae0148a529350745.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="6-2-修复方式"><a href="#6-2-修复方式" class="headerlink" title="6.2 修复方式"></a>6.2 修复方式</h2><p>对用户操作进行鉴权，防止通过修改参数进入未授权页面及进行非法操作，建议在服务端对请求的数据和当前用户身份做校验检查。<br>例如： </p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">登陆时将用户名存入<span class="hljs-keyword">session</span> <br><span class="hljs-keyword">session</span>.setAttribute(&quot;username&quot;,username);<br>在相关页面判断<br><span class="hljs-keyword">if</span>((String)<span class="hljs-keyword">session</span>.getAttribute(&quot;username&quot;)!=<span class="hljs-keyword">admin</span>)&#123;<br>(response.sendRedirect(&quot;XXX.jsp&quot;));<br><br></code></pre></td></tr></table></figure>
+
+
+<h1 id="0x07-越权篡改信息"><a href="#0x07-越权篡改信息" class="headerlink" title="0x07 越权篡改信息"></a>0x07 越权篡改信息</h1><p>查看相关函数，发现只是提示禁止修改管理员信息，并校验了一些基础的用户信息，并未做鉴权</p>
+<p><img src="https://img-blog.csdnimg.cn/61ff46a4c7794d00974810b5f1f7190c.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><img src="https://img-blog.csdnimg.cn/5588e1f4db744b779712456a0e0b8983.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>调用getLoginName方法来获取传入的id对应的登录名，之后调用getUserListByUserNameOrLoginName方法将登录名拼接到sql语句中来获取用户列表，再从列表中取出id与前端传入的id作比较，相同的话就可以更新数据。（这里并没有对当前用户身份做判断）</p>
+<p><img src="https://img-blog.csdnimg.cn/b016e9194b1d4844a36ba4e184891cbb.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="7-1-验证"><a href="#7-1-验证" class="headerlink" title="7.1 验证"></a>7.1 验证</h2><figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs http"><span class="hljs-keyword">PUT</span> <span class="hljs-string">/jshERP-boot/user/updateUser</span> <span class="hljs-meta">HTTP/1.1</span><br><span class="hljs-attribute">Host</span><span class="hljs-punctuation">: </span>192.168.XXX:3000<br><span class="hljs-attribute">Content-Length</span><span class="hljs-punctuation">: </span>198<br><span class="hljs-attribute">Accept</span><span class="hljs-punctuation">: </span>application/json, text/plain, */*<br><span class="hljs-attribute">X-Access-Token</span><span class="hljs-punctuation">: </span>48b7750c14724db19282dcf98cf48067_63<br><span class="hljs-attribute">User-Agent</span><span class="hljs-punctuation">: </span>Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Safari/537.36<br><span class="hljs-attribute">Content-Type</span><span class="hljs-punctuation">: </span>application/json;charset=UTF-8<br><span class="hljs-attribute">Origin</span><span class="hljs-punctuation">: </span>http://192.168.XXX:3000<br><span class="hljs-attribute">Referer</span><span class="hljs-punctuation">: </span>http://192.168.XXXX:3000/system/user<br><span class="hljs-attribute">Accept-Encoding</span><span class="hljs-punctuation">: </span>gzip, deflate<br><span class="hljs-attribute">Accept-Language</span><span class="hljs-punctuation">: </span>zh-CN,zh;q=0.9<br><span class="hljs-attribute">Cookie</span><span class="hljs-punctuation">: </span>Hm_lvt_1cd9bcbaae133f03a6eb19da6579aaba=1631759117; Hm_lpvt_1cd9bcbaae133f03a6eb19da6579aaba=1632223642<br><span class="hljs-attribute">Connection</span><span class="hljs-punctuation">: </span>close<br><br><span class="language-json"><span class="hljs-punctuation">&#123;</span><span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">281</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;isystem&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">0</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;loginName&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;test3&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;orgAbr&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;335&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;orgaId&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">50</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;orgaUserRelId&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">19</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;roleId&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">17</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;roleName&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;销售代表&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;status&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">0</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;tenantId&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">63</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;userType&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;普通&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;username&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;test355555555&quot;</span><span class="hljs-punctuation">&#125;</span></span><br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/078022a13e154bda910aa19178bbc679.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/5dc4320b9f844c44bd177e5770b093e9.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="7-2-防御方法"><a href="#7-2-防御方法" class="headerlink" title="7.2 防御方法"></a>7.2 防御方法</h2><p>执行关键操作前必须验证用户身份，验证用户是否具备操作数据的权限</p>
+<p>对用户操作进行鉴权，防止通过修改参数进入未授权页面及进行非法操作，建议在服务端对请求的数据和当前用户身份做校验检查。<br>例如： </p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">登陆时将用户名存入<span class="hljs-keyword">session</span> <br><span class="hljs-keyword">session</span>.setAttribute(&quot;username&quot;,username);<br>在相关页面判断<br><span class="hljs-keyword">if</span>((String)<span class="hljs-keyword">session</span>.getAttribute(&quot;username&quot;)!=<span class="hljs-keyword">admin</span>)&#123;<br>(response.sendRedirect(&quot;XXX.jsp&quot;));<br>注意：<br></code></pre></td></tr></table></figure>
+
+<p>参考链接：</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_42282189/article/details/120355304">https://blog.csdn.net/weixin_42282189&#x2F;article&#x2F;details&#x2F;120355304</a></p>
+<hr>
+<p><strong>你以为你有很多路可以选择，其实你只有一条路可以走</strong></p>
+<hr>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Java%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/">#Java代码审计</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>「Java代码审计」华夏ERP3.0代码审计</div>
+      <div>https://orangey.info/2022/09/24/120340010/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>橙留香</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年9月24日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/09/24/120441582/" title="「Java代码审计」代码审计靶场本地搭建「IDAE」">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">「Java代码审计」代码审计靶场本地搭建「IDAE」</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/09/24/123132769/" title="「干货」Linux 应急响应日志分析命令「总结」">
+                        <span class="hidden-mobile">「干货」Linux 应急响应日志分析命令「总结」</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  <article id="comments" lazyload>
+    
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1e96aec5ac46370916fa","clientSecret":"ee5e97a65cf34e9fe31e15ab0421a94968237f5e","repo":"ogGitalk","owner":"ananasOrangey","admin":["ananasOrangey"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '4214eecb3cabb6ffaad46ac3717fa639'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+  </article>
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://orangey.blog.csdn.net" target="_blank" rel="nofollow noopener"><span>橙留香CSDN博客</span></a> <i class="iconfont icon-love"></i> <a href="https://i.imgtg.com/2022/09/21/gNXxK.png" target="_blank" rel="nofollow noopener"><span>橙留香微信公众号</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

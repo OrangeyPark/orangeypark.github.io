@@ -1,0 +1,1371 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="橙留香">
+  <meta name="keywords" content="橙留香车联网安全技术博客">
+  
+    <meta name="description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  基础理论专栏长期更新，本篇最新内容请前往：  [车联网安全自学篇] 车联网基础理论之车联网安全车端知识科普  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;ananasorangey&#x2F;category11955914">
+<meta property="og:type" content="article">
+<meta property="og:title" content="车联网安全常见术语科普">
+<meta property="og:url" content="https://orangey.info/2022/09/23/118888796/index.html">
+<meta property="og:site_name" content="车联网安全技术博客 | 橙留香">
+<meta property="og:description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  基础理论专栏长期更新，本篇最新内容请前往：  [车联网安全自学篇] 车联网基础理论之车联网安全车端知识科普  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;ananasorangey&#x2F;category11955914">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/21/gNXxK.png">
+<meta property="article:published_time" content="2022-09-23T15:50:33.521Z">
+<meta property="article:modified_time" content="2022-09-24T16:36:14.821Z">
+<meta property="article:author" content="橙留香">
+<meta property="article:tag" content="Android_ATTACK">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+  
+  
+  
+  <title>车联网安全常见术语科普 - 车联网安全技术博客 | 橙留香</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"orangey.info","root":"/","version":"1.9.3","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"java"},"copy_btn":false,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>橙留香</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="车联网安全常见术语科普"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-09-23 23:50" pubdate>
+          2022年9月23日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          25k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          <!-- compatible with older versions-->
+          207 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">车联网安全常见术语科普</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <hr>
+<p><strong>也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大</strong></p>
+<p><strong>少走了弯路，也就错过了风景，无论如何，感谢经历</strong></p>
+<hr>
+<p>基础理论专栏长期更新，本篇最新内容请前往：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://orangey.blog.csdn.net/article/details/119409898">[车联网安全自学篇] 车联网基础理论之车联网安全车端知识科普</a></li>
+</ul>
+<p>更多关于Android安全的知识，可前往：<a target="_blank" rel="noopener" href="https://blog.csdn.net/ananasorangey/category11955914.html">https://blog.csdn.net/ananasorangey/category11955914.html</a></p>
+<p><img src="https://i.imgtg.com/2022/09/25/gdpGP.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><img src="https://i.imgtg.com/2022/09/21/gNXxK.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="0x01-车端"><a href="#0x01-车端" class="headerlink" title="0x01 车端"></a>0x01 车端</h2><p>车联网（IoV，Internet of Vehicle）是移动互联网和物联网相融合的技术，它囊括了所有通过后装或者原厂配置无线通信模块而具有无线网络连接能力的新老车型，它涉及的技术有通信、环保、节能及安全等。</p>
+<p>CAN（Controller Area Network）是控制器局域网的英文缩写，CAN的诞生只是为了实现更大范围的协同功能和全局控制。</p>
+<p>高速CAN总线（High Speed CAN，CAN-C）：CAN-C的标准是ISO11898-2，速率是 125bit&#x2F;s 到 1Mbit&#x2F;s，因此这个速率可以满足驱动系统的实时性数据传输要求。CAN-C经常被用于连接以下子系统：</p>
+<p>· 发动机控制单元</p>
+<p>· 变速器控制单元</p>
+<p>· 车身稳定控制</p>
+<p>· 仪表系统</p>
+<p>低速CAN总线（Low Speed CAN，CAN-B）：CAN-B的标准是ISO11898-3，速率是 5～125kbit&#x2F;s，对汽车舒适系统和车身控制系统（如天窗、车门等）的一些应用来说这个速率是足够的，CAN-B应用的例子如下：</p>
+<p>· 空调系统（AC）</p>
+<p>· 座椅调节</p>
+<p>· 电动车窗</p>
+<p>· 天窗控制</p>
+<p>· 后视镜调节</p>
+<p>· 灯光系统</p>
+<p>· 导航系统控制</p>
+<ul>
+<li>网络拓扑：网络拓扑结构是指用传输媒体（例如双绞线、光纤、无线链路等）互连各种设备的物理布局，就是用什么方式把网络中的计算机等设备连接起来。拓扑图给出网络服务器、工作站的网络配置和相互间的连接，它的结构主要有星形结构、环形结构、总线结构、分布式结构、树形结构、网状结构等</li>
+<li>总线（BUS）：总线是计算机各种功能部件之间传送信息的公共通信干线，它是由导线组成的传输线束。</li>
+<li>网络协议（Network Protocols）：网络协议是为计算机网络中进行数据交换而建立的规则、标准或约定的集合。</li>
+<li>网关（Gateway）：又称网间连接器、协议转换器。网关在网络层以上实现网络互连，是最复杂的网络互连设备，仅用于两个高层协议不同的网络互连。网关既可以用于广域网互连，也可以用于局域网互连。网关是一种充当转换重任的计算机系统或设备，使用在不同的通信协议、数据格式、语言，甚至体系结构完全不同的两种系统之间，网关是一个翻译器。与网桥只是简单地传达信息不同，网关对收到的信息要重新打包，以适应目的系统的需求。</li>
+<li>V2V：车与车通信</li>
+<li>V2R（Vehicle to Road）：车与路通信</li>
+<li>V2H（Vehicle to Human）：车与人通信</li>
+<li>V2S（Vehicle to Sensor）：车与传感器通信</li>
+<li>V2I（Vehicle to Infrastructure）：车与基础设施如道路、服务器等通信</li>
+<li>V2P（Vehicle to Pedestrian）：汽车与行人通信</li>
+<li>V2X（Vehicle to X）：表示车与X通信，X可以是车（Vehicle）、路（Road）或者其他相关基础设施</li>
+<li>UDS（Unified Diagnostic Services）：统一诊断服务</li>
+</ul>
+<h3 id="碰撞预警"><a href="#碰撞预警" class="headerlink" title="碰撞预警"></a>碰撞预警</h3><p>汽车发生碰撞的几种类型都可以在发生碰撞之前通过V2V通信避免，例如当前车要变化车道时，后面车辆的驾驶员除了前车的转弯灯信号外可能还会收到前车通过V2V通信发出的转向警告信号。在这种情况下，如果后面车辆的驾驶员没有注意到前车的转向灯或者前车驾驶员忘记打开转向灯，后面车辆的驾驶员同样可以得到声音或者指示灯的提示。另一方面，如果要变道的车辆的盲点位置（位于车辆侧后方后视镜看不到的地方）有车而驾驶员没有看到，那么在驾驶员试图转向变道时也会收到提醒。</p>
+<h3 id="1-0-左传辅助"><a href="#1-0-左传辅助" class="headerlink" title="1.0 左传辅助"></a>1.0 左传辅助</h3><p>左转辅助（LTA，Left Turn Assist）：LTA在车辆左转弯且可能发生碰撞时会提醒驾驶员。</p>
+<h3 id="1-1-紧急刹车提示"><a href="#1-1-紧急刹车提示" class="headerlink" title="1.1 紧急刹车提示"></a>1.1 紧急刹车提示</h3><p>紧急刹车提示（Emergency Electronic Brake Light）：当前方的某一辆配备了V2X功能的汽车急刹时，后车会收到提示，这在大雾、大雨天气或者前面有车辆阻挡视线时非常有用。如果没有急刹提示，当后车驾驶员注意到前车的急刹时可能已经来不及减速了。</p>
+<p>闯红灯警告（Red Light Violation Warning）：这个功能会在车辆驶向交通信号灯时根据车辆速度等信息判断是否可能闯红灯，进而提醒驾驶员。</p>
+<h3 id="1-2-过弯速度警告"><a href="#1-2-过弯速度警告" class="headerlink" title="1.2 过弯速度警告"></a>1.2 过弯速度警告</h3><p>过弯速度警告（Curve Speed Warning）：若汽车以当前速度通过前方弯曲的道路可能发生危险，那么这个功能就会提醒驾驶员减速。</p>
+<h3 id="1-3-施工路段提醒"><a href="#1-3-施工路段提醒" class="headerlink" title="1.3 施工路段提醒"></a>1.3 施工路段提醒</h3><p>施工路段提醒（Reduced Speed Zone Warning）：这个功能会提醒驾驶员减速、变道或者准备停车。</p>
+<h4 id="1-4-实时天气信息提醒"><a href="#1-4-实时天气信息提醒" class="headerlink" title="1.4 实时天气信息提醒"></a>1.4 实时天气信息提醒</h4><p>实时天气信息提醒：这个功能会通过 V2I 下载实时天气信息和位置，必要时向驾驶员发出告警。</p>
+<ul>
+<li><p>在线诊断系统（OBD）：指车辆提供的自诊断和故障报告功能，车主或维修人员可以通过OBD协议获取汽车的各个子系统的工作状态对汽车进行诊断。</p>
+</li>
+<li><p>OBD 五种协议：SAE J1850 PWM、SAE J1850 VPW、ISO 9141-2、ISO 14230 KWP2000和ISO 15765 CAN（最常用的）</p>
+</li>
+</ul>
+<h4 id="1-5-汽车总线协议介绍"><a href="#1-5-汽车总线协议介绍" class="headerlink" title="1.5 汽车总线协议介绍"></a>1.5 汽车总线协议介绍</h4><p>汽车内网采用了多种协议，例如FlexRay、MOST、CAN、LIN等，这些协议的速率和成本不同，因此有各自的应用场景，如图6-1所示。例如，MOST常用于多媒体系统中高速传输数据，FlexRay用于实时性要求较高的X-By-Wire，CAN常用于连接控制器，LIN则用于门窗开关等。</p>
+<ul>
+<li><p>ISO-TP：虽然CAN协议标准里规定了数据最长为8个字节，但是有标准的基于CAN的上层协议用于发送大于8个字节的数据，比如ISO-TP或者ISO15765-2，根据这个标准可以通过CAN总线发送任意长度的数据。ISO15765-2协议定义车载诊断系统网络层要求，基于CAN数据链路层（由ISO11898标准定义）运行。虽说它最初的设计是用在诊断系统上的，但它同样适用于其他需要网络层协议的CAN通信系统上。</p>
+</li>
+<li><p>CANopen</p>
+</li>
+</ul>
+<p>CANopen 是一种架构在控制局域网络上的高层通信协议，CANopen将11位消息ID分为4位功能码和7位节点ID。7位元的节点ID共有128种不同的组合，其中ID0不使用，因此一个CANopen网络上最多允许127台设备。CAN消息在CAN2.0B规格中允许29位的ID，因此若配合CAN2.0B使用，CANopen网络上可以超过127台设备，不过在实际运用中，大多数CANopen网络上的设备数量均低于此数值。</p>
+<ul>
+<li><p>COB-ID：CANopen将CAN消息的11位ID称为通信对象ID</p>
+</li>
+<li><p>心跳协议（Heartbeat Protocol）：用来监控网络中的节点及确认其正常工作。</p>
+</li>
+<li><p>UDS：统一诊断服务</p>
+</li>
+</ul>
+<h3 id="1-6-CAN-逆向分析工具"><a href="#1-6-CAN-逆向分析工具" class="headerlink" title="1.6 CAN 逆向分析工具"></a>1.6 CAN 逆向分析工具</h3><ul>
+<li>1．VehicleSpy</li>
+</ul>
+<p>VehicleSpy是美国英特佩斯控制系统有限公司的产品，是一款集成了诊断、节点&#x2F;ECU仿真、数据获取、自动测试和车内通信网络监控等功能的工具，支持标准的CAN数据库（即．dbc 文件），与配套的接口适配器硬件结合还可以支持 CAN 以外的其他协议，如FlexRay、LIN、汽车以太网等。</p>
+<p>它支持的硬件有很多，分析CAN协议使用ValueCAN就可以。能同时查看、筛选、分类、定制和记录多种总线网络的信号和消息。它的自动消息高亮显示能准确清晰地指示车辆总线上正在变化的数据，这在对CAN进行逆向分析时非常方便。消息编辑界面能让用户方便地设定汽车网络通信的发送或接收消息和信号。VehicleSpy还有非常强大的图形化数据分析功能，包括复合Y轴、复合X轴、数据文件重叠、图表、复制到剪贴板、多种指针仪表等</p>
+<p>VehicleSpy还支持脚本编程，功能非常强大，具体可以查看其用户手册。更多关于VehicleSpy的资料可以参考：intrepidcs．com<a target="_blank" rel="noopener" href="http://www.hongkeqiche.com/index%EF%BC%8Ephp/bussoftware/vehicle-spy3compare/">http://www．hongkeqiche．com/index．php/bussoftware/vehicle-spy3compare/</a></p>
+<ul>
+<li>2．BusMaster</li>
+</ul>
+<p>BusMaster是一款开源的免费软件，支持多家厂商的硬件，例如Kavaser、Vector等厂家的硬件。图6-13所示为BusMaster支持的硬件。</p>
+<p>BusMaster支持CAN数据的重放、记录、图形化显示、模拟，以及加载CAN数据库（但不是标准的DBC文件而是后缀名为．dbf的文件）等，功能非常强大。由于它是免费的，所以非常适合入门学习。Kavaser Leaf Light与BusMaster一起使用非常稳定</p>
+<ul>
+<li>3．SocketCAN</li>
+</ul>
+<p>SocketCAN是大众公司向Linux内核贡献的CAN驱动及协议栈实现，支持虚拟CAN设备、内置CAN芯片、USB或者串口CAN接口设备。</p>
+<p>传统的Linux CAN驱动程序采用的是字符设备模型，通常情况下只支持单个进程发送或者接收CAN数据。SocketCAN采用的是网络设备模型</p>
+<ul>
+<li>4．CANToolz</li>
+</ul>
+<p>CANToolz又叫YACHT（Yet Another Car Hacking Tool），是一个分析CAN和设备的框架。该工具基于不同的模块组装在一起，可以被安全研究人员和汽车业&#x2F;OEM的安全测试人员用来进行黑盒分析等，可以使用 CANToolz 发现电子控制单元（ECU）、中间人攻击测试、模糊测试、暴力破解、扫描或R＆D测试和验证。</p>
+<h3 id="1-7-LIN-总线"><a href="#1-7-LIN-总线" class="headerlink" title="1.7 LIN 总线"></a>1.7 LIN 总线</h3><ul>
+<li><p>LIN：支持单线双向通信，采用廉价的由RC振荡器驱动的单片机，但在时间和软件上却要付出代价，每条报文必须经过一个自动确定波特率的过程。</p>
+</li>
+<li><p>位错误：正在发送的节点应该对希望发送的数据与总线上实际出现的数据进行比较，控制器必须等待足够时间以确保总线对发出的数据做出反应，然后才可以测试这一数据。假定总线响应信号的最小边沿变化速率为1V&#x2F;μs，最大总线电压为18V，那么发送器应等待18μs后才可进行测试。</p>
+</li>
+</ul>
+<h3 id="1-8-MOST总线"><a href="#1-8-MOST总线" class="headerlink" title="1.8 MOST总线"></a>1.8 MOST总线</h3><ul>
+<li>MOST：媒体导向系统传输（MOST，Media Oriented Systems Transport）是一种用于汽车的高速多媒体网络技术，可以用于汽车及其他领域。串行MOST总线采用环形拓扑，同步数据传输机制，采用光纤传输音频、视频等</li>
+</ul>
+<h3 id="1-9-FlexRay-高速总线"><a href="#1-9-FlexRay-高速总线" class="headerlink" title="1.9 FlexRay 高速总线"></a>1.9 FlexRay 高速总线</h3><ul>
+<li><p>FlexRay：FlexRay是高速总线，在汽车上主要用于开环或闭环控制系统，主要特点是可靠性高、容错性好、实时性好。主要用于对可靠性和实时性要求比较高的应用场景，如电控转向、电控刹车、电控驱动等系统、电控油门，以及其他主动安全系统。这些系统可能没有机械备用系统，也就是说，如果电子系统故障将无法补救，所以对可靠性要求较高，并且X-By-Wire是一种趋势</p>
+</li>
+<li><p>FlexRay节点由主控制器（Host）、通信控制器（Communication Controller）和总线驱动器组成，每个节点还可能包括总线保护器（BUS Guardian）用于监控总线驱动器。</p>
+</li>
+</ul>
+<h2 id="0x02-云端"><a href="#0x02-云端" class="headerlink" title="0x02 云端"></a>0x02 云端</h2><h3 id="2-1-POC、EXP、Payload与Shellcode"><a href="#2-1-POC、EXP、Payload与Shellcode" class="headerlink" title="2.1 POC、EXP、Payload与Shellcode"></a>2.1 POC、EXP、Payload与Shellcode</h3><figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs 1c">POC：全称 &#x27; Proof of Concept &#x27;，中文 &#x27; 概念验证 &#x27; ，常指一段漏洞证明的代码。<br><br><span class="hljs-built_in">EXP</span>：全称 &#x27; Exploit &#x27;，中文 &#x27; 利用 &#x27;，指利用系统漏洞进行攻击的动作。<br><br>Payload：中文 &#x27; 有效载荷 &#x27;，指成功exploit之后，真正在目标系统执行的代码或指令。<br><br>Shellcode：简单翻译 &#x27; shell代码 &#x27;，是Payload的一种，由于其建立正向/反向shell而得名。名。<br></code></pre></td></tr></table></figure>
+<h4 id="2-1-1-注意事项"><a href="#2-1-1-注意事项" class="headerlink" title="2.1.1 注意事项"></a>2.1.1 注意事项</h4><pre><code class="hljs">POC是用来证明漏洞存在的，EXP是用来利用漏洞的，两者通常不是一类，或者说，PoC通常是无害的，Exp通常是有害的，有了POC，才有EXP。
+
+Payload有很多种，它可以是Shellcode，也可以直接是一段系统命令。同一个Payload可以用于多个漏洞，但每个漏洞都有其自己的EXP，也就是说不存在通用的EXP。
+
+Shellcode也有很多种，包括正向的，反向的，甚至meterpreter。
+
+Shellcode与Shellshcok不是一个，Shellshock特指14年发现的Shellshock漏洞。
+</code></pre>
+<h4 id="2-1-2-Payload模块"><a href="#2-1-2-Payload模块" class="headerlink" title="2.1.2 Payload模块"></a>2.1.2 Payload模块</h4><p>在Metasploit Framework 6大模块中有一个Payload模块，在该模块下有Single、Stager、Stages这三种类型，Single是一个all-in-one的Payload，不依赖其他的文件，所以它的体积会比较大，Stager主要用于当目标计算机的内存有限时，可以先传输一个较小的Stager用于建立连接，Stages指利用Stager建立的连接下载后续的Payload。Stager和Stages都有多种类型，适用于不同场景。</p>
+<h3 id="2-2-暗xx"><a href="#2-2-暗xx" class="headerlink" title="2.2 暗xx"></a>2.2 暗xx</h3><pre><code class="hljs">网上自己去搜索吧（很好理解的）
+
+暗x是利用加密传输、P2P对等网络、多点中继混淆等，为用户提供匿ming的互联网信息访问的一类技术手段，其最突出的特点就是匿m性。
+</code></pre>
+<h3 id="2-3-肉肌"><a href="#2-3-肉肌" class="headerlink" title="2.3 肉肌"></a>2.3 肉肌</h3><pre><code class="hljs">    所谓“肉肌”是一种很形象的比喻，比喻那些可以被攻击者控制的电脑、手机、服务器或者其他摄像头、路由器等智能设备，用于发动网络攻击。
+    
+    例如在2016年美国东海岸断网事件中，黑客组织控制了大量的联网摄像头用于发动网络攻击，这些摄像头则可被称为“肉肌”。
+</code></pre>
+<h3 id="2-4-僵尸网络"><a href="#2-4-僵尸网络" class="headerlink" title="2.4 僵尸网络"></a>2.4 僵尸网络</h3><pre><code class="hljs">    僵尸网络 Botnet 是指采用一种或多种传播手段，将大量主机感染病毒，从而在控制者和被感染主机之间所形成的一个可一对多控制的网络。
+    
+    僵尸网络是一个非常形象的比喻，众多的计算机在不知不觉中如同中国古老传说中的僵尸群一样被人驱赶和指挥着，成为被攻击者执行各类恶意活动（DDOS、垃圾邮件等）利用的一种基础设施。
+</code></pre>
+<h3 id="2-5-木马"><a href="#2-5-木马" class="headerlink" title="2.5 木马"></a>2.5 木马</h3><pre><code class="hljs">    就是那些表面上伪装成了正常的程序，但是当这些程序运行时，就会获取系统的整个控制权限。
+
+    有很多黑客就是热衷使用木马程序来控制别人的电脑，比如灰鸽子、Gh0st、PcShare等等。
+</code></pre>
+<h3 id="2-6-网页木马"><a href="#2-6-网页木马" class="headerlink" title="2.6 网页木马"></a>2.6 网页木马</h3><pre><code class="hljs">    表面上伪装成普通的网页或是将恶意代码直接插入到正常的网页文件中，当有人访问时，网页木马就会利用对方系统或者浏览器的漏洞自动将配置好的木马服务端植入到访问者的电脑上来自动执行将受影响的客户电脑变成肉鸡或纳入僵尸网络。
+</code></pre>
+<h3 id="2-7-Rootkit"><a href="#2-7-Rootkit" class="headerlink" title="2.7 Rootkit"></a>2.7 Rootkit</h3><pre><code class="hljs">    Rootkit是攻击者用来隐藏自己的行踪和保留root（根权限，可以理解成WINDOWS下的system或者管理员权限）访问权限的工具。
+    
+    通常，攻击者通过远程攻击的方式获得root访问权限，或者是先使用密码猜解（破解）的方式获得对系统的普通访问权限，进入系统后，再通过对方系统存在的安全漏洞获得系统的root或system权限。
+    
+    然后，攻击者就会在对方的系统中安装Rootkit，以达到自己长久控制对方的目的，Rootkit功能上与木马和后门很类似，但远比它们要隐蔽。
+</code></pre>
+<h3 id="2-8-蠕虫病毒"><a href="#2-8-蠕虫病毒" class="headerlink" title="2.8 蠕虫病毒"></a>2.8 蠕虫病毒</h3><pre><code class="hljs">    它是一类相对独立的恶意代码，利用了联网系统的开放性特点，通过可远程利用的漏洞自主地进行传播，受到控制终端会变成攻击的发起方，尝试感染更多的系统。
+    
+    蠕虫病毒的主要特性有：自我复制能力、很强的传播性、潜伏性、特定的触发性、很大的破坏性。
+</code></pre>
+<h3 id="2-9-震网病毒"><a href="#2-9-震网病毒" class="headerlink" title="2.9 震网病毒"></a>2.9 震网病毒</h3><pre><code class="hljs">    又名Stuxnet病毒，是第一个专门定向攻击真实世界中基础（能源）设施的“蠕虫”病毒，比如核电站，水坝，国家电网。
+    
+    作为世界上首个网络“超级破坏性武器”，Stuxnet的计算机病毒已经感染了全球超过 45000个网络，其目标伊朗的铀浓缩设备遭到的攻击最为严重。
+</code></pre>
+<h3 id="2-10-勒索病毒"><a href="#2-10-勒索病毒" class="headerlink" title="2.10 勒索病毒"></a>2.10 勒索病毒</h3><pre><code class="hljs">    主要以邮件、程序木马、网页挂马的形式进行传播。该病毒性质恶劣、危害极大，一旦感染将给用户带来无法估量的损失。这种病毒利用各种加密算法对文件进行加密，被感染者一般无法解密，必须拿到解密的私钥才有可能破解。
+</code></pre>
+<h3 id="2-11-挖矿木马"><a href="#2-11-挖矿木马" class="headerlink" title="2.11 挖矿木马"></a>2.11 挖矿木马</h3><pre><code class="hljs">    一种将PC、移动设备甚至服务器变为矿机的木马，通常由挖矿团伙植入，用于挖掘比特币从而赚取利益。
+</code></pre>
+<h3 id="2-12-攻击载荷"><a href="#2-12-攻击载荷" class="headerlink" title="2.12 攻击载荷"></a>2.12 攻击载荷</h3><pre><code class="hljs">    攻击载荷（Payload）是系统被攻陷后执行的多阶段恶意代码。
+    通常攻击载荷附加于漏洞攻击模块之上，随漏洞攻击一起分发，并可能通过网络获取更多的组件。
+</code></pre>
+<h3 id="2-13-嗅探器（Sniffer）"><a href="#2-13-嗅探器（Sniffer）" class="headerlink" title="2.13 嗅探器（Sniffer）"></a>2.13 嗅探器（Sniffer）</h3><pre><code class="hljs">    就是能够捕获网络报文的设备或程序。嗅探器的正当用处在于分析网络的流量，以便找出所关心的网络中潜在的问题。
+</code></pre>
+<h3 id="2-14-恶意软件"><a href="#2-14-恶意软件" class="headerlink" title="2.14 恶意软件"></a>2.14 恶意软件</h3><pre><code class="hljs">    被设计来达到非授权控制计算机或窃取计算机数据等多种恶意行为的程序。
+</code></pre>
+<h3 id="2-15-间谍软件"><a href="#2-15-间谍软件" class="headerlink" title="2.15 间谍软件"></a>2.15 间谍软件</h3><pre><code class="hljs">    一种能够在用户不知情的情况下，在其电脑、手机上安装后门，具备收集用户信息、监听、偷拍等功能的软件。
+</code></pre>
+<h3 id="2-16-后门"><a href="#2-16-后门" class="headerlink" title="2.16 后门"></a>2.16 后门</h3><pre><code class="hljs">    这是一种形象的比喻，入侵者在利用某些方法成功的控制了目标主机后，可以在对方的系统中植入特定的程序，或者是修改某些设置，用于访问、查看或者控制这台主机。
+
+    这些改动表面上是很难被察觉的，就好象是入侵者偷偷的配了一把主人房间的钥匙，或者在不起眼处修了一条按到，可以方便自身随意进出。
+
+    通常大多数木马程序都可以被入侵者用于创建后门（BackDoor）。
+</code></pre>
+<h3 id="2-17-弱口令"><a href="#2-17-弱口令" class="headerlink" title="2.17 弱口令"></a>2.17 弱口令</h3><pre><code class="hljs">    指那些强度不够，容易被猜解的，类似123，abc这样的口令（密码）。
+</code></pre>
+<h3 id="2-18-漏洞"><a href="#2-18-漏洞" class="headerlink" title="2.18 漏洞"></a>2.18 漏洞</h3><pre><code class="hljs">    漏洞是在硬件、软件、协议的具体实现或系统安全策略上存在的缺陷，从而可以使攻击者能够在未授权的情况下访问或破坏系统。
+    奇安信集团董事长齐向东在《漏洞》一书中指出，软件的缺陷是漏洞的一个主要来源，缺陷是天生的，漏洞是不可避免的。
+</code></pre>
+<h3 id="2-19-远程命令执行漏洞"><a href="#2-19-远程命令执行漏洞" class="headerlink" title="2.19 远程命令执行漏洞"></a>2.19 远程命令执行漏洞</h3><pre><code class="hljs">    由于系统设计实现上存在的漏洞，攻击者可能通过发送特定的请求或数据导致在受影响的系统上执行攻击者指定的任意命令。
+</code></pre>
+<h3 id="2-20-0day漏洞"><a href="#2-20-0day漏洞" class="headerlink" title="2.20 0day漏洞"></a>2.20 0day漏洞</h3><pre><code class="hljs">    0day漏洞最早的破解是专门针对软件的，叫做WAREZ，后来才发展到游戏，音乐，影视等其他内容的。
+    
+    0day中的0表示Zero，早期的0day表示在软件发行后的24小时内就出现破解版本。
+    
+    在网络攻防的语境下，0day漏洞指那些已经被攻击者发现掌握并开始利用，但还没有被包括受影响软件厂商在内的公众所知的漏洞，这类漏洞对攻击者来说有完全的信息优势，由于没有漏洞的对应的补丁或临时解决方案，防守方不知道如何防御，攻击者可以达成最大可能的威胁。
+</code></pre>
+<h3 id="2-21-1day漏洞"><a href="#2-21-1day漏洞" class="headerlink" title="2.21 1day漏洞"></a>2.21 1day漏洞</h3><pre><code class="hljs">    指漏洞信息已公开但仍未发布补丁的漏洞。此类漏洞的危害仍然较高，但往往官方会公布部分缓解措施，如关闭部分端口或者服务等。
+</code></pre>
+<h3 id="2-22-Nday漏洞"><a href="#2-22-Nday漏洞" class="headerlink" title="2.22 Nday漏洞"></a>2.22 Nday漏洞</h3><pre><code class="hljs">    指已经发布官方补丁的漏洞。通常情况下，此类漏洞的防护只需更新补丁即可，但由于多种原因，导致往往存在大量设备漏洞补丁更新不及时，且漏洞利用方式已经在互联网公开，往往此类漏洞是黑客最常使用的漏洞。
+    
+    例如，在永恒之蓝事件中，微软事先已经发布补丁，但仍有大量用户中招。
+</code></pre>
+<h3 id="2-23-挂马"><a href="#2-23-挂马" class="headerlink" title="2.23 挂马"></a>2.23 挂马</h3><pre><code class="hljs">    就是在别人的网站文件里面放入网页木马或者是将代码潜入到对方正常的网页文件里，以使浏览者中马。
+</code></pre>
+<h3 id="2-24-挖洞"><a href="#2-24-挖洞" class="headerlink" title="2.24 挖洞"></a>2.24 挖洞</h3><pre><code class="hljs">    指漏洞挖掘。
+</code></pre>
+<h3 id="2-25-加壳"><a href="#2-25-加壳" class="headerlink" title="2.25 加壳"></a>2.25 加壳</h3><pre><code class="hljs">    就是利用特殊的算法，将EXE可执行程序或者DLL动态连接库文件的编码进行改变（比如实现压缩、加密），以达到缩小文件体积或者加密程序编码，甚至是躲过杀毒软件查杀的目的。
+    
+    目前较常用的壳有UPX，ASPack、PePack、PECompact、UPack、免疫007、木马彩衣等等。
+</code></pre>
+<h3 id="2-26-溢出"><a href="#2-26-溢出" class="headerlink" title="2.26 溢出"></a>2.26 溢出</h3><pre><code class="hljs">    简单的解释就是程序对输入数据没有执行有效的边界检测而导致错误，后果可能是造成程序崩溃或者是执行攻击者的命令。
+</code></pre>
+<h3 id="2-27-缓冲区溢出"><a href="#2-27-缓冲区溢出" class="headerlink" title="2.27 缓冲区溢出"></a>2.27 缓冲区溢出</h3><pre><code class="hljs">    攻击者向一个地址区输入这个区间存储不下的大量字符。在某些情况下，这些多余的字符可以作为“执行代码”来运行，因此足以使攻击者不受安全措施限制而获得计算机的控制权。
+</code></pre>
+<h3 id="2-28-注入"><a href="#2-28-注入" class="headerlink" title="2.28 注入"></a>2.28 注入</h3><pre><code class="hljs">    Web安全头号大敌。攻击者把一些包含攻击代码当做命令或者查询语句发送给解释器，这些恶意数据可以欺骗解释器，从而执行计划外的命令或者未授权访问数据。
+    
+    注入攻击漏洞往往是应用程序缺少对输入进行安全性检查所引起的。注入漏洞通常能在SQL查询、LDAP查询、OS命令、程序参数等中出现。
+</code></pre>
+<h4 id="2-28-1-SQL注入"><a href="#2-28-1-SQL注入" class="headerlink" title="2.28.1 SQL注入"></a>2.28.1 SQL注入</h4><pre><code class="hljs">    注入攻击最常见的形式，主要是指Web应用程序对用户输入数据的合法性没有判断或过滤不严，攻击者可以在Web应用程序中事先定义好的查询语句的结尾上添加额外的SQL语句，在管理员不知情的情况下实现非法操作，以此来实现欺骗数据库服务器执行非授权的任意查询或其他操作，导致数据库信息泄露或非授权操作数据表。
+</code></pre>
+<h4 id="2-28-2注入点"><a href="#2-28-2注入点" class="headerlink" title="2.28.2注入点"></a>2.28.2注入点</h4><pre><code class="hljs">    即可以实行注入的地方，通常是一个涉及访问数据库的应用链接。根据注入点数据库的运行帐号的权限的不同，你所得到的权限也不同。
+</code></pre>
+<h3 id="2-29-软件脱壳"><a href="#2-29-软件脱壳" class="headerlink" title="2.29 软件脱壳"></a>2.29 软件脱壳</h3><pre><code class="hljs">    顾名思义，就是利用相应的工具，把在软件“外面”起保护作用的“壳”程序去除，还文件本来面目，这样再修改文件内容或进行分析检测就容易多了。
+</code></pre>
+<h3 id="2-30-免杀"><a href="#2-30-免杀" class="headerlink" title="2.30 免杀"></a>2.30 免杀</h3><pre><code class="hljs">    就是通过加壳、加密、修改特征码、加花指令等等技术来修改程序，使其逃过杀毒软件的查杀。
+</code></pre>
+<h3 id="2-31-暴力破解"><a href="#2-31-暴力破解" class="headerlink" title="2.31 暴力破解"></a>2.31 暴力破解</h3><pre><code class="hljs">    简称“爆破”。黑客对系统中账号的每一个可能的密码进行高度密集的自动搜索，从而破坏安全并获得对计算机的访问权限。
+</code></pre>
+<h3 id="2-32-洪水攻击"><a href="#2-32-洪水攻击" class="headerlink" title="2.32 洪水攻击"></a>2.32 洪水攻击</h3><pre><code class="hljs">    是黑客比较常用的一种攻击技术，特点是实施简单，威力巨大，大多是无视防御的。
+    
+    从定义上说，攻击者对网络资源发送过量数据时就发生了洪水攻击，这个网络资源可以是router，switch，host，application等。
+    
+    洪水攻击将攻击流量比作成洪水，只要攻击流量足够大，就可以将防御手段打穿。
+    DDoS攻击便是洪水攻击的一种。
+</code></pre>
+<h3 id="2-33-SYN攻击"><a href="#2-33-SYN攻击" class="headerlink" title="2.33 SYN攻击"></a>2.33 SYN攻击</h3><pre><code class="hljs">    利用操作系统TCP协调设计上的问题执行的拒绝服务攻击，涉及TCP建立连接时三次握手的设计。
+</code></pre>
+<h3 id="2-34-DoS攻击"><a href="#2-34-DoS攻击" class="headerlink" title="2.34 DoS攻击"></a>2.34 DoS攻击</h3><pre><code class="hljs">    拒绝服务攻击。攻击者通过利用漏洞或发送大量的请求导致攻击对象无法访问网络或者网站无法被访问。
+</code></pre>
+<h3 id="2-35-DDoS"><a href="#2-35-DDoS" class="headerlink" title="2.35 DDoS"></a>2.35 DDoS</h3><pre><code class="hljs">    分布式DOS攻击，常见的UDP、SYN、反射放大攻击等等，就是通过许多台肉鸡一起向你发送一些网络请求信息，导致你的网络堵塞而不能正常上网。
+</code></pre>
+<h4 id="2-1-36-抓鸡"><a href="#2-1-36-抓鸡" class="headerlink" title="2.1.36 抓鸡"></a>2.1.36 抓鸡</h4><pre><code class="hljs">    即设法控制电脑，将其沦为肉鸡。
+</code></pre>
+<h3 id="2-37-端口扫描"><a href="#2-37-端口扫描" class="headerlink" title="2.37 端口扫描"></a>2.37 端口扫描</h3><pre><code class="hljs">    端口扫描是指发送一组端口扫描消息，通过它了解到从哪里可探寻到攻击弱点，并了解其提供的计算机网络服务类型，试图以此侵入某台计算机。
+</code></pre>
+<h3 id="2-38-花指令"><a href="#2-38-花指令" class="headerlink" title="2.38 花指令"></a>2.38 花指令</h3><pre><code class="hljs">    通过加入不影响程序功能的多余汇编指令，使得杀毒软件不能正常的判断病毒文件的构造。说通俗点就是“杀毒软件是从头到脚按顺序来识别病毒。如果我们把病毒的头和脚颠倒位置，杀毒软件就找不到病毒了”。
+</code></pre>
+<h3 id="2-39-反弹端口"><a href="#2-39-反弹端口" class="headerlink" title="2.39 反弹端口"></a>2.39 反弹端口</h3><pre><code class="hljs">    有人发现，防火墙对于连入的连接往往会进行非常严格的过滤，但是对于连出的连接却疏于防范。
+    
+    于是，利用这一特性，反弹端口型软件的服务端(被控制端)会主动连接客户端(控制端)，就给人“被控制端主动连接控制端的假象，让人麻痹大意。
+</code></pre>
+<h3 id="2-40-网络钓鱼"><a href="#2-40-网络钓鱼" class="headerlink" title="2.40 网络钓鱼"></a>2.40 网络钓鱼</h3><pre><code class="hljs">    攻击者利用欺骗性的电子邮件或伪造的Web 站点等来进行网络诈骗活动。
+    
+    诈骗者通常会将自己伪装成网络银行、在线零售商和信用卡公司等可信的品牌，骗取用户的私人信息或邮件账号口令。
+    
+    受骗者往往会泄露自己的邮箱、私人资料，如信用卡号、银行卡账户、身份证号等内容。
+</code></pre>
+<h3 id="2-41-鱼叉攻击"><a href="#2-41-鱼叉攻击" class="headerlink" title="2.41 鱼叉攻击"></a>2.41 鱼叉攻击</h3><pre><code class="hljs">    鱼叉攻击是将用鱼叉捕鱼形象的引入到了网络攻击中，主要是指可以使欺骗性电子邮件看起来更加可信的网络钓鱼攻击，具有更高的成功可能性。
+    
+    不同于撒网式的网络钓鱼，鱼叉攻击往往更加具备针对性，攻击者往往“见鱼而使叉”。
+    
+    为了实现这一目标，攻击者将尝试在目标上收集尽可能多的信息。通常，组织内的特定个人存在某些安全漏洞。
+</code></pre>
+<h3 id="2-42-钓鲸攻击"><a href="#2-42-钓鲸攻击" class="headerlink" title="2.42 钓鲸攻击"></a>2.42 钓鲸攻击</h3><pre><code class="hljs">    捕鲸是另一种进化形式的鱼叉式网络钓鱼。它指的是针对高级管理人员和组织内其他高级人员的网络钓鱼攻击。
+    
+    通过使电子邮件内容具有个性化并专门针对相关目标进行定制的攻击。
+</code></pre>
+<h3 id="2-43-水坑攻击"><a href="#2-43-水坑攻击" class="headerlink" title="2.43 水坑攻击"></a>2.43 水坑攻击</h3><pre><code class="hljs">    顾名思义，是在受害者必经之路设置了一个“水坑(陷阱)”。
+    最常见的做法是，黑客分析攻击目标的上网活动规律，寻找攻击目标经常访问的网站的弱点，先将此网站“攻破”并植入攻击代码，一旦攻击目标访问该网站就会“中招”。
+</code></pre>
+<h3 id="2-44-嗅探"><a href="#2-44-嗅探" class="headerlink" title="2.44 嗅探"></a>2.44 嗅探</h3><pre><code class="hljs">    嗅探指的是对局域网中的数据包进行截取及分析，从中获取有效信息。
+</code></pre>
+<h3 id="2-45-APT攻击"><a href="#2-45-APT攻击" class="headerlink" title="2.45 APT攻击"></a>2.45 APT攻击</h3><pre><code class="hljs">    Advanced Persistent Threat，即高级可持续威胁攻击，指某组织在网络上对特定对象展开的持续有效的攻击活动。
+    
+    这种攻击活动具有极强的隐蔽性和针对性，通常会运用受感染的各种介质、供应链和社会工程学等多种手段实施先进的、持久的且有效的威胁和攻击。
+</code></pre>
+<h3 id="2-46-C2"><a href="#2-46-C2" class="headerlink" title="2.46 C2"></a>2.46 C2</h3><pre><code class="hljs">    C2 全称为Command and Control，命令与控制，常见于APT攻击场景中。作动词解释时理解为恶意软件与攻击者进行交互，作名词解释时理解为攻击者的“基础设施”。
+</code></pre>
+<h3 id="2-47-供应链攻击"><a href="#2-47-供应链攻击" class="headerlink" title="2.47 供应链攻击"></a>2.47 供应链攻击</h3><pre><code class="hljs">    是黑客攻击目标机构的合作伙伴，并以该合作伙为跳板，达到渗透目标用户的目的。
+    
+    一种常见的表现形式为，用户对厂商产品的信任，在厂商产品下载安装或者更新时进行恶意软件植入进行攻击。
+    
+    所以，在某些软件下载平台下载的时候，若遭遇捆绑软件，就得小心了！
+</code></pre>
+<h3 id="2-48-社会工程学"><a href="#2-48-社会工程学" class="headerlink" title="2.48 社会工程学"></a>2.48 社会工程学</h3><pre><code class="hljs">    一种无需依托任何黑客软件，更注重研究人性弱点的黑客手法正在兴起，这就是社会工程学黑客技术。
+    
+    通俗而言是指利用人的社会学弱点实施网络攻击的一整套方法论，其攻击手法往往出乎人意料。
+    
+    世界第一黑客凯文·米特尼克在《反欺骗的艺术》中曾提到，人为因素才是安全的软肋。很多企业、公司在信息安全上投入大量的资金，最终导致数据泄露的原因，往往却是发生在人本身。
+</code></pre>
+<h3 id="2-49-拿站"><a href="#2-49-拿站" class="headerlink" title="2.49 拿站"></a>2.49 拿站</h3><pre><code class="hljs">    指得到一个网站的最高权限，即得到后台和管理员名字和密码。
+</code></pre>
+<h3 id="2-50-提权"><a href="#2-50-提权" class="headerlink" title="2.50 提权"></a>2.50 提权</h3><pre><code class="hljs">    指得到你本没得到的权限，比如说电脑中非系统管理员就无法访问一些C盘的东西，而系统管理员就可以，通过一定的手段让普通用户提升成为管理员，让其拥有管理员的权限，这就叫提权。
+</code></pre>
+<h3 id="2-51-渗透"><a href="#2-51-渗透" class="headerlink" title="2.51 渗透"></a>2.51 渗透</h3><pre><code class="hljs">    就是通过扫描检测你的网络设备及系统有没有安全漏洞，有的话就可能被入侵，就像一滴水透过一块有漏洞的木板，渗透成功就是系统被入侵。
+</code></pre>
+<h3 id="2-52-横移"><a href="#2-52-横移" class="headerlink" title="2.52 横移"></a>2.52 横移</h3><pre><code class="hljs">    指攻击者入侵后，从立足点在内部网络进行拓展，搜寻控制更多的系统。
+</code></pre>
+<h3 id="2-53-跳板"><a href="#2-53-跳板" class="headerlink" title="2.53 跳板"></a>2.53 跳板</h3><pre><code class="hljs">    一个具有辅助作用的机器，利用这个主机作为一个间接工具，来入侵其他主机，一般和肉鸡连用。
+</code></pre>
+<h3 id="2-54-网马"><a href="#2-54-网马" class="headerlink" title="2.54 网马"></a>2.54 网马</h3><pre><code class="hljs">    就是在网页中植入木马，当打开网页的时候就运行了木马程序。
+</code></pre>
+<h3 id="2-55-黑页"><a href="#2-55-黑页" class="headerlink" title="2.55 黑页"></a>2.55 黑页</h3><pre><code class="hljs">    黑客攻击成功后，在网站上留下的黑客入侵成功的页面，用于炫耀攻击成果。
+</code></pre>
+<h3 id="2-56-暗链"><a href="#2-56-暗链" class="headerlink" title="2.56 暗链"></a>2.56 暗链</h3><pre><code class="hljs">    看不见的网站链接，“暗链”在网站中的链接做得非常隐蔽，短时间内不易被搜索引擎察觉。
+    
+    它和友情链接有相似之处，可以有效地提高网站权重。
+</code></pre>
+<h3 id="2-57-拖库"><a href="#2-57-拖库" class="headerlink" title="2.57 拖库"></a>2.57 拖库</h3><pre><code class="hljs">    拖库本来是数据库领域的术语，指从数据库中导出数据。
+    在网络攻击领域，它被用来指网站遭到入侵后，黑客窃取其数据库文件。
+</code></pre>
+<h3 id="2-58-撞库"><a href="#2-58-撞库" class="headerlink" title="2.58 撞库"></a>2.58 撞库</h3><pre><code class="hljs">    撞库是黑客通过收集互联网已泄露的用户和密码信息，生成对应的字典表，尝试批量登陆其他网站后，得到一系列可以登录的用户。
+    
+    很多用户在不同网站使用的是相同的帐号密码，因此黑客可以通过获取用户在A网站的账户从而尝试登录B网址，这就可以理解为撞库攻击。
+</code></pre>
+<h3 id="2-59-暴库"><a href="#2-59-暴库" class="headerlink" title="2.59 暴库"></a>2.59 暴库</h3><pre><code class="hljs">    入侵网站的一种手法，通过恶意代码让网站爆出其一些敏感数据来。
+</code></pre>
+<h3 id="2-60-CC攻击"><a href="#2-60-CC攻击" class="headerlink" title="2.60 CC攻击"></a>2.60 CC攻击</h3><pre><code class="hljs">    即Challenge Collapsar，名字来源于对抗国内安全厂商绿盟科技早期的抗拒绝服务产品黑洞，攻击者借助代理服务器生成指向受害主机的涉及大量占用系统资源的合法请求，耗尽目标的处理资源，达到拒绝服务的目的。
+</code></pre>
+<h3 id="2-61-Webshell"><a href="#2-61-Webshell" class="headerlink" title="2.61 Webshell"></a>2.61 Webshell</h3><pre><code class="hljs">    Webshell就是以asp、php、jsp或者cgi等网页文件形式存在的一种命令执行环境，也可以将其称做是一种网页后门，可以上传下载文件，查看数据库，执行任意程序命令等。
+</code></pre>
+<h3 id="2-62-跨站攻击"><a href="#2-62-跨站攻击" class="headerlink" title="2.62 跨站攻击"></a>2.62 跨站攻击</h3><pre><code class="hljs">    通常简称为XSS，是指攻击者利用网站程序对用户输入过滤不足，输入可以显示在页面上对其他用户造成影响的HTML代码，从而盗取用户资料、利用用户身份进行某种动作或者对访问者进行病毒侵害的一种攻击方式。
+</code></pre>
+<h3 id="2-63-中间人攻击"><a href="#2-63-中间人攻击" class="headerlink" title="2.63 中间人攻击"></a>2.63 中间人攻击</h3><pre><code class="hljs">    中间人攻击是一种“间接”的入侵攻击，这种攻击模式是通过各种技术手段将受入侵者控制的一台计算机虚拟放置在网络连接中的两台通信计算机之间，通过拦截正常的网络通信数据，并进行数据篡改和嗅探，而这台计算机就称为“中间人”。
+</code></pre>
+<h3 id="2-64-薅羊毛"><a href="#2-64-薅羊毛" class="headerlink" title="2.64 薅羊毛"></a>2.64 薅羊毛</h3><pre><code class="hljs">    指网赚一族利用各种网络金融产品或红包活动推广下线抽成赚钱，又泛指搜集各个银行等金融机构及各类商家的优惠信息，以此实现盈利的目的。这类行为就被称之为薅羊毛。
+</code></pre>
+<h3 id="2-65-商业电子邮件攻击（BEC）"><a href="#2-65-商业电子邮件攻击（BEC）" class="headerlink" title="2.65 商业电子邮件攻击（BEC）"></a>2.65 商业电子邮件攻击（BEC）</h3><pre><code class="hljs">    也被称为“变脸诈骗”攻击，这是针对高层管理人员的攻击，攻击者通常冒充（盗用）决策者的邮件，来下达与资金、利益相关的指令；或者攻击者依赖社会工程学制作电子邮件，说服/诱导高管短时间进行经济交易。
+</code></pre>
+<h3 id="2-66-电信诈骗"><a href="#2-66-电信诈骗" class="headerlink" title="2.66 电信诈骗"></a>2.66 电信诈骗</h3><pre><code class="hljs">    是指通过电话、网络和短信方式，编造虚假信息，设置骗局，对受害人实施远程、非接触式诈骗，诱使受害人打款或转账的犯罪行为，通常以冒充他人及仿冒、伪造各种合法外衣和形式的方式达到欺骗的目的。
+</code></pre>
+<h3 id="2-67-杀猪盘"><a href="#2-67-杀猪盘" class="headerlink" title="2.67 杀猪盘"></a>2.67 杀猪盘</h3><pre><code class="hljs">    网络流行词，电信诈骗的一种，是一种网络交友诱导股票投资、赌博等类型的诈骗方式，“杀猪盘”则是“从业者们”自己起的名字，是指放长线“养猪”诈骗，养得越久，诈骗得越狠。
+</code></pre>
+<h3 id="2-68-ARP攻击"><a href="#2-68-ARP攻击" class="headerlink" title="2.68 ARP攻击"></a>2.68 ARP攻击</h3><pre><code class="hljs">    ARP协议的基本功能就是通过目标设备的IP地址，查询目标设备的MAC地址，以保证通信的进行。
+    
+    基于ARP协议的这一工作特性，黑客向对方计算机不断发送有欺诈性质的ARP数据包，数据包内包含有与当前设备重复的Mac地址，使对方在回应报文时，由于简单的地址重复错误而导致不能进行正常的网络通信。
+</code></pre>
+<h3 id="2-69-欺骗攻击"><a href="#2-69-欺骗攻击" class="headerlink" title="2.69 欺骗攻击"></a>2.69 欺骗攻击</h3><pre><code class="hljs">    网络欺骗的技术主要有：HONEYPOT和分布式HONEYPOT、欺骗空间技术等。
+    
+    主要方式有：IP欺骗、ARP欺骗、 DNS欺骗、Web欺骗、电子邮件欺骗、源路由欺骗（通过指定路由，以假冒身份与其他主机进行合法通信或发送假报文，使受攻击主机出现错误动作）、地址欺骗（包括伪造源地址和伪造中间站点）等。
+</code></pre>
+<h3 id="2-70-Shellcode"><a href="#2-70-Shellcode" class="headerlink" title="2.70 Shellcode"></a>2.70 Shellcode</h3><pre><code class="hljs">    一段可被操作系统无需特别定位处理的指令，通常在利用软件漏洞后执行的恶意代码，shellcode为二进制的机器码，因为经常让攻击者获得shell而得名。
+</code></pre>
+<h3 id="2-71-物理攻击"><a href="#2-71-物理攻击" class="headerlink" title="2.71 物理攻击"></a>2.71 物理攻击</h3><pre><code class="hljs">    通俗理解，即采用物理接触而非技术手段达到网络入侵的目的，最常见的表现形式为插U盘。
+    
+    著名的震网病毒事件即通过插U盘的形式，感染了伊朗核设施。
+  
+</code></pre>
+<h3 id="2-72-黑产"><a href="#2-72-黑产" class="headerlink" title="2.72 黑产"></a>2.72 黑产</h3><pre><code class="hljs">    网络黑产，指以互联网为媒介，以网络技术为主要手段，为计算机信息系统安全和网络空间管理秩序，甚至国家安全、社会政治稳定带来潜在威胁（重大安全隐患）的非法行为。
+    
+    例如非法数据交易产业。
+</code></pre>
+<h3 id="2-73-黑帽黑客"><a href="#2-73-黑帽黑客" class="headerlink" title="2.73 黑帽黑客"></a>2.73 黑帽黑客</h3><pre><code class="hljs">    以非法目的进行黑客攻击的人，通常是为了经济利益。他们进入安全网络以销毁、赎回、修改或窃取数据，或使网络无法用于授权用户。
+    
+    这个名字来源于这样一个历史：老式的黑白西部电影中，恶棍很容易被电影观众识别，因为他们戴着黑帽子，而“好人”则戴着白帽子。
+</code></pre>
+<h3 id="2-74-白帽黑客"><a href="#2-74-白帽黑客" class="headerlink" title="2.74 白帽黑客"></a>2.74 白帽黑客</h3><pre><code class="hljs">    是那些用自己的黑客技术来进行合法的安全测试分析的黑客，测试网络和系统的性能来判定它们能够承受入侵的强弱程度。
+</code></pre>
+<h3 id="2-75-红帽黑客"><a href="#2-75-红帽黑客" class="headerlink" title="2.75 红帽黑客"></a>2.75 红帽黑客</h3><pre><code class="hljs">    事实上最为人所接受的说法叫红客。
+    红帽黑客以正义、道德、进步、强大为宗旨，以热爱祖国、坚持正义、开拓进取为精神支柱，红客通常会利用自己掌握的技术去维护国内网络的安全，并对外来的进攻进行还击。
+</code></pre>
+<h3 id="2-76-红队"><a href="#2-76-红队" class="headerlink" title="2.76 红队"></a>2.76 红队</h3><pre><code class="hljs">    通常指攻防演*中的攻击队伍。
+</code></pre>
+<h3 id="2-77-蓝队"><a href="#2-77-蓝队" class="headerlink" title="2.77 蓝队"></a>2.77 蓝队</h3><pre><code class="hljs">    通常指攻防演*中的防守队伍。
+</code></pre>
+<h3 id="2-78-紫队"><a href="#2-78-紫队" class="headerlink" title="2.78 紫队"></a>2.78 紫队</h3><pre><code class="hljs">    攻防演*中新*诞生的一方，通常指监理方或者裁判方。
+</code></pre>
+<h3 id="2-79-加密机"><a href="#2-79-加密机" class="headerlink" title="2.79 加密机"></a>2.79 加密机</h3><pre><code class="hljs">主机加密设备，加密机和主机之间使用TCP/IP协议通信，所以加密机对主机的类型和主机操作系统无任何特殊的要求。
+</code></pre>
+<h3 id="2-80-CA证书"><a href="#2-80-CA证书" class="headerlink" title="2.80 CA证书"></a>2.80 CA证书</h3><pre><code class="hljs">为实现双方安全通信提供了电子认证。
+
+在因特网、公司内部网或外部网中，使用数字证书实现身份识别和电子信息加密。
+
+数字证书中含有密钥对（公钥和私钥）所有者的识别信息，通过验证识别信息的真伪实现对证书持有者身份的认证。
+</code></pre>
+<h3 id="2-81-SSL证书"><a href="#2-81-SSL证书" class="headerlink" title="2.81 SSL证书"></a>2.81 SSL证书</h3><pre><code class="hljs">SSL证书是数字证书的一种，类似于驾驶证、护照和营业执照的电子副本。
+因为配置在服务器上，也称为SSL服务器证书。
+</code></pre>
+<h3 id="2-82-防火墙"><a href="#2-82-防火墙" class="headerlink" title="2.82 防火墙"></a>2.82 防火墙</h3><pre><code class="hljs">主要部署于不同网络或网络安全域之间的出口，通过监测、限制、更改跨越防火墙的数据流，尽可能地对外部屏蔽网络内部的信息、结构和运行状况，有选择地接受外部访问。
+</code></pre>
+<h3 id="2-83-IDS"><a href="#2-83-IDS" class="headerlink" title="2.83 IDS"></a>2.83 IDS</h3><pre><code class="hljs">入侵检测系统，用于在黑客发起进攻或是发起进攻之前检测到攻击，并加以拦截。
+
+IDS是不同于防火墙。防火墙只能屏蔽入侵，而IDS却可以在入侵发生以前，通过一些信息来检测到即将发生的攻击或是入侵并作出反应。
+</code></pre>
+<h3 id="2-84-NIDS"><a href="#2-84-NIDS" class="headerlink" title="2.84 NIDS"></a>2.84 NIDS</h3><pre><code class="hljs">是Network Intrusion Detection System的缩写，即网络入侵检测系统，主要用于检测Hacker或Cracker 。
+
+通过网络进行的入侵行为。NIDS的运行方式有两种，一种是在目标主机上运行以监测其本身的通信信息，另一种是在一台单独的机器上运行以监测所有网络设备的通信信息，比如Hub、路由器。
+</code></pre>
+<h3 id="2-85-IPS"><a href="#2-85-IPS" class="headerlink" title="2.85 IPS"></a>2.85 IPS</h3><pre><code class="hljs">全称为Intrusion-Prevention System，即入侵防御系统，目的在于及时识别攻击程序或有害代码及其克隆和变种，采取预防措施，先期阻止入侵，防患于未然。
+
+或者至少使其危害性充分降低。入侵预防系统一般作为防火墙 和防病毒软件的补充来投入使用。
+</code></pre>
+<h3 id="2-86-杀毒软件"><a href="#2-86-杀毒软件" class="headerlink" title="2.86 杀毒软件"></a>2.86 杀毒软件</h3><pre><code class="hljs">也称反病毒软件或防毒软件，是用于消除电脑病毒、特洛伊木马和恶意软件等计算机威胁的一类软件。
+</code></pre>
+<h3 id="2-87-反病毒引擎"><a href="#2-87-反病毒引擎" class="headerlink" title="2.87 反病毒引擎"></a>2.87 反病毒引擎</h3><pre><code class="hljs">通俗理解，就是一套判断特定程序行为是否为病毒程序（包括可疑的）的技术机制。
+
+例如，奇安信自主研发的QOWL猫头鹰反病毒引擎。
+</code></pre>
+<h3 id="2-88-防毒墙"><a href="#2-88-防毒墙" class="headerlink" title="2.88 防毒墙"></a>2.88 防毒墙</h3><pre><code class="hljs">区别于部署在主机上的杀毒软件，防毒墙的部署方式与防火墙类似，主要部署于网络出口，用于对病毒进行扫描和拦截，因此防毒墙也被称为反病毒网关。
+</code></pre>
+<h3 id="2-89-老三样"><a href="#2-89-老三样" class="headerlink" title="2.89 老三样"></a>2.89 老三样</h3><pre><code class="hljs">通常指IDS、防火墙和反病毒三样历史最悠久安全产品。
+</code></pre>
+<h3 id="2-90-告警"><a href="#2-90-告警" class="headerlink" title="2.90 告警"></a>2.90 告警</h3><pre><code class="hljs">指网络安全设备对攻击行为产生的警报。
+</code></pre>
+<h3 id="2-91-误报"><a href="#2-91-误报" class="headerlink" title="2.91 误报"></a>2.91 误报</h3><pre><code class="hljs">也称为无效告警，通常指告警错误，即把合法行为判断成非法行为而产生了告警。
+
+目前，由于攻击技术的快速进步和检测技术的限制，误报的数量非常大，使得安全人员不得不花费大量时间来处理此类告警，已经成为困扰并拉低日常安全处置效率的主要原因。
+</code></pre>
+<h3 id="2-92-漏报"><a href="#2-92-漏报" class="headerlink" title="2.92 漏报"></a>2.92 漏报</h3><pre><code class="hljs">通常指网络安全设备没有检测出非法行为而没有产生告警。一旦出现漏报，将大幅增加系统被入侵的风险。
+</code></pre>
+<h3 id="2-93-NAC"><a href="#2-93-NAC" class="headerlink" title="2.93 NAC"></a>2.93 NAC</h3><pre><code class="hljs">全称为Network Access Control，即网络准入控制，其宗旨是防止病毒和蠕虫等新兴黑客技术对企业安全造成危害。
+
+借助NAC，客户可以只允许合法的、值得信任的终端设备（例如PC、服务器、PDA）接入网络，而不允许其它设备接入。
+</code></pre>
+<h3 id="2-94-漏扫"><a href="#2-94-漏扫" class="headerlink" title="2.94 漏扫"></a>2.94 漏扫</h3><pre><code class="hljs">即漏洞扫描，指基于漏洞数据库，通过扫描等手段对指定的远程或者本地计算机系统的安全脆弱性进行检测，发现可利用漏洞的一种安全检测（渗透攻击）行为。
+</code></pre>
+<h3 id="2-95-UTM"><a href="#2-95-UTM" class="headerlink" title="2.95 UTM"></a>2.95 UTM</h3><pre><code class="hljs">即Unified Threat Management，中文名为统一威胁管理，最早由IDC于2014年提出，即将不同设备的安全能力（最早包括入侵检测、防火墙和反病毒技术），集中在同一网关上，实现统一管理和运维。
+</code></pre>
+<h3 id="2-96-网闸"><a href="#2-96-网闸" class="headerlink" title="2.96 网闸"></a>2.96 网闸</h3><pre><code class="hljs">网闸是使用带有多种控制功能的固态开关读写介质，连接两个独立主机系统的信息安全设备。
+
+由于两个独立的主机系统通过网闸进行隔离，只有以数据文件形式进行的无协议摆渡。
+</code></pre>
+<h3 id="2-97-堡垒机"><a href="#2-97-堡垒机" class="headerlink" title="2.97 堡垒机"></a>2.97 堡垒机</h3><pre><code class="hljs">运用各种技术手段监控和记录运维人员对网络内的服务器、网络设备、安全设备、数据库等设备的操作行为，以便集中报警、及时处理及审计定责。
+</code></pre>
+<h3 id="2-98-数据库审计"><a href="#2-98-数据库审计" class="headerlink" title="2.98 数据库审计"></a>2.98 数据库审计</h3><pre><code class="hljs">能够实时记录网络上的数据库活动，对数据库操作进行细粒度审计的合规性管理，对数据库遭受到的风险行为进行告警，对攻击行为进行阻断。
+
+它通过对用户访问数据库行为的记录、分析和汇报，用来帮助用户事后生成合规报告、事故追根溯源，同时加强内外部数据库网络行为记录，提高数据资产安全。
+</code></pre>
+<h3 id="2-99-DLP"><a href="#2-99-DLP" class="headerlink" title="2.99 DLP"></a>2.99 DLP</h3><pre><code class="hljs">数据防泄漏，通过数字资产的精准识别和策略制定，主要用于防止企业的指定数据或信息资产以违反安全策略规定的形式流出企业。
+</code></pre>
+<h3 id="2-100-VPN"><a href="#2-100-VPN" class="headerlink" title="2.100 VPN"></a>2.100 VPN</h3><pre><code class="hljs">虚拟专用网，在公用网络上建立专用网络，进行加密通讯，通过对数据包的加密和数据包目标地址的转换实现远程访问。
+</code></pre>
+<h3 id="2-101-SD-WAN"><a href="#2-101-SD-WAN" class="headerlink" title="2.101 SD-WAN"></a>2.101 SD-WAN</h3><pre><code class="hljs">即软件定义广域网，这种服务用于连接广阔地理范围的企业网络、数据中心、互联网应用及云服务。
+
+这种服务的典型特征是将网络控制能力通过软件方式云化。
+
+通常情况下，SD-WAN都集成有防火墙、入侵检测或者防病毒能力。并且从目前的趋势来看，以安全为核心设计的SD-WAN正在崭露头角，包括奇安信、Fortinet等多家安全厂商开始涉足该领域，并提供了较为完备的内生安全设计。
+</code></pre>
+<h3 id="2-102-路由器"><a href="#2-102-路由器" class="headerlink" title="2.102 路由器"></a>2.102 路由器</h3><pre><code class="hljs">是用来连接不同子网的中枢，它们工作于OSI7层模型的传输层和网络层。
+
+路由器的基本功能就是将网络信息包传输到它们的目的地。一些路由器还有访问控制列表（ACLs），允许将不想要的信息包过滤出去。
+
+许多路由器都可以将它们的日志信息注入到IDS系统中，并且自带基础的包过滤（即防火墙）功能。
+</code></pre>
+<h3 id="2-103网关"><a href="#2-103网关" class="headerlink" title="2.103网关"></a>2.103网关</h3><pre><code class="hljs">通常指路由器、防火墙、IDS、VPN等边界网络设备。
+</code></pre>
+<h3 id="2-104-WAF"><a href="#2-104-WAF" class="headerlink" title="2.104 WAF"></a>2.104 WAF</h3><pre><code class="hljs">即Web Application Firewall，即Web应用防火墙，是通过执行一系列针对HTTP/HTTPS的安全策略来专门为Web应用提供保护的一款产品。
+</code></pre>
+<h3 id="2-105-SOC"><a href="#2-105-SOC" class="headerlink" title="2.105 SOC"></a>2.105 SOC</h3><pre><code class="hljs">即Security Operations Center，翻译为安全运行中心或者安全管理平台，通过建立一套实时的资产风险模型，协助管理员进行事件分析、风险分析、预警管理和应急响应处理的集中安全管理系统。
+</code></pre>
+<h3 id="2-106-LAS"><a href="#2-106-LAS" class="headerlink" title="2.106 LAS"></a>2.106 LAS</h3><pre><code class="hljs">日志审计系统，主要功能是提供日志的收集、检索和分析能力，可为威胁检测提供丰富的上下文。
+</code></pre>
+<h3 id="2-107-NOC"><a href="#2-107-NOC" class="headerlink" title="2.107 NOC"></a>2.107 NOC</h3><pre><code class="hljs">即Network Operations Center，网络操作中心或网络运行中心，是远程网络通讯的管理、监视和维护中心，是网络问题解决、软件分发和修改、路由、域名管理、性能监视的焦点。
+</code></pre>
+<h3 id="2-108-SIEM"><a href="#2-108-SIEM" class="headerlink" title="2.108 SIEM"></a>2.108 SIEM</h3><pre><code class="hljs">即Security Information and Event Management，安全信息和事件管理，负责从大量企业安全控件、主机操作系统、企业应用和企业使用的其他软件收集安全日志数据，并进行分析和报告。
+</code></pre>
+<h3 id="2-109-上网行为管理"><a href="#2-109-上网行为管理" class="headerlink" title="2.109 上网行为管理"></a>2.109 上网行为管理</h3><pre><code class="hljs">是指帮助互联网用户控制和管理对互联网使用的设备。
+
+其包括对网页访问过滤、上网隐私保护、网络应用控制、带宽流量管理、信息收发审计、用户行为分析等。
+</code></pre>
+<h3 id="2-110-蜜罐（Honeypot）"><a href="#2-110-蜜罐（Honeypot）" class="headerlink" title="2.110 蜜罐（Honeypot）"></a>2.110 蜜罐（Honeypot）</h3><pre><code class="hljs">是一个包含漏洞的系统，它摸拟一个或多个易受攻击的主机，给黑客提供一个容易攻击的目标。
+
+由于蜜罐没有其它任务需要完成，因此所有连接的尝试都应被视为是可疑的。
+</code></pre>
+<p>蜜罐的另一个用途是拖延攻击者对其真正目标的攻击，让攻击者在蜜罐上浪费时间。</p>
+<pre><code class="hljs">蜜罐类产品包括蜜网、蜜系统、蜜账号等等。
+</code></pre>
+<h3 id="2-111-沙箱"><a href="#2-111-沙箱" class="headerlink" title="2.111 沙箱"></a>2.111 沙箱</h3><pre><code class="hljs">沙箱是一种用于安全的运行程序的机制。它常常用来执行那些非可信的程序。
+
+非可信程序中的恶意代码对系统的影响将会被限制在沙箱内而不会影响到系统的其它部分。
+</code></pre>
+<h3 id="2-112-沙箱逃逸"><a href="#2-112-沙箱逃逸" class="headerlink" title="2.112 沙箱逃逸"></a>2.112 沙箱逃逸</h3><pre><code class="hljs">一种识别沙箱环境，并利用静默、欺骗等技术，绕过沙箱检测的现象
+</code></pre>
+<h3 id="2-113-网络靶场"><a href="#2-113-网络靶场" class="headerlink" title="2.113 网络靶场"></a>2.113 网络靶场</h3><pre><code class="hljs">主要是指通过虚拟环境与真实设备相结合，模拟仿真出真实赛博网络空间攻防作战环境，能够支撑攻防演练、安全教育、网络空间作战能力研究和网络武器装备验证试验平台。
+</code></pre>
+<h3 id="2-114-加密技术"><a href="#2-114-加密技术" class="headerlink" title="2.114 加密技术"></a>2.114 加密技术</h3><pre><code class="hljs">加密技术包括两个元素：算法和密钥。
+
+算法是将普通的文本与一串数字（密钥）的结合，产生不可理解的密文的步骤，密钥是用来对数据进行编码和解码的一种算法。
+
+密钥加密技术的密码体制分为对称密钥体制和非对称密钥体制两种。相应地，对数据加密的技术分为两类，即对称加密（私人密钥加密）和非对称加密（公开密钥加密）。对称加密的加密密钥和解密密钥相同，而非对称加密的加密密钥和解密密钥不同，加密密钥可以公开而解密密钥需要保密。
+</code></pre>
+<h3 id="2-115-黑名单"><a href="#2-115-黑名单" class="headerlink" title="2.115 黑名单"></a>2.115 黑名单</h3><pre><code class="hljs">顾名思义，黑名单即不好的名单，凡是在黑名单上的软件、IP地址等，都被认为是非法的。
+</code></pre>
+<h3 id="2-116-白名单"><a href="#2-116-白名单" class="headerlink" title="2.116 白名单"></a>2.116 白名单</h3><pre><code class="hljs">与黑名单对应，白名单即“好人”的名单，凡是在白名单上的软件、IP等，都被认为是合法的，可以在计算机上运行。
+</code></pre>
+<h3 id="2-117-内网"><a href="#2-117-内网" class="headerlink" title="2.117 内网"></a>2.117 内网</h3><pre><code class="hljs">通俗的讲就是局域网，比如网吧、校园网、公司内部网等都属于此类。
+
+查看IP地址，如果是在以下三个范围之内，就说明我们是处于内网之中的：10.0.0.0—10.255.255.255，172.16.0.0—172.31.255.255，192.168.0.0—192.168.255.255
+</code></pre>
+<h3 id="2-118-外网"><a href="#2-118-外网" class="headerlink" title="2.118 外网"></a>2.118 外网</h3><pre><code class="hljs">直接连入INTERNET（互连网），可以与互连网上的任意一台电脑互相访问。
+</code></pre>
+<h3 id="2-119-边界防御"><a href="#2-119-边界防御" class="headerlink" title="2.119 边界防御"></a>2.119 边界防御</h3><pre><code class="hljs">以网络边界为核心的防御模型，以静态规则匹配为基础，强调把所有的安全威胁都挡在外网。
+</code></pre>
+<h3 id="2-120-南北向流量"><a href="#2-120-南北向流量" class="headerlink" title="2.120 南北向流量"></a>2.120 南北向流量</h3><pre><code class="hljs">通常指数据中心内外部通信所产生的的流量。
+</code></pre>
+<h3 id="2-121-东西向流量"><a href="#2-121-东西向流量" class="headerlink" title="2.121 东西向流量"></a>2.121 东西向流量</h3><pre><code class="hljs">通常指数据中心内部不同主机之间互相通信所产生的的流量。
+</code></pre>
+<h3 id="2-122-规则库"><a href="#2-122-规则库" class="headerlink" title="2.122 规则库"></a>2.122 规则库</h3><pre><code class="hljs">网络安全的核心数据库，类似于黑白名单，用于存储大量安全规则，一旦访问行为和规则库完成匹配，则被认为是非法行为。所以有人也将规则库比喻为网络空间的法律。
+</code></pre>
+<h3 id="2-123-下一代"><a href="#2-123-下一代" class="headerlink" title="2.123 下一代"></a>2.123 下一代</h3><pre><code class="hljs">网络安全领域经常用到，用于表示产品或者技术有较大幅度的创新，在能力上相对于传统方法有明显的进步，通常缩写为NG（Next Gen）。
+</code></pre>
+<p>例如NGFW（下一代防火墙）、NGSOC（下一代安全管理平台）等。</p>
+<h3 id="2-124-大数据安全分析"><a href="#2-124-大数据安全分析" class="headerlink" title="2.124 大数据安全分析"></a>2.124 大数据安全分析</h3><pre><code class="hljs">区别于传统被动规则匹配的防御模式，以主动收集和分析大数据的方法，找出其中可能存在的安全威胁，因此也称数据驱动安全。
+
+该理论最早由奇安信于2015年提出。
+</code></pre>
+<h3 id="2-125-EPP"><a href="#2-125-EPP" class="headerlink" title="2.125 EPP"></a>2.125 EPP</h3><pre><code class="hljs">全称为Endpoint Protection Platform，翻译为端点保护平台，部署在终端设备上的安全防护解决方案,用于防止针对终端的恶意软件、恶意脚本等安全威胁，通常与EDR进行联动。
+</code></pre>
+<h3 id="2-126-EDR"><a href="#2-126-EDR" class="headerlink" title="2.126 EDR"></a>2.126 EDR</h3><pre><code class="hljs">全称Endpoint Detection &amp; Response，即端点检测与响应，通过对端点进行持续检测，同时通过应用程序对操作系统调用等异常行为分析，检测和防护未知威胁，最终达到杀毒软件无法解决未知威胁的目的。
+</code></pre>
+<h3 id="2-127-NDR"><a href="#2-127-NDR" class="headerlink" title="2.127 NDR"></a>2.127 NDR</h3><pre><code class="hljs">全称Network Detection &amp; Response，即网络检测与响应，通过对网络侧流量的持续检测和分析，帮助企业增强威胁响应能力，提高网络安全的可见性和威胁免疫力。
+</code></pre>
+<h3 id="2-128-安全可视化"><a href="#2-128-安全可视化" class="headerlink" title="2.128 安全可视化"></a>2.128 安全可视化</h3><pre><code class="hljs">指在网络安全领域中的呈现技术，将网络安全加固、检测、防御、响应等过程中的数据和结果转换成图形界面，并通过人机交互的方式进行搜索、加工、汇总等操作的理论、方法和技术。
+</code></pre>
+<h3 id="2-129-NTA"><a href="#2-129-NTA" class="headerlink" title="2.129 NTA"></a>2.129 NTA</h3><pre><code class="hljs">网络流量分析（NTA）的概念是Gartner于2013年首次提出的，位列五种检测高级威胁的手段之一。
+
+它融合了传统的基于规则的检测技术，以及机器学*和其他高级分析技术，用以检测企业网络中的可疑行为，尤其是失陷后的痕迹。
+</code></pre>
+<h3 id="2-130-MDR"><a href="#2-130-MDR" class="headerlink" title="2.130 MDR"></a>2.130 MDR</h3><pre><code class="hljs">全称Managed Detection &amp; Response，即托管检测与响应，依靠基于网络和主机的检测工具来识别恶意模式。
+
+此外，这些工具通常还会从防火墙之内的终端收集数据，以便更全面地监控网络活动。
+</code></pre>
+<h3 id="2-131-应急响应"><a href="#2-131-应急响应" class="headerlink" title="2.131 应急响应"></a>2.131 应急响应</h3><pre><code class="hljs">通常是指一个组织为了应对各种意外事件的发生所做的准备以及在事件发生后所采取的措施。
+</code></pre>
+<h3 id="2-132-XDR"><a href="#2-132-XDR" class="headerlink" title="2.132 XDR"></a>2.132 XDR</h3><pre><code class="hljs">通常指以检测和响应技术为核心的网络安全策略的统称，包括EDR、NDR、MDR等。
+</code></pre>
+<h3 id="2-133-安全运营"><a href="#2-133-安全运营" class="headerlink" title="2.133 安全运营"></a>2.133 安全运营</h3><pre><code class="hljs">贯穿产品研发、业务运行、漏洞修复、防护与检测、应急响应等一系列环节，实行系统的管理方法和流程，将各个环节的安全防控作用有机结合，保障整个业务的安全性。
+</code></pre>
+<h3 id="2-134-威胁情报"><a href="#2-134-威胁情报" class="headerlink" title="2.134 威胁情报"></a>2.134 威胁情报</h3><pre><code class="hljs">根据Gartner的定义，威胁情报是某种基于证据的知识，包括上下文、机制、标示、含义和能够执行的建议，这些知识与资产所面临已有的或酝酿中的威胁或危害相关，可用于资产相关主体对威胁或危害的响应或处理决策提供信息支持。根据使用对象的不同，威胁情报主要分为人读情报和机读情报。
+</code></pre>
+<h3 id="2-135-TTP"><a href="#2-135-TTP" class="headerlink" title="2.135 TTP"></a>2.135 TTP</h3><pre><code class="hljs">主要包括三要素，战术Tactics、技术Techniques和过程Procedures，是描述高级威胁组织及其攻击的重要指标，作为威胁情报的一种重要组成部分，TTP可为安全分析人员提供决策支撑。
+</code></pre>
+<h3 id="2-136-IOC"><a href="#2-136-IOC" class="headerlink" title="2.136 IOC"></a>2.136 IOC</h3><pre><code class="hljs">中文名为失陷标示：用以发现内部被APT团伙、木马后门、僵尸网络控制的失陷主机，类型上往往是域名、URL等。
+
+目前而言，IOC是应用最为广泛的威胁情报，因为其效果最为直接。一经匹配，则意味着存在已经失陷的主机。
+</code></pre>
+<h3 id="2-137-上下文"><a href="#2-137-上下文" class="headerlink" title="2.137 上下文"></a>2.137 上下文</h3><pre><code class="hljs">从文章的上下文引申而来，主要是指某项威胁指标的关联信息，用于实现更加精准的安全匹配和检测。
+</code></pre>
+<h3 id="2-138-STIX"><a href="#2-138-STIX" class="headerlink" title="2.138 STIX"></a>2.138 STIX</h3><pre><code class="hljs">STIX是一种描述网络威胁信息的结构化语言，能够以标准化和结构化的方式获取更广泛的网络威胁信息，常用于威胁情报的共享与交换，目前在全球范围内使用最为广泛。
+
+STIX在定义了8中构件的1.0版本基础上，已经推出了定义了12中构件的2.0版本。
+</code></pre>
+<h3 id="2-139-杀伤链"><a href="#2-139-杀伤链" class="headerlink" title="2.139 杀伤链"></a>2.139 杀伤链</h3><pre><code class="hljs">杀伤链最早来源于军事领域，用于描述进攻一方各个阶段的状态。
+
+在网络安全领域，这一概念最早由洛克希德-马丁公司提出，英文名称为Kill Chain，也称作网络攻击生命周期，包括侦查追踪、武器构建、载荷投递、漏洞利用、安装植入、命令控制、目标达成等七个阶段，来识别和防止入侵。
+</code></pre>
+<h3 id="2-140-ATT-amp-CK"><a href="#2-140-ATT-amp-CK" class="headerlink" title="2.140 ATT&amp;CK"></a>2.140 ATT&amp;CK</h3><pre><code class="hljs">可以简单理解为描述攻击者技战术的知识库。
+
+MITRE在2013年推出了该模型，它是根据真实的观察数据来描述和分类对抗行为。
+
+ATT&amp;CK将已知攻击者行为转换为结构化列表，将这些已知的行为汇总成战术和技术，并通过几个矩阵以及结构化威胁信息表达式（STIX）、指标信息的可信自动化交换（TAXII）来表示。
+</code></pre>
+<h3 id="2-141-钻石模型"><a href="#2-141-钻石模型" class="headerlink" title="2.141 钻石模型"></a>2.141 钻石模型</h3><pre><code class="hljs">钻石模型在各个领域的应用都十分广泛，在网络安全领域，钻石模型首次建立了一种将科学原理应用于入侵分析的正式方法：
+
+可衡量、可测试和可重复——提供了一个对攻击活动进行记录、(信息)合成、关联的简单、正式和全面的方法。
+
+这种科学的方法和简单性可以改善分析的效率、效能和准确性。
+</code></pre>
+<h3 id="2-142-关联分析"><a href="#2-142-关联分析" class="headerlink" title="2.142 关联分析"></a>2.142 关联分析</h3><pre><code class="hljs">又称关联挖掘，就是在交易数据、关系数据或其他信息载体中，查找存在于项目集合或对象集合之间的频繁模式、关联、相关性或因果结构。
+
+在网络安全领域主要是指将不同维度、类型的安全数据进行关联挖掘，找出其中潜在的入侵行为。
+</code></pre>
+<h3 id="2-143-态势感知"><a href="#2-143-态势感知" class="headerlink" title="2.143 态势感知"></a>2.143 态势感知</h3><pre><code class="hljs">是一种基于环境的、动态、整体地洞悉安全风险的能力，是以安全大数据为基础，从全局视角提升对安全威胁的发现识别、理解分析、响应处置能力的一种方式，最终是为了决策与行动，是安全能力的落地。
+</code></pre>
+<h3 id="2-144-探针"><a href="#2-144-探针" class="headerlink" title="2.144 探针"></a>2.144 探针</h3><pre><code class="hljs">也叫作网络安全探针或者安全探针，可以简单理解为赛博世界的摄像头，部署在网络拓扑的关键节点上，用于收集和分析流量和日志，发现异常行为，并对可能到来的攻击发出预警。
+</code></pre>
+<h3 id="2-145-网络空间测绘"><a href="#2-145-网络空间测绘" class="headerlink" title="2.145 网络空间测绘"></a>2.145 网络空间测绘</h3><pre><code class="hljs">用搜索引擎技术来提供交互，让人们可以方便的搜索到网络空间上的设备。
+
+相对于现实中使用的地图，用各种测绘方法描述和标注地理位置，用主动或被动探测的方法，来绘制网络空间上设备的网络节点和网络连接关系图，及各设备的画像。
+</code></pre>
+<h3 id="2-146-SOAR"><a href="#2-146-SOAR" class="headerlink" title="2.146 SOAR"></a>2.146 SOAR</h3><pre><code class="hljs">全称Security Orchestration, Automation and Response，意即安全编排自动化与响应，主要通过剧本化、流程化的指令，对入侵行为采取的一系列自动化或者半自动化响应处置动作。
+</code></pre>
+<h3 id="2-147-UEBA"><a href="#2-147-UEBA" class="headerlink" title="2.147 UEBA"></a>2.147 UEBA</h3><pre><code class="hljs">全称为User and Entity Behavior Analytics，即用户实体行为分析，一般通过大数据分析的方法，分析用户以及IT实体的行为，从而判断是否存在非法行为。
+</code></pre>
+<h3 id="2-148-内存保护"><a href="#2-148-内存保护" class="headerlink" title="2.148 内存保护"></a>2.148 内存保护</h3><pre><code class="hljs">内存保护是操作系统对电脑上的内存进行访问权限管理的一个机制。内存保护的主要目的是防止某个进程去访问不是操作系统配置给它的寻址空间。
+</code></pre>
+<h3 id="2-149-RASP"><a href="#2-149-RASP" class="headerlink" title="2.149 RASP"></a>2.149 RASP</h3><pre><code class="hljs">全称为Runtime application self-protection，翻译成应用运行时自我保护。
+
+在2014年时由Gartner提出，它是一种新型应用安全保护技术，它将保护程序像疫苗一样注入到应用程序中，应用程序融为一体，能实时检测和阻断安全攻击，使应用程序具备自我保护能力，当应用程序遭受到实际攻击伤害，就可以自动对其进行防御，而不需要进行人工干预。
+</code></pre>
+<h3 id="2-150-包检测"><a href="#2-150-包检测" class="headerlink" title="2.150 包检测"></a>2.150 包检测</h3><pre><code class="hljs">对于流量包、数据包进行拆包、检测的行为。
+</code></pre>
+<h3 id="2-151-深度包检测"><a href="#2-151-深度包检测" class="headerlink" title="2.151 深度包检测"></a>2.151 深度包检测</h3><pre><code class="hljs">Deep Packet Inspection，缩写为 DPI，又称完全数据包探测（complete packet inspection）或信息萃取（Information eXtraction，IX），是一种计算机网络数据包过滤技术，用来检查通过检测点之数据包的数据部分（亦可能包含其标头），以搜索不匹配规范之协议、病毒、垃圾邮件、入侵迹象。
+</code></pre>
+<h3 id="2-152-全流量检测"><a href="#2-152-全流量检测" class="headerlink" title="2.152 全流量检测"></a>2.152 全流量检测</h3><pre><code class="hljs">全流量主要体现在三个“全”上，即全流量采集与保存，全行为分析以及全流量回溯。
+
+通过全流量分析设备，实现网络全流量采集与保存、全行为分析与全流量回溯，并提取网络元数据上传到大数据分析平台实现更加丰富的功能。
+</code></pre>
+<h3 id="2-153元数据"><a href="#2-153元数据" class="headerlink" title="2.153元数据"></a>2.153元数据</h3><pre><code class="hljs">元数据（Metadata），又称中介数据、中继数据，为描述数据的数据（data about data），主要是描述数据属性（property）的信息，用来支持如指示存储位置、历史数据、资源查找、文件记录等功能。
+</code></pre>
+<h3 id="2-154-欺骗检测"><a href="#2-154-欺骗检测" class="headerlink" title="2.154 欺骗检测"></a>2.154 欺骗检测</h3><pre><code class="hljs">以构造虚假目标来欺骗并诱捕攻击者，从而达到延误攻击节奏，检测和分析攻击行为的目的。
+</code></pre>
+<h3 id="2-155-微隔离"><a href="#2-155-微隔离" class="headerlink" title="2.155 微隔离"></a>2.155 微隔离</h3><pre><code class="hljs">顾名思义是细粒度更小的网络隔离技术，能够应对传统环境、虚拟化环境、混合云环境、容器环境下对于东西向流量隔离的需求，重点用于阻止攻击者进入企业数据中心网络内部后的横向平移。
+</code></pre>
+<h3 id="2-156-逆向"><a href="#2-156-逆向" class="headerlink" title="2.156 逆向"></a>2.156 逆向</h3><pre><code class="hljs">常见于逆向工程或者逆向分析，简单而言，一切从产品中提取原理及设计信息并应用于再造及改进的行为，都是逆向工程。
+
+在网络安全中，更多的是调查取证、恶意软件分析等。
+</code></pre>
+<h3 id="2-157-无代理安全"><a href="#2-157-无代理安全" class="headerlink" title="2.157 无代理安全"></a>2.157 无代理安全</h3><pre><code class="hljs">在终端安全或者虚拟化安全防护中，往往需要在每一台主机或者虚机上安装agent（代理程序）来实现，这种方式往往需要消耗大量的资源。
+
+而无代理安全则不用安装agent，可以减少大量的部署运维工作，提升管理效率。
+</code></pre>
+<h3 id="2-158-CWPP"><a href="#2-158-CWPP" class="headerlink" title="2.158 CWPP"></a>2.158 CWPP</h3><pre><code class="hljs">全称Cloud Workload Protection Platform，意为云工作负载保护平台，主要是指对云上应用和工作负载（包括虚拟主机和容器主机上的工作负载）进行保护的技术，实现了比过去更加细粒度的防护，是现阶段云上安全的最后一道防线。
+</code></pre>
+<h3 id="2-159-CSPM"><a href="#2-159-CSPM" class="headerlink" title="2.159 CSPM"></a>2.159 CSPM</h3><pre><code class="hljs">云安全配置管理，能够对基础设施安全配置进行分析与管理。这些安全配置包括账号特权、网络和存储配置、以及安全配置（如加密设置）。如果发现配置不合规，CSPM会采取行动进行修正。
+</code></pre>
+<h3 id="2-160-CASB"><a href="#2-160-CASB" class="headerlink" title="2.160 CASB"></a>2.160 CASB</h3><pre><code class="hljs">全称Cloud Access Security Broker，即云端接入安全代理。作为部署在客户和云服务商之间的安全策略控制点，是在访问基于云的资源时企业实施的安全策略。
+</code></pre>
+<h3 id="2-161-防爬"><a href="#2-161-防爬" class="headerlink" title="2.161 防爬"></a>2.161 防爬</h3><pre><code class="hljs">意为防爬虫，主要是指防止网络爬虫从自身网站中爬取信息。网络爬虫是一种按照一定的规则，自动地抓取网络信息的程序或者脚本。
+</code></pre>
+<h3 id="2-162-安全资源池"><a href="#2-162-安全资源池" class="headerlink" title="2.162 安全资源池"></a>2.162 安全资源池</h3><pre><code class="hljs">安全资源池是多种安全产品虚拟化的集合，涵盖了服务器终端、网络、业务、数据等多种安全能力。
+</code></pre>
+<h3 id="2-163-IAM"><a href="#2-163-IAM" class="headerlink" title="2.163 IAM"></a>2.163 IAM</h3><pre><code class="hljs">全称为Identity and Access Management，即身份与访问管理，经常也被叫做身份认证。
+</code></pre>
+<h3 id="2-164-4A"><a href="#2-164-4A" class="headerlink" title="2.164 4A"></a>2.164 4A</h3><pre><code class="hljs">即认证Authentication、授权Authorization、账号Account、审计Audit，即融合统一用户账号管理、统一认证管理、统一授权管理和统一安全审计四要素后的解决方案将，涵盖单点登录（SSO）等安全功能。
+</code></pre>
+<h3 id="2-165-Access-Control-list-ACL"><a href="#2-165-Access-Control-list-ACL" class="headerlink" title="2.165 Access Control list(ACL)"></a>2.165 Access Control list(ACL)</h3><pre><code class="hljs">访问控制列表。
+</code></pre>
+<h3 id="2-166-多因子认证"><a href="#2-166-多因子认证" class="headerlink" title="2.166 多因子认证"></a>2.166 多因子认证</h3><pre><code class="hljs">主要区别于单一口令认证的方式，要通过两种以上的认证机制之后，才能得到授权，使用计算机资源。
+
+例如，用户要输入PIN码，插入银行卡，最后再经指纹比对，通过这三种认证方式，才能获得授权。这种认证方式可以降低单一口令失窃的风险，提高安全性。
+</code></pre>
+<h3 id="2-167-特权账户管理"><a href="#2-167-特权账户管理" class="headerlink" title="2.167 特权账户管理"></a>2.167 特权账户管理</h3><pre><code class="hljs">简称PAM。由于特权账户往往拥有很高的权限，因此一旦失窃或被滥用，会给机构带来非常大的网络安全风险。所以，特权账户管理往往在显得十分重要。
+
+其主要原则有：杜绝特权凭证共享、为特权使用赋以个人责任、为日常管理实现最小权限访问模型、对这些凭证执行的活动实现审计功能。
+</code></pre>
+<h3 id="2-168-零信任"><a href="#2-168-零信任" class="headerlink" title="2.168 零信任"></a>2.168 零信任</h3><pre><code class="hljs">零信任并不是不信任，而是作为一种新的身份认证和访问授权理念，不再以网络边界来划定可信或者不可信，而是默认不相信任何人、网络以及设备，采取动态认证和授权的方式，把访问者所带来的的网络安全风险降到最低。
+</code></pre>
+<h3 id="2-169-SDP"><a href="#2-169-SDP" class="headerlink" title="2.169 SDP"></a>2.169 SDP</h3><pre><code class="hljs">全称为Software Defined Perimeter，即软件定义边界，由云安全联盟基于零信任网络提出，是围绕某个应用或某一组应用创建的基于身份和上下文的逻辑访问边界。
+</code></pre>
+<h3 id="2-170-Security-as-a-Service"><a href="#2-170-Security-as-a-Service" class="headerlink" title="2.170 Security as a Service"></a>2.170 Security as a Service</h3><pre><code class="hljs">安全即服务，通常可理解为以SaaS的方式，将安全能力交付给客户。
+</code></pre>
+<h3 id="2-171-同态加密"><a href="#2-171-同态加密" class="headerlink" title="2.171 同态加密"></a>2.171 同态加密</h3><pre><code class="hljs">同态加密是一类具有特殊自然属性的加密方法，此概念是Rivest等人在20世纪70年代首先提出的，与一般加密算法相比，同态加密除了能实现基本的加密操作之外，还能实现密文间的多种计算功能。
+</code></pre>
+<h3 id="2-172-量子计算"><a href="#2-172-量子计算" class="headerlink" title="2.172 量子计算"></a>2.172 量子计算</h3><pre><code class="hljs">是一种遵循量子力学规律调控量子信息单元进行计算的新型计算模式，目前已经逐渐应用于加密和通信传输。
+</code></pre>
+<h3 id="2-173-可信计算"><a href="#2-173-可信计算" class="headerlink" title="2.173 可信计算"></a>2.173 可信计算</h3><pre><code class="hljs">是一项由可信计算组（可信计算集群，前称为TCPA）推动和开发的技术。
+
+可信计算是在计算和通信系统中广泛使用基于硬件安全模块支持下的可信计算平台，以提高系统整体的安全性。
+</code></pre>
+<h3 id="2-174-拟态防御"><a href="#2-174-拟态防御" class="headerlink" title="2.174 拟态防御"></a>2.174 拟态防御</h3><pre><code class="hljs">核心实现是一种基于网络空间内生安全机理的动态异构冗余构造（Dynamic Heterogeneous Redundancy，DHR)，为应对网络空间中基于未知漏洞、后门或病毒木马等的未知威胁，提供具有普适创新意义的防御理论和方法。
+</code></pre>
+<h3 id="2-175-区块链"><a href="#2-175-区块链" class="headerlink" title="2.175 区块链"></a>2.175 区块链</h3><pre><code class="hljs">英文名为blockchain，它是一个共享数据库，存储于其中的数据或信息，具有“不可伪造”、“全程留痕”、“可以追溯”、“公开透明”、“集体维护”等特征。
+</code></pre>
+<h3 id="2-176-远程浏览器"><a href="#2-176-远程浏览器" class="headerlink" title="2.176 远程浏览器"></a>2.176 远程浏览器</h3><pre><code class="hljs">鉴于浏览器往往成为黑客攻击的入口，因此将浏览器部署在远程的一个“浏览器服务器池”中。
+
+这样一来，这些浏览器所在的服务器跟用户所在环境中的终端和网络是隔离的，从而使得客户所在网络的暴露面大大降低。
+
+这种服务也类似于虚拟桌面、云手机等产品。
+</code></pre>
+<h3 id="2-177-云手机"><a href="#2-177-云手机" class="headerlink" title="2.177 云手机"></a>2.177 云手机</h3><pre><code class="hljs">云手机采用全新的VMI（Virtual Mobile Infrastructure虚拟移动设施，与PC云桌面类似）技术，为员工提供一个独立的移动设备安全虚拟手机，业务应用和数据仅在服务端运行和存储，个人终端上仅做加密流媒体呈现和触控，从而有效保障企业数据的安全性。
+</code></pre>
+<h3 id="2-178-风控"><a href="#2-178-风控" class="headerlink" title="2.178 风控"></a>2.178 风控</h3><pre><code class="hljs">也称大数据风控，是指利用大数据分析的方法判断业务可能存在的安全风险，目前该技术主要用于金融信贷领域，防止坏账的发生。
+</code></pre>
+<h3 id="2-179-渗透测试"><a href="#2-179-渗透测试" class="headerlink" title="2.179 渗透测试"></a>2.179 渗透测试</h3><pre><code class="hljs">为了证明网络防御按照预期计划正常运行而提供的一种机制，通常会邀请专业公司的攻击团队，按照一定的规则攻击既定目标，从而找出其中存在的漏洞或者其他安全隐患，并出具测试报告和整改建议。
+</code></pre>
+<p>其目的在于不断提升系统的安全性。</p>
+<h3 id="2-180-安全众测"><a href="#2-180-安全众测" class="headerlink" title="2.180 安全众测"></a>2.180 安全众测</h3><pre><code class="hljs">借助众多白帽子的力量，针对目标系统在规定时间内进行漏洞悬赏测试。
+
+您在收到有效的漏洞后，按漏洞风险等级给予白帽子一定的奖励。通常情况下是按漏洞付费，性价比较高。
+
+同时，不同白帽子的技能研究方向可能不同，在进行测试的时候更为全面。
+</code></pre>
+<h3 id="2-181-内生安全"><a href="#2-181-内生安全" class="headerlink" title="2.181 内生安全"></a>2.181 内生安全</h3><pre><code class="hljs">由奇安信集团董事长齐向东在2019北京网络安全大会上首次提出，指的是不断从信息化系统内生长出的安全能力，能伴随业务的增长而持续提升，持续保证业务安全。
+
+内生安全有三个特性，即依靠信息化系统与安全系统的聚合、业务数据与安全数据的聚合以及IT人才和安全人才的聚合，从信息化系统的内部，不断长出自适应、自主和自成长的安全能力。
+</code></pre>
+<h3 id="2-182-内生安全框架"><a href="#2-182-内生安全框架" class="headerlink" title="2.182 内生安全框架"></a>2.182 内生安全框架</h3><pre><code class="hljs">为推动内生安全的落地，奇安信推出了内生安全框架。
+
+该框架从顶层视角出发，支撑各行业的建设模式从“局部整改外挂式”，走向“深度融合体系化”；从工程实现的角度，将安全需求分步实施，逐步建成面向未来的安全体系；内生安全框架能够输出实战化、体系化、常态化的安全能力，构建出动态防御、主动防御、纵深防御、精准防护、整体防控、联防联控的网络安全防御体系。
+
+内生安全框架包含了总结出了29个安全区域场景和 79类安全组件。
+</code></pre>
+<h3 id="2-183-PPDR"><a href="#2-183-PPDR" class="headerlink" title="2.183 PPDR"></a>2.183 PPDR</h3><pre><code class="hljs">英文全称为Policy Protection Detection Response，翻译为策略、防护、检测和响应。
+
+主要以安全策略为核心，通过一致性检查、流量统计、异常分析、模式匹配以及基于应用、目标、主机、网络的入侵检查等方法进行安全漏洞检测。
+</code></pre>
+<h3 id="2-184-CARTA"><a href="#2-184-CARTA" class="headerlink" title="2.184 CARTA"></a>2.184 CARTA</h3><pre><code class="hljs">全称为Continuous Adaptive Risk and Trust Assessment，即持续自适应风险与信任评估旨在通过动态智能分析来评估用户行为，放弃追求完美的安全，不能要求零风险，不要求100%信任，寻求一种0和1之间的风险与信任的平衡。
+
+CARTA战略是一个庞大的体系，其包括大数据、AI、机器学*、自动化、行为分析、威胁检测、安全防护、安全评估等方面。
+</code></pre>
+<h3 id="2-185-SASE"><a href="#2-185-SASE" class="headerlink" title="2.185 SASE"></a>2.185 SASE</h3><pre><code class="hljs">全称为Secure Access Service Edge，即安全访问服务边缘，Gartner将其定义为一种基于实体的身份、实时上下文、企业安全/合规策略，以及在整个会话中持续评估风险/信任的服务。
+
+实体的身份可与人员、人员组（分支办公室）、设备、应用、服务、物联网系统或边缘计算场地相关联。
+</code></pre>
+<h3 id="2-186-SDL"><a href="#2-186-SDL" class="headerlink" title="2.186 SDL"></a>2.186 SDL</h3><pre><code class="hljs">全称为Security Development Lifecycle，翻译为安全开发生命周期，是一个帮助开发人员构建更安全的软件和解决安全合规要求的同时降低开发成本的软件开发过程，最早由微软提出。
+</code></pre>
+<h3 id="2-187-DevSecOps"><a href="#2-187-DevSecOps" class="headerlink" title="2.187 DevSecOps"></a>2.187 DevSecOps</h3><pre><code class="hljs">全称为Development Security Operations，可翻译为安全开发与运维。
+
+它强调在DevOps计划刚启动时就要邀请安全团队来确保信息的安全性，制定自动安全防护计划，并贯穿始终，实现持续 IT 防护。
+</code></pre>
+<h3 id="2-188-代码审计"><a href="#2-188-代码审计" class="headerlink" title="2.188 代码审计"></a>2.188 代码审计</h3><pre><code class="hljs">顾名思义就是检查源代码中的安全缺陷，检查程序源代码是否存在安全隐患，或者有编码不规范的地方，通过自动化工具或者人工审查的方式，对程序源代码逐条进行检查和分析，发现这些源代码缺陷引发的安全漏洞，并提供代码修订措施和建议。
+</code></pre>
+<h3 id="2-189-NTLM验证"><a href="#2-189-NTLM验证" class="headerlink" title="2.189 NTLM验证"></a>2.189 NTLM验证</h3><pre><code class="hljs">NTLM(NT LAN Manager)是微软公司开发的一种身份验证机制，从NT4开始就一直使用，主要用于本地的帐号管理。
+</code></pre>
+<h3 id="2-190-MTTD"><a href="#2-190-MTTD" class="headerlink" title="2.190 MTTD"></a>2.190 MTTD</h3><pre><code class="hljs">平均检测时间。
+</code></pre>
+<h3 id="2-191-MTTR"><a href="#2-191-MTTR" class="headerlink" title="2.191 MTTR"></a>2.191 MTTR</h3><pre><code class="hljs">平均响应时间。
+</code></pre>
+<h3 id="2-192-CVE"><a href="#2-192-CVE" class="headerlink" title="2.192 CVE"></a>2.192 CVE</h3><pre><code class="hljs">全称Common Vulnerabilities and Exposures，由于安全机构Mitre维护一个国际通用的漏洞唯一编号方案，已经被安全业界广泛接受的标准。
+</code></pre>
+<h3 id="2-193-软件加壳"><a href="#2-193-软件加壳" class="headerlink" title="2.193 软件加壳"></a>2.193 软件加壳</h3><pre><code class="hljs">“壳”是一段专门负责保护软件不被非法修改或反编译的程序。
+
+它们一般都是先于程序运行，拿到控制权，然后完成它们保护软件的任务。
+
+经过加壳的软件在跟踪时已无法看到其真实的十六进制代码，因此可以起到保护软件的目的。
+</code></pre>
+<h3 id="2-194-CNVD"><a href="#2-194-CNVD" class="headerlink" title="2.194 CNVD"></a>2.194 CNVD</h3><pre><code class="hljs">国家信息安全漏洞共享平台，由国家计算机应急响应中心CNCERT维护，主要负责统一收集、管理国内的漏洞信息，其发布的漏洞编号前缀也为CNVD。
+</code></pre>
+<h3 id="2-195-数据脱敏"><a href="#2-195-数据脱敏" class="headerlink" title="2.195 数据脱敏"></a>2.195 数据脱敏</h3><pre><code class="hljs">数据脱敏是指对某些敏感信息通过脱敏规则进行数据的变形，实现敏感隐私数据的可靠保护，主要用于数据的共享和交易等涉及大范围数据流动的场景。
+</code></pre>
+<h3 id="2-196-GDPR"><a href="#2-196-GDPR" class="headerlink" title="2.196 GDPR"></a>2.196 GDPR</h3><pre><code class="hljs">《通用数据保护条例》（General Data Protection Regulation，简称GDPR）为欧洲联盟的条例，前身是欧盟在1995年制定的《计算机数据保护法》。
+</code></pre>
+<h3 id="2-197-CCPA"><a href="#2-197-CCPA" class="headerlink" title="2.197 CCPA"></a>2.197 CCPA</h3><pre><code class="hljs">美国加利福尼亚州消费者隐私保护法案。
+</code></pre>
+<h3 id="2-198-SRC"><a href="#2-198-SRC" class="headerlink" title="2.198 SRC"></a>2.198 SRC</h3><pre><code class="hljs">即Security Response Center，中文名为安全应急响应中心，主要职责为挖掘并公开收集机构存在的漏洞和其他安全隐患。
+</code></pre>
+<h3 id="2-199-CISO"><a href="#2-199-CISO" class="headerlink" title="2.199 CISO"></a>2.199 CISO</h3><pre><code class="hljs">有时也被叫做CSO，即首席信息安全官，为机构的主要安全负责人。
+</code></pre>
+<h3 id="2-120-IPC管道"><a href="#2-120-IPC管道" class="headerlink" title="2.120 IPC管道"></a>2.120 IPC管道</h3><pre><code class="hljs">为了更好地控制和处理不同进程之间的通信和数据交换，系统会通过一个特殊的连接管道来调度整个进程。
+</code></pre>
+<h3 id="2-121-SYN包"><a href="#2-121-SYN包" class="headerlink" title="2.121 SYN包"></a>2.121 SYN包</h3><pre><code class="hljs">TCP连接的第一个包，非常小的一种数据包。SYN攻击包括大量此类的包，由于这些包看上去来自实际不存在的站点，因此无法有效进行处理。
+</code></pre>
+<h3 id="2-122-IPC"><a href="#2-122-IPC" class="headerlink" title="2.122 IPC$"></a>2.122 IPC$</h3><pre><code class="hljs">是共享“命名管道”的资源，它是为了让进程间通信而开放的命名管道，可以通过验证用户名和密码获得相应的权限，在远程管理计算机和查看计算机的共享资源时使用。
+</code></pre>
+<h3 id="2-123-shell"><a href="#2-123-shell" class="headerlink" title="2.123 shell"></a>2.123 shell</h3><pre><code class="hljs">指的是一种命令指行环境，是系统与用户的交换方式界面。简单来说，就是系统与用户“沟通”的环境。
+
+我们平时常用到的DOS，就是一个shell。（Windows2000是cmd.exe）
+</code></pre>
+<h3 id="2-124-ARP"><a href="#2-124-ARP" class="headerlink" title="2.124 ARP"></a>2.124 ARP</h3><pre><code class="hljs">地址解析协议(Address Resolution Protocol)此协议将网络地址映射到硬件地址。
+</code></pre>
+<p>参考链接：<br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/wenyoudo/p/14284916.html">https://www.cnblogs.com/wenyoudo/p/14284916.html</a><br>以及《<strong>智能汽车安全攻防大揭秘</strong>》里面的常见名词的解释<br>还有一些其它地方的来源，有遗漏链接私聊一下我，我添加上去</p>
+<p>暂时禁止转载，需转载请联系博主</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Android-ATTACK/">#Android_ATTACK</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>车联网安全常见术语科普</div>
+      <div>https://orangey.info/2022/09/23/118888796/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>橙留香</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年9月23日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/09/23/122089268/" title="Android APP应用程序的汉化功能 (修改so中的字符串内容)">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Android APP应用程序的汉化功能 (修改so中的字符串内容)</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  <article id="comments" lazyload>
+    
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1e96aec5ac46370916fa","clientSecret":"ee5e97a65cf34e9fe31e15ab0421a94968237f5e","repo":"ogGitalk","owner":"ananasOrangey","admin":["ananasOrangey"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '537392f8b78ea8fd66efbd3795f1e314'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+  </article>
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://orangey.blog.csdn.net" target="_blank" rel="nofollow noopener"><span>橙留香CSDN博客</span></a> <i class="iconfont icon-love"></i> <a href="https://i.imgtg.com/2022/09/21/gNXxK.png" target="_blank" rel="nofollow noopener"><span>橙留香微信公众号</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

@@ -1,0 +1,833 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="橙留香">
+  <meta name="keywords" content="橙留香车联网安全技术博客">
+  
+    <meta name="description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  Android安全付费专栏长期更新，本篇最新内容请前往：  [车联网安全自学篇] Android安全之Android奇淫run-as命令  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;ananasorangey&#x2F;c">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android奇淫run-as命令，调用系统受UID限制的API">
+<meta property="og:url" content="https://orangey.info/2022/09/23/122264566/index.html">
+<meta property="og:site_name" content="车联网安全技术博客 | 橙留香">
+<meta property="og:description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  Android安全付费专栏长期更新，本篇最新内容请前往：  [车联网安全自学篇] Android安全之Android奇淫run-as命令  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;ananasorangey&#x2F;c">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/21/gNXxK.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/cf26ba08cefc4680864d781954e2eec7.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/01147d415a0947448218248b14eb15ea.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5c0c6c20e1c54bc2997754467a0927c3.png">
+<meta property="article:published_time" content="2022-09-23T15:50:33.543Z">
+<meta property="article:modified_time" content="2022-09-24T16:39:07.246Z">
+<meta property="article:author" content="橙留香">
+<meta property="article:tag" content="AndroidSecurity">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+  
+  
+  
+  <title>Android奇淫run-as命令，调用系统受UID限制的API - 车联网安全技术博客 | 橙留香</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"orangey.info","root":"/","version":"1.9.3","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"java"},"copy_btn":false,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>橙留香</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Android奇淫run-as命令，调用系统受UID限制的API"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-09-23 23:50" pubdate>
+          2022年9月23日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          7.6k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          <!-- compatible with older versions-->
+          64 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Android奇淫run-as命令，调用系统受UID限制的API</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <hr>
+<p><strong>也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大</strong></p>
+<p><strong>少走了弯路，也就错过了风景，无论如何，感谢经历</strong></p>
+<hr>
+<p>Android安全付费专栏长期更新，本篇最新内容请前往：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://orangey.blog.csdn.net/article/details/122264566">[车联网安全自学篇] Android安全之Android奇淫run-as命令</a></li>
+</ul>
+<p>更多关于Android安全的知识，可前往：<a target="_blank" rel="noopener" href="https://blog.csdn.net/ananasorangey/category11955914.html">https://blog.csdn.net/ananasorangey/category11955914.html</a></p>
+<p><img src="https://i.imgtg.com/2022/09/25/gdpGP.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><img src="https://i.imgtg.com/2022/09/21/gNXxK.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x01-前言"><a href="#0x01-前言" class="headerlink" title="0x01 前言"></a>0x01 前言</h1><p>run-as是Android系统中的一个小应用，可以辅助我们进行Android程序的开发。</p>
+<p><strong>功能</strong>：run-as命令，以root身份运行命令，可以在未root的情况下查看某个(debug模式的)应用的内部信息（沙盒文件夹），前提条件是应用需为debug模式，即AndroidManifest.xml文件中，android:debugable需要为true</p>
+<p>在开发Android应用的时候，有的时候希望能获取到保存到手机盘应用私有目录&#x2F;data&#x2F;data&#x2F;com.mwr.dz下的数据来验证开发的应用是否达到预期结果，或者获取写到私有目录的log日志文件来进行debug工作。</p>
+<p>在没有root过的手机中，我们是无法直接使用adb shell来获取到&#x2F;data&#x2F;data&#x2F;com.mwr.dz下的数据，此时的用户权限是无法查看很多信息的，包括各个应用的沙盒，而run-as就向开发者提供了未root情况下访问沙盒信息的权限，执行run-as + 包名，就可以直接以root权限进入该应用的沙盒中查看包括数据库、xml、各种信息文件</p>
+<ul>
+<li><strong>为什么命令可以查看到Android应用私有数据？</strong></li>
+</ul>
+<p>run-as程序就是通过s权限使得普通用户可以在满足条件（应用为debug模式时、操作目录仅在应用沙盒下）时具备root权限</p>
+<p>除了提权以外，s权限还可以用来降权，root用户可更改文件的拥有者，以及通过s权限任意更改程序执行时的权限，在Linux中所有进程都是由zygote进程fork出来的，如果不降权的话则所有进程都与父进程相同、具备了root权限，这显然是不安全的，因此zygote通过forkAndSpecializeCommon函数来进行降权处理，使得子进程具备可控的权限</p>
+<ul>
+<li>注：<ul>
+<li>1.使用run-as后，是无法使用cp命令将应用数据拷贝到sd卡的，没有权限</li>
+<li>2.apk已签名，并且设置了android:debuggable&#x3D;”false”，将无法使用run-as命令</li>
+<li>3.无法使用run-as来直接获取应用数据的话，需在自己的应用里实现读取应用数据到sd卡的功能，应用本身对自己的数据是有访问权限的</li>
+<li>4.&#x2F;data&#x2F;data&#x2F;com.packagename&#x2F;lib目录不需要执行run-as就拥有访问权限，为apk间共享so提供了便利</li>
+</ul>
+</li>
+</ul>
+<p>Java中的调试系统jdb，其实Android中的调试系统是gdb，通过gdb和gdbserver来调试App。具体来说，就是gdbserver通过ptrace附加到目标App进程去，然后gdb再通过socket或者pipe来链接gdbserver，并且向它发出命令来对App进程进行调试。需要注意以下关键点：</p>
+<ul>
+<li><p>每一个需要调试的apk在打包的时候都会带上一个gdbserver，因为手机上面不带有gdbserver工具。gdbserver用来通过ptrace附加到要调度的App进程去。</p>
+</li>
+<li><p>ptrace的调用。一般来说，只有root权限的进程可以调用。例如，如果想通过ptrace向目标进程注入一个so，需要在root过的手机上向su申请root权限。但是，这不是绝对的。如果一个进程与目标进程的uid是相同的，那么该进程就具有调用ptrace的权限。gdbserver在调试一个App之前，先通过ptrace_attach来附加到该App进程去，ptrace_attach在执行实际操作之后，会调用__ptrace_may_access来检查调用进程的权限，如果调用进程与目标进程具有相同的uid和gid，那么权限检查通过。否则的话，就要求调用者进程具有执行ptrace的能力，这是通过另外一个函数ptrace_has_cap来检查的。如果调用进程的uid是root，那么ptrace_has_cap一定会检查通过。当然，通过了上述两个权限检查之后，还要接受内核安全模块的检查，这就不是通过uid或者capability这一套机制来控制的了</p>
+</li>
+<li><p><strong>如何让gdbserver进程的uid与要调试的App进程的uid一样？</strong></p>
+</li>
+</ul>
+<p>在没有root过的手机上要想获得root权限是不可能的，因此只能选择以目标进程相同的uid运行这个方法，可使用run-as工具</p>
+<h1 id="0x02-调用系统受uid限制的API"><a href="#0x02-调用系统受uid限制的API" class="headerlink" title="0x02 调用系统受uid限制的API"></a>0x02 调用系统受uid限制的API</h1><p>众所周知，Android P 引入了针对非 SDK 接口（俗称为隐藏API）的使用限制，这是继 Android N上针对 NDK 中私有库的链接限制之后的又一次重大调整。从今以后，不论是native层的NDK还是 Java层的SDK，我们只能使用Google提供的、公开的标准接口。</p>
+<p><strong>Android P 和 Android Q</strong>：<a target="_blank" rel="noopener" href="https://blog.csdn.net/github_34402358/article/details/94399343">https://blog.csdn.net/github_34402358/article/details/94399343</a></p>
+<p>用一个例子来详细介绍Android中如何降权，这个例子是模拟一个系统的API，但是这个API只允许system用户调用，代码如下：</p>
+<p>在Android平台执行Java程序需要依赖dalvik虚拟机，因此需要将jar包转换为对应的字节码文件，操作步骤如下：<br>1、生成java jar包 同Pc执行</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java">java -jar  E:\test.jar <br></code></pre></td></tr></table></figure>
+
+<p>2、java jar包转dex包，执行如下命令</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java">dx --dex --output=test.dex E:\test.jar <br></code></pre></td></tr></table></figure>
+
+<p>3、连接Android手机，并将dex执行程序推入Android设备路径下：</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs gradle">adb <span class="hljs-keyword">push</span> E:\test.dex <span class="hljs-regexp">/data/</span>local<span class="hljs-regexp">/tmp/</span><br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>打开 IDEA 软件，点击界面上的 Create New Project </li>
+<li>出现以下界面，选中 Java，然后选择 JDK，最后点击 Next，进行下一步（我的是 jdk1.8）</li>
+<li>这里是选择生成项目时是否创建 Java 文件，勾选上 Java Hello World 后会生成一个默认的 Hello world 文件，点击 Next 进行下一步</li>
+<li>给项目命名，默认是 untiled，自己填个名字吧，最后点击 finish</li>
+<li>项目创建完成，创建 Java 文件：点击 src——&gt;new——&gt;package，创建一个文件包，并给包命名，与 Eclipse 的包类似<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c">在包下面创建 Java 类文件，点击包名——&gt;New——&gt;Java Class;<br>给类文件命名<br></code></pre></td></tr></table></figure></li>
+<li>进入手机shell<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">adb shell   <br></code></pre></td></tr></table></figure></li>
+<li>进入sdcard目录<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cd</span>  sdcard<br></code></pre></td></tr></table></figure></li>
+<li>设置将要执行的jar包的classpass，不设置将无法执行</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">export CLASSPATH=/sdcard/hello.jar<br></code></pre></td></tr></table></figure>
+<ul>
+<li>执行jar包</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">app_process hello.jar com.lyh.hello.Hello  aaa  bbb  ccc<br></code></pre></td></tr></table></figure>
+
+<p>创建一个IDA 来编写Android 中的程序</p>
+<h1 id="0x03-案例1"><a href="#0x03-案例1" class="headerlink" title="0x03 案例1"></a>0x03 案例1</h1><p>run-as 命令可以获取debug应用的私有数据，在调试debug包的时候，可以使用该命令将用户切换到系统分配给debug应用的用户上，之后就可以访问其私有数据</p>
+<ul>
+<li>adb shell</li>
+<li>whoami</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/cf26ba08cefc4680864d781954e2eec7.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>run-as &#x2F;data&#x2F;data&#x2F;com.mwr.dz</li>
+<li>whoami</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/01147d415a0947448218248b14eb15ea.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><strong>注</strong>：在默认的shell环境下，用户身份是root(假设当前是普通用户，无法查看应用的私有数据)，运行 run-as 后，身份切换了 u0_a40, 这个用户其实是测试应用的uid，也可以自由的访问其私有目录</p>
+<ul>
+<li>Android中每一个应用都有一个uid，可以通过以下方式获取:</li>
+</ul>
+<p>PS命令：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java">ps | grep com.mwr.dz<br></code></pre></td></tr></table></figure>
+
+<p>每个Android应用程序的u0_axx都是不一样的，同时uid是从10000开始，u0_a后面的数字加上10000所得的值，既是uid，这个和测试应用的输出也非常的吻合，即u0_a40 和 10040。</p>
+<p><strong>注</strong>：0_a后面的数字就是该应用的UID值减去FIRST_APPLICATION_UID所得的值，40 + FIRST_APPLICATION_UID &#x3D; 10040</p>
+<p>android2.3.3_r1中run-as.c中主要代码：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/* 没有传入包名则退出 */</span><br><span class="hljs-keyword">if</span> (argc &lt; <span class="hljs-number">2</span>)<br><br>    usage();<br><br><span class="hljs-comment">/* 非&#x27;shell&#x27;用户或&#x27;root&#x27;用户则退出 */</span><br>myuid = getuid();<br><br><span class="hljs-keyword">if</span> (myuid != AID_SHELL &amp;&amp; myuid != AID_ROOT) &#123;<br><br>    panic(<span class="hljs-string">&quot;only &#x27;shell&#x27; or &#x27;root&#x27; users can run this program\n&quot;</span>);<br><br>&#125;<br><br><span class="hljs-comment">/* 根据传入包名获取应用信息，失败则退出 */</span><br>pkgname = argv[<span class="hljs-number">1</span>];<br><br><span class="hljs-keyword">if</span> (get_package_info(pkgname, &amp;info) &lt; <span class="hljs-number">0</span>) &#123;<br><br>    panic(<span class="hljs-string">&quot;Package &#x27;%s&#x27; is unknown\n&quot;</span>, pkgname);<br><br>    <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;<br><br>&#125;<br><br><span class="hljs-comment">/* reject system packages */</span><br><span class="hljs-keyword">if</span> (info.uid &lt; AID_APP) &#123;<br><br>    panic(<span class="hljs-string">&quot;Package &#x27;%s&#x27; is not an application\n&quot;</span>, pkgname);<br><br>    <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;<br><br>&#125;<br><br><span class="hljs-comment">/* 如果设置了android:debuggable=&quot;false&quot;，则退出 */</span><br><span class="hljs-keyword">if</span> (!info.isDebuggable) &#123;<br><br>    panic(<span class="hljs-string">&quot;Package &#x27;%s&#x27; is not debuggable\n&quot;</span>, pkgname);<br><br>    <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;<br><br>&#125;<br><br><span class="hljs-comment">/* 检查/data/data/com.packagename目录是否可用 */</span><br><span class="hljs-keyword">if</span> (check_data_path(info.dataDir, info.uid) &lt; <span class="hljs-number">0</span>) &#123;<br><br>    panic(<span class="hljs-string">&quot;Package &#x27;%s&#x27; has corrupt installation\n&quot;</span>, pkgname);<br><br>    <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;<br><br>&#125;<br><br><span class="hljs-comment">/* 切换当前工作目录为/data/data/com.packagename，失败则退出 */</span><br>&#123;<br><br>    <span class="hljs-type">int</span> ret;<br><br>    <span class="hljs-keyword">do</span> &#123;<br><br>        ret = chdir(info.dataDir);<br><br>    &#125; <span class="hljs-keyword">while</span> (ret &lt; <span class="hljs-number">0</span> &amp;&amp; errno == EINTR);<br>    <span class="hljs-keyword">if</span> (ret &lt; <span class="hljs-number">0</span>) &#123;<br><br>        panic(<span class="hljs-string">&quot;Could not cd to package&#x27;s data directory: %s\n&quot;</span>, strerror(errno));<br><br>        <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;<br><br>    &#125;<br><br>&#125;<br><br><span class="hljs-comment">/* Ensure that we change all real/effective/saved IDs at the</span><br><span class="hljs-comment"> * same time to avoid nasty surprises.</span><br><span class="hljs-comment"> */</span><br><br><span class="hljs-comment">/* 切换真实/有效/saved 用户ID和组ID*/</span><br>uid = gid = info.uid;<br><br><span class="hljs-keyword">if</span>(setresgid(gid,gid,gid) || setresuid(uid,uid,uid)) &#123;<br><br>    panic(<span class="hljs-string">&quot;Permission denied\n&quot;</span>);<br><br>    <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;<br><br>&#125;<br><br><span class="hljs-comment">/* 用户在包名参数后指定了要执行的命令，就执行这个命令 */</span><br><span class="hljs-keyword">if</span> (argc &gt;= <span class="hljs-number">3</span> ) &#123;<br><br>    <span class="hljs-keyword">if</span> (execvp(argv[<span class="hljs-number">2</span>], argv+<span class="hljs-number">2</span>) &lt; <span class="hljs-number">0</span>) &#123;<br><br>        panic(<span class="hljs-string">&quot;exec failed for %s Error:%s\n&quot;</span>, argv[<span class="hljs-number">2</span>], strerror(errno));<br><br>        <span class="hljs-keyword">return</span> -errno;<br><br>    &#125;<br><br>&#125;<br><br><span class="hljs-comment">/* 用户没有传入要执行的命令，执行默认的shell命令子进程，此时可以执行exit命令退出 */</span><br>execlp(<span class="hljs-string">&quot;/system/bin/sh&quot;</span>, <span class="hljs-string">&quot;sh&quot;</span>, <span class="hljs-literal">NULL</span>);<br><br>panic(<span class="hljs-string">&quot;exec failed\n&quot;</span>);<br><br><span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-number">9</span> <span class="hljs-number">8</span> <span class="hljs-number">7</span> <span class="hljs-number">6</span> <span class="hljs-number">5</span> <span class="hljs-number">4</span> <span class="hljs-number">3</span> <span class="hljs-number">2</span> <span class="hljs-number">1</span> <span class="hljs-number">0</span><br>- r w x r - x r - x<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><p>第9位表示文件类型，可以为p、d、l、s、c、b和-：</p>
+<ul>
+<li>p表示命名管道文件</li>
+<li>d表示目录文件</li>
+<li>l表示符号连接文件</li>
+<li>s表示socket文件</li>
+<li>c表示字符设备文件</li>
+<li>b表示块设备文件</li>
+<li>-表示普通文件</li>
+</ul>
+</li>
+<li><p>第8～6位、5～3位、2～0位分别表示文件所有者的权限、同组用户的权限、其他用户的权限，其形式为rwx：</p>
+<ul>
+<li>r表示可读，可以读出文件的内容，对应的数字是4</li>
+<li>w表示可写，可以修改文件的内容，对应的数字是2</li>
+<li>x表示可执行，可运行这个程序，对应的数字是1</li>
+</ul>
+</li>
+<li><p>执行的话，分别表现在所有者或同组用户权限的可执行位上，例如：</p>
+<ul>
+<li>1）-rwsr-xr-x 表示SUID和所有者权限中可执行位被设置</li>
+<li>2）-rwsr–r– 表示SUID被设置，但所有者权限中可执行位没有被设置</li>
+<li>3）-rwxr-sr-x 表示SGID和同组用户权限中可执行位被设置</li>
+<li>4）-rw-r-sr– 表示SGID被设置，但同组用户权限中可执行位没有被设置</li>
+</ul>
+</li>
+</ul>
+<h1 id="0x04-Android中setuid和setgid"><a href="#0x04-Android中setuid和setgid" class="headerlink" title="0x04 Android中setuid和setgid"></a>0x04 Android中setuid和setgid</h1><blockquote>
+Android系统进程Zygote启动过程的源代码分析：http://blog.csdn.net/luoshengyang/article/details/6768304
+</blockquote>
+
+<p>Android的APK都是运行在独立的应用程序进程里面的，Android中的所有的应用进程和SystemServer进程都是Zygote进程fork出来的。Zygote进程又是由init进程fork出来的，并且它被init进程fork出来后，没有被setuid降权，也就是它的uid仍然是root。</p>
+<p>应用程序进程被Zygote进程fork出来的时候，它的UID也应当是root。但是，它们的UID会被setuid修改为所加载的APK被分配的UID。</p>
+<p>Android 2.2 以及之前版本的Zygote没有对降权时setuid调用的返回值进行检查。同样，在耗尽目标程序uid的最大进程数之后，Zygote就无法降低它的权限，然后就以root权限启动应用了</p>
+<p>虽然Zygote进程相当于Android系统的根进程，但它也是由Linux系统的init进程启动的。各个进程的先后顺序为：</p>
+<figure class="highlight xl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xl"><span class="hljs-function"><span class="hljs-title">init</span>进程 –-&gt;</span> Zygote进程 -–&gt; SystemServer进程 -–&gt;应用进程<br></code></pre></td></tr></table></figure>
+
+<p>所有Android应用进程都是zygote fork出来的，新fork出来的应用进程还保持着root权限，这显然是不被允许的，所以这个fork出来的子进程的权限需要被降级，本文说的就是Android源码在什么地方执行了权限降级的操作</p>
+<ul>
+<li>zygote降权处理</li>
+</ul>
+<p>Zygote启动流程：</p>
+<p>1）初始化DDMS</p>
+<p>2）注册Zygote进程的Socket</p>
+<p>3）加载class、resource、OpenGL、WebView等各种资源</p>
+<p>4）fork出SystemServer进程</p>
+<p>5）启动SystemServer进程</p>
+<p>6）调用runSelectLoop()一直监听Socket信息</p>
+<p>7）收到创建应用程序Socket消息，调用ZygoteConnection#runOnce()。在runOnce（）中调用Zygote#forkAndSpecialize()创建应用进程</p>
+<p>8）启动应用进程</p>
+<ul>
+<li>su工具原理</li>
+</ul>
+<p>Android手机的root原理：一个普通的进程通过执行su，从而获得一个具有root权限的进程</p>
+<p>su所做的事情其实很简单，它再fork另外一个子进程来做真正的事情，也就是在执行su的时候后面所跟的那些参数。由于运行su的进程的uid是root，因此由它fork出来的子进程的uid也是root，于是子进程也可以达到跟root一样的权限操作稳健。不过，用来root手机的su还会配合另外一个称为superuser的App来使用。su在fork子进程来做真正的事情之前，会先启动superuser，询问用户是否允许fork一个uid是root的子进程，对root权限进行控制，避免被恶意应用偷偷地使用</p>
+<ul>
+<li>chmod修改setuid和setgid場景：run-as命令</li>
+</ul>
+<p>在Android中也有类似的场景，例如run-as命令本生的uid是root，gid是shell，输入 run-as 命令的用户就会立马升级到root用户，root用户可以进入到任何应用的data&#x2F;data&#x2F;目录下面</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">chmod <span class="hljs-number">6755</span> run-as <br></code></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">ll /system/bin/run-as<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/5c0c6c20e1c54bc2997754467a0927c3.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><strong>参考链接</strong>：</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/whklhhhh/article/details/81177455">https://blog.csdn.net/whklhhhh/article/details/81177455</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/moonshine2016/article/details/53422082">https://blog.csdn.net/moonshine2016/article/details/53422082</a></p>
+<p><a target="_blank" rel="noopener" href="https://daemon369.github.io/android/2013/09/03/use-run-as-get-android-private-data">https://daemon369.github.io/android/2013/09/03/use-run-as-get-android-private-data</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.codeboy.me/2019/09/10/android-run-as/">https://www.codeboy.me/2019/09/10/android-run-as/</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_17250009/article/details/52061171">https://blog.csdn.net/qq_17250009/article/details/52061171</a></p>
+<p><a target="_blank" rel="noopener" href="http://www.520monkey.com/archives/607">http://www.520monkey.com/archives/607</a></p>
+<hr>
+<p><strong>你以为你有很多路可以选择，其实你只有一条路可以走</strong></p>
+<hr>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/AndroidSecurity/">#AndroidSecurity</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Android奇淫run-as命令，调用系统受UID限制的API</div>
+      <div>https://orangey.info/2022/09/23/122264566/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>橙留香</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年9月23日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/09/23/123002359/" title="入侵检测常用正则表达式手册">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">入侵检测常用正则表达式手册</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/09/23/122431881/" title="和平精英辅助APK逆向分析">
+                        <span class="hidden-mobile">和平精英辅助APK逆向分析</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  <article id="comments" lazyload>
+    
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1e96aec5ac46370916fa","clientSecret":"ee5e97a65cf34e9fe31e15ab0421a94968237f5e","repo":"ogGitalk","owner":"ananasOrangey","admin":["ananasOrangey"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: 'ac6ff863ef36d84c2c5e5dd2fb8ec668'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+  </article>
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://orangey.blog.csdn.net" target="_blank" rel="nofollow noopener"><span>橙留香CSDN博客</span></a> <i class="iconfont icon-love"></i> <a href="https://i.imgtg.com/2022/09/21/gNXxK.png" target="_blank" rel="nofollow noopener"><span>橙留香微信公众号</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

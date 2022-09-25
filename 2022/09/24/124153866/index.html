@@ -1,0 +1,1310 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="橙留香">
+  <meta name="keywords" content="橙留香车联网安全技术博客">
+  
+    <meta name="description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;ananasorangey&#x2F;category11955914.html   0x01 view_source Write UpXCTF Web 练习题地址：https:&#x2F;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="「干货」XCTF Web安全入门练习靶场全部通关教程">
+<meta property="og:url" content="https://orangey.info/2022/09/24/124153866/index.html">
+<meta property="og:site_name" content="车联网安全技术博客 | 橙留香">
+<meta property="og:description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;ananasorangey&#x2F;category11955914.html   0x01 view_source Write UpXCTF Web 练习题地址：https:&#x2F;">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/21/gNXxK.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/f45bda0e7aa14e7f8c0de1d53863053d.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/108046e9c15f4a519a15a6e27f16bd31.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/be018ca7c3ab4438a4c01f786ef5e393.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/baa00f05813f463f8b542d292c40779c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/a2232102173f4300bdb8f4debc56b2b6.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/b86586140c8d4d5598ba35d9440462cd.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8f6533875b8b423f8e70c745b5a50476.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_16,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/56cd1bc016df4c2db82db6c63447f2fb.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/b7a459198fa1481f934da333e54620d5.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/0696ed6518134000b96b3b38ce115ad8.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_14,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2e6de8f13ff145dc9ff223a2dfef811e.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_19,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/dc5505e7d1a644ecab7c2be6642ea8fe.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/48fa68cd5fab4252aa98449f2dd6b277.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8a1e72d38fa64dc28e15d22ddf9f8295.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2b7850b43ba944bc80047d548875ffad.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_19,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d8326cf15ee247dab9563852303db607.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_18,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/03062fb955fa446f85a984c80fa8d4d9.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_18,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/51be167d00c64662813740b0bfcf28ad.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d4bb692d611c456ea03d6cffd35bcbbb.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/b4af6ebc686549ac8a5e78fc831ec76b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d65ae55b61624f76bab1f7e930214713.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d7bceeb9f2bf4e3ab156b74ed90c2a37.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/502aa921d06b479a814fc525f7b0d7e7.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/84e1e5c6eca44e118733210be4584fa1.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/f81239bf25a843b89f2d19944e193b3b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/40f801e3dbeb4d3e81003a08dda32967.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/dd1ab2a61deb4563992ac9c485be91a7.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/39f142dfd30b4f04bc1a82356beaabbb.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/7c433040e562495aa39b519b121aa453.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/a9a3bfd1663d41f9af59d9e2cce4a791.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/4abf3b9643a544d3a720e5ffeca45562.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/737d3c490bf14397b5754d4a666c94ae.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8c269777643242be9a02a888e45f362b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/3e50d0aed4a644cdbb92b7d73f4157e7.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/502b89dbb0e0442c8dc079a388752148.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/6a53d88f209a4f91aec2c6c0bb04b256.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/a39406dae9064335b7f15e19d5c5ed42.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/df88fcddbde0423bbb270e267a4b48ff.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e4aae67f436a44ca9f3ea281e5e526c4.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/9d087d3fd6e044f4baffc12fc3aaca41.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/808da4690ff14734b50d67095783174b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/359869c86495405d8d0a8f0115a345c4.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/7495e4decd6e4460af0a62c5331c7ebe.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5ce8d217e47442b1806dd1d3e6ad9723.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/3fc07441af0d49bda1e424ce3b21554a.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/7f7ad039900f42afa3ee7660f4fe24b3.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/85962c4b4a4645218fcfb2372f41354c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/af03454d5c8a41b482f2e1abf81f62ce.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/1dc86e7043ae4397a511ea7e55bca142.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_19,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5f5fa8bf3c0f443e8a51eeebb75effc8.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/6e8b3e04351f4e7dbabf22bffa98dcc6.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e0a1db2375fb44ceaf73e87484167c54.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/7b6baf5944cf47f29b4f12eb36ee5767.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e7c2c39adf2742b7b7144c8e73f22dbd.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2346592494404d379773350fee9b2967.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/371928b00de24403ae3ba0e7b6411b8c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c4509c13baa046c2a03d2927d03ad646.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/f96b050174a84951a76fd4e084622a31.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/a786d99881f74e0aa82943e1b4295b8d.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/ab8d944fdaa344d199b2946b927d6dd9.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/25fc17a6fd2b431192442a6a3c9e6230.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/596d505ef03f408bb672b012e82a414a.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2406e77bb1294a268c31cf47174c7d0f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/feb2d101cdad42f3ac9c57238e961e34.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/49d2349c34704096ad144376d8511dd3.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/134e5e1392a54ec090d7b51f183f3ac3.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/efa5bffd99ad40faa252770ae061ea20.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/da43fc5137e24e8e967e0431cca2bbee.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/654f3de56cf74a928375db6b358d93ce.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/f25ee6b1707e41bfaa6841ef1c9803f4.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/68818f7247ac4e37a0aa5faa7d223041.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/fbc4c8e13925483eb9582f0e4d6618d9.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5c2527516f7b4472a19d53e837354d9a.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/7a55698a23ba474d91d02a217cec0e74.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/f5163b5ff9ce478d98421fcd9c6d361f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/bb4a1cabcdda4cb09caf12c039ec6252.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d9642ada998b4f6da820bf1b656e60ee.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/88431483a89a40cb97f300bec522cc57.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/1daf15fdd5c94b0f94982d7264b3c337.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/9c185431038d4b5ea12dbfaecbfec2f1.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/207eb4daa8ae4d199fc356c5a5e5885c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5a36cc9f56ff49a0aa78aff16edf9c5c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_19,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/6210b297ac0a41249c4cc8c3128eecef.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/6f9dc30a934c45a49214ab348c67db81.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/6155d16451f14c999a2e2a4d43194e67.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/29d7a806f03d4bec8acd8068a924d776.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8e4c5404f46142e788832ecb12e022c7.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/b47be16d3d254c9098639dd4c5bb547b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/ea6bcedeccb943faaad16e5c6f4d581b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8b572bc469454890a103773801eed0d3.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/93f4a18f6a76459bbc01ad3d12c9ed5a.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/55b38e3ce7e24d8294597ffaf99f4a6c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/4478ac60d2a94469877102efecbceb7f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/af4d28fc86c642929284214a742f7a9b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e329b06f50104f22b74a1e13d1c18ce8.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/309d1d591b0c4a128513141b8018dee4.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/6c11d75f5acc4716bf34ef38f7326682.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/ce7b5963855c49d795231901f4939cfd.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c316148bf7874a2e853fa97bde403d3f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/0a95cacf0ffb429f849bf9481aac392f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/f938aa164fa24bc7a3fb0460c2805853.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/ae668e8cbed04379a20e70b25d471c04.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5965bdd8619e4dda867ad30c686ba8a4.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/3c1b299a3f934c5ea343e27a760ee393.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8dd8bc667de74dc6a111a1716c36d402.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2b19bf8ba46b4b97896fb17f6bcd6257.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/ddbc756041ed4197a8b6c88c9f13d98e.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/67a7e7a9466047a2a087f60e73bc4d23.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/75e6c75a5e094334928e4dee61361f93.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/aac266f5d81f4e9da9a5a52fa49c3312.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/04281d07539840088ab48e76c5fa29ea.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/7901fae74c424ba8b0ddfe2341e0d224.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/bb8bfd682eb845f5a54bf41f0f7d8f7f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/df380ee649474d7c8e36a6ed117b9e82.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e6f972827cd243a2a1fe0202276a9432.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e002c08c24fe4028b4f280d034c65387.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e9a606fb19ab468c90210ba0c1f9150f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/59863a7462434bc7a420d9d9cc8872d4.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/b280e4b5efa74bc688e6a73d9aa55b8d.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e19205459737425c8d96cd570c500219.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8abee084ccb74599bb50e44690f04dad.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/bae85f0078a14356a3147a94448beb5f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="article:published_time" content="2022-09-24T13:25:27.029Z">
+<meta property="article:modified_time" content="2022-09-24T16:44:46.653Z">
+<meta property="article:author" content="橙留香">
+<meta property="article:tag" content="Web安全">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+  
+  
+  
+  <title>「干货」XCTF Web安全入门练习靶场全部通关教程 - 车联网安全技术博客 | 橙留香</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"orangey.info","root":"/","version":"1.9.3","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"java"},"copy_btn":false,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>橙留香</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="「干货」XCTF Web安全入门练习靶场全部通关教程"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-09-24 21:25" pubdate>
+          2022年9月24日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          19k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          <!-- compatible with older versions-->
+          158 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">「干货」XCTF Web安全入门练习靶场全部通关教程</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <hr>
+<p><strong>也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大</strong></p>
+<p><strong>少走了弯路，也就错过了风景，无论如何，感谢经历</strong></p>
+<hr>
+<p>更多关于Android安全的知识，可前往：<a target="_blank" rel="noopener" href="https://blog.csdn.net/ananasorangey/category11955914.html">https://blog.csdn.net/ananasorangey/category11955914.html</a></p>
+<p><img src="https://i.imgtg.com/2022/09/25/gdpGP.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><img src="https://i.imgtg.com/2022/09/21/gNXxK.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x01-view-source-Write-Up"><a href="#0x01-view-source-Write-Up" class="headerlink" title="0x01 view_source Write Up"></a>0x01 view_source Write Up</h1><p>XCTF Web 练习题地址：<a target="_blank" rel="noopener" href="https://adworld.xctf.org.cn/">https://adworld.xctf.org.cn/</a></p>
+<p><img src="https://img-blog.csdnimg.cn/f45bda0e7aa14e7f8c0de1d53863053d.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><strong>难度系数</strong>：一星 </p>
+<p><strong>题目来源</strong>： Cyberpeace-n3k0</p>
+<p><strong>题目描述</strong>：X老师让小宁同学查看一个网页的源代码，但小宁同学发现鼠标右键好像不管用了。</p>
+<p><strong>题目分析</strong>：从题目，我们可以看到X老师给小宁这个靓仔（叼毛）一个任务，就是去某网站查看网页的源代码，但是进入该网站后发现无法从鼠标右键里面点击查看源代码。</p>
+<p>个人感觉，解这道题的Flag 就在网页的源代码里面藏着，那么除了右键点击查看页面源代码外，还可以使用哪些方法查看页面源代码？</p>
+<p>一些能想到的解题方法，供大家参考：</p>
+<ul>
+<li>F12 开发者工具查看源代码</li>
+<li>快捷键或输入view-source</li>
+<li>BurpSuite 抓包获得网页源代码</li>
+<li>禁用JS插件后，查看源代码</li>
+<li>html 页面存储到本地查看</li>
+</ul>
+<p><strong>备注</strong>： 大家进入攻防世界，注册账号并登陆后，点击页面左上方一栏的【答题】标签下的【Web】标签页开始竞赛吧，该Web 方向题目分【新手练习区】和【高手进阶区】</p>
+<p><img src="https://img-blog.csdnimg.cn/108046e9c15f4a519a15a6e27f16bd31.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="1-1-F12-开发者工具查看源代码"><a href="#1-1-F12-开发者工具查看源代码" class="headerlink" title="1.1 F12 开发者工具查看源代码"></a>1.1 F12 开发者工具查看源代码</h2><p>1）用firefox打开页面，摁下F12（查看整个DOM结构），打开查看器可以得到flag</p>
+<pre><code class="hljs">下方有个被注释的一串字符串，找到flag
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/be018ca7c3ab4438a4c01f786ef5e393.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>2）或用chrome打开页面，摁下F12（查看整个DOM结构），在Elements栏可以得到flagF12</p>
+<pre><code class="hljs">下方有个被注释的一串字符串，找到flag
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/baa00f05813f463f8b542d292c40779c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="1-2-快捷键或输入view-source"><a href="#1-2-快捷键或输入view-source" class="headerlink" title="1.2 快捷键或输入view-source"></a>1.2 快捷键或输入view-source</h2><p>1）URL地址栏加view-source:  或 Ctrl+u（查看源码快捷键）</p>
+<pre><code class="hljs">下方有个被注释的一串字符串，找到flag
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/a2232102173f4300bdb8f4debc56b2b6.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="1-3-Burp-Suite-抓包获得网页源代码"><a href="#1-3-Burp-Suite-抓包获得网页源代码" class="headerlink" title="1.3 Burp Suite 抓包获得网页源代码"></a>1.3 Burp Suite 抓包获得网页源代码</h2><p>1）开启监听抓包，然后去Target的Response 或开启抓包后右击一下将数据包放到Response（重放）里面查看</p>
+<pre><code class="hljs">下方有个被注释的一串字符串，找到flag
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/b86586140c8d4d5598ba35d9440462cd.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><img src="https://img-blog.csdnimg.cn/8f6533875b8b423f8e70c745b5a50476.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_16,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/56cd1bc016df4c2db82db6c63447f2fb.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="1-4-禁用JS插件后，查看源代码"><a href="#1-4-禁用JS插件后，查看源代码" class="headerlink" title="1.4 禁用JS插件后，查看源代码"></a>1.4 禁用JS插件后，查看源代码</h2><p>网页鼠标右键失效一般都是JS代码禁用了右键菜单，利用插件禁用JS代码即可。</p>
+<pre><code class="hljs">禁用js代码右键查看源代码即可得到flag
+</code></pre>
+<p>禁用js操作步骤：</p>
+<pre><code class="hljs">首先，在地址栏中输入 “about:config”
+然后，在搜索框中输入 “javascript.enabled”，将其设置为false返回题目
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/b7a459198fa1481f934da333e54620d5.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="1-5-html-页面存储到本地查看"><a href="#1-5-html-页面存储到本地查看" class="headerlink" title="1.5 html 页面存储到本地查看"></a>1.5 html 页面存储到本地查看</h2><p>将页面保存到本地，用记事本打开即可获得Flag</p>
+<ul>
+<li>不同浏览器将html 页面保存到本地会不同，但大同小异，这里以Firefox 为例，操作如下图：</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/0696ed6518134000b96b3b38ce115ad8.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_14,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述">保存到本地后用记事本打开</p>
+<p><img src="https://img-blog.csdnimg.cn/2e6de8f13ff145dc9ff223a2dfef811e.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_19,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>成功获得flag</p>
+<p><img src="https://img-blog.csdnimg.cn/dc5505e7d1a644ecab7c2be6642ea8fe.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x02-robots-Write-Up"><a href="#0x02-robots-Write-Up" class="headerlink" title="0x02 robots Write Up"></a>0x02 robots Write Up</h1><p>XCTF Web 练习题地址：<a target="_blank" rel="noopener" href="https://adworld.xctf.org.cn/">https://adworld.xctf.org.cn/</a></p>
+<p><img src="https://img-blog.csdnimg.cn/48fa68cd5fab4252aa98449f2dd6b277.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><strong>难度系数</strong>： 一星 </p>
+<p><strong>题目来源</strong>： Cyberpeace-n3k0</p>
+<p><strong>题目描述</strong>：X老师上课讲了Robots协议，小宁同学却上课打了瞌睡，赶紧来教教小宁Robots协议是什么吧。</p>
+<p><strong>题目分析</strong>：装X老师上课讲了Robots协议，但貌似小宁这个靓仔（叼毛）上课居然打瞌睡去了，不晓得是不是昨晚害羞害羞去咯（自己脑补场景）！回归正题，个人理解robots.txt 文件就是告诉搜索引擎网站中哪些东西你可以访问，哪些你不可以访问。因为搜索蜘蛛访问一个站点时，会检查该站点是否存在robots.txt文件，如果存在，搜索机器人就会按照该文件中的内容来确定访问的范围。如果该文件不存在，则所有的搜索蜘蛛将能够访问网站上所有没有被口令保护的页面面。</p>
+<h2 id="2-1-解题思路"><a href="#2-1-解题思路" class="headerlink" title="2.1 解题思路"></a>2.1 解题思路</h2><p>1）访问题目给出的URL地址：<a target="_blank" rel="noopener" href="http://111.198.29.45:53873/">http://111.198.29.45:53873/</a>  ，发现一片空白，啥都没有</p>
+<p><img src="https://img-blog.csdnimg.cn/8a1e72d38fa64dc28e15d22ddf9f8295.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>2）右键鼠标查看源代码，给出一点点提示，就是那段注释的话，说Flag 不在这里</p>
+<p><img src="https://img-blog.csdnimg.cn/2b7850b43ba944bc80047d548875ffad.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_19,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>3）页面源代码找不到Flag，那么我们再看看题目，解题关键点是Robots 协议，那么直接回到题目给出的URL掏出机关枪，在URL地址后面加上 &#x2F;robots.txt</p>
+<p><img src="https://img-blog.csdnimg.cn/d8326cf15ee247dab9563852303db607.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_18,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>URL地址后面加上 &#x2F;robots.txt 如下图</p>
+<p><img src="https://img-blog.csdnimg.cn/03062fb955fa446f85a984c80fa8d4d9.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_18,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><strong>注</strong>：打开页面后，看似好像也没什么鬼啊，到底是什么鬼？我们想要的Flag 到底在哪里？</p>
+<ul>
+<li>发现一个 disallow 里面有个 PHP 文件， disallow 声明此文件不可爬取？不可爬取并不一定代表我们人工不能访问(这只是一种道德规范，有一种此地无银三百两的意味，淫笑 <del>_</del> ！)，我们尝试访问一下这个PHP文件试试。</li>
+</ul>
+<p>4）在根目录下，添加读取robots.txt 文件时知道的PHP文件（f1ag_1s_h3re.php）名，即可得到Flag，如下图：</p>
+<p><img src="https://img-blog.csdnimg.cn/51be167d00c64662813740b0bfcf28ad.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><strong>注</strong>：解这道题的思路不局限于此，例如你可以通过扫目录获得Flag，工具例如御剑、dirsearch等工具</p>
+<h1 id="0x03-backup-Write-Up"><a href="#0x03-backup-Write-Up" class="headerlink" title="0x03 backup Write Up"></a>0x03 backup Write Up</h1><p>XCTF Web 练习题地址：<a target="_blank" rel="noopener" href="https://adworld.xctf.org.cn/">https://adworld.xctf.org.cn/</a></p>
+<p><img src="https://img-blog.csdnimg.cn/d4bb692d611c456ea03d6cffd35bcbbb.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><strong>难度系数</strong>： 一星</p>
+<p><strong>题目来源</strong>： Cyberpeace-n3k0</p>
+<p><strong>题目描述</strong>：X老师忘记删除备份文件，他派小宁同学去把备份文件找出来,一起来帮小宁同学吧！</p>
+<p><strong>本题分析</strong>：装X老师忘记删除备份文件，他让小宁这个靓仔（叼毛）去把备份文件找出来，见题知意，分明就是考察我们对backup 的理解嘛！</p>
+<p><strong>如下是对backup 的含义</strong>：</p>
+<ul>
+<li>脑中经常会看到名为backup的文件夹，那么backup到底是什么意思呢？<ul>
+<li>相信平时大家在使用电脑的时候，经常会看到一个名为backup的文件夹</li>
+<li>backup文件夹其实就是备份文件夹，这个文件夹一般出现在系统盘之外的盘中，如果你曾对磁盘进行过备份的话，备份文件就会出现在这个文件夹中了</li>
+<li>backup文件夹是很有用的，如果你的电脑想要重装系统的话，肯定是需要数据备份的，这时候备份文件就会进入backup文件夹了，大家可以在这里查找备份</li>
+<li>如果你不是很清楚backup文件夹中都有什么内容的话，最好不要直接删除，否则会导致重要文件丢失，如果你不需要这些备份文件的话，那就可以直接删除了</li>
+</ul>
+</li>
+</ul>
+<p><strong>例如</strong>：一个开发者要编辑config.php文件，为了避免修改后出现问题，那么他首先会复制该文件。复制文件的命名也差不多时能让人见名就能关联到这个时原文件</p>
+<p>常见的备份文件后缀名有：<code>&quot;.git&quot;、&quot;.svn&quot;、&quot;.swp&quot;、&quot;.~&quot;、&quot;.bak&quot;、&quot;.bash_history&quot;、&quot;.bkf&quot; </code></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c">config.php——&gt;config.php.bak<br>config.php——&gt;config.php.git<br>config.php——&gt;config.php.bkf<br>config.php——&gt;config.php.old<br>config.php——&gt;config.php.temp<br></code></pre></td></tr></table></figure>
+
+<h2 id="3-1-解题思路"><a href="#3-1-解题思路" class="headerlink" title="3.1 解题思路"></a>3.1 解题思路</h2><p>1）我们打开给解题URL地址，发现只给一段文字？</p>
+<p><img src="https://img-blog.csdnimg.cn/b4af6ebc686549ac8a5e78fc831ec76b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>2）F12 一下，去看看页面源代码里面是否会有点有用的信息，有点失望，跟之前打开页面时一样的提示语，自己摸摸了头，想了一下该题目是叫backup，会不会是要考验我们常用备份文件扩展名方面的知识？</p>
+<p><strong>注</strong>：常见的备份文件后缀名有：<code>&quot;.git&quot;、&quot;.svn&quot;、&quot;.swp&quot;、&quot;.~&quot;、&quot;.bak&quot;、&quot;.bash_history&quot;、&quot;.bkf&quot; </code></p>
+<p><img src="https://img-blog.csdnimg.cn/d65ae55b61624f76bab1f7e930214713.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>3）想到就去做，自己尝试在URL后面，依次输入常见的文件备份扩展名，惊喜出现了，尝试到“index.php.bak” 时，突然左下方出现一个index.php.bak 的文件，(●’◡’●)</p>
+<p><img src="https://img-blog.csdnimg.cn/d7bceeb9f2bf4e3ab156b74ed90c2a37.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>4）用notepad++ 打开 index.php.bak 文件</p>
+<p><img src="https://img-blog.csdnimg.cn/502aa921d06b479a814fc525f7b0d7e7.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>成功获得Flag </p>
+<p><strong>或用扫描工具，如下图</strong></p>
+<p><img src="https://img-blog.csdnimg.cn/84e1e5c6eca44e118733210be4584fa1.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x04-Cookie-Write-Up"><a href="#0x04-Cookie-Write-Up" class="headerlink" title="0x04 Cookie Write Up"></a>0x04 Cookie Write Up</h1><p>XCTF Web 练习题地址：<a target="_blank" rel="noopener" href="https://adworld.xctf.org.cn/">https://adworld.xctf.org.cn/</a></p>
+<p><img src="https://img-blog.csdnimg.cn/f81239bf25a843b89f2d19944e193b3b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>Cookie是当主机访问Web服务器时，由 Web 服务器创建的，将信息存储在用户计算机上的文件。一般网络用户习惯用其复数形式 Cookies，指某些网站为了辨别用户身份、进行 Session 跟踪而存储在用户本地终端上的数据，而这些数据通常会经过加密处理。</p>
+<p>简单的说，Cookie就是服务端为了让用户不在每次访问需要登录的页面都要登录一次，而生成的一种证明身份的数据。服务器可以设置或读取Cookies中包含信息，借此维护用户跟服务器会话中的状态。</p>
+<p>Cookie中常常包含了一些敏感消息：用户名、计算机名、使用的浏览器和曾经访问的网站等，当得到没有过期的cookie时就能绕过登录甚至做更多的事。</p>
+<p><strong>难度系数</strong>： 一星</p>
+<p><strong>题目来源</strong>： Cyberpeace-n3k0</p>
+<p><strong>题目描述</strong>：X老师告诉小宁他在cookie里放了些东西，小宁疑惑地想：‘这是夹心饼干的意思吗？</p>
+<p><strong>题目分析</strong>：装X老师，让小宁去找Cookie，个人猜测我们想要的Flag就在Cookie里面</p>
+<p><strong>http的headers中包含的部分为</strong>：</p>
+<ul>
+<li>Host：请求的域名或者ip</li>
+<li>Content-Length：用于表示http消息实体的传输长度（即表示实体长度又表示传输长度，如果实体长度和传输长度不一致则不能有Content-Length），即有tansfer-encoding时，Content-Length将被忽略</li>
+<li>Accept：用于指定客户端接收哪些类型的信息，此例子表示希望接收html文本</li>
+<li>User-Agent：简称UA，其中包含一些用户信息，使用的操作系统及版本，浏览器及版本等</li>
+<li>Content-Type：互联网媒体类型，用来表示在具体请求中的媒体类型信息 <ul>
+<li>类型格式：<code>type/subtype(;parameter)? type  </code></li>
+<li>主类型，任意的字符串，如text，如果是*号代表所有；   </li>
+<li>subtype 子类型，任意的字符串，如html，如果是*号代表所有；   </li>
+<li>parameter 可选，一些参数，如Accept请求头的q参数， Content-Type的 charset参数</li>
+<li>常见的媒体格式类型如下：<ul>
+<li><code>text/html</code>： HTML格式</li>
+<li><code>text/plain</code>：纯文本格式      </li>
+<li><code>text/xml</code>：  XML格式</li>
+<li><code>image/gif</code>：gif图片格式    </li>
+<li><code>image/jpeg</code>：jpg图片格式 </li>
+<li><code>image/png</code>：png图片格式</li>
+<li>以application开头的媒体格式类型：</li>
+<li><code>application/xhtml+xml</code>：XHTML格式</li>
+<li><code>application/xml</code>： XML数据格式</li>
+<li><code>a pplication/atom+xml</code>：Atom XML聚合格式    </li>
+<li><code>application/json</code>： JSON数据格式</li>
+<li><code>a pplication/pdf</code>：pdf格式  </li>
+<li><code>a pplication/msword</code>： Word文档格式</li>
+<li><code>application/octet-stream</code>： 二进制流数据（如常见的文件下载）</li>
+<li><code>application/x-www-form-urlencoded</code>： <code>&lt;form encType=&quot;&quot;&gt; </code>中默认的encType，form表单数据被编码为<code>key/value </code>格式发送到服务器（表单默认的提交数据的格式）</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Referer: 当浏览器向web服务器发送请求时一般会带上referer，告诉服务器从哪个页面来，基于此可获取一些信息做处理</li>
+<li>Accept-Encoding: 浏览器发给服务器，声明服务器支持的编码类型</li>
+<li>Accept-Language: 允许客户端声明自己支持的语言类型</li>
+<li>Cookie: 存放在本地文件中用于保存一些用户信息</li>
+</ul>
+<h2 id="4-1-插件工具HTTP-Headers-查看Cookie"><a href="#4-1-插件工具HTTP-Headers-查看Cookie" class="headerlink" title="4.1 插件工具HTTP Headers 查看Cookie"></a>4.1 插件工具HTTP Headers 查看Cookie</h2><p>Live HTTP Headers是一款可以帮助用户查看当前使用Chrome打开的所有网页的状态，在Chrome安装了Live HTTP Headers插件以后，用户使用Chrome打开某个网站以后，就可以使用Live HTTP Headers插件来立即查看当前网页中的HTTP Header信息，在这些信息中会包含当前网页的加载情况，比如资源的访问状态：200、301、404等，通过对这些信息的分析就可以很好地调试当前的网页，给网站的开发者带来便利</p>
+<p><img src="https://img-blog.csdnimg.cn/40f801e3dbeb4d3e81003a08dda32967.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="4-2-F12-开发者工具查看Cookie"><a href="#4-2-F12-开发者工具查看Cookie" class="headerlink" title="4.2  F12 开发者工具查看Cookie"></a>4.2  F12 开发者工具查看Cookie</h2><p>1）访问解题给出的URL ，打开F12 后重新刷新一下页面，在Network 一栏下查看消息头，发现有个Cookie 字段，字段值为look-here&#x3D;cookie.php</p>
+<p><img src="https://img-blog.csdnimg.cn/dd1ab2a61deb4563992ac9c485be91a7.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>2）访问cookie.php，再次打开F12 重新刷新一下页面，还是在Network 下查看，这次我们在消息头里面，发现了我们想要的Flag</p>
+<p><img src="https://img-blog.csdnimg.cn/39f142dfd30b4f04bc1a82356beaabbb.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="4-3-伪代码查看-cookie"><a href="#4-3-伪代码查看-cookie" class="headerlink" title="4.3 伪代码查看 cookie"></a>4.3 伪代码查看 cookie</h2><p>1）F12 开发者工具Console下输入 javascript:alert(document.cookie) 查看cookie</p>
+<p><img src="https://img-blog.csdnimg.cn/7c433040e562495aa39b519b121aa453.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>2）访问cookie.php，再次打开F12 重新刷新一下页面，还是在Network 下查看，这次我们在消息头里面，发现了我们想要的Flag</p>
+<p><img src="https://img-blog.csdnimg.cn/a9a3bfd1663d41f9af59d9e2cce4a791.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="4-4-Burp-Suite-查看Cookie"><a href="#4-4-Burp-Suite-查看Cookie" class="headerlink" title="4.4 Burp Suite 查看Cookie"></a>4.4 Burp Suite 查看Cookie</h2><p>1）BurpSuite 抓包，可看到名为look-here的cookie的值为cookie.php</p>
+<p><img src="https://img-blog.csdnimg.cn/4abf3b9643a544d3a720e5ffeca45562.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>2）访问cookie.php 页面，BurpSuite 抓包，我们放到Repeater 里重放</p>
+<p><img src="https://img-blog.csdnimg.cn/737d3c490bf14397b5754d4a666c94ae.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>3）重放，点击Go，成功得到Flag</p>
+<p><img src="https://img-blog.csdnimg.cn/8c269777643242be9a02a888e45f362b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x05-weak-auth-Write-Up"><a href="#0x05-weak-auth-Write-Up" class="headerlink" title="0x05  weak_auth Write Up"></a>0x05  weak_auth Write Up</h1><p>XCTF Web 练习题地址：<a target="_blank" rel="noopener" href="https://adworld.xctf.org.cn/">https://adworld.xctf.org.cn/</a></p>
+<p><img src="https://img-blog.csdnimg.cn/3e50d0aed4a644cdbb92b7d73f4157e7.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><strong>难度系数</strong>： 一星</p>
+<p><strong>题目来源</strong>： Cyberpeace-n3k0</p>
+<p><strong>题目描述</strong>：小宁写了一个登陆验证页面，随手就设了一个密码。</p>
+<h2 id="5-1-解题思路"><a href="#5-1-解题思路" class="headerlink" title="5.1 解题思路"></a>5.1 解题思路</h2><p>1）什么都不输入，先Fuzz 尝试登陆看看</p>
+<p><img src="https://img-blog.csdnimg.cn/502b89dbb0e0442c8dc079a388752148.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>2）点击【login】按钮，页面跳转到check.php 页面，并弹窗提示：please login as admin！（请以管理员身份登录）</p>
+<p><img src="https://img-blog.csdnimg.cn/6a53d88f209a4f91aec2c6c0bb04b256.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>我们再打开check.php 的页面源代码看看会不会有什么线索，发现在javascript alert 那一行的最后有注释的信息，提示：maybe you need a dictionary！（也许你需要一本字典!）</p>
+<p><strong>注</strong>：这提示很明显了，那么咋们就爆破嘛！盘它</p>
+<p><img src="https://img-blog.csdnimg.cn/a39406dae9064335b7f15e19d5c5ed42.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述">3）用Burp Suite 截下登录的数据包，把数据包发送到intruder爆破，这里我首先用的是BurpSuite 自带的字典爆破，发现太难了，没爆出来，看来是我字典太烂了，换个字典换个姿势再来一次</p>
+<p><img src="https://img-blog.csdnimg.cn/df88fcddbde0423bbb270e267a4b48ff.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述">推荐一个爆破字典GitHub下载链接：</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/rootphantomer/Blasting_dictionary">https://github.com/rootphantomer/Blasting_dictionary</a></p>
+<p>下载到本地并解压即可</p>
+<p><img src="https://img-blog.csdnimg.cn/e4aae67f436a44ca9f3ea281e5e526c4.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>好啦，前面都是前戏，前戏做足了，那么咋们开始盘它咯，坐好咯，要发车咯！<code>(#^.^#) </code></p>
+<p>4）再次用Burp Suite 截下登录的数据包，把数据包发送到intruder爆破</p>
+<p><img src="https://img-blog.csdnimg.cn/9d087d3fd6e044f4baffc12fc3aaca41.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>5）先清除一下变量<code>Clear$  </code>，然后设置爆破点为password，那么我们选中密码参数字段的值，点击<code>Add$ </code></p>
+<p><img src="https://img-blog.csdnimg.cn/808da4690ff14734b50d67095783174b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述">6）最后去Paylods 标签栏 Payload Option [Simple list] 模块下点击【Load】按钮，选择字典添加即可。我这里选择的是常用密码</p>
+<p><img src="https://img-blog.csdnimg.cn/359869c86495405d8d0a8f0115a345c4.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>7）开始爆破，成功爆破出admin 账号的密码：123456</p>
+<p><img src="https://img-blog.csdnimg.cn/7495e4decd6e4460af0a62c5331c7ebe.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>8）开始攻击，查看响应包列表，发现密码为123456时，响应包的长度和别的不一样，点进去查看响应包，获得Flag</p>
+<p><img src="https://img-blog.csdnimg.cn/5ce8d217e47442b1806dd1d3e6ad9723.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>9）浏览器页面，我们也尝试一下刚刚破解密码来登录，看看能不能获得Flag</p>
+<p><img src="https://img-blog.csdnimg.cn/3fc07441af0d49bda1e424ce3b21554a.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>10）登录成功，页面跳转到check.php 后显示出Flag</p>
+<p><img src="https://img-blog.csdnimg.cn/7f7ad039900f42afa3ee7660f4fe24b3.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x06-simple-php-Write-Up"><a href="#0x06-simple-php-Write-Up" class="headerlink" title="0x06 simple_php Write Up"></a>0x06 simple_php Write Up</h1><p>XCTF Web 练习题地址：<a target="_blank" rel="noopener" href="https://adworld.xctf.org.cn/">https://adworld.xctf.org.cn/</a></p>
+<p><img src="https://img-blog.csdnimg.cn/85962c4b4a4645218fcfb2372f41354c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><strong>难度系数</strong>： 一星</p>
+<p><strong>题目来源</strong>： Cyberpeace-n3k0</p>
+<p><strong>题目描述</strong>：小宁听说php是最好的语言,于是她简单学习之后写了几行php代码</p>
+<p>php中有两种比较符号：</p>
+<pre><code class="hljs">=== 会同时比较字符串的值和类型
+== 会先将字符串换成相同类型，再作比较，属于弱类型比较
+</code></pre>
+<p><a target="_blank" rel="noopener" href="https://www.php.net/manual/zh/types.comparisons.php">https://www.php.net/manual/zh/types.comparisons.php</a></p>
+<p><img src="https://img-blog.csdnimg.cn/af03454d5c8a41b482f2e1abf81f62ce.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述">数字和字符混合的字符串转换为整数后只保留数字</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span><br><br>    <span class="hljs-variable">$str</span>=<span class="hljs-string">&quot;123.9abc&quot;</span>;          <br><br>    <span class="hljs-variable">$int</span>=<span class="hljs-title function_ invoke__">intval</span>(<span class="hljs-variable">$str</span>);           <span class="hljs-comment">//转换后数值：123</span><br><br>    <span class="hljs-variable">$float</span>=<span class="hljs-title function_ invoke__">floatval</span>(<span class="hljs-variable">$str</span>);       <span class="hljs-comment">//转换后数值：123.9</span><br><br>    <span class="hljs-variable">$str</span>=<span class="hljs-title function_ invoke__">strval</span>(<span class="hljs-variable">$float</span>);        <span class="hljs-comment">//转换后数值：&quot;123.9&quot;</span><br><br><span class="hljs-meta">?&gt;</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="6-1-解题思路"><a href="#6-1-解题思路" class="headerlink" title="6.1 解题思路"></a>6.1 解题思路</h2><p>1）通过阅读代码发现需要同时满足 a&#x3D;&#x3D;0 且 if a 为真，b 不是数字且 b&gt;1234 才会返回 flag </p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span> <br><span class="hljs-title function_ invoke__">show_source</span>(<span class="hljs-keyword">__FILE__</span>); <br><span class="hljs-keyword">include</span>(<span class="hljs-string">&quot;config.php&quot;</span>); <br><span class="hljs-variable">$a</span>=@<span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;a&#x27;</span>]; <br><span class="hljs-variable">$b</span>=@<span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;b&#x27;</span>]; <br><span class="hljs-keyword">if</span>(<span class="hljs-variable">$a</span>==<span class="hljs-number">0</span> <span class="hljs-keyword">and</span> <span class="hljs-variable">$a</span>)&#123; <br>    <span class="hljs-keyword">echo</span> <span class="hljs-variable">$flag1</span>; <br>&#125; <br><span class="hljs-keyword">if</span>(<span class="hljs-title function_ invoke__">is_numeric</span>(<span class="hljs-variable">$b</span>))&#123; <br>    <span class="hljs-keyword">exit</span>(); <br>&#125; <br><span class="hljs-keyword">if</span>(<span class="hljs-variable">$b</span>&gt;<span class="hljs-number">1234</span>)&#123; <br>    <span class="hljs-keyword">echo</span> <span class="hljs-variable">$flag2</span>; <br>&#125; <br><span class="hljs-meta">?&gt;</span> <br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/1dc86e7043ae4397a511ea7e55bca142.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_19,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>2）php中的弱类型比较会使’abc’ &#x3D;&#x3D; 0为真，所以输入a&#x3D;abc时，可得到flag1。（a可换成任意字符，例如：<code>&quot;b&quot;、&quot;c&quot;、&quot;d&quot;、&quot;、&quot; </code>等字符）</p>
+<p><img src="https://img-blog.csdnimg.cn/5f5fa8bf3c0f443e8a51eeebb75effc8.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>3）is_numeric() 函数会判断如果是数字和数字字符串则返回 TRUE，否则返回 FALSE,且php中弱类型比较时，会使(‘1234a’ &#x3D;&#x3D; 1234)为真，所以应该输入a&#x3D;a&amp;b&#x3D;1235a</p>
+<p>用&amp;隔开a和b之间的参数</p>
+<ul>
+<li>URL中易出现的特殊字符</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>特殊含义</th>
+<th>十六进制</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>+ </code>表示空格（在URL中不能使用空格）</td>
+<td>%2B</td>
+</tr>
+<tr>
+<td><code>/  </code>分隔目录和子目录</td>
+<td>%2F</td>
+</tr>
+<tr>
+<td><code>? </code>分隔实际的URL和参数</td>
+<td>%3F</td>
+</tr>
+<tr>
+<td><code>#</code>表示书签</td>
+<td>%23</td>
+</tr>
+<tr>
+<td><code>&amp;</code>URL中指定的参数间的分隔符</td>
+<td>%26</td>
+</tr>
+<tr>
+<td><code>= </code>URL中指定的参数的值</td>
+<td>%3D</td>
+</tr>
+</tbody></table>
+<p>成功得到Flag</p>
+<p><img src="https://img-blog.csdnimg.cn/6e8b3e04351f4e7dbabf22bffa98dcc6.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x07-get-post-Write-Up"><a href="#0x07-get-post-Write-Up" class="headerlink" title="0x07 get_post Write Up"></a>0x07 get_post Write Up</h1><p>XCTF Web 练习题地址：<a target="_blank" rel="noopener" href="https://adworld.xctf.org.cn/">https://adworld.xctf.org.cn/</a></p>
+<p><img src="https://img-blog.csdnimg.cn/e0a1db2375fb44ceaf73e87484167c54.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><strong>难度系数</strong>： 一星</p>
+<p><strong>题目来源</strong>： Cyberpeace-n3k0</p>
+<p><strong>题目描述</strong>：X老师告诉小宁同学HTTP通常使用两种请求方法，你知道是哪两种吗？</p>
+<p><strong>题目分析</strong>：从题目中可以看出装X老师想让小宁这靓仔（叼毛），熟悉常见的HTTP协议，HTTP协议有八种，但常见的两种貌似只有Get和Post，那么可以想象的到获得Flag 的方法，就在这两种请求方式里。</p>
+<p>HTTP协议中共定义了八种方法或者叫“动作”来表明对Request-URI指定的资源的不同操作方式，具体介绍如下：</p>
+<ul>
+<li>GET：向特定的资源发出请求</li>
+<li>POST：向指定资源提交数据进行处理请求（例如提交表单或者上传文件）。数据被包含在请求体中。POST请求可能会导致新的资源的创建和&#x2F;或已有资源的修改</li>
+<li>OPTIONS：返回服务器针对特定资源所支持的HTTP请求方法。也可以利用向Web服务器发送’*’的请求来测试服务器的功能性</li>
+<li>HEAD：向服务器索要与GET请求相一致的响应，只不过响应体将不会被返回。这一方法可以在不必传输整个响应内容的情况下，就可以获取包含在响应消息头中的元信息</li>
+<li>PUT：向指定资源位置上传其最新内容</li>
+<li>DELETE：请求服务器删除Request-URI所标识的资源</li>
+<li>TRACE：回显服务器收到的请求，主要用于测试或诊断</li>
+<li>CONNECT：HTTP&#x2F;1.1协议中预留给能够将连接改为管道方式的代理服务器。</li>
+</ul>
+<p>用 GET 给后端传参的方法是：在?后跟变量名字，不同的变量之间用&amp;隔开，举例：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">https:<span class="hljs-comment">//www.baidu.com/s?ie=utf-8&amp;f=8&amp;rsv_bp=1&amp;rsv_idx=1</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/7b6baf5944cf47f29b4f12eb36ee5767.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="7-1-解题思路"><a href="#7-1-解题思路" class="headerlink" title="7.1 解题思路"></a>7.1 解题思路</h2><p>1）根据提示，先Get 方式提交一个名为a值为1的变量， 在 url 后添加&#x2F;？a&#x3D;1 ，点击Execute 按钮，即可发送 get 请求</p>
+<p><img src="https://img-blog.csdnimg.cn/e7c2c39adf2742b7b7144c8e73f22dbd.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述">2）然后再以POST方式，提交一个名为b值为2的变量。打开HackBar，复制刚刚Get 的URL，勾选Post data，填入b&#x3D;2，点击Execute 按钮，即可发送 POST 请求</p>
+<p><strong>注</strong>：切记，一定要在HackBar 里面勾选Post data</p>
+<p><img src="https://img-blog.csdnimg.cn/2346592494404d379773350fee9b2967.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>成功获得Flag</p>
+<p><img src="https://img-blog.csdnimg.cn/371928b00de24403ae3ba0e7b6411b8c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x08-xff-referer-Write-Up"><a href="#0x08-xff-referer-Write-Up" class="headerlink" title="0x08  xff_referer Write Up"></a>0x08  xff_referer Write Up</h1><p>XCTF Web 练习题地址：<a target="_blank" rel="noopener" href="https://adworld.xctf.org.cn/">https://adworld.xctf.org.cn/</a></p>
+<p><img src="https://img-blog.csdnimg.cn/c4509c13baa046c2a03d2927d03ad646.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><strong>难度系数</strong>： 一星</p>
+<p><strong>题目来源</strong>： Cyberpeace-n3k0</p>
+<p><strong>题目描述</strong>：X老师告诉小宁其实xff和referer是可以伪造的。</p>
+<p><strong>题目分析</strong>：装X老师，意图很明显就是像让小宁这个靓仔（叼毛）了解xff和referer 相关的知识点。</p>
+<ul>
+<li>X-Forwarded-For：简称XFF头，它代表客户端，也就是HTTP的请求端真实的IP，只有在通过了HTTP 代理或者负载均衡服务器时才会添加该项</li>
+<li>HTTP Referer是header的一部分，当浏览器向web服务器发送请求的时候，一般会带上Referer，告诉服务器我是从哪个页面链接过来的</li>
+</ul>
+<p><strong>X-Forwarded-For（XFF）维基百科</strong>：</p>
+<p>X-Forwarded-For（XFF）是用来识别通过HTTP代理或负载均衡方式连接到Web服务器的客户端最原始的IP地址的HTTP请求头字段。 Squid 缓存代理服务器的开发人员最早引入了这一HTTP头字段，并由IETF在HTTP头字段标准化草案中正式提出。</p>
+<p>当今多数缓存服务器的用户为大型ISP，为了通过缓存的方式来降低他们的外部带宽，他们常常通过鼓励或强制用户使用代理服务器来接入互联网。有些情况下，这些代理服务器是透明代理，用户甚至不知道自己正在使用代理上网。</p>
+<p>如果没有XFF或者另外一种相似的技术，所有通过代理服务器的连接只会显示代理服务器的IP地址，而非连接发起的原始IP地址，这样的代理服务器实际上充当了匿名服务提供者的角色，如果连接的原始IP地址不可得，恶意访问的检测与预防的难度将大大增加。XFF的有效性依赖于代理服务器提供的连接原始IP地址的真实性，因此，XFF的有效使用应该保证代理服务器是可信的，比如可以通过创建可信服务器白名单的方式。</p>
+<p>简单地说，xff是告诉服务器当前请求者的最终ip的http请求头字段</p>
+<p><strong>通常可以直接通过修改http头中的X-Forwarded-For字段来仿造请求的最终ip</strong></p>
+<p><strong>Referer 维基百科</strong>：</p>
+<p>HTTP来源地址（referer，或HTTP referer）</p>
+<p>是HTTP表头的一个字段，用来表示从哪儿链接到当前的网页，采用的格式是URL。换句话说，借着HTTP来源地址，当前的网页可以检查访客从哪里而来，这也常被用来对付伪造的跨网站请求。</p>
+<p><strong>简单的讲，referer就是告诉服务器当前访问者是从哪个url地址跳转到自己的，跟xff一样，referer也可直接修改</strong></p>
+<h2 id="8-1-解题思路"><a href="#8-1-解题思路" class="headerlink" title="8.1 解题思路"></a>8.1 解题思路</h2><h3 id="8-1-1-Burp-Suite-修改数据包获得Flag"><a href="#8-1-1-Burp-Suite-修改数据包获得Flag" class="headerlink" title="8.1.1 Burp Suite 修改数据包获得Flag"></a>8.1.1 Burp Suite 修改数据包获得Flag</h3><p>1）BurpSuite 修改数据包获得Flag</p>
+<p><img src="https://img-blog.csdnimg.cn/f96b050174a84951a76fd4e084622a31.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>BurpSuite 配置的代理</p>
+<p><img src="https://img-blog.csdnimg.cn/a786d99881f74e0aa82943e1b4295b8d.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>2）BurpSuite 开启监听，刷新当前浏览页面，在BurpSuite 的Raw下添加X-Forwarded-For（XFF）字段</p>
+<pre><code class="hljs">伪造HTTP请求头中X-Forwarded-For
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/ab8d944fdaa344d199b2946b927d6dd9.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>3）BurpSuite 放包（Forward）后，浏览页面字体发生变化，给出相关提示：“必须来自<a target="_blank" rel="noopener" href="https://www.google.com”/">https://www.google.com”</a></p>
+<p><img src="https://img-blog.csdnimg.cn/25fc17a6fd2b431192442a6a3c9e6230.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>4）根据提示，我们再次刷新浏览器页面，在BurpSuite 的Raw下添加X-Forwarded-For和Referer 字段</p>
+<ul>
+<li>伪造HTTP请求头中X-Forwarded-For</li>
+<li>伪造HTTP请求头中Referer</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c">X-Forwarded-For: <span class="hljs-number">123.123</span><span class="hljs-number">.123</span><span class="hljs-number">.123</span><br><br>Referer: https:<span class="hljs-comment">//www.google.com</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/596d505ef03f408bb672b012e82a414a.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>5）再次我们放包（Forward），浏览页面发生改变，得到了我们梦寐以求，日思夜想的Flag</p>
+<p><img src="https://img-blog.csdnimg.cn/2406e77bb1294a268c31cf47174c7d0f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>成功获得Flag</p>
+<pre><code class="hljs">cyberpeace&#123;ad1b9c31a98ecd7d33ce7b28c7667994&#125;
+</code></pre>
+<h3 id="8-1-2-ModHeader-插件工具获得Flag"><a href="#8-1-2-ModHeader-插件工具获得Flag" class="headerlink" title="8.1.2 ModHeader 插件工具获得Flag"></a>8.1.2 ModHeader 插件工具获得Flag</h3><p>ModHeader(chrome http请求头添加插件)是一款可以安装在谷歌浏览器上使用的http请求头添加插件，主要功能是为网页添加、修改或删除请求头和响应头，并可以为网页使用多个不同的配置文件来配置请求头，另外也可以将之前使用过的http请求头导入进该插件的配置中，或将正在使用的请求头导出以在别的地方使用，非常实用，需要的朋友欢迎前来下载使用！</p>
+<p><strong>使用谷歌浏览器的ModHeader 插件工具来伪造X-Forwarded-For（XFF）和Referer</strong></p>
+<p>1）首先打ModHeader 工具，添加X-Forwarded-For（XFF）字段</p>
+<p>伪造HTTP请求头中X-Forwarded-For：</p>
+<pre><code class="hljs">X-Forwarded-For: 123.123.123.123
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/feb2d101cdad42f3ac9c57238e961e34.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>2）添加X-Forwarded-For（XFF）字段成功后，刷新当前页面，当前浏览页面，给出相关提示：“必须来自<a target="_blank" rel="noopener" href="https://www.google.com”/">https://www.google.com”</a></p>
+<p><img src="https://img-blog.csdnimg.cn/49d2349c34704096ad144376d8511dd3.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>3）提示，我们需要额外添加一个Referer 字段</p>
+<p>首先，打开ModHeader 工具，点击弹窗右上角的 + 号，选择添加 “Request Heders”</p>
+<p><img src="https://img-blog.csdnimg.cn/134e5e1392a54ec090d7b51f183f3ac3.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/efa5bffd99ad40faa252770ae061ea20.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>4）ModHeader 工具新增一行Request Headers 后，在新增的一行中填写Referer 字段</p>
+<ul>
+<li>伪造HTTP请求头中X-Forwarded-For</li>
+<li>伪造HTTP请求头中Referer</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c">X-Forwarded-For: <span class="hljs-number">123.123</span><span class="hljs-number">.123</span><span class="hljs-number">.123</span><br><br>Referer: https:<span class="hljs-comment">//www.google.com</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/da43fc5137e24e8e967e0431cca2bbee.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>5）重新刷新当前浏览页面，成功获得Flag</p>
+<pre><code class="hljs"> cyberpeace&#123;ad1b9c31a98ecd7d33ce7b28c7667994&#125;
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/654f3de56cf74a928375db6b358d93ce.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x09-webshell-Write-Up"><a href="#0x09-webshell-Write-Up" class="headerlink" title="0x09 webshell Write Up"></a>0x09 webshell Write Up</h1><p>XCTF Web 练习题地址：<a target="_blank" rel="noopener" href="https://adworld.xctf.org.cn/">https://adworld.xctf.org.cn/</a></p>
+<p><img src="https://img-blog.csdnimg.cn/f25ee6b1707e41bfaa6841ef1c9803f4.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><strong>难度系数</strong>： 一星</p>
+<p><strong>题目来源</strong>： Cyberpeace-n3k0</p>
+<p><strong>题目描述</strong>：小宁，百度了php一句话,觉着很有意思，并且把它放在index.php里</p>
+<p><strong>webshell 维基百科</strong>：</p>
+<p>webshell（分类为远程访问木马）是作为一个基于网络的实现的网络安全威胁shell概念。 Webshell可以上传到Web服务器，以允许远程访问Web服务器，例如Web服务器的文件系统。</p>
+<p>Webshell的独特之处在于它使用户能够通过充当命令行界面的Web浏览器访问Web服务器。用户可以使用Web浏览器通过万维网访问远程计算机在任何类型的系统上，无论是台式计算机还是带有Web浏览器的手机，都可以在远程系统上执行任务。主机或客户端都不需要命令行环境。</p>
+<p>简单的说webshell就是web后门，比如php，asp木马后门。黑客在入侵了一个网站后，常常在将这些 asp或php木马后门文件放置在网站服务器的web目录中，与正常的网页文件混在一起。然后就可以用web的方式，通过asp或php木马后门控制网站服务器，包括上传下载文件、查看数据库、执行任意程序命令等。</p>
+<p>Web shell通过Web应用程序中的漏洞或弱服务器安全配置上传，包括以下内容：</p>
+<ul>
+<li>SQL注入 </li>
+<li>应用程序和服务中的漏洞（例如NGINX等Web服务器软件或WordPress等内容管理系统应用程序）</li>
+<li>文件处理和上传漏洞（例如限制可上传的文件类型）</li>
+<li>远程文件包含（RFI）和本地文件包含（LFI）漏洞</li>
+<li>远程代码执行 </li>
+<li>暴露的管理界面</li>
+<li>跨站脚本</li>
+</ul>
+<p>php 一句话木马：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span> @<span class="hljs-keyword">eval</span>(<span class="hljs-variable">$_POST</span>[value]); <span class="hljs-meta">?&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p>asp 一句话木马：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs php">&lt;%<span class="hljs-keyword">eval</span> <span class="hljs-title function_ invoke__">request</span> (<span class="hljs-string">&quot;value&quot;</span>)%&gt; <br>或  <br>&lt;% <span class="hljs-title function_ invoke__">execute</span>(<span class="hljs-title function_ invoke__">request</span>(<span class="hljs-string">&quot;value&quot;</span>)) %&gt;   <br></code></pre></td></tr></table></figure>
+<p>aspx 一句话木马：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs php">&lt;%@ Page Language=<span class="hljs-string">&quot;Jscript&quot;</span> %&gt;<br>或<br>&lt;% <span class="hljs-keyword">eval</span>(Request.Item[<span class="hljs-string">&quot;value&quot;</span>]) %&gt;<br></code></pre></td></tr></table></figure>
+
+<h2 id="9-1-解题思路"><a href="#9-1-解题思路" class="headerlink" title="9.1 解题思路"></a>9.1 解题思路</h2><p>1）访问解题的URL，直接提示你会使用Webshell 嘛？太明显了，而且还把php一句话木马给显示出来，不等着你盘它嘛？</p>
+<p><img src="https://img-blog.csdnimg.cn/68818f7247ac4e37a0aa5faa7d223041.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述">2）恭敬不如从命，直接上菜刀或蚁剑连接，此处用蚁剑链接：</p>
+<p><strong>注</strong>：蚁剑加载器仅在 <a target="_blank" rel="noopener" href="https://github.com/AntSwordProject/AntSword-Loader">https://github.com/AntSwordProject/AntSword-Loader</a> 发布，下载后请第一时间校验 md5 值</p>
+<p><img src="https://img-blog.csdnimg.cn/fbc4c8e13925483eb9582f0e4d6618d9.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述">或中国菜刀</p>
+<p><img src="https://img-blog.csdnimg.cn/5c2527516f7b4472a19d53e837354d9a.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>或冰蝎进行连接</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/rebeyond/Behinder">https://github.com/rebeyond/Behinder</a></p>
+<p><img src="https://img-blog.csdnimg.cn/7a55698a23ba474d91d02a217cec0e74.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>当然，也可以使用hackbar，使用post方式传递shell&#x3D;system(‘cat flag.txt’); 获得flag</p>
+<p><strong>PS</strong>：这种我不是特别推荐，都知道shell的前提下，何必这么麻烦了，影响自己的效率。</p>
+<p>3）首先看看当前shell下有哪些文件，发现存在flag.txt</p>
+<p><img src="https://img-blog.csdnimg.cn/f5163b5ff9ce478d98421fcd9c6d361f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>查看flag.txt 获得Flag</p>
+<p><img src="https://img-blog.csdnimg.cn/bb4a1cabcdda4cb09caf12c039ec6252.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>4）连接后在网站目录下发现了flag.txt文件，下载flag.txt 文件到本地</p>
+<p><img src="https://img-blog.csdnimg.cn/d9642ada998b4f6da820bf1b656e60ee.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>5）用Notepad++ 查看文件可获得flag</p>
+<p><img src="https://img-blog.csdnimg.cn/88431483a89a40cb97f300bec522cc57.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x10-command-execution-Write-Up"><a href="#0x10-command-execution-Write-Up" class="headerlink" title="0x10 command_execution Write Up"></a>0x10 command_execution Write Up</h1><p>XCTF Web 练习题地址：<a target="_blank" rel="noopener" href="https://adworld.xctf.org.cn/">https://adworld.xctf.org.cn/</a></p>
+<p><img src="https://img-blog.csdnimg.cn/1daf15fdd5c94b0f94982d7264b3c337.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><strong>难度系数</strong>： 一星</p>
+<p><strong>题目来源</strong>： Cyberpeace-n3k0</p>
+<p><strong>题目描述</strong>：小宁写了个ping功能,但没有写waf,X老师告诉她这是非常危险的，你知道为什么吗？</p>
+<p>常见命令拼接符：</p>
+<pre><code class="hljs"> • &amp;&amp; :执行两个命令，若前面出错，后面不会执行 
+ • ＆ : 执行两个命令，若前面出错，后面还是会执行 
+ • || : 执行正确的那个命令，前面的失败，后面也会执行，前面成功，后面不会执行 
+ • | : 只会执行后面的命令 
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>常见连接符</th>
+<th>举例</th>
+<th>效果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>;</td>
+<td>A;B</td>
+<td>先执行A，再执行B</td>
+</tr>
+<tr>
+<td>&amp;</td>
+<td>A&amp;B</td>
+<td>简单拼接，A B之间无制约关系</td>
+</tr>
+<tr>
+<td>|</td>
+<td>A|B</td>
+<td>显示B的执行结果</td>
+</tr>
+<tr>
+<td>&amp;&amp;</td>
+<td>A&amp;&amp;B</td>
+<td>A执行成功，然后才会执行B</td>
+</tr>
+<tr>
+<td>||</td>
+<td>A||B</td>
+<td>A执行失败，然后才会执行B</td>
+</tr>
+</tbody></table>
+<ul>
+<li>命令执行漏洞是什么?</li>
+</ul>
+<p>当应用需要调用一些外部程序去处理内容的情况下，就会用到一些执行系统命令的函数。如PHP中的system，exec，shell_exec等，当用户可以控制命令执行函数中的参数时，将可注入恶意系统命令到正常命令中，造成命令执行攻击。</p>
+<p><strong>该题中，直接把用户输入的参数不经过过滤直接放在ping命令之后，而恶意攻击者可以在输入的参数中用&amp;&amp;或|或||截断，而执行下一个恶意命令</strong></p>
+<p><strong>注</strong>：％0A 是换行符的url编码形式，有的时候可以用来绕过对以上常见的连接符过滤了的情况</p>
+<h2 id="10-1-解题思路"><a href="#10-1-解题思路" class="headerlink" title="10.1 解题思路"></a>10.1 解题思路</h2><p>1）打开解题URL地址，给出如下图的内容，貌似是一个具有Ping 功能的页面</p>
+<p><img src="https://img-blog.csdnimg.cn/9c185431038d4b5ea12dbfaecbfec2f1.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>2）那么如下，输入127.0.0.1，Ping 一下本地的IP 看看能不能成功执行，并查看命令执行结果</p>
+<p><img src="https://img-blog.csdnimg.cn/207eb4daa8ae4d199fc356c5a5e5885c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>如上图，发现能成功返回信息，而且开局就提示过没有WAF，此时大家应该也联想到能否使用命令拼接的方式来执行其它命令的思路了吧？</p>
+<p>3）咋们打开浏览器，在文本框内输入<code>127.0.0.1 | find / -name &quot;flag*&quot;  （将 | 替换成 &amp; 或 &amp;&amp; 都可以）</code>，查找flag所在位置，尝试一下看看能否成功</p>
+<p><img src="https://img-blog.csdnimg.cn/5a36cc9f56ff49a0aa78aff16edf9c5c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_19,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>4）执行成功，得到flag.txt存放的地址，我们如下，输入<code>127.0.0.1 | cat /home/flag.txt  </code>获取Flag</p>
+<pre><code class="hljs"> cyberpeace&#123;6d947e9ef8352104082e9d173396ae60&#125;
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/6210b297ac0a41249c4cc8c3128eecef.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h3 id="10-1-1-HackBar-工具POST提交方式获得Flag"><a href="#10-1-1-HackBar-工具POST提交方式获得Flag" class="headerlink" title="10.1.1 HackBar 工具POST提交方式获得Flag"></a>10.1.1 HackBar 工具POST提交方式获得Flag</h3><p>首先获取文本框的参数的值是多少，然后再用POST 提交方式一步步获得Flag，我这里是直接输入了Flag 的地址直接获取的，你也可以一步步按照上述的操作步骤在HackBar 里面用POST 方式来查询试试</p>
+<p><img src="https://img-blog.csdnimg.cn/6f9dc30a934c45a49214ab348c67db81.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述">执行成功，获得Flag</p>
+<p><img src="https://img-blog.csdnimg.cn/6155d16451f14c999a2e2a4d43194e67.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>或用Burp 抓包放到重放里，慢慢调试获得Flag的地址，或自己写一个import request 脚本去跑获得Flag的地址</p>
+<h1 id="0x11-simple-js-Write-Up"><a href="#0x11-simple-js-Write-Up" class="headerlink" title="0x11 simple_js Write Up"></a>0x11 simple_js Write Up</h1><p>XCTF Web 练习题地址：<a target="_blank" rel="noopener" href="https://adworld.xctf.org.cn/">https://adworld.xctf.org.cn/</a></p>
+<p><img src="https://img-blog.csdnimg.cn/29d7a806f03d4bec8acd8068a924d776.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><strong>难度系数</strong>： 一星</p>
+<p><strong>题目来源</strong>： root-me</p>
+<p><strong>题目描述</strong>：小宁发现了一个网页，但却一直输不对密码。(Flag格式为 Cyberpeace{xxxxxxxxx} )</p>
+<p>定义和用法</p>
+<pre><code class="hljs">  fromCharCode() 可接受一个指定的 Unicode 值，然后返回一个字符串。
+</code></pre>
+<p><strong>注</strong>：该方法是 String 的静态方法，字符串中的每个字符都由单独的 Unicode 数字编码指定。使用语法： String.fromCharCode()</p>
+<p>实例，将 Unicode 编码转为一个字符:</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-keyword">var</span> n = String.<span class="hljs-title function_ invoke__">fromCharCode</span>(<span class="hljs-number">65</span>);<br>n 输出结果:A<br></code></pre></td></tr></table></figure>
+
+<h2 id="11-1-解题思路"><a href="#11-1-解题思路" class="headerlink" title="11.1 解题思路"></a>11.1 解题思路</h2><p>1）按照页面回显结果和源码判断，不论输入任何密码，中都会跳转到错误密码</p>
+<p><img src="https://img-blog.csdnimg.cn/8e4c5404f46142e788832ecb12e022c7.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>2）输入任意密码，点击确定，弹出提示：<code>FAUX PASSWORD HAHA  </code></p>
+<p><strong>注</strong>：假密码~！哈哈</p>
+<p><img src="https://img-blog.csdnimg.cn/b47be16d3d254c9098639dd4c5bb547b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>3）修改HTML代码，将右击弹窗里选择Edit as HTML</p>
+<p><img src="https://img-blog.csdnimg.cn/ea6bcedeccb943faaad16e5c6f4d581b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>4）替换dechiffre里的字符串放到 var pas 里</p>
+<p><img src="https://img-blog.csdnimg.cn/8b572bc469454890a103773801eed0d3.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述">5）编辑文本将代码修改，用下方的可疑字符串代替函数中的常量</p>
+<p><img src="https://img-blog.csdnimg.cn/93f4a18f6a76459bbc01ad3d12c9ed5a.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述">6）替换成功后，将当前HTML页面另存到本地</p>
+<p><img src="https://img-blog.csdnimg.cn/55b38e3ce7e24d8294597ffaf99f4a6c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述">7）保存到本地后，用浏览器打开</p>
+<p><img src="https://img-blog.csdnimg.cn/4478ac60d2a94469877102efecbceb7f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>8）打开后，弹窗出出啦的就是Flag</p>
+<p><img src="https://img-blog.csdnimg.cn/af4d28fc86c642929284214a742f7a9b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="11-2-解题拆分步骤分析"><a href="#11-2-解题拆分步骤分析" class="headerlink" title="11.2 解题拆分步骤分析"></a>11.2 解题拆分步骤分析</h2><p>1）在线HTML编辑地址，方便大家手工调试：<a target="_blank" rel="noopener" href="https://www.runoob.com/runcode">https://www.runoob.com/runcode</a></p>
+<p><img src="https://img-blog.csdnimg.cn/e329b06f50104f22b74a1e13d1c18ce8.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>2）该HTML的JS 代码如下：</p>
+<p><img src="https://img-blog.csdnimg.cn/309d1d591b0c4a128513141b8018dee4.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">dechiffre</span>(<span class="hljs-params">pass_enc</span>)&#123;<br>        <span class="hljs-keyword">var</span> pass = <span class="hljs-string">&quot;70,65,85,88,32,80,65,83,83,87,79,82,68,32,72,65,72,65&quot;</span>;<br>        <span class="hljs-keyword">var</span> tab  = pass_enc.<span class="hljs-title function_">split</span>(<span class="hljs-string">&#x27;,&#x27;</span>);<br>                <span class="hljs-keyword">var</span> tab2 = pass.<span class="hljs-title function_">split</span>(<span class="hljs-string">&#x27;,&#x27;</span>);<span class="hljs-keyword">var</span> i,j,k,l=<span class="hljs-number">0</span>,m,n,o,p = <span class="hljs-string">&quot;&quot;</span>;i = <span class="hljs-number">0</span>;j = tab.<span class="hljs-property">length</span>;<br>                        k = j + (l) + (n=<span class="hljs-number">0</span>);<br>                        n = tab2.<span class="hljs-property">length</span>;<br>                        <span class="hljs-keyword">for</span>(i = (o=<span class="hljs-number">0</span>); i &lt; (k = j = n); i++ )&#123;o = tab[i-l];p += <span class="hljs-title class_">String</span>.<span class="hljs-title function_">fromCharCode</span>((o = tab2[i]));<br>                                <span class="hljs-keyword">if</span>(i == <span class="hljs-number">5</span>)<span class="hljs-keyword">break</span>;&#125;<br>                        <span class="hljs-keyword">for</span>(i = (o=<span class="hljs-number">0</span>); i &lt; (k = j = n); i++ )&#123;<br>                        o = tab[i-l];<br>                                <span class="hljs-keyword">if</span>(i &gt; <span class="hljs-number">5</span> &amp;&amp; i &lt; k-<span class="hljs-number">1</span>)<br>                                        p += <span class="hljs-title class_">String</span>.<span class="hljs-title function_">fromCharCode</span>((o = tab2[i]));<br>                        &#125;<br>        p += <span class="hljs-title class_">String</span>.<span class="hljs-title function_">fromCharCode</span>(tab2[<span class="hljs-number">17</span>]);<br>        pass = p;<span class="hljs-keyword">return</span> pass;<br>    &#125;<br>    <span class="hljs-title class_">String</span>[<span class="hljs-string">&quot;fromCharCode&quot;</span>](<span class="hljs-title function_">dechiffre</span>(<span class="hljs-string">&quot;\x35\x35\x2c\x35\x36\x2c\x35\x34\x2c\x37\x39\x2c\x31\x31\x35\x2c\x36\x39\x2c\x31\x31\x34\x2c\x31\x31\x36\x2c\x31\x30\x37\x2c\x34\x39\x2c\x35\x30&quot;</span>));<br><br>    h = <span class="hljs-variable language_">window</span>.<span class="hljs-title function_">prompt</span>(<span class="hljs-string">&#x27;Enter password&#x27;</span>);<br>    <span class="hljs-title function_">alert</span>( <span class="hljs-title function_">dechiffre</span>(h) );<br></code></pre></td></tr></table></figure>
+
+<p>3）去除无用变量：</p>
+<p><img src="https://img-blog.csdnimg.cn/6c11d75f5acc4716bf34ef38f7326682.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">dechiffre</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-keyword">var</span> pass = <span class="hljs-string">&quot;70,65,85,88,32,80,65,83,83,87,79,82,68,32,72,65,72,65&quot;</span>;<br>    <span class="hljs-keyword">var</span> tab2 = pass.<span class="hljs-title function_">split</span>(<span class="hljs-string">&#x27;,&#x27;</span>);<br>    <span class="hljs-keyword">var</span> i, n, p = <span class="hljs-string">&quot;&quot;</span>;<br>    n = tab2.<span class="hljs-property">length</span>;<br>    <span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; i &lt; n; i++) &#123;<br>        p += <span class="hljs-title class_">String</span>.<span class="hljs-title function_">fromCharCode</span>(tab2[i]);<br>        <span class="hljs-keyword">if</span> (i == <span class="hljs-number">5</span>) <span class="hljs-keyword">break</span>;<br>    &#125;<br>    <span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; i &lt; n; i++) &#123;<br>        <span class="hljs-keyword">if</span> (i &gt; <span class="hljs-number">5</span> &amp;&amp; i &lt; n - <span class="hljs-number">1</span>) p += <span class="hljs-title class_">String</span>.<span class="hljs-title function_">fromCharCode</span>(tab2[i]);<br>    &#125;<br>    p += <span class="hljs-title class_">String</span>.<span class="hljs-title function_">fromCharCode</span>(tab2[<span class="hljs-number">17</span>]);<br>    <span class="hljs-keyword">return</span> p;<br>&#125;<br>    <span class="hljs-title class_">String</span>[<span class="hljs-string">&quot;fromCharCode&quot;</span>](<span class="hljs-title function_">dechiffre</span>(<span class="hljs-string">&quot;\x35\x35\x2c\x35\x36\x2c\x35\x34\x2c\x37\x39\x2c\x31\x31\x35\x2c\x36\x39\x2c\x31\x31\x34\x2c\x31\x31\x36\x2c\x31\x30\x37\x2c\x34\x39\x2c\x35\x30&quot;</span>));<br><br>    h = <span class="hljs-variable language_">window</span>.<span class="hljs-title function_">prompt</span>(<span class="hljs-string">&#x27;Enter password&#x27;</span>);<br>    <span class="hljs-title function_">alert</span>( <span class="hljs-title function_">dechiffre</span>(h) );<br></code></pre></td></tr></table></figure>
+
+<p>4）合并两个循环：</p>
+<p><img src="https://img-blog.csdnimg.cn/ce7b5963855c49d795231901f4939cfd.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">dechiffre</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-keyword">var</span> pass = <span class="hljs-string">&quot;70,65,85,88,32,80,65,83,83,87,79,82,68,32,72,65,72,65&quot;</span>;<br>    <span class="hljs-keyword">var</span> tab2 = pass.<span class="hljs-title function_">split</span>(<span class="hljs-string">&#x27;,&#x27;</span>);<br>    <span class="hljs-keyword">var</span> i;<br>    <span class="hljs-keyword">var</span> p = <span class="hljs-string">&quot;&quot;</span>;<br>    <span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; i &lt; tab2.<span class="hljs-property">length</span> - <span class="hljs-number">1</span>; i++) &#123;<br>        p += <span class="hljs-title class_">String</span>.<span class="hljs-title function_">fromCharCode</span>(tab2[i]);<br>    &#125;<br>    p += <span class="hljs-title class_">String</span>.<span class="hljs-title function_">fromCharCode</span>(tab2[<span class="hljs-number">17</span>]);<br>    <span class="hljs-keyword">return</span> p;<br>&#125;<br>    <span class="hljs-title class_">String</span>[<span class="hljs-string">&quot;fromCharCode&quot;</span>](<span class="hljs-title function_">dechiffre</span>(<span class="hljs-string">&quot;\x35\x35\x2c\x35\x36\x2c\x35\x34\x2c\x37\x39\x2c\x31\x31\x35\x2c\x36\x39\x2c\x31\x31\x34\x2c\x31\x31\x36\x2c\x31\x30\x37\x2c\x34\x39\x2c\x35\x30&quot;</span>));<br><br>    h = <span class="hljs-variable language_">window</span>.<span class="hljs-title function_">prompt</span>(<span class="hljs-string">&#x27;Enter password&#x27;</span>);<br>    <span class="hljs-title function_">alert</span>( <span class="hljs-title function_">dechiffre</span>(h) );<br></code></pre></td></tr></table></figure>
+
+<p>5）末尾并入循环：</p>
+<p><img src="https://img-blog.csdnimg.cn/c316148bf7874a2e853fa97bde403d3f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">dechiffre</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-keyword">var</span> pass = <span class="hljs-string">&quot;70,65,85,88,32,80,65,83,83,87,79,82,68,32,72,65,72,65&quot;</span>;<br>    <span class="hljs-keyword">var</span> tab2 = pass.<span class="hljs-title function_">split</span>(<span class="hljs-string">&#x27;,&#x27;</span>);<br>    <span class="hljs-keyword">var</span> i;<br>    <span class="hljs-keyword">var</span> p = <span class="hljs-string">&quot;&quot;</span>;<br>    <span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; i &lt; tab2.<span class="hljs-property">length</span>; i++) &#123;<br>        p += <span class="hljs-title class_">String</span>.<span class="hljs-title function_">fromCharCode</span>(tab2[i]);<br>    &#125;<br>    <span class="hljs-keyword">return</span> p;<br>&#125;<br>    <span class="hljs-title class_">String</span>[<span class="hljs-string">&quot;fromCharCode&quot;</span>](<span class="hljs-title function_">dechiffre</span>(<span class="hljs-string">&quot;\x35\x35\x2c\x35\x36\x2c\x35\x34\x2c\x37\x39\x2c\x31\x31\x35\x2c\x36\x39\x2c\x31\x31\x34\x2c\x31\x31\x36\x2c\x31\x30\x37\x2c\x34\x39\x2c\x35\x30&quot;</span>));<br><br>    h = <span class="hljs-variable language_">window</span>.<span class="hljs-title function_">prompt</span>(<span class="hljs-string">&#x27;Enter password&#x27;</span>);<br>    <span class="hljs-title function_">alert</span>( <span class="hljs-title function_">dechiffre</span>(h) );<br></code></pre></td></tr></table></figure>
+
+
+<p>6）就逻辑上可见它只是将内容为逗号分隔的数字的字符串转成相应编码的字符串，将代码修改，用下方的可疑字符串代替函数中的常量，得到的整个网页代码是：</p>
+<p><img src="https://img-blog.csdnimg.cn/0a95cacf0ffb429f849bf9481aac392f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><img src="https://img-blog.csdnimg.cn/f938aa164fa24bc7a3fb0460c2805853.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">dechiffre</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-keyword">var</span> pass = <span class="hljs-string">&quot;\x35\x35\x2c\x35\x36\x2c\x35\x34\x2c\x37\x39\x2c\x31\x31\x35\x2c\x36\x39\x2c\x31\x31\x34\x2c\x31\x31\x36\x2c\x31\x30\x37\x2c\x34\x39\x2c\x35\x30&quot;</span>;<br>    <span class="hljs-keyword">var</span> tab2 = pass.<span class="hljs-title function_">split</span>(<span class="hljs-string">&#x27;,&#x27;</span>);<br>    <span class="hljs-keyword">var</span> i;<br>    <span class="hljs-keyword">var</span> p = <span class="hljs-string">&quot;&quot;</span>;<br>    <span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; i &lt; tab2.<span class="hljs-property">length</span>; i++) &#123;<br>        p += <span class="hljs-title class_">String</span>.<span class="hljs-title function_">fromCharCode</span>(tab2[i]);<br>    &#125;<br>    <span class="hljs-keyword">return</span> p;<br>&#125;<br><span class="hljs-title function_">alert</span>(<span class="hljs-title function_">dechiffre</span>());<br></code></pre></td></tr></table></figure>
+
+<h2 id="11-3-Python-脚本获得Flag"><a href="#11-3-Python-脚本获得Flag" class="headerlink" title="11.3 Python 脚本获得Flag"></a>11.3 Python 脚本获得Flag</h2><p>1）按照页面回显结果和源码判断，不论输入任何密码，中都会跳转到错误密码</p>
+<p><img src="https://img-blog.csdnimg.cn/ae668e8cbed04379a20e70b25d471c04.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>2）输入任意密码，点击确定，弹出提示：<code>FAUX PASSWORD HAHA  </code></p>
+<p><strong>注</strong>：假密码~！哈哈</p>
+<p><img src="https://img-blog.csdnimg.cn/5965bdd8619e4dda867ad30c686ba8a4.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>3）而真正的密码在这里，不在常量里面</p>
+<p><img src="https://img-blog.csdnimg.cn/3c1b299a3f934c5ea343e27a760ee393.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>4）通过观察JS代码，判断编码方式为 base16，写python脚本进行转码，代码如下</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python">string = <span class="hljs-string">&quot;\x35\x35\x2c\x35\x36\x2c\x35\x34\x2c\x37\x39\x2c\x31\x31\x35\x2c\x36\x39\x2c\x31\x31\x34\x2c\x31\x31\x36\x2c\x31\x30\x37\x2c\x34\x39\x2c\x35\x30&quot;</span><br>a = string.split(<span class="hljs-string">&quot;,&quot;</span>)<br>b = <span class="hljs-string">&quot;&quot;</span><br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> a:<br>    i = <span class="hljs-built_in">chr</span>(<span class="hljs-built_in">int</span>(i))<br>    <span class="hljs-built_in">print</span>(i)<br>    b+=i<br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;Flag：&quot;</span>,b)<br></code></pre></td></tr></table></figure>
+
+<p>运行结果如下：</p>
+<p><img src="https://img-blog.csdnimg.cn/8dd8bc667de74dc6a111a1716c36d402.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>或</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-meta">&gt;&gt;&gt; </span>a = <span class="hljs-string">&quot;\x35\x35\x2c\x35\x36\x2c\x35\x34\x2c\x37\x39\x2c\x31\x31\x35\x2c\x36\x39\x2c\x31\x31\x34\x2c\x31\x31\x36\x2c\x31\x30\x37\x2c\x34\x39\x2c\x35\x30&quot;</span><br><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-built_in">print</span>(a)<br><span class="hljs-number">55</span>,<span class="hljs-number">56</span>,<span class="hljs-number">54</span>,<span class="hljs-number">79</span>,<span class="hljs-number">115</span>,<span class="hljs-number">69</span>,<span class="hljs-number">114</span>,<span class="hljs-number">116</span>,<span class="hljs-number">107</span>,<span class="hljs-number">49</span>,<span class="hljs-number">50</span><br><span class="hljs-meta">&gt;&gt;&gt; </span>a = [<span class="hljs-number">55</span>,<span class="hljs-number">56</span>,<span class="hljs-number">54</span>,<span class="hljs-number">79</span>,<span class="hljs-number">115</span>,<span class="hljs-number">69</span>,<span class="hljs-number">114</span>,<span class="hljs-number">116</span>,<span class="hljs-number">107</span>,<span class="hljs-number">49</span>,<span class="hljs-number">50</span>]<br><span class="hljs-meta">&gt;&gt;&gt; </span><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> a:<br><span class="hljs-meta">... </span>    <span class="hljs-built_in">print</span>(<span class="hljs-built_in">chr</span>(i),end=<span class="hljs-string">&#x27;&#x27;</span>)<br>...<br>786OsErtk12&gt;&gt;&gt;<br></code></pre></td></tr></table></figure>
+
+<p>运行结果如下：</p>
+<p><img src="https://img-blog.csdnimg.cn/2b19bf8ba46b4b97896fb17f6bcd6257.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x12-disabled-button-Write-Up"><a href="#0x12-disabled-button-Write-Up" class="headerlink" title="0x12 disabled_button Write Up"></a>0x12 disabled_button Write Up</h1><p><img src="https://img-blog.csdnimg.cn/ddbc756041ed4197a8b6c88c9f13d98e.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><strong>难度系数</strong>： 一星</p>
+<p><strong>题目来源</strong>： Cyberpeace-n3k0</p>
+<p><strong>题目描述</strong>：X老师今天上课讲了前端知识，然后给了大家一个不能按的按钮，小宁惊奇地发现这个按钮按不下去，到底怎么才能按下去呢？</p>
+<p>定义和用法：</p>
+<ul>
+<li>disabled 属性规定禁用按钮</li>
+<li>被禁用的按钮既不可用，也不可点击</li>
+<li>可以设置 disabled 属性，直到满足某些条件（比如选择一个复选框），才恢复用户对该按钮的使用。然后，可以使用 JavaScript 来清除 disabled 属性，以使文本区变为可用状态</li>
+</ul>
+<p>属性值：</p>
+<table>
+<thead>
+<tr>
+<th>值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>disabled</td>
+<td>规定应该禁用该按钮</td>
+</tr>
+</tbody></table>
+<p>例子：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs html"><span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;button&quot;</span> <span class="hljs-attr">disabled</span>=<span class="hljs-string">&quot;disabled&quot;</span>&gt;</span>不可点击的按钮<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>按钮表单里面有disabled 属性，按钮是置灰状态，不可点击</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/67a7e7a9466047a2a087f60e73bc4d23.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述">- 按钮表单里面无disabled 属性，按钮是可点击状态</p>
+<p><img src="https://img-blog.csdnimg.cn/75e6c75a5e094334928e4dee61361f93.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="12-1-F12-工具获得Flag"><a href="#12-1-F12-工具获得Flag" class="headerlink" title="12.1 F12 工具获得Flag"></a>12.1 F12 工具获得Flag</h2><p>1）进入解题的URL，发现按钮是置灰状态，无法点击。我们打开开发者工具（快捷键 F12），在查看器窗口（Elements）审查元素，发现存在disabled&#x3D;”” 字段或 disabled 字段  （我这里用的是谷歌浏览器，所以删掉disabled字段即可，如果是火狐删除disabled&#x3D;”” 即可，如下图）</p>
+<ul>
+<li>谷歌浏览器</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/aac266f5d81f4e9da9a5a52fa49c3312.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>火狐浏览器</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/04281d07539840088ab48e76c5fa29ea.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述">2）将disabled&#x3D;”” 字段或 disabled 字段删除后，按钮变成可按状态，不处于置灰状态，按下后得到flag，操作如下</p>
+<p><img src="https://img-blog.csdnimg.cn/7901fae74c424ba8b0ddfe2341e0d224.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>编辑html 内容</p>
+<p><img src="https://img-blog.csdnimg.cn/bb8bfd682eb845f5a54bf41f0f7d8f7f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>删掉disabled 属性</p>
+<p><img src="https://img-blog.csdnimg.cn/df380ee649474d7c8e36a6ed117b9e82.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述">disabled 属性规定应该禁用的 <input>元素。被禁用的 input 元素是无法使用和无法点击的。 删除源码中的disable属性，按钮即可点击，然后得到Flag</p>
+<p><img src="https://img-blog.csdnimg.cn/e6f972827cd243a2a1fe0202276a9432.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="12-2-HackBar-POST-提交获得Flag"><a href="#12-2-HackBar-POST-提交获得Flag" class="headerlink" title="12.2 HackBar POST 提交获得Flag"></a>12.2 HackBar POST 提交获得Flag</h2><p>1）审计from表单代码，使用HackBar，用post方式传递auth&#x3D;flag，同样可以获得Flag</p>
+<p><img src="https://img-blog.csdnimg.cn/e002c08c24fe4028b4f280d034c65387.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>2）打开HackBar 勾选Post data ，输入auth&#x3D;flag 后，点击Execute 按钮，页面成功回显Flag</p>
+<p><img src="https://img-blog.csdnimg.cn/e9a606fb19ab468c90210ba0c1f9150f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="12-3-BurpSuite-修改HTML-内容获得Flag"><a href="#12-3-BurpSuite-修改HTML-内容获得Flag" class="headerlink" title="12.3 BurpSuite 修改HTML 内容获得Flag"></a>12.3 BurpSuite 修改HTML 内容获得Flag</h2><p>1、开启代理拦截，直接修改Response值</p>
+<p>1）开启监听后，在Raw一栏下右击弹窗中选择Do intercept——&gt;点击 Response to this request 开启代理拦截</p>
+<p><img src="https://img-blog.csdnimg.cn/59863a7462434bc7a420d9d9cc8872d4.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述">2）BurpSuite 删掉disabled 属性，点击Forward 放行</p>
+<p><img src="https://img-blog.csdnimg.cn/b280e4b5efa74bc688e6a73d9aa55b8d.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>3）然后返回浏览器，发现按钮变为可点击状态</p>
+<p><img src="https://img-blog.csdnimg.cn/e19205459737425c8d96cd570c500219.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>4）点击Flag 按钮后，成功获得Flag</p>
+<p><img src="https://img-blog.csdnimg.cn/8abee084ccb74599bb50e44690f04dad.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>2、使用自动代理转发，如下图</p>
+<p><img src="https://img-blog.csdnimg.cn/bae85f0078a14356a3147a94448beb5f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<hr>
+<p><strong>你以为你有很多路可以选择，其实你只有一条路可以走</strong></p>
+<hr>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Web%E5%AE%89%E5%85%A8/">#Web安全</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>「干货」XCTF Web安全入门练习靶场全部通关教程</div>
+      <div>https://orangey.info/2022/09/24/124153866/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>橙留香</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年9月24日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/09/24/123132769/" title="「干货」Linux 应急响应日志分析命令「总结」">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">「干货」Linux 应急响应日志分析命令「总结」</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/09/24/123407669/" title="RealWin Server HMI 漏洞复现与恶意攻击链分析">
+                        <span class="hidden-mobile">RealWin Server HMI 漏洞复现与恶意攻击链分析</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  <article id="comments" lazyload>
+    
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1e96aec5ac46370916fa","clientSecret":"ee5e97a65cf34e9fe31e15ab0421a94968237f5e","repo":"ogGitalk","owner":"ananasOrangey","admin":["ananasOrangey"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '1ccc54a21913710d4455f7e8f76da2b2'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+  </article>
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://orangey.blog.csdn.net" target="_blank" rel="nofollow noopener"><span>橙留香CSDN博客</span></a> <i class="iconfont icon-love"></i> <a href="https://i.imgtg.com/2022/09/21/gNXxK.png" target="_blank" rel="nofollow noopener"><span>橙留香微信公众号</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

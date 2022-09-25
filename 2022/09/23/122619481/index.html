@@ -1,0 +1,3070 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="橙留香">
+  <meta name="keywords" content="橙留香车联网安全技术博客">
+  
+    <meta name="description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;ananasorangey&#x2F;category11955914.html   0x01 前言1.1 IDS是什么？IDS（intrusion detection syste">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Snort使用手册详细版「起手篇」">
+<meta property="og:url" content="https://orangey.info/2022/09/23/122619481/index.html">
+<meta property="og:site_name" content="车联网安全技术博客 | 橙留香">
+<meta property="og:description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;ananasorangey&#x2F;category11955914.html   0x01 前言1.1 IDS是什么？IDS（intrusion detection syste">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/21/gNXxK.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2c6e1b2545f64d07be7b6fd6a49f2ac2.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_18,color_FFFFFF,t_70,g_se,x_16">
+<meta property="article:published_time" content="2022-09-23T15:50:33.543Z">
+<meta property="article:modified_time" content="2022-09-24T16:39:28.283Z">
+<meta property="article:author" content="橙留香">
+<meta property="article:tag" content="ATTACK">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+  
+  
+  
+  <title>Snort使用手册详细版「起手篇」 - 车联网安全技术博客 | 橙留香</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"orangey.info","root":"/","version":"1.9.3","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"java"},"copy_btn":false,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>橙留香</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Snort使用手册详细版「起手篇」"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-09-23 23:50" pubdate>
+          2022年9月23日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          56k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          <!-- compatible with older versions-->
+          466 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Snort使用手册详细版「起手篇」</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <hr>
+<p><strong>也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大</strong></p>
+<p><strong>少走了弯路，也就错过了风景，无论如何，感谢经历</strong></p>
+<hr>
+<p>更多关于Android安全的知识，可前往：<a target="_blank" rel="noopener" href="https://blog.csdn.net/ananasorangey/category11955914.html">https://blog.csdn.net/ananasorangey/category11955914.html</a></p>
+<p><img src="https://i.imgtg.com/2022/09/25/gdpGP.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><img src="https://i.imgtg.com/2022/09/21/gNXxK.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x01-前言"><a href="#0x01-前言" class="headerlink" title="0x01 前言"></a>0x01 前言</h1><h2 id="1-1-IDS是什么？"><a href="#1-1-IDS是什么？" class="headerlink" title="1.1 IDS是什么？"></a>1.1 IDS是什么？</h2><p>IDS（intrusion detection system）入侵检测系统是一种对网络传输进行即时监视，在发现可疑传输时发出警报或者采取主动反应措施的网络安全设备。它与其他网络安全设备的不同之处便在于，IDS是一种积极主动的安全防护技术。例如，某目标官网如果有防火墙是一幢大厦员工的门禁卡，那么IDS就是这幢大厦里的监视系统，一旦有非企业员工进入没有报备进入了大厦，或内部人员有越界行为，只有实时监视系统才能发现情况并发出警告</p>
+<h2 id="1-2-术语"><a href="#1-2-术语" class="headerlink" title="1.2 术语"></a>1.2 术语</h2><ul>
+<li>TOE（TCP Offload Engine，TCP卸载引擎)</li>
+</ul>
+<p>TOE是一个延续了多年的概念，它旨在使用网卡上专用处理器来完成一些或所有数据包的处理任务。也就是说，通过采用配有TOE芯片的专用网卡，包括TCP在内的四层处理请示都可以从主机处理器转移到网卡，其最终的结果就是在加速网络响应的同时提高服务器的性能。</p>
+<p>TOE与标准网络驱动的实现主要区别在将用户数据直接拷贝到数据链路层驱动处理，减少了传输层与网络层的数据拷贝，降低了协议复杂度，加快了网络传输速度，减轻了CPU负载。</p>
+<ul>
+<li>EAL3</li>
+</ul>
+<p>EAL3测评会按照安全目标，配置管理，交付与运行、开发、文档、生命周期支持、测试和脆弱性分析、不同层次的设计审核等几个方面对安全产品进行测评。根据国际通行的CC标准ISO&#x2F;IEC 15408准则的TOE评估的七个安全认证级别类别，EAL3为系统测试和检查级（methodically tested andchecked），是目前国内网络级的安全设备能认证的最高级别。</p>
+<ul>
+<li>PP：保护轮廓</li>
+<li>ST：安全目标   </li>
+<li>TOE:评估对象   </li>
+<li>TSF：安全功能   </li>
+<li>TSP：执行TOE安全策略  </li>
+<li>GPL：公共许可证GPL(The GUN Genearl Public License)</li>
+<li>NIDS(Network Intrusion Detection System，即网络入侵检测系统)</li>
+</ul>
+<p>NIDS主要用于检测Hacker或Cracker通过网络进行的入侵行为</p>
+<p>NIDS的运行方式：</p>
+<ul>
+<li>在目标主机上运行以监测其本身的通信信息</li>
+<li>在一台单独的机器上运行以监测所有网络设备的通信信息，比如Hub、路由器。</li>
+</ul>
+<h2 id="1-3-IDS真的那么强大吗？"><a href="#1-3-IDS真的那么强大吗？" class="headerlink" title="1.3 IDS真的那么强大吗？"></a>1.3 IDS真的那么强大吗？</h2><p>其实IDS，只是依照一定的安全策略，对网络、系统的运行状况进行监视，尽可能发现各种攻击企图、攻击行为或者攻击结果，以保证网络系统资源的机密性、完整性和可用性。与防火墙不同的是，IDS入侵检测系统是一个旁路监听设备，没有也不需要跨接在任何链路上，无须网络流量流经它便可以工作。因此，对IDS的部署的唯一要求就是：IDS应当挂接在所有所关注流量都必须流经的链路上</p>
+<ul>
+<li>IDS的接入方式：并行接入(并联)</li>
+<li>IDS在交换式网络中的位置：尽可能靠近攻击源，尽可能靠近受保护资源<ul>
+<li>服务器区域的交换机上</li>
+<li>边界路由器的相邻交换机上</li>
+<li>重点保护网段的局域网交换机上</li>
+</ul>
+</li>
+</ul>
+<h2 id="1-4-IDS作用"><a href="#1-4-IDS作用" class="headerlink" title="1.4 IDS作用"></a>1.4 IDS作用</h2><ul>
+<li>防火墙的重要补充</li>
+<li>构建网络安全防御体系重要环节</li>
+<li>克服传统防御机制的限制</li>
+</ul>
+<h2 id="1-5-IDS功能"><a href="#1-5-IDS功能" class="headerlink" title="1.5 IDS功能"></a>1.5 IDS功能</h2><ul>
+<li>监测并分析用户和系统的活动</li>
+<li>核查系统配置和漏洞</li>
+<li>对操作系统进行日志管理，并识别违反安全策略的用户活动</li>
+<li>针对已发现的攻击行为作出适当的反应，如告警、中止进程等</li>
+</ul>
+<h2 id="1-6-IDS分类"><a href="#1-6-IDS分类" class="headerlink" title="1.6 IDS分类"></a>1.6 IDS分类</h2><p>入侵检测系统分为主机级（NIDS）和网络级（HIDS）</p>
+<ul>
+<li><p>按入侵检测形态</p>
+<ul>
+<li>硬件入侵检测</li>
+<li>软件入侵检测</li>
+</ul>
+</li>
+<li><p>按目标系统的类型</p>
+<ul>
+<li>网络入侵检测<ul>
+<li>基于网络的入侵检测能够实时监控网络中的数据流量，发现潜在的攻击行为，并做出迅速响应。另外，它的分析对象是网络协议，通常而言是标准化的，独立于主机的操作系统类型，因此NDIS一般没有移植性的问题。同时它的运行丝毫不影响主机或服务器的自身运行，因为基于网络的入侵检测系统经常采取独立主机和被动监听的工作模式</li>
+</ul>
+</li>
+<li>主机入侵检测<ul>
+<li>基于主机的入侵检测系统的信息来源为操作系统事件日志、管理工具审计记录和应用程序审计一记录。它通过监视系统运行情况(文件的打开和访问、文件权限的改变、用户的登录和特权服务的访问等)、审计系统日志文件(Sysofg)和应用程序(关系数据库、Web服务器)日志来检测入侵来检测入侵。HDIS可以检测到用户滥用权限、创建后门帐户、修改重要数据和改变安全配置等行为，同时还可以定期对系统关键文件进行检查，计算其校验值来确信其完整性。HDS检测发生在主机上的活动，处理的都是操作系统事件或应用程序事件而不是网络包，所以高速网络对它没有影响。同时它使用的是操作系统提供的信息，经过加密的数据包在到达操作系统后，都已经被解密，所以HDIS能很好地处理包加密的问题。并且，HDS还可以综合多个数据源进行进一步的分析，利用数据挖掘技术来发现入侵。但是，HDIS也有依赖特定的操作系统、影响系统性能、配置和维护困难等缺陷。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>按系统结构</p>
+<ul>
+<li>集中式</li>
+<li>分布式</li>
+</ul>
+</li>
+</ul>
+<h2 id="1-7-入侵检测系统的架构"><a href="#1-7-入侵检测系统的架构" class="headerlink" title="1.7 入侵检测系统的架构"></a>1.7 入侵检测系统的架构</h2><ul>
+<li>事件产生器：它的目的是从整个计算环境中获得事件，并向系统的其他部分提供此事件</li>
+<li>事件分析器：分析数据，发现危险、异常事件，通知响应单元</li>
+<li>响应单元：对分析结果作出反应</li>
+<li>事件数据库：存放各种中间和最终数据</li>
+</ul>
+<h2 id="1-8-数据检测技术"><a href="#1-8-数据检测技术" class="headerlink" title="1.8 数据检测技术"></a>1.8 数据检测技术</h2><h3 id="1-8-1-误用检测技术"><a href="#1-8-1-误用检测技术" class="headerlink" title="1.8.1 误用检测技术"></a>1.8.1 误用检测技术</h3><ul>
+<li>工作原理</li>
+</ul>
+<p>将符合已知入侵特征的行为视为入侵，它事先对已知的攻击方法进行分析，提取其特征，并将它们编码为程序可以理解的形式，存放在参照信息数据库中，以便分析器据此对实际的审计数据进行比较分析，一旦发现真实的信息与信息数据库中的特征相匹配，则报警 </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs C">建立入侵行为模型(攻击特征)<br>假设可以识别和表示所有可能的特征<br>基于系统和基于用户的误用<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><p>优点</p>
+<ul>
+<li>准确率高</li>
+<li>算法简单</li>
+<li>关键问题</li>
+</ul>
+</li>
+<li><p>缺点</p>
+<ul>
+<li>要识别所有的攻击特征，就要建立完备的特征库</li>
+<li>特征库要不断更新</li>
+<li>无法检测新的入侵</li>
+</ul>
+</li>
+</ul>
+<h3 id="1-8-2-异常检测技术"><a href="#1-8-2-异常检测技术" class="headerlink" title="1.8.2 异常检测技术"></a>1.8.2 异常检测技术</h3><ul>
+<li>工作原理</li>
+</ul>
+<p>假定，所有入侵行为都是与正常行为不同的 。 如果建立目标系统( 受监控系统) 及其用户的正常活动轮廓 , 那么理论上可以把所有与正常活动轮廓不同的系统状态视为可疑企图 。 对异常阀值与特征的选择是异常入侵检测技术的关键 。异常入侵检测主要有概率统计方法 、 预测模式生成和神经网</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs C">设定“正常”的行为模式<br>假设所有的入侵行为是异常的<br>基于系统和基于用户的异常<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><p>优点</p>
+<ul>
+<li>可检测未知攻击</li>
+<li>自适应、自学习能力</li>
+</ul>
+</li>
+<li><p>缺点</p>
+<ul>
+<li>需要去对“正常”行为特征进行分析</li>
+<li>需要去对统计算法、统计点的选择</li>
+</ul>
+</li>
+</ul>
+<h2 id="1-9-入侵检测系统的局限性"><a href="#1-9-入侵检测系统的局限性" class="headerlink" title="1.9 入侵检测系统的局限性"></a>1.9 入侵检测系统的局限性</h2><ul>
+<li>对用户知识要求较高，配置、操作和管理使用较为复杂</li>
+<li>网络发展迅速，对入侵检测系统的处理性能要求越来越高，现有技术难以满足实际需要<br>高虚警率，用户处理的负担重</li>
+<li>由于警告信息记录的不完整，许多警告信息可能无法与入侵行为相关联，难以得到有用的结果</li>
+<li>在应对对自身的攻击时，对其他数据的检测也可能会被抑制或受到影响</li>
+</ul>
+<h2 id="1-10-总结"><a href="#1-10-总结" class="headerlink" title="1.10 总结"></a>1.10 总结</h2><p>通过上述的了解，IDS是根据入侵者在进行入侵时所执行程序的某些行为为特征，建立了一种入侵行为模型。根据，这种行为模型所代表的入侵意图的行为特征，来判断用户执行的操作是否是属于入侵行为。然而，要建立一个这样的特征信息(又称攻击签名)库的前提是必须建立一个有效、可扩展的特征描述方法 , 能够描述所有的入侵事件</p>
+<h2 id="1-11-libpcap"><a href="#1-11-libpcap" class="headerlink" title="1.11 libpcap"></a>1.11 libpcap</h2><p>libpcap（Packet Capture Library）即数据包捕获函数库，是Unix&#x2F;Linux平台下的网络数据包捕获函数库。它是一个独立于系统的用户层包捕获的API接口，为底层网络监测提供了一个可移植的框架。著名的软件TCPDUMP就是在libpcap的的基础上开发而成的</p>
+<p><strong>libpcap可实现以下功能</strong>：</p>
+<ul>
+<li>数据包捕获：捕获流经网卡的原始数据包</li>
+<li>自定义数据包发送：任何构造格式的原始数据包</li>
+<li>流量采集与统计：网络采集的中流量信息</li>
+<li>规则过滤：提供自带规则过滤功能，按需要选择过滤规则</li>
+</ul>
+<p>在linux下面使用libpcap收发包，如果只做发包，那么速度是很快，如果代码做多线程，一个收包，一个发包，一旦发包比较多，就会开始丢失，而且速度相当的慢</p>
+<h3 id="1-11-1-BM算法"><a href="#1-11-1-BM算法" class="headerlink" title="1.11.1 BM算法"></a>1.11.1 BM算法</h3><p>BM匹配算法是Boyer和Moore两人在KMP算法的启发下，提出的一种字符串快速匹配算法。它采用自右向左的方式扫描模式(P表示)与正文（T表示），一旦发现正文中出现模式中没有的字符时就可以将模式、正文进行一个大幅度的偏移。模式与正文在匹配比较的过程中，将<code>P与T 左对齐，即P[1]与T[1]对齐</code>。<code>匹配从P 的 最右端字符开始，判断P[strlen(P)](strlen(p)为模式长度)与T[strlen(P)]</code>是否匹配，如果匹配成功，则继续判断<code>P[strlen(P)-1]与T[strlen (P)-1]</code>是否匹配，如此反复比较，直到P中的所有字符全部匹配成功或是有不匹配的字符出现。其移动遵循以下规律：</p>
+<ul>
+<li>a．坏字符移动，当发生不匹配时，移动模式串使得不匹配的正文字符与该字符在模式串中的最右出现对齐。如果字符没有在模式中出现，移动距离为字符到模式首位的长度；如果字符在模式中出现，移动模式中字符出现位置到正文字符处</li>
+<li>b．好后缀移动，当匹配过程中发生不匹配时，如果已匹配子串长度不为0，且匹配子串在模式串中有相同的其他子串，移动模式串使得已匹配部分与该部分在模式串中的最右端出现对齐</li>
+</ul>
+<p>BM算法先对模式P进行预处理，计算两个偏移函数:Bad_Char(针对某个字符)和Good_Suffix(针对某个子串)，然后将文本和模式对齐，从右往左进行匹配，当文本字符与模式字符失配时，根据函数BadChar和Good_Suffix计算出的偏移值，取两者中的大者，将文本指针往右移，匹配成功则予以输出</p>
+<ul>
+<li>例如：设正文为“otootowtmwotwom”要在其中搜索“ttowtow”<ul>
+<li>正文Text：otootowtmwotwom</li>
+<li>模式Pattern：ttowtow  初始状态</li>
+<li>模式Pattern：ttowtow  根据坏字符移动一个字符</li>
+<li>模式Pattern：ttowtow  根据好后缀移动3个字符</li>
+</ul>
+</li>
+</ul>
+<h3 id="1-11-2-AC算法"><a href="#1-11-2-AC算法" class="headerlink" title="1.11.2 AC算法"></a>1.11.2 AC算法</h3><p>AC算法是基于FSA（有限状态自动机）的，在进行匹配之前先对模式串集合P进行预处理，形成树型FSA－AC状态机(AC state machine)，然后只需对文本串T扫描一次就可以找出与其匹配的所有模式串。有限自动机的基本思想是根据输入和当前的状态决定下一个状态和输出，接着再进入下一次输入。有限自动机的构造过程是将模式串集合变换成由转向函数，失效函数和输出函数组成的树型有限自动机。模式匹配的处理过程就变成了状态转换的处理过程</p>
+<p>有限自动机的构造中，每个模式串的字符是从前到后依次加到树型的有限自动机中的，在匹配时，目标串的输入，即匹配过程，也是按照从前到后的次序。预处理生成3个函数：goto（转移）函数，failure（失效）函数和output（输出）函数</p>
+<p>设<code>U=&#123;0，1，2…&#125;</code>为状态集合，转移函数<code>g：(U,Sp)→U</code>为一映射，其建立过程为：逐个取出Sp中模式串的每个字符，从状态0出发，由当前状态和新取出的字符决定下一状态。如果有从当前状态出发并标注该字符的矢线，则将矢线所指的状态赋为当前状态，否则，添加一个标号比已有状态标号大1的新状态，并用一条矢线从当前状态指向新加入的状态，并将新加入的状态赋为当前状态。Sp中的所有模式串处理完后，再画一条从0状态到0状态的自返线，标注的字符为不能从0开始的字符集。例如，Sp&#x3D;{he,she,his,hers}的goto函数，如下图</p>
+<ul>
+<li>goto函数表</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/2c6e1b2545f64d07be7b6fd6a49f2ac2.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_18,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>失效函数f用来指明当某个模式与文本匹配不成功时，应处理的下一状态。f的构造方法为：所有第一层状态的失效函数为0，如<code>f(1)=f(3)=0；</code>对于非第一层状态s，若其父状态为r（即存在字符a,使g(r,a)&#x3D;s），则<code>f(s)=g(f(s*),a)</code>，其中状态<code>s*为追溯s</code>的祖先状态得到的第一个使g<code>(f(s*),a)</code>存在的状态。如<code>f(4)=g(f(3),h)=g(0,h)=1，f(5)=g(f(4),e)=g(1,e)=2</code>。失效函数把一个状态匹配到另一个状态。f的值，如下表</p>
+<table>
+<thead>
+<tr>
+<th>i</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+<th>6</th>
+<th>7</th>
+<th>8</th>
+<th>9</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>f(i)</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>2</td>
+<td>0</td>
+<td>3</td>
+<td>0</td>
+<td>3</td>
+</tr>
+</tbody></table>
+<p>输出函数output的作用是在匹配过程中输出已经匹配的模式串。output的构造分两步，第一步是在构造转移函数g时，每处理完一个模式串，则将该模式串加入到当前状态s的输出函数中，如<code>output(2)=&#123;he&#125;,output(5)=&#123;she&#125;</code>。第二步是构造失效函数f时，若<code>f(s)=s’</code>,则<code>output(s)=output(s)∪output(s’)</code>, 如<code>output(5)=output(5)∪output(2)=&#123;she,he&#125;</code>。goto函数图中黑粗圈的状态表示有输出，output的值如下：其他状态的输出为空</p>
+<ul>
+<li>Output函数表</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>i</th>
+<th>output(i)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>2</td>
+<td>{he}</td>
+</tr>
+<tr>
+<td>5</td>
+<td>{she,he}</td>
+</tr>
+<tr>
+<td>7</td>
+<td>{his}</td>
+</tr>
+<tr>
+<td>9</td>
+<td>{hers}</td>
+</tr>
+</tbody></table>
+<p>对于上面的模式串集合<code>Sp=&#123;he,she,his,hers&#125;</code>，假设文本T为ushers。当状态机M在状态4的时候并且当前的输入是e，因为<code>g(4,e)＝5</code>，自动机进入状态5，表明已经在输入文本字符串的第四个字符末尾处发现关键字“she”和“he”。在状态5，当输入字符是r时，自动机完成两个状态转换。因为<code>g(5,r)＝fail</code>，所以M的输入状态为2＝f(5)。由于g(2,r)＝8。M把8作为输入状态继续下一个输入字符。在这个状态转换循环，没有输出状态，具体匹配过程如下：</p>
+<table>
+<thead>
+<tr>
+<th>目标串中的位置</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+<th>6</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>输入字符</td>
+<td>u</td>
+<td>s</td>
+<td>h</td>
+<td>e</td>
+<td>r</td>
+<td>s</td>
+</tr>
+<tr>
+<td>输入后的状态</td>
+<td>0</td>
+<td>3</td>
+<td>4</td>
+<td>5(2)</td>
+<td>8</td>
+<td>9</td>
+</tr>
+<tr>
+<td>输出</td>
+<td>{}</td>
+<td>{}</td>
+<td>{}</td>
+<td>{she,he}</td>
+<td>{}</td>
+<td>{hers}</td>
+</tr>
+</tbody></table>
+<h1 id="0x02-开源IDS规则集"><a href="#0x02-开源IDS规则集" class="headerlink" title="0x02 开源IDS规则集"></a>0x02 开源IDS规则集</h1><ul>
+<li>ET：<a target="_blank" rel="noopener" href="https://rules.emergingthreats.net/open/suricata/rules">https://rules.emergingthreats.net/open/suricata/rules</a></li>
+<li>PT：<a target="_blank" rel="noopener" href="https://github.com/ptresearch/AttackDetection">https://github.com/ptresearch/AttackDetection</a></li>
+<li>sslbl：<a target="_blank" rel="noopener" href="https://sslbl.abuse.ch/blacklist">https://sslbl.abuse.ch/blacklist</a></li>
+<li>open suricata-rules：<a target="_blank" rel="noopener" href="https://github.com/suricata-rules/suricata-rules">https://github.com/suricata-rules/suricata-rules</a></li>
+<li>suricata-update list-sources</li>
+<li>Snort VRT Rules：<a target="_blank" rel="noopener" href="http://www.snort.org/vrt">http://www.snort.org/vrt</a></li>
+</ul>
+<h1 id="0x03-Snor3介绍"><a href="#0x03-Snor3介绍" class="headerlink" title="0x03 Snor3介绍"></a>0x03 Snor3介绍</h1><p>Snort是一个轻量级的网络入侵检测系统。具有实时数据流量分析日志IP网络数据包捕获的能力，能够进行协议分析，对内容进行搜索&#x2F;匹配。通过编写规则文件，能够检测各种不同的攻击方式，对攻击进行实时告警。</p>
+<p>snort的工作原理是解析规则集形成规则树，然后利用lihpcap对采集来的数据进行模式匹配，若匹配成功，则认为是有入侵行为发生，进入报警理模块</p>
+<p>而Snort 3是下一代Snort IPS(入侵防御系统)</p>
+<h2 id="3-1-IPS简介"><a href="#3-1-IPS简介" class="headerlink" title="3.1 IPS简介"></a>3.1 IPS简介</h2><p>入侵指的是破坏目标系统资源的完整性、机密性或可用性的一系列活动，IDS所检测的入侵不包括物理入侵，而仅包括以电子方式从系统内部或者外部发起的，尝试或者实施对系统资源的非授权访问、操纵或破坏的行为。</p>
+<p>基于一个假设，即入侵者的行为与正常用户的行为不同，而且这种不同会通过某种可观察的方式表现出来，这种不同寻常的表现，就形成了“入侵迹象”，“入侵迹象” 被以攻击规则的形式存储在规则库中。IDS自动收集并分析审计数据，一旦发现入侵迹象，则采取适当措施(如报警、断开相应连接等)，保护系统不被攻击</p>
+<h2 id="3-2-Snort目录结构"><a href="#3-2-Snort目录结构" class="headerlink" title="3.2 Snort目录结构"></a>3.2 Snort目录结构</h2><p>建议将Snort的目录结构配置成如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs c">/etc/snort<br> ├── barnyard2.conf      barnyard2日志分析工具配置文件<br> ├── snort.conf          snort配置文件（关键）<br> ├── threshold.conf      事件过滤配置文件<br> ├── classification.config 规则分类配置文件(classtype)<br> ├── reference.config      外部参考配置文件(reference)<br> ├── gen-msg.<span class="hljs-built_in">map</span>      generate id 和 msg 对应关系<span class="hljs-built_in">map</span><br> ├── sid-msg.<span class="hljs-built_in">map</span>      snort id 和 msg对应关系<span class="hljs-built_in">map</span><br> ├── unicode.<span class="hljs-built_in">map</span>      预处理器http_inspect编码翻译文件<br> ├── preproc_rules       预处理器及解码器规则集<br> │ ├── decoder.rules  <br> │ ├── preprocessor.rules<br> │ └── sensitive-data.rules<br> ├── rules               Snort规则集（关键）<br> │  ├── web-iis.rules <br> │  ├── web-php.rules<br> More…<br> ├── so_rules            Share Object规则集<br> │  ├── browser-ie.rules<br> │  ├── browser-other.rules    <br> More…<br></code></pre></td></tr></table></figure>
+
+<h1 id="0x04-Snort三种运行模式"><a href="#0x04-Snort三种运行模式" class="headerlink" title="0x04 Snort三种运行模式"></a>0x04 Snort三种运行模式</h1><ul>
+<li>嗅探器模式：从网络中读取数据包并在控制台（屏幕）上以连续流的形式为您显示它们。</li>
+<li>数据包记录器模式：将数据包记录到磁盘</li>
+<li>网络入侵检测系统（NIDS）模式，它对网络流量进行检测和分析。这是最复杂和可配置的模式</li>
+</ul>
+<p>Snort的命令行参数很多，可以使用 Snort-？命令列出这些参数及其简单的解释，详细的解释可以使用 man Snort命令查看帮助页</p>
+<ul>
+<li>运行Snort命令的参数</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>-A</td>
+<td>设置报警模式：fast、full、none（只是使用报警文件）、undock（使用UNIX套接字记入日志，出于测试阶段）</td>
+</tr>
+<tr>
+<td>-a</td>
+<td>显示ARP（Address resolution protocol，地址解析协议）包</td>
+</tr>
+<tr>
+<td>-b</td>
+<td>日志文件使用tcpdump格式（更快）</td>
+</tr>
+<tr>
+<td>-c</td>
+<td>使用规则文件 rules</td>
+</tr>
+<tr>
+<td>-C</td>
+<td>只使用字符方式打印负载信息（不使用hex方式）</td>
+</tr>
+<tr>
+<td>-d</td>
+<td>复制应用层</td>
+</tr>
+<tr>
+<td>-D</td>
+<td>在后台运行 Snort（精灵状态）</td>
+</tr>
+<tr>
+<td>-e</td>
+<td>显示第二层（数据链路层）包头信息</td>
+</tr>
+<tr>
+<td>-F</td>
+<td>Read BPF filters from file</td>
+</tr>
+<tr>
+<td>-g</td>
+<td>初始化完成后，使 Snort的gid为 gname</td>
+</tr>
+<tr>
+<td>-h</td>
+<td>Home网络为h</td>
+</tr>
+<tr>
+<td>-i</td>
+<td>在接口if监听</td>
+</tr>
+<tr>
+<td>-I</td>
+<td>把界面名加入到报警输出界面</td>
+</tr>
+<tr>
+<td>-I</td>
+<td>设置目录ld为日志目录</td>
+</tr>
+<tr>
+<td>-M</td>
+<td>把SMB消息发送到文件 wrkst列出的工作站中（Requires smbclient to be in PATH）</td>
+</tr>
+<tr>
+<td>-n</td>
+<td>收到cnt个包后退出</td>
+</tr>
+<tr>
+<td>-N</td>
+<td>关闭日志功能（警报功能仍然有效）</td>
+</tr>
+<tr>
+<td>-o</td>
+<td>把规则测试顺序修改为：Pass|Alert|Log</td>
+</tr>
+<tr>
+<td>-O</td>
+<td>打乱被日志的IP地址</td>
+</tr>
+<tr>
+<td>-p</td>
+<td>关闭混杂嗅探模式</td>
+</tr>
+<tr>
+<td>-P</td>
+<td>设置复制的包的长度为 snaplen（默认：1514）</td>
+</tr>
+<tr>
+<td>-q</td>
+<td>安静模式。不输出 banner和状态报告</td>
+</tr>
+<tr>
+<td>-r</td>
+<td>读取并处理 tcpdump文件tf（回放功能）</td>
+</tr>
+<tr>
+<td>-s</td>
+<td>把所有警告信息记入 syslog</td>
+</tr>
+<tr>
+<td>-S</td>
+<td>设置规则文件中的n的值等于v的值</td>
+</tr>
+<tr>
+<td>-t</td>
+<td>初始化完成后 Chroot到dir目录</td>
+</tr>
+<tr>
+<td>-u</td>
+<td>初始化完成后，把 Snort的uid设置为 uname</td>
+</tr>
+<tr>
+<td>-v</td>
+<td>设置冗余模式</td>
+</tr>
+<tr>
+<td>-V</td>
+<td>显示版本号</td>
+</tr>
+<tr>
+<td>-X</td>
+<td>从链路层开始复制包的数据</td>
+</tr>
+<tr>
+<td>-？</td>
+<td>显示帮助信息</td>
+</tr>
+</tbody></table>
+</blockquote>
+
+
+<h2 id="4-1-嗅探器模式"><a href="#4-1-嗅探器模式" class="headerlink" title="4.1 嗅探器模式"></a>4.1 嗅探器模式</h2><ul>
+<li>将 TCP &#x2F; IP 数据包标题打印到屏幕上（即嗅探器模式），该命令将运行 Snort，仅显示 IP 和 TCP &#x2F; UDP &#x2F; ICMP 标头</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">./snort -v<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>查看传输中的应用程序数据，指示 Snort 显示数据包数据以及标头</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">./snort -vd<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>显示更具描述性的显示，以显示数据链接层标题</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">./snort -vde<br></code></pre></td></tr></table></figure>
+
+<p><strong>PS</strong>：上面提及的命令可以单独分开使用，跟以往同学们学到的命令行命令需要执行的多组合的参数一起使用是一样的道理，例如：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">./snort -d -v -e<br></code></pre></td></tr></table></figure>
+
+<h2 id="4-2-数据包记录器-Packet-Logger-模式"><a href="#4-2-数据包记录器-Packet-Logger-模式" class="headerlink" title="4.2 数据包记录器(Packet Logger)模式"></a>4.2 数据包记录器(Packet Logger)模式</h2><ul>
+<li>将数据包记录到磁盘，则需要指定一个日志目录，Snort 会默认进入数据包记录器模式</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">./snort -dev -l ./<span class="hljs-built_in">log</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>PS</strong>：运行上述命令报错的话，查看报错信息，可能提示的信息是没有在当前目录中有一个 log 目录，只需在当前目录创建log目录即可。此时运行成功后，Snort会收集它能发现的每个数据包，并根据数据报中主机之一的 IP 地址将其放置在目录层次结构中。</p>
+<p>如果仅指定普通的 -l 开关，则可能会注意到 Snort 有时会</p>
+<ul>
+<li>监听本地主机地址，并将IP地址放置到数据包的目录</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">./snort -dev -l ./<span class="hljs-built_in">log</span> -h <span class="hljs-number">192.168</span><span class="hljs-number">.6</span><span class="hljs-number">.0</span>/<span class="hljs-number">24</span> <br></code></pre></td></tr></table></figure>
+
+<p><strong>PS</strong>：将数据链接和 TCP &#x2F; IP 标头以及应用程序数据打印到.&#x2F;log 目录中，并且要记录相对于 192.168.6.0 的C类网络的数据包;如果源主机和目标主机都在本地网络上，它们将被登录到一个目录，该目录的名称基于两个端口号中的较高者，或者如果是平局，则基于源地址</p>
+<ul>
+<li>使用高速网络或者希望将数据包记录为更紧凑的形式以供以后分析，则应考虑以二进制模式记录</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">./snort -l ./<span class="hljs-built_in">log</span> -b <br></code></pre></td></tr></table></figure>
+
+<p><strong>PS</strong>：上面的命令，执行二进制模式以 tcpdump 格式将数据包记录到日志目录中的单个二进制文件中，此处不再指定网络地址，因为二进制模式将所有内容记录到单个文件中，从而不需指定格式化输出的目录结构；在详细模式下不需要运行或指定 -d 或 -e 开关，因为在二进制模式下，整个数据包都被记录下来，而不仅仅是部分内容。要使 Snort 进入记录器模式，需要做的就是使用 -l 开关在命令行中指定一个记录目录，-b 二进制记录开关仅提供一个修饰符，告诉 Snort 将数据包记录在除 ASCII 纯文本的默认输出格式;Snort 可使用 - r 开关将数据包读回，从而将其置于播放模式</p>
+<ul>
+<li>通过嗅探器模式下的 Snort 运行二进制日志文件以将数据包转储到屏幕</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">./snort -dv -r packet.<span class="hljs-built_in">log</span> <br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>命令行中指定一个 BPF 过滤器，查看日志文件中的 ICMP 数据包</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">./snort -dvr packet.<span class="hljs-built_in">log</span> icmp <br></code></pre></td></tr></table></figure>
+
+<h2 id="4-3-网络入侵检测系统-NIDS-模式"><a href="#4-3-网络入侵检测系统-NIDS-模式" class="headerlink" title="4.3 网络入侵检测系统(NIDS)模式"></a>4.3 网络入侵检测系统(NIDS)模式</h2><ul>
+<li>启用网络入侵检测系统（NIDS）模式，以便不记录网络上发送的每个单个数据包</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">./snort -dev -l ./<span class="hljs-built_in">log</span> -h <span class="hljs-number">192.168</span><span class="hljs-number">.6</span><span class="hljs-number">.0</span>/<span class="hljs-number">24</span> -c snort.conf<br></code></pre></td></tr></table></figure>
+
+<p><strong>PS</strong>：上述中snort.conf 是snort 配置文件的名，snort.conf 文件中配置的规则应用于每个数据包，以决定是否应基于文件中的规则类型采取措施。如果没有为程序指定输出目录，则默认为 &#x2F;var&#x2F;log&#x2F;snort</p>
+<p>关于最后一个命令行要注意的一件事是，如果长期使用 Snort 作为 IDS，则为了提高速度，应该将 -v 开关置于命令行之外。屏幕是写入数据的缓慢地方，在写入显示器时可以丢弃数据包。</p>
+<p>对于大多数应用程序，也不必记录数据链接头，因此通常也可以省略 -e 开关，例如：</p>
+<ul>
+<li>将 snort 配置为以其最基本的 NIDS 形式运行，使用分层目录结构（就像数据包记录器模式一样），将触发 snort.conf 中指定规则的数据包以纯 ASCII 格式记录到磁盘</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">./snort -d -h <span class="hljs-number">192.168</span><span class="hljs-number">.6</span><span class="hljs-number">.0</span>/<span class="hljs-number">24</span> -l ./<span class="hljs-built_in">log</span> -c snort.conf <br></code></pre></td></tr></table></figure>
+
+<h3 id="4-3-1-NIDS-模式输出选项"><a href="#4-3-1-NIDS-模式输出选项" class="headerlink" title="4.3.1 NIDS 模式输出选项"></a>4.3.1 NIDS 模式输出选项</h3><p>多种方法可在 NIDS 模式下配置 Snort 的输出。默认的日志记录和警报机制是以解码的 ASCII 格式登录并使用完整警报。完整警报机制除了完整的数据包标头外，还会打印出警报消息。在命令行上还有其他几种警报输出模式，以及两种日志记录功能。</p>
+<p>警报模式稍微复杂一些。命令行提供了七个警报模式：完全，快速，套接字，系统日志，控制台，cmg 和 none。使用 - A 命令行开关可以访问其中的六个模式，如下表：</p>
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>-A fast</td>
+<td>快速警报模式。以简单的格式写入警报，其中包含时间戳，警报消息，源 IP 地址和目标 IP &#x2F; 端口</td>
+</tr>
+<tr>
+<td>-A full</td>
+<td>完全警报模式。这是默认的警报模式，如果您未指定模式，它将自动使用</td>
+</tr>
+<tr>
+<td>-A unsock</td>
+<td>将警报发送到另一个程序可以监听的 UNIX 套接字</td>
+</tr>
+<tr>
+<td>-A none</td>
+<td>关闭警报</td>
+</tr>
+<tr>
+<td>-A console</td>
+<td>将 “快速样式” 警报发送到控制台（屏幕）</td>
+</tr>
+<tr>
+<td>-A cmg</td>
+<td>生成 “cmg 样式” 警报</td>
+</tr>
+</tbody></table>
+<p>数据包可通过 -b 命令行开关记录为默认的 ASCII 解码格式或二进制日志文件。要完全禁用数据包日志记录，使用 -N 命令行开关</p>
+<p><strong>PS</strong>：命令行日志记录选项将覆盖配置文件中指定的所有输出选项，即可通过命令行快速调试配置问题</p>
+<p>将警报发送到 syslog 使用 - s 开关。syslog 警报机制的默认功能是 LOG_AUTHPRIV 和 LOG_ALERT。如果要为系统日志输出配置其他功能，要在snort.conf 中使用输出插件指令，例如：</p>
+<ul>
+<li>登录到默认（解码的 ASCII）功能并将警报发送到 syslog</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">./snort -c snort.conf -l ./<span class="hljs-built_in">log</span> -h <span class="hljs-number">192.168</span><span class="hljs-number">.6</span><span class="hljs-number">.0</span>/<span class="hljs-number">24</span> -s <br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>登录到 &#x2F;var&#x2F;log &#x2F;snort 中的默认工具，并将警报发送到快速警报文件</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">./snort -c snort.conf -A fast-h <span class="hljs-number">192.168</span><span class="hljs-number">.6</span><span class="hljs-number">.0</span>/<span class="hljs-number">24</span> <br></code></pre></td></tr></table></figure>
+
+<h3 id="4-3-2-了解标准警报输出"><a href="#4-3-2-了解标准警报输出" class="headerlink" title="4.3.2 了解标准警报输出"></a>4.3.2 了解标准警报输出</h3><p>Snort 生成警报消息时，通常如下所示：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">[**] [<span class="hljs-number">116</span>:<span class="hljs-number">56</span>:<span class="hljs-number">1</span>] (snort_decoder): T/TCP Detected [**]<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>第一个数字是生成器 ID，它告诉用户 Snort 的哪个组件生成了此警报。在这种情况下，我们知道此事件来自 Snort 的 “解码”（116）组件</li>
+<li>第二个数字是 Snort ID（有时称为签名 ID）。使用 sid 选项将基于规则的 SID 直接写入规则。在这种情况下， 56 表示 T &#x2F; TCP 事件</li>
+<li>第三个数字是修订 ID。此数字主要在编写签名时使用，因为规则的每个表示形式都应使用 rev 选项将该数字递增</li>
+</ul>
+<h3 id="4-3-3-高性能配置"><a href="#4-3-3-高性能配置" class="headerlink" title="4.3.3 高性能配置"></a>4.3.3 高性能配置</h3><p>Snort 的模式为 fast（如与 1000 Mbps 连接跟上），需使用 unified2 记录和 unified2 日志读者，比如 barnyard2。这样可以让Snort尽快以二进制形式记录警报，而另一个程序执行缓慢的操作，例如写入数据库。</p>
+<p>如果文本文件易于解析，但是仍然有些快速，使用具有 “快速” 输出机制的二进制日志记录，这将以 tcpdump 格式记录数据包，并产生最少的警报。例如：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">./snort -b -A快速-c snort.conf <br></code></pre></td></tr></table></figure>
+
+<h3 id="4-3-4-更改警报顺序"><a href="#4-3-4-更改警报顺序" class="headerlink" title="4.3.4 更改警报顺序"></a>4.3.4 更改警报顺序</h3><p>Snort 将其规则应用于数据包的默认方式可能不适用于所有安装。首先应用 Pass 规则，然后应用 Drop 规则，然后应用 Alert 规则，最后应用 Log 规则</p>
+<p><strong>PS</strong>：有时，错误的通过规则可能会导致警报不显示，在这种情况下，可更改默认顺序，以允许在通过规则之前应用警报规则</p>
+<p>有几个命令行选项可用于更改执行规则操作的顺序</p>
+<ul>
+<li>-alert-before-pass 选项强制警报规则生效以支持通过规则</li>
+<li>-treat-drop-as-alert 导致丢弃和拒绝规则以及所有关联的警报记录为警报，而不是常规操作。这允许在被动 &#x2F; IDS 模式下使用内联策略。未加载 Sdrop 规则</li>
+<li>-process-all-events 选项使 Snort 处理与数据包关联的每个事件，同时根据规则排序采取措施。如果没有此选项（默认情况），则仅处理基于规则排序的第一个操作的事件</li>
+</ul>
+<p><strong>PS</strong>：传递规则在这里是特殊情况，因为遇到传递规则时事件处理会终止，而不管 -process-all-events 的使用</p>
+<h1 id="0x05-snort-conf配置文件"><a href="#0x05-snort-conf配置文件" class="headerlink" title="0x05 snort.conf配置文件"></a>0x05 snort.conf配置文件</h1><p>此文件是配置snort的核心文件，包括以下几部分：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-number">1</span>) Set the network variables.  设置各类网络地址，规则中易于使用<br><span class="hljs-number">2</span>) Configure the decoder      设置解码器<br><span class="hljs-number">3</span>) Configure the base detection engine  设置基础检测引擎<br><span class="hljs-number">4</span>) Configure dynamic loaded libraries   设置动态链接库<br><span class="hljs-number">5</span>) Configure preprocessors     设置预处理器<br><span class="hljs-number">6</span>) Configure output plugins    设置输出插件<br><span class="hljs-number">7</span>) Customize your rule <span class="hljs-built_in">set</span>     设置自定义规则<br><span class="hljs-number">8</span>) Customize preprocessor and decoder rule <span class="hljs-built_in">set</span>设置预处理、解码器规则<br><span class="hljs-number">9</span>) Customize shared object rule <span class="hljs-built_in">set</span> 设置共享对象规则集<br></code></pre></td></tr></table></figure>
+
+<h1 id="0x06-Snort-IDS体系结构"><a href="#0x06-Snort-IDS体系结构" class="headerlink" title="0x06 Snort IDS体系结构"></a>0x06 Snort IDS体系结构</h1><blockquote>
+数据包嗅探解码模块：
+
+<ul>
+<li>主要负责监听网络数据包，并根据TCP&#x2F;IP协议解析数据包</li>
+</ul>
+<p>预处理模块：</p>
+<ul>
+<li>包重组预处理器，它的作用是为了防止攻击信息被拆分到多个包中而逃避了Snort的检测</li>
+<li>协议编码预处理器，它的功能是把数据包协议解码成一个统一的格式，再传送给检测模块</li>
+<li>协议异常检测预处器</li>
+</ul>
+<p>检测引擎模块：</p>
+<ul>
+<li>当预处理器把数据包送过来后，检测引擎将这些数据包与三维链表形式的检测规则进行匹配，一旦发现数据包中的内容和某条规则相匹配，就通知报警模块</li>
+</ul>
+<p>报警&#x2F;日志模块检测引擎：</p>
+<ul>
+<li>将数据包传送给报警模块后，报警模块会根据规则定义（alert，log…）对其进行不同的处理（数据库，日志）</blockquote></li>
+</ul>
+<p>Snort的结构由4大软件模块组成，分别是：</p>
+<ul>
+<li>数据包嗅探模块——负责监听网络数据包，对网络进行分</li>
+<li>预处理模块——该模块用相应的插件来检查原始数据包，从中发现原始数据的“行为”，如端口扫描，IP碎片等，数据包经过预处理后才传到检测引擎</li>
+<li>检测模块——该模块是Snort的核心模块。当数据包从预处理器送过来后，检测引擎依据预先设置的规则检查数据包，一旦发现数据包中的内容和某条规则相匹配，就通知报警模块</li>
+<li>报警&#x2F;日志模块——经检测引擎检查后的Snort数据需要以某种方式输出。如果检测引擎中的某条规则被匹配，则会触发一条报警，这条报警信息会通过网络、UNIXsocket、WindowsPopup(SMB)、SNMP协议的trap命令传送给日志文件，甚至可以将报警传送给第三方插件（如SnortSam），另外报警信息也可以记入SQL数据库</li>
+</ul>
+<p>Snort将检测规则利用链表的形式进行组织，建立链表时，首先按规则类型分类，分成了五个单独的规则链</p>
+<p>然后，针对这五个规则链的每一个按协议类型分成相应的节点链表；在节点链表之下又分为若干规则树节点(Rule TreeNode RTN)；每个规则树节点下又有若干规则选项，称为选项树节点(Opfion~Tree Node OTN)。每一个RTN对应于规则头，其中包含协议类型、源和目的地址、源和目的端口号等；每一个OTN对应于规则选项结点，其中包含报警信息(msg)、匹配内容(content)，TCP标志位(flags)等选项</p>
+<p>当数据包到达检测引擎时，Snort将首先匹配规则链，然后根据数据包协议匹配相应的节点链表，于是从左至右遍历RTN，参看源、目的IP及端口号是否匹配，找到一个匹配后，算法向下进行，再进入OTN中寻找匹配，每个OTN结点包含一条规则所对应的全部选项，当数据包与所有函数都匹配成功时，即判断此数据包为攻击数据包，进入告警模块</p>
+<h1 id="0x07-解码模块与预处理模块"><a href="#0x07-解码模块与预处理模块" class="headerlink" title="0x07 解码模块与预处理模块"></a>0x07 解码模块与预处理模块</h1><h2 id="7-1-模块介绍"><a href="#7-1-模块介绍" class="headerlink" title="7.1 模块介绍"></a>7.1 模块介绍</h2><p>由于解码模块和预处理模块功能类似，都是在规则检测引擎之前对数据包的处理，所以两个模块一并介绍。</p>
+<p>解码模块主要是将从监控网络当中抓取的原始网络数据包，按照各个网络协议栈从下至上进行解码，并将解码数据保存到各个对应的数据结构当中，最后交由预处理模块进行处理。</p>
+<p>解码后的数据包经过预处理之后才能被主探测引擎进行规则匹配。预处理器的主要用来应对一些IDS攻击手段。其作用包括：</p>
+<ul>
+<li>针对可疑行为检查包或修改包，以便探测引擎能对其正确解释</li>
+<li>负责对流量标准化，以便探测引擎能精确匹配特征</li>
+</ul>
+<p>目前已知的IDS逃避技术主要有：</p>
+<ul>
+<li>多态URL编码</li>
+<li>多态shellcode</li>
+<li>会话分割</li>
+<li>IP碎片</li>
+</ul>
+<p>Snort主要包含以下三类预处理器（举例说明）：</p>
+<ul>
+<li>包重组预处理器：<ul>
+<li>frag3：IP分片重组和攻击监测</li>
+<li>stream：维持TCP流状态，进行会话重组</li>
+</ul>
+</li>
+</ul>
+<p>协议规范化预处理器：</p>
+<ul>
+<li>http_inspect：规范HTTP流</li>
+<li>rpcDecode：规范RPC调用</li>
+</ul>
+<p>异常检测预处理器：</p>
+<ul>
+<li>ARP spoof：检测ARP欺骗</li>
+<li>sfPortscan：检测端口扫描</li>
+</ul>
+<h2 id="7-2-模块配置"><a href="#7-2-模块配置" class="headerlink" title="7.2 模块配置"></a>7.2 模块配置</h2><p>配置分两个步骤，都是在snort.conf中配置:</p>
+<ul>
+<li>snort.conf 配置解码器或者预处理参数</li>
+<li>snort.conf 启用检测规则</li>
+</ul>
+<h3 id="7-2-1-解码器配置举例"><a href="#7-2-1-解码器配置举例" class="headerlink" title="7.2.1 解码器配置举例"></a>7.2.1 解码器配置举例</h3><ul>
+<li>配置解码器</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c">config disable_decode_alerts   	#关闭decode告警<br>config enable_decode_oversized_alerts<br><br>如果一个包（IP,UDP,TCP）长度长于length字段，则告警<br># Stop generic decode events<br></code></pre></td></tr></table></figure>
+<p><strong>PS</strong>：格式为 config docoder [option]，使用 # 作为注释</p>
+<ul>
+<li>启用解码器检测规则</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">include $PREPROC_RULE_PATH/decoder.rules<br></code></pre></td></tr></table></figure>
+<p><strong>PS</strong>：snort.conf 文件中使用 include 关键词包含配置文件和规则文件。</p>
+<ul>
+<li>在 decoder.rules 中我们找到了检测IP长度异常的规则。</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">alert ( msg:<span class="hljs-string">&quot;DECODE_IPV4_DGRAM_GT_IPHDR&quot;</span>; sid:<span class="hljs-number">6</span>; gid:<span class="hljs-number">116</span>; rev:<span class="hljs-number">1</span>; metadata:rule-type decode;classtype:protocol-command-decode; )<br></code></pre></td></tr></table></figure>
+
+<h3 id="7-2-2-预处理器-http-insepect-配置举例"><a href="#7-2-2-预处理器-http-insepect-配置举例" class="headerlink" title="7.2.2 预处理器 http_insepect 配置举例"></a>7.2.2 预处理器 http_insepect 配置举例</h3><p>下面是 http_inspect 默认的配置</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#unicode.map是http_inspect解码unicode时的解码文件。</span><br>preprocessor http_inspect: global iis_unicode_map unicode.<span class="hljs-built_in">map</span> <span class="hljs-number">1252</span> compress_depth <span class="hljs-number">65535</span> decompress_depth <span class="hljs-number">65535</span><br><br>preprocessor http_inspect_server: server <span class="hljs-keyword">default</span> \<br>http_methods &#123; GET POST PUT SEARCH MKCOL ...&#125; \<br>    ...  <br>    enable_cookie        	#将http请求或响应中的cookie提取到缓存，用于后面规则匹配。<br>    normalize javascript 	#对标签中的js脚本解码。<br>    ...<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>启用预处理器规则</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> $PREPROC_RULE_PATH/preprocessor.rules</span><br></code></pre></td></tr></table></figure>
+<p>下面是一条解码器规则：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">alert ( msg:<span class="hljs-string">&quot;DECODE_TCP_INVALID_OFFSET&quot;</span>; sid:<span class="hljs-number">46</span>; gid:<span class="hljs-number">116</span>; rev:<span class="hljs-number">1</span>; metadata:rule-type decode; reference:cve,<span class="hljs-number">2004</span><span class="hljs-number">-0816</span>; classtype:bad-unknown; )<br></code></pre></td></tr></table></figure>
+
+<p>发现这条规则和之前看到的不一样，它没有源&#x2F;目的IP，端口等信息，说明这条规则是由解码器自动触发的，用户不需要干预。 一般我们也不需要去修改解码器或者预处理器的规则，只需要去 snort.conf 中添加、配置或者删除插件即可</p>
+<ul>
+<li>预处理程序</li>
+</ul>
+<p>预处理程序使得 Snort的功能可以很容易地扩展，用户和程序员能够将模块化的插件方便地融入Snort之中。预处理程序代码在探测引擎被调用之前运行，但在数据包译码之后。通过这个机制，数据包可以通过额外的方法被修改或分析。使用 preprocessor关键字加载和配置预处理程序。</p>
+<p>在 Snort规则文件中的 preprocessor指令格式如下:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">preprocessor：<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>例如：<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">preprocessor minfrag：<span class="hljs-number">128</span><br></code></pre></td></tr></table></figure></li>
+</ul>
+<h1 id="0x08-Snort规则编写介绍"><a href="#0x08-Snort规则编写介绍" class="headerlink" title="0x08 Snort规则编写介绍"></a>0x08 Snort规则编写介绍</h1><p>在设计检测方案时，既要考虑快速地结束一个无效的检测过程，也应该尽量减少检测的范围。如何从众多的参数中选出最适合的、最容易达到匹配目的的参数先进行匹配？以TCP报文来说，独特的属性就是源端口和目的端口。</p>
+<p>端口可以分为两种，保留端口和非保留端口。对于一般的连接来说，通常在服务器端采用保留端口，在客户端采用非保留端口，所以可以利用保留端口作为独特的参数。Snort可以观察保留端口的位置，如果保留端口在源端口，通常情况下就意味着这是从服务器端发出的网络流量，反之，如果在目的端口，就是从客户端发出的流量。比如当Snort观察到一个HTTP请求报文，先检查它的源端日和目的端口，看是否能找到一个参数来组成独特的集合。</p>
+<p>一般来说，HTTP请求报文的源端口是超过1024的非保留端口，而它的目的端口是80或者其他已知的HTTP服务端口，此时就可以从特征库中选出目的端口是80，源端口任意的特征组成一个集合，再进行接下来的匹配工作。</p>
+<p>多数TCP规则定义的特点是以端口为特征、以标志位或者协议的字段为特征、以某个数据段为字符串特征。在定义规则时，抓住这些特征或特征的组合，可以有效提高IDS的工作效率</p>
+<ul>
+<li>Snort通过两种机制来满足网络流量的需要将网卡设置为混杂模式利用libpcap 从网卡捕获网络数据包</li>
+</ul>
+<p>网卡的默认工作方式，是忽略所有不是自己的MAC地址为目的地址的流量，通过将网卡设置成混杂模式，可以监听网络中的所有流量数据包，捕获函数库是一个独立的软件工具数据包捕获库函数，能直接从网卡获取数据包</p>
+<p>Snort就是通过调用该库函数从网络设备上捕获数据包它工作在OSI模型的数据链路层在不同的平台上，使用Snort系统需要安装不同版本的Libpcap，比如在Linux和Unix系统下，需要安装Libpcap，而在Windows系列系统下，就需要安装Winpcap</p>
+<p>网络协议变量就是把网络协议中的各个数据域分解为一个个标准变量，Snort规则中定义的网络协议变量较少，仅是攻击特征中常用的网络协议数据域</p>
+<h2 id="8-1-Snort规则"><a href="#8-1-Snort规则" class="headerlink" title="8.1 Snort规则"></a>8.1 Snort规则</h2><p>Snort使用一种简单的规则描述语言，这种描述语言易于扩展，功能也比较强大。Snort规则是基于文本的，规则文件按照不同的组进行分类，比如，文件ftp.rules包含了FTP攻击内容。「注」Snort的每条规则必须在一行中，它的规则解释器无法对跨行的规则进行解析。Snort的每条规则都可以分成逻辑上的两个部分：规则头和规则体。</p>
+<p><strong>规则头包括</strong>：规则行为(rule’s action)、协议(protocol)、源&#x2F;目的IP地址、子网掩码以及源&#x2F;目的端口。规则选项包含报警信息和异常包的信息(特征码,signature)，使用这些特征码来决定是否采取规则规定的行动。</p>
+<h2 id="8-2-Libpcap的命令行"><a href="#8-2-Libpcap的命令行" class="headerlink" title="8.2 Libpcap的命令行"></a>8.2 Libpcap的命令行</h2><p>Snort和大多数基于 Libpcap的应用程序（如 Tcpdump）一样可以使用标准BPF类型的过滤器。过滤器的正确设置将决定 Snort是否只看到所感兴趣的数据包，如果没有设置过滤器，Snort将看到所有网络中的数据包。</p>
+<p>整个过滤器的表达式由一个或多个元语组成，而一个元语则是由一个或多个关键字加上一个相关的值（字符串或数字）所组成。</p>
+<ul>
+<li><p>关键字分为以下几类</p>
+<ul>
+<li>属性类关键字：说明后面所跟值的意义，这样的关键字有host、net、port。如果一个元语没有属性关键字，默认为host</li>
+<li>方向类关键字：说明报文的流向，这样的关键字有src，dst，src or dst，src and dst。对于空连接层（如：使用slip等的点到点协议），可以使用 inbound和 outbound来说明方向</li>
+<li>协议类关键字：用来限制协议，这样的关键字有 ether，fddi，ip，arp，rarp，decnet，lat，sca，moprc，mopdl，tcp，udp。如果一个元语没有协议类关键字，那么所有可能的协议都将符合</li>
+</ul>
+</li>
+<li><p>过滤器的描述功能非常强大，可以用来描述任何想要得到的报文，例如：</p>
+</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">net <span class="hljs-number">192.168</span><span class="hljs-number">.1</span> and not host <span class="hljs-number">192.168</span><span class="hljs-number">.1</span><span class="hljs-number">.1</span><br></code></pre></td></tr></table></figure>
+
+<p>说明除了主机192.168.1.1外其他所有192.168.1网段的网络数据报文</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">tcp[<span class="hljs-number">13</span>]&amp;<span class="hljs-number">3</span>！=<span class="hljs-number">0</span> and not src and dst net localnet<br></code></pre></td></tr></table></figure>
+
+<p>说明涉及外网的tcp会话中起始和终止报文（SYN和FIN报文） </p>
+<h2 id="8-3-检测引擎模块"><a href="#8-3-检测引擎模块" class="headerlink" title="8.3 检测引擎模块"></a>8.3 检测引擎模块</h2><p>规则结构：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c">alert tcp <span class="hljs-number">202.110</span><span class="hljs-number">.8</span><span class="hljs-number">.1</span> any -&gt; <span class="hljs-number">122.111</span><span class="hljs-number">.90</span><span class="hljs-number">.8</span> <span class="hljs-number">80</span> (msg:<span class="hljs-string">&quot;Web Access&quot;</span>; sid:<span class="hljs-number">1</span>) <br>|---||---||---||---||---||---||---||---||---||--规则头---||---||---||---||---||---||---||---||--||---||---||---||-规则选项---||---||---||---||-|<br></code></pre></td></tr></table></figure>
+
+<h3 id="8-3-1-规则组成"><a href="#8-3-1-规则组成" class="headerlink" title="8.3.1 规则组成"></a>8.3.1 规则组成</h3><p>当snort规则命中流量中的关键数据是，需要执行的操作，主要有告警动作(alert)、丢弃动作(drop)。实时入侵检测以威胁告警为主，规则使用的是alert字段。</p>
+<ul>
+<li><p>规则头</p>
+<ul>
+<li>规则行为</li>
+<li>协议类型</li>
+<li>源&#x2F;目的IP地址</li>
+<li>子网掩码</li>
+<li>方向操作符</li>
+<li>源&#x2F;目的端口</li>
+</ul>
+</li>
+<li><p>规则选项</p>
+<ul>
+<li>告警信息</li>
+<li>异常数据的信息（特征码、signature）</li>
+</ul>
+</li>
+</ul>
+<p>例如，检测尝试SSH的root登录：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs C">alert tcp $EXTERNAL_NET any -&gt; $HOME_NET  <span class="hljs-number">22</span> (content: <span class="hljs-string">&quot;User root&quot;</span>; msg: <span class="hljs-string">&quot;ssh root login&quot;</span>;)<br></code></pre></td></tr></table></figure>
+
+<p>例如，匹配数据包进行实时流量分析：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs C">alert tcp <span class="hljs-number">222.111</span><span class="hljs-number">.333</span><span class="hljs-number">.222</span> any -&gt; <span class="hljs-number">111.111</span><span class="hljs-number">.555</span><span class="hljs-number">.33</span> <span class="hljs-number">80</span> (msg:<span class="hljs-string">&quot;Web Access&quot;</span>; sid:<span class="hljs-number">2222</span>)<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>alert：表示如果此条规则被触发则告警</li>
+<li>tcp：协议类型</li>
+<li>ip地址：源&#x2F;目的IP地址</li>
+<li>any&#x2F;80：端口号</li>
+<li>-&gt;：方向操作符，还有&lt;&gt;双向</li>
+<li>msg：在告警和包日志中打印消息</li>
+<li>sid：Snort规则id</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>规则名称</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>msg</td>
+<td>在报警和包日志中打印一个消息</td>
+</tr>
+<tr>
+<td>logto</td>
+<td>把包记录到用户指定的文件中而不是记录到标准输出</td>
+</tr>
+<tr>
+<td>ttl</td>
+<td>检查ip头的ttl的值</td>
+</tr>
+<tr>
+<td>tos</td>
+<td>检查IP头中TOS字段的值</td>
+</tr>
+<tr>
+<td>id</td>
+<td>检查ip头的分片id值</td>
+</tr>
+<tr>
+<td>ipoption</td>
+<td>查看IP选项字段的特定编码</td>
+</tr>
+<tr>
+<td>fragbits</td>
+<td>检查IP头的分段位</td>
+</tr>
+<tr>
+<td>dsize</td>
+<td>检查包的净荷尺寸的值</td>
+</tr>
+<tr>
+<td>flags</td>
+<td>检查tcp flags的值</td>
+</tr>
+<tr>
+<td>seq</td>
+<td>检查tcp顺序号的值</td>
+</tr>
+<tr>
+<td>ack</td>
+<td>检查tcp应答（acknowledgement）的值</td>
+</tr>
+<tr>
+<td>window</td>
+<td>测试TCP窗口域的特殊值</td>
+</tr>
+<tr>
+<td>itype</td>
+<td>检查icmp type的值</td>
+</tr>
+<tr>
+<td>icode</td>
+<td>检查icmp code的值</td>
+</tr>
+<tr>
+<td>icmp_id</td>
+<td>检查ICMP ECHO ID的值</td>
+</tr>
+<tr>
+<td>icmp_seq</td>
+<td>检查ICMP ECHO 顺序号的值</td>
+</tr>
+<tr>
+<td>content</td>
+<td>在包的净荷中搜索指定的样式</td>
+</tr>
+<tr>
+<td>content-list</td>
+<td>在数据包载荷中搜索一个模式集合</td>
+</tr>
+<tr>
+<td>offset</td>
+<td>content选项的修饰符，设定开始搜索的位置</td>
+</tr>
+<tr>
+<td>depth</td>
+<td>content选项的修饰符，设定搜索的最大深度</td>
+</tr>
+<tr>
+<td>nocase</td>
+<td>指定对content字符串大小写不敏感</td>
+</tr>
+<tr>
+<td>session</td>
+<td>记录指定会话的应用层信息的内容</td>
+</tr>
+<tr>
+<td>rpc</td>
+<td>监视特定应用&#x2F;进程调用的RPC服务</td>
+</tr>
+<tr>
+<td>resp</td>
+<td>主动反应（切断连接等）</td>
+</tr>
+<tr>
+<td>react</td>
+<td>响应动作（阻塞web站点）</td>
+</tr>
+<tr>
+<td>reference</td>
+<td>外部攻击参考ids</td>
+</tr>
+<tr>
+<td>sid</td>
+<td>snort规则id</td>
+</tr>
+<tr>
+<td>rev</td>
+<td>规则版本号</td>
+</tr>
+<tr>
+<td>classtype</td>
+<td>规则类别标识</td>
+</tr>
+<tr>
+<td>priority</td>
+<td>规则优先级标识号</td>
+</tr>
+<tr>
+<td>uricontent</td>
+<td>在数据包的URI部分搜索一个内容</td>
+</tr>
+<tr>
+<td>tag</td>
+<td>规则的高级记录行为</td>
+</tr>
+<tr>
+<td>ip_proto</td>
+<td>IP头的协议字段值</td>
+</tr>
+<tr>
+<td>sameip</td>
+<td>判定源IP和目的IP是否相等</td>
+</tr>
+<tr>
+<td>stateless</td>
+<td>忽略刘状态的有效性</td>
+</tr>
+<tr>
+<td>regex</td>
+<td>通配符模式匹配</td>
+</tr>
+<tr>
+<td>distance</td>
+<td>强迫关系模式匹配所跳过的距离</td>
+</tr>
+<tr>
+<td>within</td>
+<td>强迫关系模式匹配所在的范围</td>
+</tr>
+<tr>
+<td>byte_test</td>
+<td>数字模式匹配</td>
+</tr>
+<tr>
+<td>byte_jump</td>
+<td>数字模式测试和偏移量调整</td>
+</tr>
+<tr>
+<td>flow</td>
+<td>这个选项要和TCP流重建联合使用，它允许规则只应用到流量流的某个方向上。这将允许规则只应用到客户端或者服务器端</td>
+</tr>
+</tbody></table>
+<p>对于规则可选项部分(options)部分有以下常用字段：</p>
+<ul>
+<li>sid</li>
+</ul>
+<p>snort规则的编号，确保每条规则编号的唯一性</p>
+<p>这个关键字被用来识别snort规则的唯一性。这个信息允许输出插件很容易的识别规则的ID号。</p>
+<p>sid 的范围是如下分配的：</p>
+<figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs dns">&lt;<span class="hljs-number">100</span> 保留做将来使用<br><span class="hljs-number">100-1000</span>,<span class="hljs-number">000</span> 包含在snort发布包中<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">1000</span>,<span class="hljs-number">000</span> 作为本地规则使用<br></code></pre></td></tr></table></figure>
+
+
+<ul>
+<li>rev</li>
+</ul>
+<p>规则的版本，默认使用1，如果规则有调整，可以增加1</p>
+<p>这个关键字是被用来识别规则修改的。修改，随同snort规则ID，允许签名和描述被较新的信息替换</p>
+<ul>
+<li>reference</li>
+</ul>
+<p>规则相关信息，如参考链接等</p>
+<ul>
+<li>relative</li>
+</ul>
+<p>使用一个相对于上次模式匹配的相对的偏移量</p>
+<ul>
+<li>classtype</li>
+</ul>
+<p>规则分类，在classification.config中进行配置使用，确保classification.config存在对应规则类别，否则规则将无法生效。</p>
+<p>这个关键字把报警分成不同的攻击类。通过使用这个关键字和使用优先级，用户可以指定规则类中每个类型所具有的优先级</p>
+<p>classification.config内容配置示例：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">config classification: web-application-attack,Web Application Attack,<span class="hljs-number">1</span>config classification: not-suspicious,Not Suspicious Traffic,<span class="hljs-number">3</span><br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>flow</li>
+</ul>
+<p>这个选项要和TCP流重建联合使用。它允许规则只应用到流量流的某个方向上。这将允许规则只应用到客户端或者服务器端。这将能把内网客户端流览web页面的数据包和内网服务器所发送的数据包区分开来。这个确定的关键字能够代替标志：A+ 这个标志在显示已建立的TCP连接时都将被使用。<br>选项：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c">to_client 触发上服务器从A到B的响应<br>to_server 触发客户端上从A到B的请求<br>from_client 触发客户端上从A到B的请求<br>from_server 触发服务器上从A到B的响应<br>established 只触发已经建立的TCP连接<br>stateless 不管流处理器的状态都触发（这对处理那些能引起机器崩溃的数据包很有用）<br>no_stream 不在重建的流数据包上触发<br>only_stream 只在重建的流数据包上触发<br></code></pre></td></tr></table></figure>
+
+<p><strong>格式</strong>：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">flow:[to_client|to_server|from_client|from_server|established|stateless|no_stream|only_stream]<br></code></pre></td></tr></table></figure>
+
+<p>reference 外部攻击参考ids</p>
+<p>这个关键字允许规则包含一个外面的攻击识别系统。这个插件目前支持几种特定的系统，它和支持唯一的URL一样好。这些插件被输出插件用来提供一个关于产生报警的额外信息的连接。</p>
+<p>数据流状态，从服务端到客户端，常用值如下：</p>
+<p>1）to_client</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs">流量数据从服务端到客户端<br></code></pre></td></tr></table></figure>
+
+<p>2）to_server</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs">流量数据从客户端到服务端<br></code></pre></td></tr></table></figure>
+
+<p>3）from_client</p>
+<figure class="highlight gcode"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs gcode">流量数据从客户端来 <span class="hljs-comment">(与to_server效果相同)</span><br></code></pre></td></tr></table></figure>
+
+<p>4）from_server</p>
+<figure class="highlight gcode"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs gcode">流量数据从服务端来 <span class="hljs-comment">(与to_client效果相同)</span><br></code></pre></td></tr></table></figure>
+
+<p>5）established</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs">匹配已经建立连接的流量数据，对于tcp协议，为三次握手之后的流量数据，对于udp协议，为两端都存在数据传输之后的流量数据<br></code></pre></td></tr></table></figure>
+
+<p>6）not_established</p>
+<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs erlang">匹配未建立连接的流量数据，该值可以用户检测端口扫描行为，端口扫描存在大量的未开放端口，因此都不能正常建立连接.<br></code></pre></td></tr></table></figure>
+
+<p>7）stateless</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">匹配已经建立为为建立连接的流量数据，这个应该是用来约束流数据或者报文数据协议的，一般指tcp/udp协议<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>fast_pattern</li>
+</ul>
+<p>suricata对只有一个content关键字的规则使用多模匹配，而对于多个content的规则就对最长对复杂的一个进行多模匹配，而fast_pattern则可以改变这个状况，如果在较短较简单的content字段后加上fast_pattern关键字则会优先匹配这个content，有时这种方法可以有效提升效率。</p>
+<p>下面这个例子就是这种情况，如果第二个content没有fast_parttern关键字的话便会先去匹配”User-Agent:”，而这个在数据包中的出现频率是远远高于”Badness”的，这样就会导致大量的多余时间浪费到无用的匹配上，使用了fast_pattern之后便大大提高了匹配的效率：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c">content:”User-Agent|<span class="hljs-number">3</span>A|”;<br>content:”Badness”; distance:<span class="hljs-number">0</span>; fast_pattern;<br></code></pre></td></tr></table></figure>
+
+<p>不仅如此，fast_parttern还支持部分content多模匹配，比如下面这个例子，表示从content的第8字节开始之后的4字节进行多摸匹配以提高效率：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">content: “aaaaaaaaabc”; fast_pattern:<span class="hljs-number">8</span>,<span class="hljs-number">4</span>;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>阀值 threshold</li>
+</ul>
+<p>用于控制规则的警报频率</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">threshold: type &lt;threshold|limit|both&gt;, track &lt;by_src|by_dst&gt;, count , seconds<br></code></pre></td></tr></table></figure>
+
+<p>threshold：最小阀值 也就是说只有匹配到至少多少次数才进行告警</p>
+<p>limit：限制告警次数，例如最少5分钟内告警一次</p>
+<p>both：此类型是“阈值”和“限制”类型的组合</p>
+<p>调节阀值主要是通过2种方法，一种是通过规则内的threshold关键字来调节</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c">threshold: type threshold, track by_src, count <span class="hljs-number">10</span>, seconds <span class="hljs-number">60</span><br>在<span class="hljs-number">60</span>秒内对同一个源ip匹配到<span class="hljs-number">10</span>次才产生告警<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c">threshold: type limit, track by_src, seconds <span class="hljs-number">180</span>, count <span class="hljs-number">1</span><br>如果匹配成功，则在<span class="hljs-number">3</span>分钟内每个源ip最多生成<span class="hljs-number">1</span>个警报<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c">threshold: type both, track by_src, count <span class="hljs-number">5</span>, seconds <span class="hljs-number">360</span>;<br>如果在<span class="hljs-number">6</span>分钟内有<span class="hljs-number">5</span>个或更多匹配，将生成警报，并且在<span class="hljs-number">6</span>分钟内仅警报一次<br></code></pre></td></tr></table></figure>
+
+
+
+<ul>
+<li>target</li>
+</ul>
+<p>攻击目标，可选择值，src_ip|dest_ip，如果被攻击者是源ip，则target:src_ip，默认被攻击者是目的ip</p>
+<ul>
+<li>msg</li>
+</ul>
+<p>在报警和包日志中打印一个消息</p>
+<p>规则信息说明，可以在规则中丰富对规则的说明描述。例如，某cve编号对应漏洞的检测规则，某个木马家族名称对应的上线包等</p>
+<ul>
+<li>content</li>
+</ul>
+<p>在包的净荷中搜索指定的样式</p>
+<p>Content关键字的选项数据比较复杂；它可以包含混合的文本和二进制数据。二进制数据一般包含在管道符号中（”|”），表示为字节码（bytecode）。字节码把二进制数据表示为16进制数字，是描述复杂二进制数据的好方法。</p>
+<p>例如：<code>content: &quot;|90C8 C0FF FFFF|/bin/sh&quot;;</code>字符 <code>: ; \</code>“在content选项内容中出现时必须被转义（有两个方法：1. 用前导“\”字符 2. 使用字节的二进制表示方式，比如用“|3A|”表示“:”）：内容匹配项的默认是区分大小写的；</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c">alert tcp <span class="hljs-number">192.168</span><span class="hljs-number">.1</span><span class="hljs-number">.0</span>/<span class="hljs-number">24</span> any -&gt; ![<span class="hljs-number">192.168</span><span class="hljs-number">.1</span><span class="hljs-number">.0</span>/<span class="hljs-number">24</span>] any (content: <span class="hljs-string">&quot;GET&quot;</span>; msg: <span class="hljs-string">&quot;GET matched&quot;</span>;)<br>以下的规则作用与上面一条相同，但是特征以<span class="hljs-number">16</span>进制表示。<br>alert tcp <span class="hljs-number">192.168</span><span class="hljs-number">.1</span><span class="hljs-number">.0</span>/<span class="hljs-number">24</span> any -&gt; ![<span class="hljs-number">192.168</span><span class="hljs-number">.1</span><span class="hljs-number">.0</span>/<span class="hljs-number">24</span>] any (content: <span class="hljs-string">&quot;|47 45 54|&quot;</span>; msg: <span class="hljs-string">&quot;GET matched&quot;</span>;)<br><span class="hljs-number">16</span>进值的数字<span class="hljs-number">47</span>与ASCII字符G的值相等，<span class="hljs-number">45</span>与E相等，<span class="hljs-number">54</span>与T相等<br></code></pre></td></tr></table></figure>
+
+
+
+<p>需要匹配的网络流量。支持16进制及明文字符串匹配，使用示例：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c">content:<span class="hljs-string">&quot;a|0D|bc&quot;</span>;<br><br>content:<span class="hljs-string">&quot;|61 0D 62 63|&quot;</span>;<br><br>content:<span class="hljs-string">&quot;a|0D|b|63|&quot;</span>;<br></code></pre></td></tr></table></figure>
+
+<p>默认content匹配的内容为字符串敏感，例如：Payload：qwe123 为例：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-number">1</span>）content:<span class="hljs-string">&quot;qWe&quot;</span>; x 匹配失败<br><span class="hljs-number">2</span>）content:<span class="hljs-string">&quot;Qwe&quot;</span>; x 匹配失败<br><span class="hljs-number">3</span>）content:<span class="hljs-string">&quot;qwe&quot;</span>; √ 匹配成功<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>nocase</li>
+</ul>
+<p>指定对content字符串大小写不敏感</p>
+<p>nocase与content配套使用，申明content大小写字符串不敏感，使用示例：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">content: <span class="hljs-string">&quot;qwe&quot;</span>; nocase;<br></code></pre></td></tr></table></figure>
+
+<p><strong>例如</strong>：Payload：qwe123 为例</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-number">1</span>）content:<span class="hljs-string">&quot;qWe&quot;</span>; nocase; x 匹配失败<br><span class="hljs-number">2</span>）content:<span class="hljs-string">&quot;Qwe&quot;</span>; nocase; x 匹配失败<br><span class="hljs-number">3</span>）content:<span class="hljs-string">&quot;qwe&quot;</span>; nocase; √ 匹配成功<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>offset</li>
+</ul>
+<p>content选项的修饰符，设定开始搜索的位置(开始处理的字节在负载中的偏移量)</p>
+<p>offset规则选项被用作使用 content规则选项关键字的规则的修饰符。这个关键字修饰符指定模式匹配函数从数据包开始处开始搜索的偏移量。它对于cgi扫描(通用网关接口：Common Gateway Interface)检测规则很有用，cgi扫描的内容搜索字符串不会在数据区的前4个字节中出现。小心不要把这个偏移量设置的太严格了，会有可能漏掉攻击！这个规则选项关键字必须和content规则选项一起使用。</p>
+<p>匹配网络流量的偏移位置。偏移位置起始位置为标准协议头之后的数据载荷payload，使用示例：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">content:<span class="hljs-string">&quot;e12&quot;</span>; offset:<span class="hljs-number">2</span>;<br></code></pre></td></tr></table></figure>
+
+<p><strong>例如</strong>：Payload：qwe123 为例</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-number">1</span>）content:<span class="hljs-string">&quot;E12&quot;</span>; offset:<span class="hljs-number">2</span>; x 匹配失败<br><span class="hljs-number">2</span>）content:<span class="hljs-string">&quot;E1&quot;</span>; offset:<span class="hljs-number">2</span>; x 匹配失败<br><span class="hljs-number">3</span>）content:<span class="hljs-string">&quot;e12&quot;</span>; offset:<span class="hljs-number">2</span>; √ 匹配成功<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>depth</li>
+</ul>
+<p>content选项的修饰符，设定搜索的最大深度</p>
+<p>depth 也是一个content规则选项修饰符。它设置了内容模式匹配函数从他搜索的区域的起始位置搜索的最大深度。它对于限制模式匹配函数超出搜索域指定范围而 造成无效搜索很有用。（也就是说，如果你在一个web包中搜索”cgi-bin&#x2F;phf”，你可能不需要浪费时间搜索超过数据区的头20个字节）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">alert tcp any any -&gt; <span class="hljs-number">192.168</span><span class="hljs-number">.1</span><span class="hljs-number">.0</span>/<span class="hljs-number">24</span> <span class="hljs-number">80</span> (content: <span class="hljs-string">&quot;cgi-bin/phf&quot;</span>; offset: <span class="hljs-number">3</span>; depth: <span class="hljs-number">22</span>; msg: <span class="hljs-string">&quot;CGI-PHF access&quot;</span>;)<br></code></pre></td></tr></table></figure>
+
+
+
+<p>匹配网络流量的长度，一般与offset字段搭配使用，使用示例：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">content:<span class="hljs-string">&quot;123&quot;</span>; offset:<span class="hljs-number">3</span>; depth:<span class="hljs-number">3</span>;<br></code></pre></td></tr></table></figure>
+
+<p><strong>例如</strong>：Payload：qwe123ert 为例</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-number">1</span>）content:<span class="hljs-string">&quot;123&quot;</span>; offset:<span class="hljs-number">3</span>; depth:<span class="hljs-number">3</span>; x 匹配失败<br><span class="hljs-number">2</span>）content:<span class="hljs-string">&quot;123&quot;</span>; offset:<span class="hljs-number">3</span>; depth:<span class="hljs-number">3</span>; x 匹配失败<br><span class="hljs-number">3</span>）content:<span class="hljs-string">&quot;123&quot;</span>; offset:<span class="hljs-number">3</span>; depth:<span class="hljs-number">3</span>; √ 匹配成功<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>distance</li>
+</ul>
+<p>content选项的修饰符，设定模式匹配间的最小间距</p>
+<p>distance关键字是content关键字的一个修饰词，确信在使用content时模式匹配间至少有N个字节存在。它被设计成在规则选项中和其他选项联合使用。</p>
+<p><strong>格式</strong>：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">distance: ;<br></code></pre></td></tr></table></figure>
+
+<p><strong>例子</strong>：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">alert tcp any any -&gt; any <span class="hljs-title function_">any</span> <span class="hljs-params">(content: <span class="hljs-string">&quot;2 Patterns&quot;</span>; content: <span class="hljs-string">&quot;ABCDE&quot;</span>; content: <span class="hljs-string">&quot;EFGH&quot;</span>; distance: <span class="hljs-number">1</span>;)</span><br></code></pre></td></tr></table></figure>
+
+
+<p>与content配套使用，本次匹配内容与上次匹配payload内容的间距，同时确保不同的content匹配内容存在匹配的顺序，distance生效的content为距离distance最近的左侧content。举例：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">content:<span class="hljs-string">&quot;qwe&quot;</span>; content:<span class="hljs-string">&quot;123&quot;</span>; distance:<span class="hljs-number">0</span>;<br></code></pre></td></tr></table></figure>
+
+<p><strong>例如</strong>：Payload：qwe123ert 为例</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-number">1</span>）content:<span class="hljs-string">&quot;qWe&quot;</span>; content:<span class="hljs-string">&quot;1234&quot;</span>; distance:<span class="hljs-number">0</span>; x 匹配失败<br><span class="hljs-number">2</span>）content:<span class="hljs-string">&quot;Qwe&quot;</span>; content:<span class="hljs-string">&quot;13&quot;</span>; distance:<span class="hljs-number">0</span>;   x 匹配失败<br><span class="hljs-number">3</span>）content:<span class="hljs-string">&quot;qwe&quot;</span>; content:<span class="hljs-string">&quot;123&quot;</span>; distance:<span class="hljs-number">0</span>;  √ 匹配成功<br></code></pre></td></tr></table></figure>
+
+<p><strong>例如</strong>：Payload：qwe12xxxx3ert 为例</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-number">1</span>）content:<span class="hljs-string">&quot;qWe&quot;</span>; content:<span class="hljs-string">&quot;1234&quot;</span>; distance:<span class="hljs-number">0</span>; x 匹配失败<br><span class="hljs-number">2</span>）content:<span class="hljs-string">&quot;Qwe&quot;</span>; content:<span class="hljs-string">&quot;13&quot;</span>; distance:<span class="hljs-number">0</span>;   x 匹配失败<br><span class="hljs-number">3</span>）content:<span class="hljs-string">&quot;qwe&quot;</span>; content:<span class="hljs-string">&quot;123&quot;</span>; distance:<span class="hljs-number">0</span>;  √ 匹配成功<br><span class="hljs-number">4</span>）content:<span class="hljs-string">&quot;qwe&quot;</span>; content:<span class="hljs-string">&quot;123&quot;</span>; distance:<span class="hljs-number">4</span>;  √ 匹配成功<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>within</li>
+</ul>
+<p>content选项的修饰符，设定模式匹配间的最大间距</p>
+<p>within关键字是content关键字的一个修饰词，确保在使用content时模式匹配间至多有N个字节存在。它被设计成在规则选项中和distance选项联合使用</p>
+<p><strong>格式</strong>：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">within: ;<br></code></pre></td></tr></table></figure>
+
+<p><strong>例子</strong>：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">alert tcp any any -&gt; any <span class="hljs-title function_">any</span> <span class="hljs-params">(content: <span class="hljs-string">&quot;2 Patterns&quot;</span>; content: <span class="hljs-string">&quot;ABCDE&quot;</span>; content: <span class="hljs-string">&quot;EFGH&quot;</span>; within: <span class="hljs-number">10</span>;)</span><br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>flags</li>
+</ul>
+<p>检查tcp flags的值</p>
+<p>在snort中有8个标志变量：</p>
+<table>
+<thead>
+<tr>
+<th>变量</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>F</td>
+<td>FIN (LSB in TCP Flags byte)</td>
+</tr>
+<tr>
+<td>S</td>
+<td>SYN</td>
+</tr>
+<tr>
+<td>R</td>
+<td>RST</td>
+</tr>
+<tr>
+<td>P</td>
+<td>PSH</td>
+</tr>
+<tr>
+<td>A</td>
+<td>ACK</td>
+</tr>
+<tr>
+<td>U</td>
+<td>URG</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Reserved bit 2</td>
+</tr>
+<tr>
+<td>1</td>
+<td>Reserved bit 1 (MSB in TCP Flags byte)</td>
+</tr>
+</tbody></table>
+<ul>
+<li>dsize</li>
+</ul>
+<p>匹配的通信流量payload大小。示例：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c">dsize:&gt;<span class="hljs-number">268</span>;  payload大于<span class="hljs-number">268</span> 字节<br><br>dsize:&lt;<span class="hljs-number">268</span>;  payload小于<span class="hljs-number">268</span> 字节<br><br>dsize:<span class="hljs-number">268</span>;   payload等于<span class="hljs-number">268</span> 字节<br><br>dsize:<span class="hljs-number">200</span>&lt;&gt;<span class="hljs-number">268</span>;  payload在<span class="hljs-number">200</span>字节和<span class="hljs-number">268</span>字节之间<br><br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>byte_test</li>
+</ul>
+<p>数字模式匹配</p>
+<p>把数据包净载中特定位置的字串转换为数值类型与指定的值进行比较。</p>
+<p><strong>格式</strong>：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">byte_test: , , , [[relative],[big],[little],[<span class="hljs-built_in">string</span>],[hex],[dec],[oct]]<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>bytes_to_convert</li>
+</ul>
+<p>从数据包取得的字节数</p>
+<ul>
+<li>operator</li>
+</ul>
+<p>对检测执行的操作 <code>(&lt;,&gt;,=,!)</code></p>
+<ul>
+<li>value</li>
+</ul>
+<p>和转换后的值相测试的值</p>
+<ul>
+<li>big</li>
+</ul>
+<p>以网络字节顺序处理数据（缺省）</p>
+<ul>
+<li>little</li>
+</ul>
+<p>以主机字节顺序处理数据</p>
+<ul>
+<li>string</li>
+</ul>
+<p>数据包中的数据以字符串形式存储</p>
+<ul>
+<li>hex</li>
+</ul>
+<p>把字符串数据转换成十六进制数形式</p>
+<ul>
+<li>dec</li>
+</ul>
+<p>把字符串数据转换成十进制数形式</p>
+<ul>
+<li>oct</li>
+</ul>
+<p>把字符串数据转换成八进制数形式</p>
+<p><strong>例子</strong>：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">alert udp $EXTERNAL_NET any -&gt; $HOME_NET <span class="hljs-title function_">any</span> <span class="hljs-params">(msg:<span class="hljs-string">&quot;AMD procedure 7 plog overflow &quot;</span>; content: <span class="hljs-string">&quot;|00 04 93 F3|&quot;</span>; content: <span class="hljs-string">&quot;|00 00 00 07|&quot;</span>; distance: <span class="hljs-number">4</span>; within: <span class="hljs-number">4</span>; byte_test: <span class="hljs-number">4</span>,&gt;, <span class="hljs-number">1000</span>, <span class="hljs-number">20</span>, relative;)</span><br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>uricontent</li>
+</ul>
+<p>用于匹配正规化处理后URI字段</p>
+<p>这个关键字允许只在一个请求的URI（URL）部分进行搜索匹配。它允许一条规则只搜索请求部分的攻击，这样将避免服务数据流的错误报警。关于这个关键字的参数的描述可以参考content关键字部分。这个选项将和HTTP解析器一起工作。（只能搜索第一个“&#x2F;”后面的内容）。</p>
+<p><strong>例如</strong>：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">uricontent:<span class="hljs-string">&quot;.emf&quot;</span>;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>pcre</li>
+</ul>
+<p>正则表达式匹配，遵循标准正则表达式的书写方法，后面会单独写一篇正则表达式的文章。</p>
+<p>PCRE官网下载：<a target="_blank" rel="noopener" href="http://www.pcre.org/">http://www.pcre.org</a></p>
+<p>正则写法参考链接：</p>
+<p><a target="_blank" rel="noopener" href="https://redmine.openinfosecfoundation.org/projects/suricata/wiki/Pcre_%28Perl_Compatible_Regular_Expressions%29">https://redmine.openinfosecfoundation.org/projects/suricata/wiki/Pcre_%28Perl_Compatible_Regular_Expressions%29</a></p>
+<p>例如：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c">pcre:<span class="hljs-string">&quot;/&lt;regex&gt;/opts&quot;</span>;<br><br>pcre: “/&lt;regex&gt;/i”;<br>/i表示正则表达式字符串大小写不敏感<br></code></pre></td></tr></table></figure>
+
+<p>Perl兼容的修饰符：</p>
+<table>
+<thead>
+<tr>
+<th>修饰符</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>i</td>
+<td>对大小不敏感</td>
+</tr>
+<tr>
+<td>s</td>
+<td>在点转义符号中包含换行符， 一般情况下被匹配的缓冲区是作为一个大字符串</td>
+</tr>
+<tr>
+<td>m</td>
+<td>的，和$分别匹配串头和串尾。当设置了m修饰符，和$匹配跟紧跟换行符和紧先导于换行符的情况</td>
+</tr>
+<tr>
+<td>x</td>
+<td>要匹配的模式中的空格符被忽略，除非是被转义过的或在一个字符集中</td>
+</tr>
+</tbody></table>
+<p>PCRE兼容的修饰符：</p>
+<table>
+<thead>
+<tr>
+<th>修饰符</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>A</td>
+<td>模式必须在缓冲区的开头匹配到（同^） 设置指定的$必须匹配到缓冲区末尾。如果不用E</td>
+</tr>
+<tr>
+<td>E</td>
+<td>修饰符，$则可能只匹配到串尾之前换行符</td>
+</tr>
+<tr>
+<td>G</td>
+<td>在默认情况下不使用“贪婪”模式，只有在模式后面跟了“?”字符的情况下贪婪</td>
+</tr>
+</tbody></table>
+<p>Snort特定的修饰符：</p>
+<table>
+<thead>
+<tr>
+<th>修饰符</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>R</td>
+<td>此匹配相对于前一个匹配成功串尾开始(类似于distance:0)</td>
+</tr>
+<tr>
+<td>U</td>
+<td>匹配解码后的URI缓冲区（类似于uricontent</td>
+</tr>
+<tr>
+<td>B</td>
+<td>不使用解码后的缓冲区（类似于rawbytes）</td>
+</tr>
+</tbody></table>
+<p><strong>PS</strong>：修饰符R和B不能同时使用</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">例如： alert ip any any -&gt; any <span class="hljs-title function_">any</span> <span class="hljs-params">(pcre:<span class="hljs-string">&quot;/BLAH/i&quot;</span>;)</span><br></code></pre></td></tr></table></figure>
+
+<p>例子：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">alert tcp $EXTERNAL_NET $HTTP_PORTS -&gt; $HOME_NET <span class="hljs-title function_">any</span> <span class="hljs-params">(msg:<span class="hljs-string">&quot;WEB-CLIENT PNG large colour depth download attempt&quot;</span>; flow:from_server,established; content:<span class="hljs-string">&quot;|89|PNG|0D 0A 1A 0A|&quot;</span>; content:<span class="hljs-string">&quot;IHDR&quot;</span>; within:<span class="hljs-number">8</span>; byte_test:<span class="hljs-number">1</span>,&gt;,<span class="hljs-number">16</span>,<span class="hljs-number">8</span>,relative;classtype:attempted-user; sid:<span class="hljs-number">3134</span>; rev:<span class="hljs-number">3</span>;reference:url,www.microsoft.com/technet/security/bulletin/MS05<span class="hljs-number">-009.</span>mspx; )</span><br></code></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">alert tcp $EXTERNAL_NET any -&gt; $HOME_NET <span class="hljs-number">139</span> (msg:<span class="hljs-string">&quot;NETBIOS SMB Trans Max Param/Count DOS attempt&quot;</span>; flow:established,to_server; content:<span class="hljs-string">&quot;|00|&quot;</span>; depth:<span class="hljs-number">1</span>; content:<span class="hljs-string">&quot;|FF|SMB%&quot;</span>; within:<span class="hljs-number">5</span>; distance:<span class="hljs-number">3</span>; byte_test:<span class="hljs-number">1</span>,!&amp;,<span class="hljs-number">128</span>,<span class="hljs-number">6</span>,relative; pcre:<span class="hljs-string">&quot;/^.&#123;27&#125;/sR&quot;</span>; content:<span class="hljs-string">&quot;|00 00 00 00|&quot;</span>; within:<span class="hljs-number">4</span>; distance:<span class="hljs-number">5</span>;reference:url,www.corest.com/common/showdoc.php?idx=<span class="hljs-number">262</span>;classtype:protocol-command-decode; sid:<span class="hljs-number">2101</span>; rev:<span class="hljs-number">15</span>;)<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">alert tcp $HOME_NET any -&gt; $EXTERNAL_NET $HTTP_PORTS (msg:<span class="hljs-string">&quot;SPYWARE-PUT Hijacker shop at home select installation in progress&quot;</span>; flow:to_server,established; uricontent:<span class="hljs-string">&quot;GRInstallCL.asp&quot;</span>; nocase; uricontent:<span class="hljs-string">&quot;E=&quot;</span>; nocase; uricontent:<span class="hljs-string">&quot;MID=&quot;</span>; nocase; uricontent:<span class="hljs-string">&quot;Refer=&quot;</span>; nocase; uricontent:<span class="hljs-string">&quot;WGR=&quot;</span>; nocase; uricontent:<span class="hljs-string">&quot;Prev=&quot;</span>; nocase; uricontent:<span class="hljs-string">&quot;sGUID=&quot;</span>; nocase; classtype:misc-activity; sid:<span class="hljs-number">5810</span>; rev:<span class="hljs-number">1</span>;)<br></code></pre></td></tr></table></figure>
+
+<p>正则表达式元字符的解释：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs c">\： 转移字符，将后一个字符标记为一个特殊字符<br>^：匹配输入字串的开始位置<br>$：匹配输入字串的结束位置<br>*：匹配前面的子表达式<span class="hljs-number">0</span>次或多次<br>+：匹配前面的子表达式<span class="hljs-number">1</span>次或多次<br>?：匹配前面的子表达式<span class="hljs-number">0</span>次或<span class="hljs-number">1</span>次<br>&#123;n,m&#125;：匹配至少n次，至多m次<br>.：匹配到除<span class="hljs-string">&quot;\n&quot;</span>之外的所有单个字符<br>[]：表示一个字符集，可以单个列出，如[amk$]；也可以加一个<span class="hljs-string">&quot;-&quot;</span>表示一个字符范围，如[a-z]；匹配任意一个字符即可；也可以用补集来匹配不在区间范围内的字符。其做法是把<span class="hljs-string">&quot;&quot;</span>作为类别的首个字符；其它地方的<span class="hljs-string">&quot;&quot;</span>只会简单匹配 <span class="hljs-string">&quot;&quot;</span>字符本身，例如[<span class="hljs-number">5</span>] 将匹配除 <span class="hljs-string">&quot;5&quot;</span> 之外的任意字符。<br></code></pre></td></tr></table></figure>
+
+<p><strong>例如</strong>：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c">pcre:<span class="hljs-string">&quot;/X-Mailer\x3A[\r\n]*mPOP\s+Web-Mail/smi&quot;</span>;<br>pcre:<span class="hljs-string">&quot;/Host\x3A[\r\n]*e2give.com/smi&quot;</span>;<br>pcre:<span class="hljs-string">&quot;/User-Agent\x3A[\r\n]*NSISDL/smi&quot;</span>;<br>pcre:<span class="hljs-string">&quot;/Host\x3A[\r\n]*push\x2Ecom/smi&quot;</span>;<br>...<br></code></pre></td></tr></table></figure>
+
+<p><strong>注</strong>：\x 后为十六进制转义值</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs c">\r 匹配一个回车符<br>\n 匹配一个换行符<br>\s 匹配任何空白字符<br>\d 匹配任何十进制数；它相当于类 [<span class="hljs-number">0</span><span class="hljs-number">-9</span>]<br>\D 匹配任何非数字字符；它相当于类 [^<span class="hljs-number">0</span><span class="hljs-number">-9</span>]<br>\s 匹配任何空白字符；它相当于类 [ \t\n\r\f\v]<br>\S 匹配任何非空白字符；它相当于类 [^ \t\n\r\f\v]<br>\w 匹配任何字母数字字符；它相当于类 [a-zA-Z0<span class="hljs-number">-9</span>_]<br>\W 匹配任何非字母数字字符；它相当于类 [^a-zA-Z0<span class="hljs-number">-9</span>_]<br></code></pre></td></tr></table></figure>
+
+
+
+
+
+<p>一些Snort案例的文章：</p>
+<p><a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000038329114">https://segmentfault.com/a/1190000038329114</a></p>
+<h3 id="8-3-2-规则头"><a href="#8-3-2-规则头" class="headerlink" title="8.3.2 规则头"></a>8.3.2 规则头</h3><p>规则头主要定义匹配的网络流量的协议、IP地址、端口、流量方向</p>
+<ul>
+<li>规则行为</li>
+</ul>
+<p>“alert” 表示如果这条规则被触发则告警，属于规则行为。除了alet以外，规则行为还有4种，分别是log、pass、activate、dynamic</p>
+<p>snort中有五种动作：alert、log、pass、activate、dynamic</p>
+<ul>
+<li><p>alert：使用选定的告警方法产生告警信息，并且记录数据包</p>
+</li>
+<li><p>log：记录数据包</p>
+</li>
+<li><p>pass：忽略数据包</p>
+</li>
+<li><p>activate：告警，接着打开其它的dynamic规则 </p>
+</li>
+<li><p>dynamic：保持空闲状态，直到被activete规则激活，作为一条log规则</p>
+</li>
+<li><p>协议</p>
+</li>
+</ul>
+<p>每条snort规则的第二项为协议类型，目前支持分析的协议类型：TCP、UDP、ICMP、IP，不排除未来可能对ARP、ICRP、GRE、OSPF、RIP、IPX等协议的支持</p>
+<p>更加上层的协议为：</p>
+<p>http、ftp、tls (包括ssl)、smb、dns、dcerpc、ssh、smtp、imap、msn、modbus (默认关闭该协议的支持)、dnp3 (默认关闭该协议的支持)、enip (默认关闭该协议的支持)、nfs (默认关闭该协议的支持)、ikev2 (默认关闭该协议的支持)、krb5 (依赖rust语言环境)、ntp (依赖rust语言环境)、dhcp (依赖rust语言环境)。</p>
+<ul>
+<li>源&#x2F;目的IP地址</li>
+</ul>
+<p>地址支持以常量、变量、范围域、非运算符方式来定义匹配流量，参考：</p>
+<table>
+<thead>
+<tr>
+<th>示例</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>!1.1.1.1</code></td>
+<td>所有的IP地址除去1.1.1.1</td>
+</tr>
+<tr>
+<td><code>![1.1.1.1, 1.1.1.2]</code></td>
+<td>所有的IP地址除去1.1.1.1,1.1.1.2</td>
+</tr>
+<tr>
+<td><code>$HOME_NET</code></td>
+<td>在suricata.yaml配置文件中设置的局域网范围，IP地址变量</td>
+</tr>
+<tr>
+<td><code>[$EXTERNAL_NET, !$HOME_NET]</code></td>
+<td>外部网络变量 除去局域网变量</td>
+</tr>
+<tr>
+<td><code>[10.0.0.0/24, !10.0.0.5]</code></td>
+<td>所有<code>10.0.0.0/24(10.0.0.1-10.0.0.255)</code>网段的ip 除去10.0.0.5</td>
+</tr>
+</tbody></table>
+<p>1）any 则为定义任意IP地址，比如<code>![192.168.1.0/24,10.1.1.1.0/24]</code>表示非这两个网段的IP<br>2）否定操作符用“!”表示<br>3）关键字 “any” 可以被用来定义任何地址（地址就是由直接的数字型ip地址和一个cidr块组成的。cidr块指示作用在规则地址和需要检查的进入的任何包的网络掩码。<code>/24</code>表示c类网络， <code>/16</code>表示b类网络，<code>/32</code>表示一个特定的机器的地址。）</p>
+<p><strong>例如</strong>：指定ip地址列表，一个ip地址列表由逗号分割的ip地址和CIDR块组成，并且要放在方括号内“[”，“]”。此时，ip列表可以不包含空格在ip地址之间</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">alert tcp ![<span class="hljs-number">192.168</span><span class="hljs-number">.1</span><span class="hljs-number">.0</span>/<span class="hljs-number">24</span>,<span class="hljs-number">10.1</span><span class="hljs-number">.1</span><span class="hljs-number">.0</span>/<span class="hljs-number">24</span>] any -&gt; [<span class="hljs-number">192.168</span><span class="hljs-number">.1</span><span class="hljs-number">.0</span>/<span class="hljs-number">24</span>,<span class="hljs-number">10.1</span><span class="hljs-number">.1</span><span class="hljs-number">.0</span>/<span class="hljs-number">24</span>] <span class="hljs-number">111</span> (content: <span class="hljs-string">&quot;|00 01 86 a5|&quot;</span>; msg: <span class="hljs-string">&quot;external mountd access&quot;</span>;)<br></code></pre></td></tr></table></figure>
+
+<p>变量定义：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c">var MY_NET <span class="hljs-number">192.168</span><span class="hljs-number">.1</span><span class="hljs-number">.0</span>/<span class="hljs-number">24</span><br>alert tcp any any -&gt; $MY_NET <span class="hljs-title function_">any</span> <span class="hljs-params">(flags: S; msg: <span class="hljs-string">&quot;SYN packet&quot;</span>;)</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>注</strong>：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-string">&quot;$&quot;</span> 操作符之后定义变量；<br><span class="hljs-string">&quot;?&quot;</span> 和 <span class="hljs-string">&quot;-&quot;</span>可用于变量修改操作符；<br></code></pre></td></tr></table></figure>
+
+<p>&#96;&#96;$var -&#96;&#96;&#96;定义变量：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c">$(var) - 用变量<span class="hljs-string">&quot;var&quot;</span>的值替换<br>$(var:-<span class="hljs-keyword">default</span>) - 用变量<span class="hljs-string">&quot;var&quot;</span>的值替换，如果<span class="hljs-string">&quot;var&quot;</span>没有定义用<span class="hljs-string">&quot;default&quot;</span>替换<br>$(var:?message) - 用变量<span class="hljs-string">&quot;var&quot;</span>的值替换或打印出错误消息<span class="hljs-string">&quot;message&quot;</span>然后退出<br></code></pre></td></tr></table></figure>
+
+<p><strong>例如</strong>：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c">var MY_NET $(MY_NET:<span class="hljs-number">-192.168</span><span class="hljs-number">.1</span><span class="hljs-number">.0</span>/<span class="hljs-number">24</span>)<br><span class="hljs-built_in">log</span> tcp any any -&gt; $(MY_NET:?MY_NET is undefined!) <span class="hljs-number">23</span><br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>端口号</li>
+</ul>
+<p>any 则为定义任意端口号，也可以通过设置static静态端口号，或者通过设置端口号的范围，比如 1:1024表示端口号1到端口号1024、500:表示大于等于500的端口号、!1:500表示除了端口号1到500</p>
+<p>1）端口号可以用几种方法表示，包括 any 端口、静态端口定义、范围、以及通过否定操作符<br>2）静态端口定义表示一个单个端口号，例如111表示 portmapper，23表示 telnet，80表示 http 等等<br>3）端口范围用范围操作符 “:” 表示。比如，80:，:1024，80:1024</p>
+<p>范围操作符可以有数种使用方法，如下所示：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-built_in">log</span> udp any any -&gt; <span class="hljs-number">192.168</span><span class="hljs-number">.1</span><span class="hljs-number">.0</span>/<span class="hljs-number">24</span> <span class="hljs-number">1</span>:<span class="hljs-number">1024</span><br>记录来自任何端口的，目标端口范围在<span class="hljs-number">1</span>到<span class="hljs-number">1024</span>的udp流<br><br><span class="hljs-built_in">log</span> tcp any any -&gt; <span class="hljs-number">192.168</span><span class="hljs-number">.1</span><span class="hljs-number">.0</span>/<span class="hljs-number">24</span> :<span class="hljs-number">6000</span><br>记录来自任何端口，目标端口小于等于<span class="hljs-number">6000</span>的tcp流<br><br><span class="hljs-built_in">log</span> tcp any :<span class="hljs-number">1024</span> -&gt; <span class="hljs-number">192.168</span><span class="hljs-number">.1</span><span class="hljs-number">.0</span>/<span class="hljs-number">24</span> <span class="hljs-number">500</span>:<br>记录来自任何小于等于<span class="hljs-number">1024</span>的特权端口，目标端口大于等于<span class="hljs-number">500</span>的tcp流<br></code></pre></td></tr></table></figure>
+
+
+<p>端口与IP地址书写配套使用，支持常量，变量，任意端口的匹配，参考：</p>
+<table>
+<thead>
+<tr>
+<th>示例</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>[80, 81, 82]</code></td>
+<td>匹配80,81,82中的任意端口</td>
+</tr>
+<tr>
+<td><code>[80: 82]</code></td>
+<td>匹配从80到82之间的任意端口</td>
+</tr>
+<tr>
+<td><code>[1024: ]</code></td>
+<td>匹配1024一直到65535的最大端口</td>
+</tr>
+<tr>
+<td><code>!80</code></td>
+<td>匹配所有端口除去80</td>
+</tr>
+<tr>
+<td><code>[80:100,!99]</code></td>
+<td>匹配80到100端口，除去99端口</td>
+</tr>
+<tr>
+<td><code>[1:80,![2,4]]</code></td>
+<td>匹配1到80端口，除去2到4端口</td>
+</tr>
+<tr>
+<td><code>$HTTP_PORTS</code></td>
+<td>匹配在suricata.yaml配置文件中设置<code>$HTTP_PORTS</code>对应的端口</td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th>常用端口号</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>20</td>
+<td>FTP数据</td>
+</tr>
+<tr>
+<td>21</td>
+<td>FTP</td>
+</tr>
+<tr>
+<td>22</td>
+<td>SSH或安全Shell</td>
+</tr>
+<tr>
+<td>23</td>
+<td>Telnet</td>
+</tr>
+<tr>
+<td>25</td>
+<td>SMTP或类似于Sendmail的e-mail服务器</td>
+</tr>
+<tr>
+<td>37</td>
+<td>NTP（网络时钟协议，用来同步网络主机时间）</td>
+</tr>
+<tr>
+<td>53</td>
+<td>DNS 服务器</td>
+</tr>
+<tr>
+<td>67</td>
+<td>BootP&#x2F;DHCP客户端</td>
+</tr>
+<tr>
+<td>68</td>
+<td>BootP&#x2F;DHCP服务器</td>
+</tr>
+<tr>
+<td>69</td>
+<td>TFTP</td>
+</tr>
+<tr>
+<td>80</td>
+<td>HTTP，web服务器</td>
+</tr>
+<tr>
+<td>110</td>
+<td>POP3，供类似于OE的邮件客户端使用</td>
+</tr>
+<tr>
+<td>161</td>
+<td>SNMP</td>
+</tr>
+<tr>
+<td>162</td>
+<td>SNMP trap</td>
+</tr>
+<tr>
+<td>443</td>
+<td>HTTPS或安全HTTP</td>
+</tr>
+<tr>
+<td>514</td>
+<td>Syslog</td>
+</tr>
+</tbody></table>
+<ul>
+<li>方向操作符号</li>
+</ul>
+<p>除了单向 “-&gt;”方向操作符外(“-&gt;” 表示流量的方向，流量流向箭头指向的方向)，还有“&lt;&gt;”双向操作符(“&lt;&gt;” 表示双向流量都可以进行匹配)</p>
+<p>通俗的说就是代表数据包的流向，操作符左边代表源地址\源端口，操作符右边代表目的地址\目的端口</p>
+<h3 id="8-3-3-Activate和-Dynamic规则"><a href="#8-3-3-Activate和-Dynamic规则" class="headerlink" title="8.3.3 Activate和 Dynamic规则"></a>8.3.3 Activate和 Dynamic规则</h3><p>注意：Activate和 Dynamic规则将被 Tagging所代替。在 Snort的将来版本，Activate和 Dynamic规则将完全被功能增强的Tagging所代替。</p>
+<p>Activate和 Dynamic规则对给了 Snort更强大的能力。用户现在可以用一条规则来激活另一条规则，当这条规则适用于些数据包时，在一些情况下这是非常有用的，例如用户想设置一条规则：当一条规则结束后来完成记录。Activate规则除了包含一个选择域：Activates外就和一条 Alert规则一样。</p>
+<h3 id="8-3-4-规则的语法"><a href="#8-3-4-规则的语法" class="headerlink" title="8.3.4 规则的语法"></a>8.3.4 规则的语法</h3><p>规则分类存放在规则文件中。规则文件是普通的文本文件，用户可以使用普通的文本编辑器打开进行编辑。</p>
+<p>规则文件可以包含注释行，注释行以“#”字符开头，<code>#</code>号前不能有任何非空字符。</p>
+<p>Snort允许定义变量，并在规则中使用这些变量。变量的定义格式如下所示：</p>
+<p>var：</p>
+<ul>
+<li>在规则中可以直接使用 <code>$</code>，而遇到变量名解释器就会使用<code>&lt; value&gt;</code>替代 <code>$</code></li>
+</ul>
+<h3 id="8-3-5-规则描述"><a href="#8-3-5-规则描述" class="headerlink" title="8.3.5 规则描述"></a>8.3.5 规则描述</h3><ul>
+<li>选项主要可以分为四类<ul>
+<li>第一类是（<strong>负载检测规则选项</strong>(Payload detection rule option)）数据包相关各种特征的描述选项，比如：content、flags、dsize、ttl等</li>
+<li>第二类是（<strong>通用规则选项</strong>(General rule option)）规则本身相关一些说明选项，比如：reference、sid、classtype、priority等</li>
+<li>第三类是（<strong>后检测规则选项</strong>(Post detection rule option)）规则匹配后的动作选项，比如：msg、resp、react、session、logto、tag等</li>
+<li>第四类是（<strong>非负载检测规则选项</strong>(Non-Payload detection rule option)）选项是对某些选项的修饰，比如从属于content的nocase、offset、depth、regex等</li>
+</ul>
+</li>
+</ul>
+<h4 id="8-3-5-1-负载检测规则选项-Payload-Detection-Rule-Options"><a href="#8-3-5-1-负载检测规则选项-Payload-Detection-Rule-Options" class="headerlink" title="8.3.5.1 负载检测规则选项(Payload Detection Rule Options)"></a>8.3.5.1 负载检测规则选项(Payload Detection Rule Options)</h4><ul>
+<li>content</li>
+</ul>
+<p>content 是 Snort 重要的关键词之一。它规定在数据包的负载中搜索指定的样式。它的选项数据可以包含混合的文本和二进制数据。二进制数据一般包含在管道符号中 “|”，表示为字节码（bytecode），也就是将二进制数据的十六进制形式</p>
+<p>例如：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c">alert tcp any any -&gt; any <span class="hljs-number">139</span> (content:<span class="hljs-string">&quot;|5c 00|P|00|I|00|P|00|E|00 5c|&quot;</span>;)<br>alert tcp any any -&gt; any <span class="hljs-number">80</span> (content:!<span class="hljs-string">&quot;GET&quot;</span>;)<br></code></pre></td></tr></table></figure>
+
+<p>content 还有很多修饰符：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs c">Nocase            content字符串大小写不敏感<br>rawbytes          直接匹配原始数据包<br>Depth             匹配的深度<br>Offset            开始匹配的偏移量<br>Distance          两次content匹配的间距<br>Within            两次content匹配之间至多的间距  <br>http_cookie       匹配cookie<br>http_raw_cookie   匹配未经normalize的cookie<br>http_header       匹配header<br>http_raw_header   匹配未经normalize的header<br>http_method       匹配method<br>http_url          匹配url<br>http_raw_url      匹配日在未经normalize的url中<br>http_stat_code    匹配状态码中匹配<br>http_stat_msg     匹配状态信息<br>http_encode       匹配编码格式<br></code></pre></td></tr></table></figure>
+<p>http 开头的修饰符需要配合预处理器 http_inspect 一起使用</p>
+<ul>
+<li>pcre</li>
+</ul>
+<p>允许用户使用与 PERL 语言相兼容的正则表达式</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">格式 pcre:[!]<span class="hljs-string">&quot;(/&lt;regex&gt;/|m&lt;delim&gt;&lt;regex&gt;&lt;delim&gt;)[ismxAEGRUBPHMCOIDKY]</span><br></code></pre></td></tr></table></figure>
+
+<p>例如：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">alert tcp any any -&gt; any <span class="hljs-number">80</span> (content:<span class="hljs-string">&quot;/foo.php?id=&quot;</span>; pcre:<span class="hljs-string">&quot;/\/foo.php?id=[0-9]&#123;1,10&#125;/iU&quot;</span>;) <br></code></pre></td></tr></table></figure>
+
+<p>正则的细节查阅snort_manual</p>
+<ul>
+<li>protected_content</li>
+</ul>
+<p>将 content 中的查询内容使用 hash 算法加密，保护规则的私密性。</p>
+<p>格式：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">protected_content:[!]<span class="hljs-string">&quot;&lt;content hash&gt;&quot;</span>, length:orig_len[, hash:md5|sha256|sha512];<br></code></pre></td></tr></table></figure>
+<ul>
+<li>rawbytes</li>
+</ul>
+<p>忽略解码器及预处理器的操作，直接匹配原始网络包。</p>
+<p>上面只列举出了一些常用的 payload detection rule option，更多的关键词查阅 snort_manual</p>
+<h4 id="8-3-5-2-通用规则选项-General-rule-option"><a href="#8-3-5-2-通用规则选项-General-rule-option" class="headerlink" title="8.3.5.2 通用规则选项(General rule option)"></a>8.3.5.2 通用规则选项(General rule option)</h4><ul>
+<li>sid</li>
+</ul>
+<p>snort id，这个关键字被用来识别 snort 规则的唯一性。sid 的范围是如下分配的：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c">&lt;<span class="hljs-number">100</span> 			#保留做将来使用<br><br><span class="hljs-number">100</span><span class="hljs-number">-1000</span>,<span class="hljs-number">000</span> 	#包含在snort发布包中<br><br>&gt;<span class="hljs-number">1000</span>,<span class="hljs-number">000</span> 		#作为本地规则使用<br></code></pre></td></tr></table></figure>
+
+
+<ul>
+<li>msg</li>
+</ul>
+<p>标示一个消息，但是规则中的 msg 不起作用，sid 和 msg 的对应关系查阅 sid-msg.map</p>
+<ul>
+<li>sid-msg.map</li>
+</ul>
+<p>格式：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">sid || msg<br></code></pre></td></tr></table></figure>
+
+<p>例子：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-number">384</span> || PROTOCOL-ICMP PING<br></code></pre></td></tr></table></figure>
+
+<p>在 &#x2F;etc&#x2F;snort&#x2F;rules&#x2F;protocol-icmp.ruls 中我们找到了这条规则：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">alert icmp $EXTERNAL_NET any -&gt; $HOME_NET <span class="hljs-title function_">any</span> <span class="hljs-params">(msg:<span class="hljs-string">&quot;PROTOCOL-ICMP PING&quot;</span>; icode:<span class="hljs-number">0</span>; itype:<span class="hljs-number">8</span>; metadata:ruleset community; classtype:misc-activity; sid:<span class="hljs-number">384</span>; rev:<span class="hljs-number">8</span>;)</span><br></code></pre></td></tr></table></figure>
+
+<p>此文件作用是将 sid 与 msg 的一一对应，否则，在告警中会出现下图中第一条的现象。</p>
+<p>此文件用于自定义规则中 sid 与 msg 的对应和在 snort 自有规则中自定义告警信息。 上图中 Snort Alert[1:1000015:0] 其中内容对应为 Snort alert[gid:sid:rev]。这说明一个规则需要这三个因素才能确定，之前说只有 sid 唯一标示一条规则是不严谨的</p>
+<ul>
+<li>gid</li>
+</ul>
+<p>generate id，作用是为了说明这条规则是 snort 的哪部分触发的。比如是由解码器、预处理器还是 Snort 自有规则等。</p>
+<p>查看 &#x2F;usr&#x2F;local&#x2F;share&#x2F;doc&#x2F;snort&#x2F;generators 文件（此文件不是配置文件）：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c">rules_subsystem       <span class="hljs-number">1</span> 		# Snort Rules Engine<br>rpc_decode            <span class="hljs-number">106</span> 		# RPC <span class="hljs-title function_">Preprocessor</span><span class="hljs-params">(预处理器)</span><br>stream4               111 		# Stream4 preprocessor（预处理器）<br>ftp                   125 		# FTP decoder（解码器）<br>...               <br></code></pre></td></tr></table></figure>
+
+<p>decoder 和 preprocessor 的 gid 就不一一列举，可以看到 Snort Rule Engine 的 gid 为1，自定义规则和 snort 自有规则（也就是 &#x2F;etc&#x2F;snort&#x2F;rules 目录下的规则）gid默认是1。但是这里我们获知 decoder 和 preprocessor 也是有 sid 的。举例说明：</p>
+<p>&#x2F;etc&#x2F;snort&#x2F;rules&#x2F;protocol-icmp.rules 中的一条规则：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">alert icmp $EXTERNAL_NET any -&gt; $HOME_NET <span class="hljs-title function_">any</span> <span class="hljs-params">(msg:<span class="hljs-string">&quot;PROTOCOL-ICMP Traceroute&quot;</span>; icode:<span class="hljs-number">0</span>; itype:<span class="hljs-number">30</span>; metadata:ruleset community; classtype:misc-activity; sid:<span class="hljs-number">456</span>; rev:<span class="hljs-number">8</span>;)</span><br></code></pre></td></tr></table></figure>
+
+<p>可以看到两条规则的 sid 是相同的，所以还需要 gid 来区分</p>
+<ul>
+<li>gen-msg.map</li>
+</ul>
+<p>这个文件和 sid-msg.map 作用类似，在逻辑上应该是包含了sid-msg.map（sid-msg.map相当于默认gid为1）</p>
+<p>格式：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">generatorid || alertid(sid) || MSG<br></code></pre></td></tr></table></figure>
+
+<p>例子：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-number">1</span>   || <span class="hljs-number">1</span> || snort general alert<br><span class="hljs-number">129</span> || <span class="hljs-number">2</span> || stream5: Data on SYN packet<br><span class="hljs-number">116</span> || <span class="hljs-number">271</span> || snort_decoder: WARNING: IPv6 header claims to not be IPv6<br><span class="hljs-number">116</span> || <span class="hljs-number">456</span> || snort_decoder: WARNING: too many IPV6 extension headers #例子<br>...<br></code></pre></td></tr></table></figure>
+
+<p>拿 gid 中第二条规则举例，如果此条规则被触发，则会报 snort_decoder: WARNING: too many IPV6 extension headers告警，而不是DECODE_IP6_EXCESS_EXT_HDR。所以规则中的 msg 仅仅起到标示作用，告警 msg 需要在 sid-msg.map 和gen-msg.map 这两个文件中对应查找</p>
+<ul>
+<li>rev</li>
+</ul>
+<p>这个关键字是被用来识别规则修改的版本，需要和 sid,gid 配合使用。 这样就介绍完了 gid，sid，rev 三个确定规则唯一的元素</p>
+<ul>
+<li>reference</li>
+</ul>
+<p>外部攻击参考，这个关键字允许规则包含一个外面的攻击识别系统。这个插件目前支持几种特定的系统，这些插件被输出插件用来提供一个关于产生报警的额外信息的连接</p>
+<ul>
+<li>reference.config</li>
+</ul>
+<p>格式：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">config reference: system URL<br></code></pre></td></tr></table></figure>
+
+<p>例子： </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">config reference: cve http:<span class="hljs-comment">//cve.mitre.org/cgi-bin/cvename.cgi?name=</span><br></code></pre></td></tr></table></figure>
+
+<p>定义了一些外部安全网站的网址。比如规则中定义 reference: cve,1001，那么就像在上面的网址后面添加了1001，<a target="_blank" rel="noopener" href="http://cve.mitre.org/cgi-bin/cvename.cgi?name=1001%EF%BC%8C%E6%9C%80%E5%90%8E%E7%82%B9%E5%87%BB%E5%91%8A%E8%AD%A6%E4%B8%AD%E7%9A%84">http://cve.mitre.org/cgi-bin/cvename.cgi?name=1001，最后点击告警中的</a> [cve]，就会跳转到相应的网址</p>
+<p><strong>PS</strong>：reference 也需要在 sid-msg.map 中与 sid 对应，否则不起作用，类比 msg</p>
+<ul>
+<li>classtype</li>
+</ul>
+<p>规则类别标识。这个关键字把报警分成不同的攻击类。通过使用这个关键字和使用优先级，用户可以指定规则类中每个类型所具有的优先级</p>
+<ul>
+<li>priority</li>
+</ul>
+<p>设置 classtype 的优先级。classtype 和 priority 是配合使用的，classification.config 文件将其联系起来</p>
+<ul>
+<li>classification.config</li>
+</ul>
+<p>格式：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">config classification:shortname,<span class="hljs-type">short</span> description,priority<br></code></pre></td></tr></table></figure>
+
+<p>例子： </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">config classification: attempted-admin,Attempted Administrator Privilege Gain,<span class="hljs-number">1</span><br></code></pre></td></tr></table></figure>
+
+<p>写在此文件中的都是默认值，priority 关键词可以在规则中重写优先级。</p>
+<p>例子：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">alert tcp any any -&gt; any <span class="hljs-number">80</span> (msg:<span class="hljs-string">&quot;EXPLOIT ntpdx overflow&quot;</span>; dsize:&gt;<span class="hljs-number">128</span>; classtype:attempted-admin; priority:<span class="hljs-number">10</span> );<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>metadata</li>
+</ul>
+<p>可以在规则中添加自定义的信息，一般以键值对的形式出现。通用规则选项只是对一条规则进行标示，分类等操作，并没有进行实际的过滤检测</p>
+<h4 id="8-3-5-3-后检测规则选项-Post-Detection-Rule-Option"><a href="#8-3-5-3-后检测规则选项-Post-Detection-Rule-Option" class="headerlink" title="8.3.5.3 后检测规则选项(Post-Detection Rule Option)"></a>8.3.5.3 后检测规则选项(Post-Detection Rule Option)</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs c">Logto                     输出日志路径<br>Session                   从 TCP 会话中获取用户数据<br>Resp                      通过发送响应结束恶意的请求<br>React                     不仅仅记录触发规则的特定数据包<br>Tag                       不仅仅记录触发规则的特定数据包<br>Activates                 activate 动作<br>Activates_by              dynamic 动作<br>Count                     dynamic 规则被触发后可以匹配的包的数目<br>Replace                   替换 content 内容<br>Detection-filter          检测过滤<br></code></pre></td></tr></table></figure>
+
+<h4 id="8-3-5-4-非负载检测规则选项-Non-Payload-Detection-Rule-Option"><a href="#8-3-5-4-非负载检测规则选项-Non-Payload-Detection-Rule-Option" class="headerlink" title="8.3.5.4 非负载检测规则选项(Non-Payload Detection Rule Option)"></a>8.3.5.4 非负载检测规则选项(Non-Payload Detection Rule Option)</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs c">Fragoffset                IP 偏移量<br>Ttl                       IP 生存时间<br>Tos                       IP 服务类型<br>Id                        IP 标识<br>Ipopts                    IP 可选项<br>Fragbits                  IP 标志<br>Dsize                     数据包负载量<br>Flags                     TCP flags<br>Seq                       TCP seq<br>Ack                       TCP ack<br>Window                    TCP window<br>Icmp_id                   ICMP ID<br></code></pre></td></tr></table></figure>
+
+<p>此类规则选项都是对数据包帧结构中特殊字段的匹配</p>
+<p>Non-Payload 的关键字用于匹配 IP 层、传输层协议的关键字段，主要包括：</p>
+<ul>
+<li>fragoffset，匹配 IP 报文中分片 offset 字段 <code>fragoffset:[!|&lt;|&gt;]&lt;number&gt;</code>;</li>
+<li>ttl，匹配 IP 首部的 TTL 字段，支持比较 <code>ttl:[&lt;, &gt;, =, &lt;=, &gt;=]&lt;number&gt;</code>;，支持数值范围 <code>ttl:[&lt;number&gt;]-[&lt;number&gt;]</code>;</li>
+<li>tos，匹配 IP 首部 tos 字段 <code>tos:[!]&lt;number&gt;</code>;</li>
+<li>id，匹配 IP ID 字段，<code>id:&lt;number&gt;</code>;</li>
+<li>ipopts，匹配 IP 首部的选项，<code>ipopts:&lt;rr|eol|nop|ts|sec|esec|lsrr|lsrre|ssrr|satid|any&gt;</code>;</li>
+<li>fragbits，匹配 IP 首部的分片标识，支持使用 <code>+/*/!</code>进行逻辑组合 <code>fragbits:[+*!]&lt;[MDR]&gt;</code>;</li>
+<li>dsize，匹配&#x2F;测试 报文的载荷长度，<code>dsize:min&lt;&gt;max;</code>与 <code>dsize:[&lt;|&gt;]&lt;number&gt;;</code></li>
+<li>flags，匹配 TCP 的 Flag 字段，支持使用 <code>+/*/!</code>进行逻辑组合，<code>flags:[!|*|+]&lt;FSRPAUCE0&gt;[,&lt;FSRPAUCE&gt;];</code></li>
+<li>flowbits，匹配&#x2F;设置 TCP 的 Flag 字段，用于跟踪 TCP 协议 Sesion 状态</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c">flowbits:[<span class="hljs-built_in">set</span>|setx|unset|toggle|isset|isnotset|noalert|reset][, &lt;bits/bats&gt;][, &lt;GROUP_NAME&gt;];<br>bits ::= bit[|bits]<br>bats ::= bit[&amp;bats]<br></code></pre></td></tr></table></figure>
+<ul>
+<li>seq，匹配 TCP 的序列号，<code>seq:&lt;number&gt;</code>;</li>
+<li>ack，匹配 TCP 的 ACK 序列号，<code>ack:&lt;number&gt;</code>;</li>
+<li>windows，匹配 TCP 的窗口大小，<code>window:[!]&lt;number&gt;</code>;</li>
+<li>itype，匹配 ICMP 的 type 字段，<code>itype:min&lt;&gt;max;</code>与 <code>itype:[&lt;|&gt;]&lt;number&gt;;</code></li>
+<li>icode，匹配 ICMP 的 code 字段，<code>icode:min&lt;&gt;max;</code>与 <code>icode:[&lt;|&gt;]&lt;number&gt;;</code></li>
+<li>icmp_id，匹配 ICMP 的 ID 值，<code>icmp_id:&lt;number&gt;;</code></li>
+<li>icmp_seq，匹配 ICMP 的序列号，<code>icmp_seq:&lt;number&gt;;</code></li>
+<li>rpc，匹配 SUNRPC 请求信息，<code>rpc:&lt;application number&gt;, [&lt;version number&gt;|*], [&lt;procedure number&gt;|*]&gt;;</code></li>
+<li>ip_proto，匹配 IP 的协议字段，<code>ip_proto:[!|&gt;|&lt;] &lt;name or number&gt;;</code></li>
+<li>sameip，匹配源 IP 与目的 IP 相同的流</li>
+<li>stream_reassemable，对 TCP 流的重组流进行设置，<code>stream_reassemble:&lt;enable|disable&gt;, &lt;server|client|both&gt;[, noalert][, fastpath];</code></li>
+<li>stream_size，匹配指定长度的 TCP 流，<code>stream_size:&lt;server|client|both|either&gt;, &lt;operator&gt;, &lt;number&gt;;</code></li>
+</ul>
+<h4 id="8-3-5-5-载荷选项-Payload-关键字"><a href="#8-3-5-5-载荷选项-Payload-关键字" class="headerlink" title="8.3.5.5 载荷选项(Payload) 关键字"></a>8.3.5.5 载荷选项(Payload) 关键字</h4><p>Snort 的 Payload 选项的关键字(Key)非常丰富，主要分为三大类</p>
+<ul>
+<li>查找关键字：对数据流进行内容查找，包括: content, protectedcontent 、<code>byte[test/jump] </code>及 isdata</li>
+<li>协议关键字：Preprocessor 解析协议相关的选项查找</li>
+<li>修饰关键字：修饰查找行为的关键字，主要包括：nocase, rawbytes, depth, offset, distance, within, <code>http_[cookie/header/method/uri]</code>等等</li>
+</ul>
+<h4 id="8-3-6-检测引擎模块配置"><a href="#8-3-6-检测引擎模块配置" class="headerlink" title="8.3.6 检测引擎模块配置"></a>8.3.6 检测引擎模块配置</h4><ul>
+<li>在 &#x2F;etc&#x2F;rules 目录下的 *.rules 文件中写规则</li>
+<li>snort.conf 中 include 对应规则</li>
+</ul>
+<p>例子：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c">include $RULE_PATH/local.rules<br><span class="hljs-meta">#<span class="hljs-keyword">include</span> $RULE_PATH/app-detect.rules</span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> $RULE_PATH/attack-responses.rules</span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> $RULE_PATH/backdoor.rules</span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> $RULE_PATH/bad-traffic.rules</span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> $RULE_PATH/blacklist.rules</span><br></code></pre></td></tr></table></figure>
+
+<h1 id="0x09-Snort-告警-x2F-日志模块"><a href="#0x09-Snort-告警-x2F-日志模块" class="headerlink" title="0x09 Snort 告警&#x2F;日志模块"></a>0x09 Snort 告警&#x2F;日志模块</h1><h2 id="9-1-输出插件"><a href="#9-1-输出插件" class="headerlink" title="9.1  输出插件"></a>9.1  输出插件</h2><p>输出插件使得Snot在向用户提供格式化输出时更加灵活。输出插件在 Snort的告警和记录子系统被调用时运行，在预处理程序和探测引擎之后。规则文件中指令的格式非常类似于预处理程序。</p>
+<p>格式：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">output：<br></code></pre></td></tr></table></figure>
+
+<p>例子：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">output alert_syslog：LOG_AUTH LOG_ALERT<br></code></pre></td></tr></table></figure>
+
+<h2 id="9-2-输出模块配置"><a href="#9-2-输出模块配置" class="headerlink" title="9.2 输出模块配置"></a>9.2 输出模块配置</h2><p>输出模块配置在 snort.conf 的 Configure output plugins. 支持多种输出格式。如下列中是将 Snort 的报警日志输出格式设置为 unified2，并通过 barnyard2 解析 unified2 文件，将报警日志存入数据库。</p>
+<p>设置日志路径：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">config logdir：/var/<span class="hljs-built_in">log</span>/snort <br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>设置输出格式为 unified2：</li>
+</ul>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs lua"><span class="hljs-built_in">output</span> unified2: filename snort.<span class="hljs-built_in">log</span>, limit <span class="hljs-number">128</span><br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>barnyard2.conf</li>
+</ul>
+<p>barnyard2 的作用是将 unified2 格式的数据存入数据库</p>
+<p>设置与 snort 日志关联：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">config waldo_file: /var/<span class="hljs-built_in">log</span>/snort/barnyard.waldo<br></code></pre></td></tr></table></figure>
+
+<p>设置数据库：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">output database: <span class="hljs-built_in">log</span>, mysql, user=snort password=<span class="hljs-number">123456</span> dbname=snort host=localhost<br></code></pre></td></tr></table></figure>
+
+<h2 id="9-3-数据库"><a href="#9-3-数据库" class="headerlink" title="9.3 数据库"></a>9.3 数据库</h2><ul>
+<li>schema</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c">vseq：数据库模式ID<br>ctime：数据库创建时间<br></code></pre></td></tr></table></figure>
+
+<p>信息表，和其他数据库内容上没有联系</p>
+<ul>
+<li>sensor</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c">sid：传感器代号<br>hostname：传感器所属的用户名称<br>Interface：传感器对应的网络接口<br>filter：对应传感器的过滤原则<br>detail：表示传感器监测模式，记录模式详细程度的级别        <br>encoding：包含数据存在形式<br>last_cid： 对应每个sid即传感器捕获告警的最后一个值<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>detail</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-number">0</span>-fast快速检测<br><span class="hljs-number">1</span>-full全面检测<br></code></pre></td></tr></table></figure>
+
+<p>传感器sensor的检测级别</p>
+<ul>
+<li>encoding</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-number">0</span>- Hex<br><span class="hljs-number">1</span>- base64<br><span class="hljs-number">2</span>- asci<br></code></pre></td></tr></table></figure>
+
+<p>数据包中数据的存在形式</p>
+<ul>
+<li>event</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c">sid：sensor id，传感器id<br>cid；event id   事件id。sid和cid共同作为主码，其中cid是在sid的基础上进行排序的。每个sid对应自己的cid排序<br>signature：对应signature表格中的sig_id选项，表明这条告警事件所属的规则形式的告警对应哪一类rules<br>timestamp：对应告警事件发生的系统时间<br></code></pre></td></tr></table></figure>
+
+<p>最核心的一张表，告警的每一条数据都会存储在 event 表中，一条 event 数据就代表一个包</p>
+<ul>
+<li>signature</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c">sig_id： 总数代表发生告警种类的总数。是告警种类的主码。唯一标识一条规则<br>sig_name：告警名称。对应每条alert语句的Msg<br>sig_class_id：对应sig_class表格中的sig_class_id.代表告警种类的大类信息<br>sig_priority：告警的优先级<br>sig_rev：版本号<br>sig_sid：snort id   <br>sig_gid：generate id <br></code></pre></td></tr></table></figure>
+
+<p>存储 snort 规则的一张表，可以看到 sig_sid,sig_gid,sig_rev 分别对应规则中的 sid,gid,rev。注意规则中的 snort id 和数据库中的 sensor id 注意区分</p>
+<ul>
+<li>sig_reference</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c">sig_id：对应的告警种类。<br>ref_id：对应reference表格中的主码<br>ref_seq：参考序列号<br></code></pre></td></tr></table></figure>
+
+<p>提供报警种类信息signature的参考信息。将signature与reference联系起来的表格</p>
+<ul>
+<li>reference</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c">Ref_id：主码<br>Ref_system_id：对应reference_system表格<br>Ref_tag：规则中 cve,bugtraq 后面的参数<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>reference_system</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c">ref_system_id：主码<br>ref_system_name：reference system的名字，如cve，url等<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>sig_class</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c">sig_class_id：分类编号<br>sig_class_name：分类名称<br></code></pre></td></tr></table></figure>
+
+<p>signature 告警种类的分类信息</p>
+<ul>
+<li>iphdr</li>
+<li>tcphdr</li>
+<li>udphdr</li>
+<li>icmphdr</li>
+<li>data</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c">data_payload：数据包有效载荷<br><br>规则中协议为 tcp 时，data_payload 中是 tcp 后面的内容<br><br>规则中协议为 icmp 时，data_payload 中是 icmp 协议中的 data 字段值<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>opt</li>
+</ul>
+<p>IP 和 OPT 的 option</p>
+<h1 id="0x010-Snort如何获取数据包"><a href="#0x010-Snort如何获取数据包" class="headerlink" title="0x010 Snort如何获取数据包"></a>0x010 Snort如何获取数据包</h1><p>Snort 2.9 时引入了用于数据包 I &#x2F; O 的 DAQ 或数据采集库。DAQ 用抽象层代替了对 libpcap 函数的直接调用，该抽象层便于在各种硬件和软件接口上进行操作，而无需更改 Snort。调用 Snort 进行 pcap 回读或内联操作等时，可以选择 DAQ 类型和模式。</p>
+<p><strong>PS</strong>：某些网卡具有可能会影响 Snort 的功能。其中两个功能分别称为 “大型接收卸载”（lro）和 “通用接收卸载”（gro）。启用这些功能后，网卡将在内核对其进行处理之前执行数据包重组。默认情况下，Snort 将截断大于默认快照值 1518 字节的数据包。此外，LRO 和 GRO 可能会导致基于 Stream 目标的重组问题。建议关闭 LRO 和 GRO(此处我们在前面的搭建教程中已配置)。在 Linux 系统上，您可以运行：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c">ethtool -K eth1 gro off<br>ethtool -K eth1 lro off<br></code></pre></td></tr></table></figure>
+
+<h2 id="10-1-配置"><a href="#10-1-配置" class="headerlink" title="10.1 配置"></a>10.1 配置</h2><p>假设您没有禁用静态模块或更改默认的 DAQ 类型，则可以像以往一样运行 Snort 进行文件回读或嗅探接口。但是，可以在调用 Snort 时选择和配置 DAQ，如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs c">./snort \<br>     [--daq &lt;type&gt;] \<br>     [--daq-mode &lt;mode&gt;] \<br>     [--daq-dir &lt;dir&gt;] \<br>     [--daq-var &lt;var&gt;]<br><br> config daq: &lt;type&gt;<br> config daq_dir: &lt;dir&gt;<br> config daq_var: &lt;var&gt;<br> config daq_mode: &lt;mode&gt;<br><br> &lt;type&gt; ::= pcap | afpacket | dump | nfq | ipq | ipfw<br> &lt;mode&gt; ::= read-file | passive | <span class="hljs-keyword">inline</span><br> &lt;var&gt; ::= arbitrary &lt;name&gt;=&lt;value&gt; passed to DAQ<br> &lt;dir&gt; ::= path where to look <span class="hljs-keyword">for</span> DAQ module so<span class="hljs-number">&#x27;</span>s<br></code></pre></td></tr></table></figure>
+
+<p>如上，通过命令行或在 conf 文件中指定 DAQ 类型、模式、变量和目录。可通过重复 arg &#x2F;config 来包含所需数量的变量和目录。DAQ 类型最多可在 conf 中指定一次，而在命令行中一次指定；如果在两个地方都配置，则命令行将覆盖 conf</p>
+<p>如果没设置模式，则 - Q 将强制其内联，如果尚未设置，则 - r 将其强制为读取文件，如果尚未设置，则模式默认为被动。另外，由于没有冲突，因此允许 - Q 和 - daq-mode 内联，但是 - Q 和任何其他 DAQ 模式将在启动时导致致命错误。</p>
+<p><strong>PS</strong>：如果 Snort 找到给定库的多个版本，则选择最新版本。这适用于同一库的静态和动态版本。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c">./snort --daq-<span class="hljs-built_in">list</span>[=&lt;dir&gt;]<br>./snort --daq-dir=&lt;dir&gt; --daq-<span class="hljs-built_in">list</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>PS</strong>：如上执行命令后在指定的目录中搜索 DAQ 模块以及每个模块的打印类型、版本和属性。该功能在 conf 中不可用。Snort 在解析 - daq-list 之后停止处理，因此，如果要添加一个或多个目录，请在命令行上的 - daq-list 之前添加 - daq-dir 选项。（由于目录是 - daq-list 的可选目录，因此此选项必须使用 &#x3D; 不带空格）</p>
+<h2 id="10-2-pcap"><a href="#10-2-pcap" class="headerlink" title="10.2 pcap"></a>10.2 pcap</h2><p>pcap 是默认的 DAQ，如果在没有任何 DAQ 参数的情况下运行 snort，它将像使用该模块一样始终运行。这些是等效的：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c">./snort -i &lt;device&gt;<br>./snort -r &lt;file&gt;<br>./snort --daq pcap --daq-mode passive -i &lt;device&gt;<br>./snort --daq pcap --daq-mode read-file -r &lt;file&gt;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>指定 pcap 使用的缓冲区大小</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">./snort --daq pcap --daq-var buffer_size = &lt;＃bytes&gt; <br></code></pre></td></tr></table></figure>
+
+<p><strong>PS</strong>：pcap DAQ 不计算过滤的数据包</p>
+<h2 id="10-3-Afpacket"><a href="#10-3-Afpacket" class="headerlink" title="10.3 Afpacket"></a>10.3 Afpacket</h2><p>afpacket 函数类似于内存映射的 pcap DAQ，但不需要外部库</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c">./snort --daq afpacket -i &lt;device&gt;<br>           [--daq-var buffer_size_mb=&lt;#MB&gt;]<br>           [--daq-var debug]<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>以串联模式运行 afpacket</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c">eth0：eth1<br>或<br>eth0：eth1 :: eth2：eth3 <br></code></pre></td></tr></table></figure>
+
+<p><strong>PS</strong>：必须将设备设置为一个或多个接口对，其中一对接口的每个成员都由单个冒号分隔，而每个配对对则由双冒号分隔</p>
+<ul>
+<li>更改afpacket DAQ 数据包内存大小</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">--daq-var buffer_size_mb = &lt;＃MB&gt; <br></code></pre></td></tr></table></figure>
+<p>PS：默认情况下，afpacket DAQ 为数据包内存分配 128MB，所以需要更改默认内存大小的话可以使用如上命令，但分配的总数实际上更高。假设，默认数据包内存的快照数为 1518，则数字按如下所示分解：</p>
+<blockquote>
+
+<ol>
+<li><p>帧大小为 1518（snaplen）+ AFPacket 标头的大小（66 个字节）&#x3D; 1584 个字节</p>
+</li>
+<li><p>帧数为 128 MB &#x2F; 1518 &#x3D; 84733</p>
+</li>
+<li><p>至少可容纳一帧的最小块大小为 4 KB &#x3D; 4096 字节 @每块 2 帧</p>
+</li>
+<li><p>结果发现却是需要 84733&#x2F;2 &#x3D; 42366 块</p>
+</li>
+<li><p>分配的实际内存为 42366 * 4 KB &#x3D; 165.5 MB</p>
+</blockquote></li>
+</ol>
+<h2 id="10-4-NFQ"><a href="#10-4-NFQ" class="headerlink" title="10.4 NFQ"></a>10.4 NFQ</h2><p>NFQ 是处理 iptables 数据包的新方法和改进的方法：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs c">./snort --daq nfq \<br>        [--daq-var device=&lt;dev&gt;] \<br>        [--daq-var proto=&lt;proto&gt;] \<br>        [--daq-var <span class="hljs-built_in">queue</span>=&lt;qid&gt;] \<br>        [--daq-var queue_len=&lt;qlen&gt;]<br><br>    &lt;dev&gt; ::= ip | eth0, etc; <span class="hljs-keyword">default</span> is IP injection<br>    &lt;proto&gt; ::= ip4 | ip6 | ip*; <span class="hljs-keyword">default</span> is ip4<br>    &lt;qid&gt; ::= <span class="hljs-number">0.</span><span class="hljs-number">.65535</span>; <span class="hljs-keyword">default</span> is <span class="hljs-number">0</span><br>    &lt;qlen&gt; ::= <span class="hljs-number">0.</span><span class="hljs-number">.65535</span>; <span class="hljs-keyword">default</span> is <span class="hljs-number">0</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="10-5-IPQ"><a href="#10-5-IPQ" class="headerlink" title="10.5 IPQ"></a>10.5 IPQ</h2><p>IPQ 是处理 iptables 数据包的旧方法。它替换了使用此版本构建的 2.9 之前版本中的内联版本：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">./configure --enable-<span class="hljs-keyword">inline</span> / -DGIDS <br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>启动IPQ DAQ</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c">./snort --daq ipq \<br>        [--daq-var device=&lt;dev&gt;] \<br>        [--daq-var proto=&lt;proto&gt;] \<br><br>    &lt;dev&gt; ::= ip | eth0, etc; <span class="hljs-keyword">default</span> is IP injection<br>    &lt;proto&gt; ::= ip4 | ip6; <span class="hljs-keyword">default</span> is ip4<br></code></pre></td></tr></table></figure>
+
+<h2 id="10-6-IPFW"><a href="#10-6-IPFW" class="headerlink" title="10.6 IPFW"></a>10.6 IPFW</h2><p>IPFW 可用于 BSD 系统（IPFW 仅支持 ip4 流量），它替换了使用此版本构建的 2.9 之前版本中的内联版本：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">./configure --enable-ipfw / -DGIDS -DIPFW <br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>不再支持此命令行参数：</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">./snort -J &lt;port#&gt; <br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>相反，像如下启动 Snort：</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c">./snort --daq ipfw [--daq-var port = &lt;port&gt;]<br> &lt;port&gt; :: = <span class="hljs-number">1.</span><span class="hljs-number">.65535</span>;  <span class="hljs-keyword">default</span> is <span class="hljs-number">8000</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="10-7-转储"><a href="#10-7-转储" class="headerlink" title="10.7 转储"></a>10.7 转储</h2><p>转储 DAQ 允许您测试 2.9 Snort 中可用的各种串联模式功能，例如：</p>
+<ul>
+<li>注入和规范化</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c">./snort -i &lt;device&gt; --daq dump<br>./snort -r &lt;pcap&gt; --daq dump<br></code></pre></td></tr></table></figure>
+
+<p><strong>PS</strong>：默认情况下，如上命令会将创建一个名为 inline-out.pcap 的文件，其中包含所有通过 snort 或由 snort 生成的数据包</p>
+<ul>
+<li>指定其他名称</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">./snort --daq dump --daq-var file=&lt;name&gt;<br></code></pre></td></tr></table></figure>
+
+<p>PS：dump 使用 pcap daq 进行数据包获取。因此，它不计算过滤的数据包。且转储 DAQ 串联模式不是实际的串联模式</p>
+<ul>
+<li>以其他方式获取 pcap DAQ</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c">./snort -r &lt;pcap&gt; -Q --daq dump --daq-var load-mode=read-file<br>./snort -i &lt;device&gt; -Q --daq dump --daq-var load-mode=passive<br></code></pre></td></tr></table></figure>
+
+<h2 id="10-8-统计数据变化"><a href="#10-8-统计数据变化" class="headerlink" title="10.8 统计数据变化"></a>10.8 统计数据变化</h2><p>Snort 输出的 Packet Wire Totals 和 Action Stats 部分包括其他字段：</p>
+<ul>
+<li>过滤 数据包的数量过滤掉，而不是交给的 Snort 进行分析</li>
+<li>注入 Snort 生成并发送了数据包，例如 TCP 重置</li>
+<li>允许 Snort 数据包进行分析，并且未采取任何措施</li>
+<li>阻止 Snort 未转发数据包，例如由于阻止规则</li>
+<li>替换 Snort 修改的数据包</li>
+<li>白名单导致 Snort 允许任何分析程序通过无检查的流量的数据包</li>
+<li>黑名单导致 Snort 阻止流量通过的数据包</li>
+<li>忽略 导致 Snort 通过此 Snort 实例允许流通过 &#x2F; 不进行检查的数据包。</li>
+</ul>
+<p>动作统计信息显示 “已阻止” 数据包，而不是 “已丢弃” 数据包，以避免已丢弃数据包（Snort 实际看不到的数据包）和已阻止数据包（Snort 不允许通过的数据包）之间的混淆</p>
+<h1 id="0x11-Snort读取pcap文件"><a href="#0x11-Snort读取pcap文件" class="headerlink" title="0x11 Snort读取pcap文件"></a>0x11 Snort读取pcap文件</h1><p>Snort可以捕获要读取的数据包，而不是单单在接口上侦听，Snort还会读取并分析数据包</p>
+<h2 id="11-1-命令行参数"><a href="#11-1-命令行参数" class="headerlink" title="11.1 命令行参数"></a>11.1 命令行参数</h2><p>在命令行（包括 -r）上以及除其他 Snort 命令行选项之外多次指定以下任何内容</p>
+<p><strong>PS</strong>：多次指定 -pcap-reset 和 -pcap-show 与指定一次具有相同的效果</p>
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>-r &lt; file &gt;</td>
+<td>读一个 pcap</td>
+</tr>
+<tr>
+<td>-pcap-single &#x3D; &lt; file &gt;</td>
+<td>与 - r 相同。为完整性而添加</td>
+</tr>
+<tr>
+<td>-pcap-file &#x3D; &lt; file &gt;</td>
+<td>包含要读取的 pcap 文件列表的文件，可以指定要递归以获得 pcaps 的每个 pcap 或目录的路径</td>
+</tr>
+<tr>
+<td>-pcap-list &#x3D;“ &lt; list &gt;”</td>
+<td>用空格分隔的要读取的 pcap 列表</td>
+</tr>
+<tr>
+<td>-pcap-dir &#x3D; &lt; dir &gt;</td>
+<td>递归查找 pcaps 的目录。以 ASCII 顺序排序</td>
+</tr>
+<tr>
+<td>-pcap-filter &#x3D; &lt; filter &gt;</td>
+<td>从文件或目录获取 pcaps 时要应用的 Shell 样式过滤器。此过滤器将应用于以下任何 -pcap-file 或 -pcap-dir 参数。使用 -pcap-no-filter 可以删除过滤器后面的-pcap-file 或 -pcap-dir 参数，或者再次指定 -pcap-filter 为了忘记先前的过滤器并应用于后面的 -pcap-file 或 -pcap-dir 参数</td>
+</tr>
+<tr>
+<td>-pcap-no-filter</td>
+<td>从文件或目录获取 pcaps 时，重置为不使用过滤器</td>
+</tr>
+<tr>
+<td>-pcap-reset</td>
+<td>如果要读取多个 pcap，请在读取下一个 pcap 之前将 snort 重置为配置后状态。默认值（即没有此选项）是不重置状态</td>
+</tr>
+<tr>
+<td>-pcap-show</td>
+<td>打印一行，说明当前正在读取什么 pcap</td>
+</tr>
+</tbody></table>
+<ul>
+<li>读一个 pcap</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c">snort -r test.pcap<br>snort --pcap-single = test.pcap<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>从文件读取 pcap</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c">$ cat test.txt<br>test1.pcap<br>test2.pcap<br>/home/test/pcaps<br><br>$ snort --pcap-file = test.txt <br></code></pre></td></tr></table></figure>
+
+<p><strong>PS</strong>：上面的命令将读取 test1.pcap，test2.pcap 以及 &#x2F;home&#x2F;test&#x2F;pcaps 下的所有文件。Snort 不会尝试确定该目录下的文件是否真的是 pcap 文件。</p>
+<ul>
+<li>从命令行列表中读取 pcap</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">snort --pcap-<span class="hljs-built_in">list</span> =<span class="hljs-string">&quot;test1.pcap test2.pcap test3.pcap&quot;</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>PS</strong>：读取 test1.pcap，test2.pcap 和 test3.pcap</p>
+<ul>
+<li>在目录下读取 pcaps</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">snort --pcap-dir =<span class="hljs-string">&quot;/home/test/pcaps&quot;</span><br></code></pre></td></tr></table></figure>
+<p><strong>PS</strong>：将包括 &#x2F;home&#x2F;test&#x2F;pcaps 下的所有文件</p>
+<ul>
+<li>使用过滤器</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c">$ cat test.txt <br>test1.pcap<br>test2.pcap<br>/home/test/pcaps<br>$ snort --pcap-filter =<span class="hljs-string">&quot;*.pcap&quot;</span> --pcap-file = test.txt<br>$ snort --pcap-filter =<span class="hljs-string">&quot;*.pcap&quot;</span> --pcap-dir = /home/test/pcaps<br></code></pre></td></tr></table></figure>
+
+<p><strong>PS</strong>：包含与外壳模式 “* .pcap” 匹配的文件</p>
+<p> 1）第一个过滤器 “<em>.pcap” 将仅应用于文件 “test.txt”（以及该文件中递归的所有目录）中的 pcaps。添加第二个过滤器 “</em>.cap” 将导致第一个过滤器被忘记，然后应用于目录 &#x2F;home&#x2F;test&#x2F;pcaps，因此该目录中仅包含以 “.cap” 结尾的文件</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c">snort --pcap-filter =<span class="hljs-string">&quot;*.pcap&quot;</span> --pcap-file = test.txt \ <br> &gt; --pcap-filter =<span class="hljs-string">&quot;*.cap&quot;</span> --pcap-dir = /home/test/pcaps<br></code></pre></td></tr></table></figure>
+
+<p>2）第一个过滤器将应用于 test.txt，然后没有过滤器将应用于在 &#x2F;home&#x2F;test&#x2F;pcaps 下找到的文件，因此将包括在 &#x2F;home&#x2F;test&#x2F;pcaps 下找到的所有文件</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c">snort --pcap-filter =<span class="hljs-string">&quot;*.pcap&quot;</span> --pcap-file = test.txt \<br> &gt; --pcap-no-filter --pcap-dir = /home/test/pcaps<br></code></pre></td></tr></table></figure>
+
+<p>3）第一个过滤器将应用于 test.txt，然后没有过滤器将应用于在 &#x2F;home&#x2F;test&#x2F;pcaps 下找到的文件，因此将包括在 &#x2F;home&#x2F;test&#x2F;pcaps 下找到的所有文件，然后过滤器 “*.cap” 将应用于 &#x2F;home&#x2F;test&#x2F;pcaps2 下的文件</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c">snort --pcap-filter =<span class="hljs-string">&quot;*.pcap&quot;</span> --pcap-file = test.txt \ <br> &gt; --pcap-no-filter --pcap-dir = /home/test/pcaps \ <br> &gt; --pcap-filter =<span class="hljs-string">&quot;*.cap&quot;</span> --pcap-dir = /home/test/pcaps2<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>复位状态</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">snort --pcap-dir = /home/test/pcaps --pcap-reset <br></code></pre></td></tr></table></figure>
+
+<p><strong>PS</strong>：将读取 &#x2F;home&#x2F;test&#x2F;pcaps 下的所有文件，但是在读取每个 pcap 之后，Snort 将被重置为配置后状态，意味着将刷新所有缓冲区，重置统计信息等。对于每个 pcap ，就好像 Snort 第一次看到流量一样</p>
+<ul>
+<li>打印 pcap</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">snort --pcap-dir = /home/test/pcaps --pcap-show<br></code></pre></td></tr></table></figure>
+
+<p><strong>PS</strong>：将读取  &#x2F;home&#x2F;test&#x2F;pcaps 下的所有文件，并显示一行以指示当前正在读取哪个 pcap</p>
+<h1 id="0x12-Snort基本输出"><a href="#0x12-Snort基本输出" class="headerlink" title="0x12 Snort基本输出"></a>0x12 Snort基本输出</h1><h2 id="12-1-时序统计"><a href="#12-1-时序统计" class="headerlink" title="12.1 时序统计"></a>12.1 时序统计</h2><p>基本的时序统计信息。它包括总秒数和数据包以及数据包处理速率。速率基于整秒，分钟等，并且仅在非零时显示。</p>
+<p>例：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c">================================================== ================<br>数据包处理的运行时间为 <span class="hljs-number">175.856509</span> 秒<br>Snort 处理了 <span class="hljs-number">3716022</span> 个数据包<br>Snort 运行了 <span class="hljs-number">0</span> 天 <span class="hljs-number">0</span> 小时 <span class="hljs-number">2</span> 分钟 <span class="hljs-number">55</span> 秒<br>Pkts / 分钟：<span class="hljs-number">1858011</span><br>Pkts / 秒：<span class="hljs-number">21234</span><br>================================================== ================<br></code></pre></td></tr></table></figure>
+
+<h2 id="12-2-数据包-I-x2F-O-总计"><a href="#12-2-数据包-I-x2F-O-总计" class="headerlink" title="12.2 数据包 I&#x2F;O 总计"></a>12.2 数据包 I&#x2F;O 总计</h2><p>从 DAQ 获得的基本数据包获取和注入挂钩计数。如果要读取 pcap，则总计为所有 pcap 的总和，除非您使用 - pcap-reset，在这种情况下，每个 pcap 都会显示该总数。</p>
+<ul>
+<li>未完成表示缓冲了等待处理的数据包数量。每个 DAQ 的计数方式各不相同</li>
+<li>未显示 pcap DAQ 的已过滤数据包</li>
+<li>注入的数据包是主动响应的结果，可以将其配置为串联或被动模式</li>
+</ul>
+<p>例：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs c">================================================== ================<br>数据包 I/O 总计：<br>收到：<span class="hljs-number">3716022</span><br>分析：<span class="hljs-number">3716022</span>（<span class="hljs-number">100.000</span>％）<br>减少：<span class="hljs-number">0</span>（<span class="hljs-number">0.000</span>％）<br>已过滤：<span class="hljs-number">0</span>（<span class="hljs-number">0.000</span>％）<br>优秀：<span class="hljs-number">0</span>（<span class="hljs-number">0.000</span>％）<br>注入：<span class="hljs-number">0</span><br>================================================== ================<br></code></pre></td></tr></table></figure>
+
+<h2 id="12-3-协议统计"><a href="#12-3-协议统计" class="headerlink" title="12.3 协议统计"></a>12.3 协议统计</h2><p>如果启用了预处理器（例如 frag3 和 stream5），则此流量包括内部 “伪数据包”，因此总数可能大于数据包 I &#x2F; O 部分中已分析数据包的数量</p>
+<ul>
+<li>由于基本的编码完整性缺陷会阻止 Snort 解码数据包，因此光盘计数被丢弃</li>
+<li>其他包括包含 Snort 不解码的封装的数据包</li>
+<li>S5 G 1&#x2F;2 是由于高速缓存限制，会话超时，会话重置而刷新的客户机 &#x2F; 服务器会话 stream5 的数量</li>
+</ul>
+<p>例：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><code class="hljs c">===================================================================<br>按协议细分（包括重建的数据包）：<br>Eth：<span class="hljs-number">3722347</span>（<span class="hljs-number">100.000</span>％）<br>VLAN：<span class="hljs-number">0</span>（<span class="hljs-number">0.000</span>％）<br>IP4：<span class="hljs-number">1782394</span>（<span class="hljs-number">47.884</span>％）<br>Frag：<span class="hljs-number">3839</span>（<span class="hljs-number">0.103</span>％）<br>ICMP：<span class="hljs-number">38860</span>（<span class="hljs-number">1.044</span>％）<br>UDP：<span class="hljs-number">137162</span>（<span class="hljs-number">3.685</span>％）<br>TCP：<span class="hljs-number">1619621</span>（<span class="hljs-number">43.511</span>％）<br>IP6：<span class="hljs-number">1781159</span>（<span class="hljs-number">47.850</span>％）<br>IP6 Ext：<span class="hljs-number">1787327</span>（<span class="hljs-number">48.016</span>％）<br>IP6 Opts：<span class="hljs-number">6168</span>（<span class="hljs-number">0.166</span>％）<br>Frag6：<span class="hljs-number">3839</span>（<span class="hljs-number">0.103</span>％）<br>ICMP6：<span class="hljs-number">1650</span>（<span class="hljs-number">0.044</span>％）<br>UDP6：<span class="hljs-number">140446</span>（<span class="hljs-number">3.773</span>％）<br>TCP6：<span class="hljs-number">1619633</span>（<span class="hljs-number">43.511</span>％）<br>Teredo：<span class="hljs-number">18</span>（<span class="hljs-number">0.000</span>％）<br>ICMP-IP：<span class="hljs-number">0</span>（<span class="hljs-number">0.000</span>％）<br>EAPOL：<span class="hljs-number">0</span>（<span class="hljs-number">0.000</span>％）<br>IP4 / IP4：<span class="hljs-number">0</span>（<span class="hljs-number">0.000</span>％）<br>IP4 / IP6：<span class="hljs-number">0</span>（<span class="hljs-number">0.000</span>％）<br>IP6 / IP4：<span class="hljs-number">0</span>（<span class="hljs-number">0.000</span>％）<br>IP6 / IP6：<span class="hljs-number">0</span>（<span class="hljs-number">0.000</span>％）<br>GRE：<span class="hljs-number">202</span>（<span class="hljs-number">0.005</span>％）<br>GRE Eth：<span class="hljs-number">0</span>（<span class="hljs-number">0.000</span>％）<br>GRE VLAN：<span class="hljs-number">0</span>（<span class="hljs-number">0.000</span>％）<br>GRE IP4：<span class="hljs-number">0</span>（<span class="hljs-number">0.000</span>％）<br>GRE IP6：<span class="hljs-number">0</span>（<span class="hljs-number">0.000</span>％）<br>GRE IP6 Ext：<span class="hljs-number">0</span>（<span class="hljs-number">0.000</span>％）<br>GRE PPTP：<span class="hljs-number">202</span>（<span class="hljs-number">0.005</span>％）<br>GRE ARP：<span class="hljs-number">0</span>（<span class="hljs-number">0.000</span>％）<br>GRE IPX：<span class="hljs-number">0</span>（<span class="hljs-number">0.000</span>％）<br>GRE Loop：<span class="hljs-number">0</span>（<span class="hljs-number">0.000</span>％）<br>MPLS：<span class="hljs-number">0</span>（<span class="hljs-number">0.000</span>％）<br>ARP：<span class="hljs-number">104840</span>（<span class="hljs-number">2.817</span>％）<br>IPX：<span class="hljs-number">60</span>（<span class="hljs-number">0.002</span>％）<br>Eth Loop：<span class="hljs-number">0</span>（<span class="hljs-number">0.000</span>％）<br>Eth Disc：<span class="hljs-number">0</span>（<span class="hljs-number">0.000</span>％）<br>IP4 Disc：<span class="hljs-number">0</span>（<span class="hljs-number">0.000</span>％）<br>IP6 Disc：<span class="hljs-number">0</span>（<span class="hljs-number">0.000</span>％）<br>TCP Disc：<span class="hljs-number">0</span>（<span class="hljs-number">0.000</span>％）<br>UDP Disc：<span class="hljs-number">1385</span>（<span class="hljs-number">0.037</span>％）<br>ICMP Disc：<span class="hljs-number">0</span>（<span class="hljs-number">0.000</span>％）<br>All Discard：<span class="hljs-number">1385</span>（<span class="hljs-number">0.037</span>％）<br>Other：<span class="hljs-number">57876</span>（<span class="hljs-number">1.555</span>％）<br>Bad Chk Sum：<span class="hljs-number">32135</span>（<span class="hljs-number">0.863</span>％）<br>Bad TTL：<span class="hljs-number">0</span>（<span class="hljs-number">0.000</span>％）<br>S5 G <span class="hljs-number">1</span>：<span class="hljs-number">1494</span>（<span class="hljs-number">0.040</span>％）<br>S5 G <span class="hljs-number">2</span>：<span class="hljs-number">1654</span>（<span class="hljs-number">0.044</span>％）<br>Total：<span class="hljs-number">3722347</span><br>==================================================================<br></code></pre></td></tr></table></figure>
+
+<h2 id="12-4-Snort-内存统计"><a href="#12-4-Snort-内存统计" class="headerlink" title="12.4 Snort 内存统计"></a>12.4 Snort 内存统计</h2><p>在具有 mallinfo（3）的系统上，您将看到其他统计信息。检查 mallinfo 的手册页以获取详细信息</p>
+<p>例：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c">================================================== =================<br>内存使用情况摘要:<br>未映射的字节总数（区域）：<span class="hljs-number">415481856</span><br>映射区域中的字节数（hblkhd）：<span class="hljs-number">409612288</span><br>已分配的总空间（单位）：<span class="hljs-number">92130384</span><br>总可用空间（fordblks）：<span class="hljs-number">323351472</span><br>最上面的可释放块（保持成本）：<span class="hljs-number">3200</span><br>================================================== =================<br></code></pre></td></tr></table></figure>
+
+<h2 id="12-5-行动，限制和判决"><a href="#12-5-行动，限制和判决" class="headerlink" title="12.5 行动，限制和判决"></a>12.5 行动，限制和判决</h2><p>动作和判定计数表明 Snort 对所分析的数据包做了什么。仅在 IDS 模式下输出此信息（使用 -c <conf> 选项运行 snort 时 ）</p>
+<ul>
+<li>警报是警报的数量，由规则操作确定处理的阻止操作。此处的阻止包括阻止，删除和拒绝操作</li>
+</ul>
+<p>由于现实世界对处理时间和可用内存的限制，因此出现了限制。这些指示未发生的潜在操作：</p>
+<ul>
+<li>由于配置检测：max_queue_events 设置，未处理 “匹配限制计数” 规则匹配 。默认值为 5</li>
+<li>由于配置event_queue：max_queue 设置，队列限制计数事件无法存储在事件队列中。预设值为 8</li>
+<li>由于配置event_queue：日志设置，未记录日志限制计数事件 。预设值为 3</li>
+<li>由于 event_filter 限制，“事件限制” 对未发出警报的事件进行计数 </li>
+<li>警报限制计数事件未发出警报，因为它们已在会话中触发</li>
+</ul>
+<p>Snort 在每个数据包上做出判决：</p>
+<ul>
+<li>允许 &#x3D; 分析 Snort 的数据包，未对其采取任何措施</li>
+<li>阻止 &#x3D; 数据包 Snort 没有转发，例如由于阻止规则。使用 “阻止” 代替 “丢弃”，以避免丢弃的数据包（实际上没有看到 Snort 的数据包）和阻止的数据包（不允许 Snort 通过的数据包）之间的混淆</li>
+<li>替换 &#x3D; 数据包 Snort 修改，例如，由于规范化或替换规则。这只能在具有兼容 DAQ 的串联模式下发生</li>
+<li>白名单 &#x3D; 导致 Snort 允许流通过任何分析程序而没有通过检查的数据包。像黑名单一样，这是由 DAQ 或 Snort 对后续数据包进行的</li>
+<li>黑名单 &#x3D; 导致 Snort 阻止流量通过的数据包。阻止 TCP 规则触发时就是这种情况。如果 DAQ 在硬件中支持此功能，则 Snort 在该会话中将看不到其他数据包。否则，snort 将阻止每个数据包，并且此计数将更高。<br>忽略 &#x3D; 导致 Snort 通过此 Snort 实例允许流通过 &#x2F; 不进行检查的数据包。像黑名单一样，这是由 DAQ 或 Snort 对后续数据包进行的<br>Int Blklst &#x3D; 被封装的 GTP，Teredo，6in4 或 4in6 封装的数据包。如果为给定协议设置了 config tunnel_verdicts，则这些数据包可能会获得黑名单判决。注意，只有非零时才输出这些计数。同样，此计数在发出警报的流中的第一个数据包上增加。流中的警报数据包和所有后续数据包将计入 “块” 下<br>Int Whtlst &#x3D; 允许封装为 GTP，Teredo，6in4 或 4in6 的数据包。如果为给定协议设置了 config tunnel_verdicts，则这些数据包可能获得白名单判决。注意，只有非零时才输出这些计数。同样，从警报包开始，对于流上的所有包，此计数都会增加</li>
+</ul>
+<p>例：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs c">================================================== ==============<br>动作统计:<br>	警报：<span class="hljs-number">0</span>（<span class="hljs-number">0.000</span>％）<br>	记录：<span class="hljs-number">0</span>（<span class="hljs-number">0.000</span>％）<br>	通过：<span class="hljs-number">0</span>（<span class="hljs-number">0.000</span>％）<br>限制：<br>	匹配：<span class="hljs-number">0</span><br>	列：<span class="hljs-number">0</span><br>	日志：<span class="hljs-number">0</span><br>	事件：<span class="hljs-number">0</span><br>	警报：<span class="hljs-number">0</span><br>判决：<br>	允许：<span class="hljs-number">3716022</span>（<span class="hljs-number">100.000</span>％）<br>	阻止：<span class="hljs-number">0</span>（<span class="hljs-number">0.000</span>％）<br>	替换：<span class="hljs-number">0</span>（<span class="hljs-number">0.000</span>％）<br>	白名单：<span class="hljs-number">0</span>（<span class="hljs-number">0.000</span>％）<br>	黑名单：<span class="hljs-number">0</span>（<span class="hljs-number">0.000</span>％）<br>	忽略：<span class="hljs-number">0</span>（<span class="hljs-number">0.000</span>％）<br>================================================== ================<br></code></pre></td></tr></table></figure>
+
+<h1 id="0x16-Snort-隧道协议支持"><a href="#0x16-Snort-隧道协议支持" class="headerlink" title="0x16 Snort 隧道协议支持"></a>0x16 Snort 隧道协议支持</h1><h2 id="16-1-前言"><a href="#16-1-前言" class="headerlink" title="16.1 前言"></a>16.1 前言</h2><p>Snort 支持许多隧道协议的解码，包括 GRE，GRE 上的 PPTP，MPLS，IP 中的 IP 和 ERSPAN，所有这些默认情况下都是启用的。</p>
+<p>要禁用对任何与 GRE 相关的封装，基于 GRE 的 PPTP，基于 GRE 的 IPv4 &#x2F; IPv6 和 ERSPAN 的支持，需要一个额外的配置选项：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">./configure --disable-gre<br></code></pre></td></tr></table></figure>
+
+<p>要禁用对 MPLS 的支持，需要一个单独的额外配置选项</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">./configure --disable-mpls<br></code></pre></td></tr></table></figure>
+
+<h2 id="16-2-多种封装"><a href="#16-2-多种封装" class="headerlink" title="16.2 多种封装"></a>16.2 多种封装</h2><p>Snort不会解码多个封装（将不会被处理，并会生成解码器警报），如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c">Eth IPv4 GRE IPv4 GRE IPv4 TCP Payload<br><br>或<br><br>Eth IPv4 IPv6 IPv6 TCP Payload<br></code></pre></td></tr></table></figure>
+
+<h2 id="16-3-日志记录"><a href="#16-3-日志记录" class="headerlink" title="16.3 日志记录"></a>16.3 日志记录</h2><ul>
+<li>当前，仅记录包的封装部分，例如：</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">Eth IP1 GRE IP2 TCP Payload<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>想要获取登录的话，如下：</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c">Eth IP2 TCP Payload<br><br>或<br><br>Eth IP1 IP2 TCP Payload<br></code></pre></td></tr></table></figure>
+
+<p>PS：在需要字对齐的架构（例如 SPARC）上不支持利用 GRE 和 PPP 的 PPTP 解码</p>
+<h2 id="16-4-Snort-其他相关操作"><a href="#16-4-Snort-其他相关操作" class="headerlink" title="16.4 Snort 其他相关操作"></a>16.4 Snort 其他相关操作</h2><h3 id="16-4-1-Snort-作为守护程序运行"><a href="#16-4-1-Snort-作为守护程序运行" class="headerlink" title="16.4.1 Snort 作为守护程序运行"></a>16.4.1 Snort 作为守护程序运行</h3><p>Snort 作为守护程序的话，则可以将 - D 开关添加到所说几种模式进行任何组合。但如果只希望能够通过向守护程序发送 SIGHUP 信号来重新启动 Snort，则在启动时必须指定 Snort 二进制文件的完整路径，例如：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c">/usr/local/bin/snort -d -h <span class="hljs-number">192.168</span><span class="hljs-number">.6</span><span class="hljs-number">.0</span>/<span class="hljs-number">24</span> \<br>-l /var/<span class="hljs-built_in">log</span>/snortlogs -c /usr/local/etc/snort.conf -s -D<br></code></pre></td></tr></table></figure>
+
+<p><strong>PS</strong>：Snort出于安全考虑，不支持相对路径</p>
+<ul>
+<li>Snort PID 文件</li>
+</ul>
+<p>当 Snort 作为守护程序运行时，该守护程序在日志目录中创建一个 PID 文件。在 Snort 2.6 中，-pid-path 命令行开关使 Snort 将 PID 文件写入指定的目录中</p>
+<p>此外，即使未在守护程序模式下运行，-create-pidfile 开关也可用于强制创建 PID 文件</p>
+<p>PID 文件将被锁定，以便其他 snort 进程无法启动。使用 -nolock-pidfile 开关不锁定 PID 文件</p>
+<p>如果不想在 PID 文件中包含接口名称，请使用 -no-interface-pidfile 开关</p>
+<h3 id="16-4-2-在规则存根创建模式下运行"><a href="#16-4-2-在规则存根创建模式下运行" class="headerlink" title="16.4.2  在规则存根创建模式下运行"></a>16.4.2  在规则存根创建模式下运行</h3><p>如果将共享库规则存根转储到目录中，则必须使用 - dump-dynamic-rules 命令行选项。这些规则存根文件与共享库规则一起使用，路径可以是相对的或绝对的</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">/usr/local/bin/snort -c /usr/local/etc/snort.conf \  --dump-dynamic-rules = /tmp<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>命令行配置的路径优先于使用 dump-dynamic-rules-path 配置的路径</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c">/usr/local/bin/snort -c /usr/local/etc/snort.conf \ <br>--dump-dynamic-rules <br>snort.conf：<br>config dump-dynamic-rules-path：/tmp/sorules<br></code></pre></td></tr></table></figure>
+
+<p><strong>PS</strong>：如上命令将转储路径设置为 &#x2F;tmp&#x2F;sorules</p>
+<h3 id="16-4-3-混淆-IP-地址打印输出"><a href="#16-4-3-混淆-IP-地址打印输出" class="headerlink" title="16.4.3 混淆 IP 地址打印输出"></a>16.4.3 混淆 IP 地址打印输出</h3><p>如果需要将数据包日志发布到公共邮件列表，则可能需要使用 - O 开关。此开关在数据包打印输出中混淆了您的 IP 地址。</p>
+<ul>
+<li>如果不想邮件列表中的人知道所涉及的 IP 地址，可以将 - O 开关与 - h 开关组合使用，以仅使归属网络上主机的 IP 地址模糊</li>
+<li>如果想所有人看到攻击主机的地址，使用以下命令从日志文件中读取数据包并将其转储到屏幕，仅混淆来自 192.168.6.0&#x2F;24 C 类网络的地址：</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">./snort -d -v -r snort.<span class="hljs-built_in">log</span> -O -h <span class="hljs-number">192.168</span><span class="hljs-number">.6</span><span class="hljs-number">.0</span>/<span class="hljs-number">24</span> <br></code></pre></td></tr></table></figure>
+
+<h3 id="16-4-4-指定多实例标识符"><a href="#16-4-4-指定多实例标识符" class="headerlink" title="16.4.4 指定多实例标识符"></a>16.4.4 指定多实例标识符</h3><p>在 Snort v2.4 中，添加了 -G 命令行选项，该选项指定事件日志的实例标识符。<br>在不同的 CPU 上或在同一 CPU 但接口不同的情况下运行多个 snort 实例时，可使用此选项。每个 Snort 实例将使用指定的值来生成唯一的事件 ID。用户可以指定一个十进制值（-G1）或以 0x 开头的十六进制值（-G0x11）。长选项 -logid 也支持此功能</p>
+<h1 id="0x17-Snort-模式"><a href="#0x17-Snort-模式" class="headerlink" title="0x17  Snort 模式"></a>0x17  Snort 模式</h1><p>同学们，应该知道Snort 可以在三种不同的模式下运行，即 tap（被动）、内联和内联测试，但Snort 策略也可以在这三种模式下配置</p>
+<h2 id="17-1-模式说明"><a href="#17-1-模式说明" class="headerlink" title="17.1  模式说明"></a>17.1  模式说明</h2><ul>
+<li>内联</li>
+</ul>
+<p>当 Snort 处于内联模式时，它充当 IPS 允许触发丢弃规则。可以使用命令行参数 - Q 和 snort 配置选项 policy_mode 将 Snort 配置为以内联模式运行，如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c">snort -Q<br>config policy_mode：<span class="hljs-keyword">inline</span><br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>被动</li>
+</ul>
+<p>当 Snort 处于被动模式时，它充当 IDS。未加载放置规则（没有 - treat-drop-as-alert）。可以使用 snort config 选项 policy_mode 将 Snort 配置为被动模式，如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">config policy_mode：tap<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>内联测试</li>
+</ul>
+<p>内联测试模式模拟 snort 的内联模式，允许评估内联行为而不影响流量。放置规则将被加载，并将作为 Wdrop（Would Drop）警报触发。可以使用命令行选项（-enable-inline-test）或使用 snort 配置选项 policy_mode 将 snort 配置为内联测试模式运行，如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c">snort --enable-<span class="hljs-keyword">inline</span>-test<br>config policy_mode：inline_test<br></code></pre></td></tr></table></figure>
+
+<p><strong>PS</strong>：- enable-inline-test 不能与 - Q 一起使用</p>
+<ul>
+<li>带有规则选项的不同模式的行为</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>规则选项</th>
+<th>内联模式</th>
+<th>被动模式</th>
+<th>内联测试模式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>拒绝</td>
+<td>下降 + 回应</td>
+<td>警报 + 响应</td>
+<td>Wdrop + 回应</td>
+</tr>
+<tr>
+<td>反应</td>
+<td>阻止并发送通知</td>
+<td>阻止并发送通知</td>
+<td>阻止并发送通知</td>
+</tr>
+<tr>
+<td>标准化</td>
+<td>标准化数据包</td>
+<td>不标准</td>
+<td>不标准</td>
+</tr>
+<tr>
+<td>替换</td>
+<td>替换内容</td>
+<td>不替换</td>
+<td>不替换</td>
+</tr>
+<tr>
+<td>响应</td>
+<td>关闭会话</td>
+<td>关闭会话</td>
+<td>关闭会话</td>
+</tr>
+</tbody></table>
+<ul>
+<li>具有规则动作的不同模式的行为</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>适配器模式</th>
+<th>Snort args</th>
+<th>配置 policy_mode</th>
+<th>删除规则处理</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>被动</td>
+<td>-treat-drop-as-alert</td>
+<td>tap</td>
+<td>警报</td>
+</tr>
+<tr>
+<td>被动</td>
+<td>no args</td>
+<td>tap</td>
+<td>未加载</td>
+</tr>
+<tr>
+<td>被动</td>
+<td>-treat-drop-as-alert</td>
+<td>inline_test</td>
+<td>警报</td>
+</tr>
+<tr>
+<td>被动</td>
+<td>no args</td>
+<td>inline_test</td>
+<td>下降</td>
+</tr>
+<tr>
+<td>被动</td>
+<td>-treat-drop-as-alert</td>
+<td>inline</td>
+<td>警报</td>
+</tr>
+<tr>
+<td>被动</td>
+<td>no args</td>
+<td>inline</td>
+<td>未加载 + 警告</td>
+</tr>
+<tr>
+<td>内联测试</td>
+<td>-enable-inline-test -treat-drop-as-alert</td>
+<td>tap</td>
+<td>警报</td>
+</tr>
+<tr>
+<td>内联测试</td>
+<td>-enable-inline-test</td>
+<td>tap</td>
+<td>下降</td>
+</tr>
+<tr>
+<td>内联测试</td>
+<td>-enable-inline-test -treat-drop-as-alert</td>
+<td>inline_test</td>
+<td>警报</td>
+</tr>
+<tr>
+<td>内联测试</td>
+<td>enable-inline-test</td>
+<td>inline_test</td>
+<td>会掉落</td>
+</tr>
+<tr>
+<td>内联测试</td>
+<td>enable-inline-test -treat-drop-as-alert</td>
+<td>inline</td>
+<td>警报</td>
+</tr>
+<tr>
+<td>内联测试</td>
+<td>enable-inline-test</td>
+<td>inline</td>
+<td>下降</td>
+</tr>
+<tr>
+<td>内联</td>
+<td>-Q -treat-drop-as-alert</td>
+<td>tap</td>
+<td>警报</td>
+</tr>
+<tr>
+<td>内联</td>
+<td>-Q</td>
+<td>tap</td>
+<td>警报</td>
+</tr>
+<tr>
+<td>内联</td>
+<td>-Q -treat-drop-as-alert</td>
+<td>inline_test</td>
+<td>警报</td>
+</tr>
+<tr>
+<td>内联</td>
+<td>-Q</td>
+<td>inline_test</td>
+<td>下降</td>
+</tr>
+<tr>
+<td>内联</td>
+<td>-Q -treat-drop-as-alert</td>
+<td>inline</td>
+<td>警报</td>
+</tr>
+<tr>
+<td>内联</td>
+<td>-Q</td>
+<td>inline</td>
+<td>下降</td>
+</tr>
+</tbody></table>
+<h1 id="0x18-Snort-控制套接字"><a href="#0x18-Snort-控制套接字" class="headerlink" title="0x18 Snort 控制套接字"></a>0x18 Snort 控制套接字</h1><p>Snort 配置为提供 Unix 套接字，该套接字可用于向正在运行的进程发出命令。必须使用 -enable-control-socket 选项构建 snort ，控制套接字功能仅在 Linux 上受支持。</p>
+<p>可使用命令行参数 -cs-dir <path> 和 snort 配置选项 cs_dir 将 Snort 配置为使用控制套接字，如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">snort --cs-dir &lt;路径&gt; 设定cs_dir：&lt;路径&gt;<br></code></pre></td></tr></table></figure>
+
+<p><path> 指定 snort 创建套接字的目录。如果使用相对路径，则该路径相对于指定的 pid 路径。如果未指定 pid 路径，则该路径是相对于当前工作目录的。</p>
+<p>使用 -enable-control-socket 选项配置时，将在同一 bin 目录中创建并安装 snort_control 命令，并将其与 snort 一起安装。</p>
+<h1 id="0x19-Snort-配置信号值"><a href="#0x19-Snort-配置信号值" class="headerlink" title="0x19 Snort 配置信号值"></a>0x19 Snort 配置信号值</h1><p>在某些系统上，snort 使用的信号可能会被其他功能使用。为避免冲突，对于非 Windows 系统，用户可以通过.&#x2F;configure 选项更改默认信号值</p>
+<p>信号可更改为：</p>
+<ul>
+<li>SIGNAL_SNORT_RELOAD</li>
+<li>SIGNAL_SNORT_DUMP_STATS</li>
+<li>SIGNAL_SNORT_ROTATE_STATS</li>
+<li>SIGNAL_SNORT_READ_ATTR_TBL</li>
+</ul>
+<p>用法：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">./configure SIGNAL_SNORT_RELOAD = &lt;value/name&gt; SIGNAL_SNORT_DUMP_STATS = &lt;value/name&gt; \        SIGNAL_SNORT_READ_ATTR_TBL = &lt;value/name&gt; SIGNAL_SNORT_ROTATE_STATS = &lt;value/name&gt;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>将信号设置为系统中用户定义的值或已知的信号名称，例如将轮换状态信号更改为 31 并将重载属性表更改为信号 SIGUSR2：</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">./configure SIGNAL_SNORT_ROTATE_STATS = <span class="hljs-number">31</span> SIGNAL_SNORT_READ_ATTR_TBL = SIGUSR2<br></code></pre></td></tr></table></figure>
+
+<p><strong>PS</strong>：如果多次分配同一信号，则在 snort 初始化期间将记录一条警告。如果无法安装信号处理程序，则会记录一条警告，并且必须予以修复，否则该功能将丢失</p>
+<ul>
+<li>snort 中使用的信号:</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>信号名称</th>
+<th>默认值</th>
+<th>行为</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>SIGTERM</td>
+<td>SIGTERM</td>
+<td>退出</td>
+</tr>
+<tr>
+<td>SIGINT</td>
+<td>SIGINT</td>
+<td>退出</td>
+</tr>
+<tr>
+<td>SIGQUIT</td>
+<td>SIGQUIT</td>
+<td>退出</td>
+</tr>
+<tr>
+<td>SIGPIPE</td>
+<td>SIGPIPE</td>
+<td>忽视</td>
+</tr>
+<tr>
+<td>SIGNAL_SNORT_RELOAD</td>
+<td>SIGHUP</td>
+<td>重装 snort</td>
+</tr>
+<tr>
+<td>SIGNAL_SNORT_DUMP_STATS</td>
+<td>SIGUSR1</td>
+<td>转储数据</td>
+</tr>
+<tr>
+<td>SIGNAL_SNORT_ROTATE_STATS</td>
+<td>SIGUSR2</td>
+<td>转储数据</td>
+</tr>
+<tr>
+<td>SIGNAL_SNORT_READ_ATTR_TBL</td>
+<td>SIGURG</td>
+<td>重新加载属性表</td>
+</tr>
+<tr>
+<td>SIGNAL_SNORT_CHILD_READY</td>
+<td>SIGCHLD</td>
+<td>在守护程序模式下内部使用</td>
+</tr>
+</tbody></table>
+<h1 id="0x20-解码模块与预处理模块"><a href="#0x20-解码模块与预处理模块" class="headerlink" title="0x20 解码模块与预处理模块"></a>0x20 解码模块与预处理模块</h1><h2 id="20-1-模块介绍"><a href="#20-1-模块介绍" class="headerlink" title="20.1 模块介绍"></a>20.1 模块介绍</h2><p>由于解码模块和预处理模块功能类似，都是在规则检测引擎之前对数据包的处理，所以两个模块一并介绍。 解码模块主要是将从监控网络当中抓取的原始网络数据包，按照各个网络协议栈从下至上进行解码，并将解码数据保存到各个对应的数据结构当中，最后交由预处理模块进行处理。</p>
+<p>解码后的数据包经过预处理之后才能被主探测引擎进行规则匹配。预处理器的主要用来应对一些IDS攻击手段。其作用包括：</p>
+<p>1）针对可疑行为检查包或修改包，以便探测引擎能对其正确解释<br>2）负责对流量标准化，以便探测引擎能精确匹配特征</p>
+<p>目前已知的IDS逃避技术主要有：</p>
+<ul>
+<li>多态URL编码</li>
+<li>多态shellcode</li>
+<li>会话分割</li>
+<li>IP碎片</li>
+</ul>
+<p>Snort主要包含以下三类预处理器（举例说明）：</p>
+<p>1)包重组预处理器：</p>
+<ul>
+<li>frag3：IP分片重组和攻击监测</li>
+<li>stream：维持TCP流状态，进行会话重组</li>
+</ul>
+<p>2)协议规范化预处理器：</p>
+<ul>
+<li>http_inspect：规范HTTP流</li>
+<li>rpcDecode：规范RPC调用</li>
+</ul>
+<p>3)异常检测预处理器：</p>
+<ul>
+<li>ARP spoof：检测ARP欺骗</li>
+<li>sfPortscan：检测端口扫描</li>
+</ul>
+<h2 id="20-2-预处理器http-insepect配置举例"><a href="#20-2-预处理器http-insepect配置举例" class="headerlink" title="20.2 预处理器http_insepect配置举例"></a>20.2 预处理器http_insepect配置举例</h2><ul>
+<li><p>http_inspect默认的配置：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c">preprocessor http_inspect: global iis_unicode_map                            unicode.<span class="hljs-built_in">map</span> <span class="hljs-number">1252</span> compress_depth <span class="hljs-number">65535</span> decompress_depth <span class="hljs-number">65535</span><br><span class="hljs-meta">#unicode.map是http_inspect解码unicode时的解码文件</span><br>preprocessor http_inspect_server: server <span class="hljs-keyword">default</span> \<br>http_methods &#123; GET POST PUT SEARCH MKCOL ...&#125; \<br>    ...  <br>    enable_cookie        #将http请求或响应中的cookie提取到缓存，用于后面规则匹配<br>    normalize javascript #对标签中的js脚本解码<br>    ...<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>启用预处理器规则</p>
+</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> $PREPROC_RULE_PATH/preprocessor.rules</span><br></code></pre></td></tr></table></figure>
+
+<p>下面是一条解码器规则：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">alert ( msg:<span class="hljs-string">&quot;DECODE_TCP_INVALID_OFFSET&quot;</span>; sid:<span class="hljs-number">46</span>; gid:<span class="hljs-number">116</span>; rev:<span class="hljs-number">1</span>; metadata:rule-type decode; reference:cve,<span class="hljs-number">2004</span><span class="hljs-number">-0816</span>; classtype:bad-unknown; )<br></code></pre></td></tr></table></figure>
+
+<p>发现这条规则和之前看到的不一样，它没有源&#x2F;目的IP，端口等信息，说明这条规则是由解码器自动触发的，用户不需要干预。 一般我们也不需要去修改解码器或者预处理器的规则，只需要去snort.conf中添加、配置或者删除插件即可。</p>
+<h2 id="20-3-模块配置"><a href="#20-3-模块配置" class="headerlink" title="20.3 模块配置"></a>20.3 模块配置</h2><p>配置分两个步骤，都是在snort.conf中配置：</p>
+<ul>
+<li>snort.conf的2)和5)中配置解码器或者预处理参数</li>
+<li>snort.conf的8)中启用检测规则</li>
+</ul>
+<h3 id="20-3-1-解码器配置举例"><a href="#20-3-1-解码器配置举例" class="headerlink" title="20.3.1 解码器配置举例"></a>20.3.1 解码器配置举例</h3><ul>
+<li>配置解码器</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c">config disable_decode_alerts   关闭decode告警<br>config enable_decode_oversized_alerts<br>      如果一个包（IP,UDP,TCP）长度长于length字段，则告警<br># Stop generic decode events<br></code></pre></td></tr></table></figure>
+
+<p><strong>PS</strong>：格式为config docoder [option],使用#作为注释</p>
+<ul>
+<li>启用解码器检测规则</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">include $PREPROC_RULE_PATH/decoder.rules<br></code></pre></td></tr></table></figure>
+
+<p><strong>PS</strong>：snort.conf文件中使用include关键词包含配置文件和规则文件</p>
+<ul>
+<li>在decoder.rules中我们找到了检测IP长度异常的规则</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">alert ( msg:<span class="hljs-string">&quot;DECODE_IPV4_DGRAM_GT_IPHDR&quot;</span>; sid:<span class="hljs-number">6</span>; gid:<span class="hljs-number">116</span>; rev:<span class="hljs-number">1</span>; metadata:rule-type decode;classtype:protocol-command-decode; )<br></code></pre></td></tr></table></figure>
+
+
+<p><strong>参考链接</strong>：</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_36119192/article/details/84343269">https://blog.csdn.net/qq_36119192/article/details/84343269</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/ptmozhu/article/details/78743126">https://blog.csdn.net/ptmozhu/article/details/78743126</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/shenwansangz/article/details/38079865">https://blog.csdn.net/shenwansangz/article/details/38079865</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/m0_60574457/article/details/120216166">https://blog.csdn.net/m0_60574457/article/details/120216166</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/hexf9632/article/details/106688245">https://blog.csdn.net/hexf9632/article/details/106688245</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_32350719/article/details/101025106">https://blog.csdn.net/qq_32350719/article/details/101025106</a></p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/tetkfYk9wV0TLlPU2EeSKQ">https://mp.weixin.qq.com/s/tetkfYk9wV0TLlPU2EeSKQ</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/hexf9632/category_9678430.html">https://blog.csdn.net/hexf9632/category_9678430.html</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.wangan.com/docs/1166">https://www.wangan.com/docs/1166</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.wangan.com/discuss/users/edc22adf">https://www.wangan.com/discuss/users/edc22adf</a></p>
+<p><a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000038329114">https://segmentfault.com/a/1190000038329114</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/c90c0f6f29da">https://www.jianshu.com/p/c90c0f6f29da</a></p>
+<p><a target="_blank" rel="noopener" href="https://jarviswwong.com/try-snort-ruls.html">https://jarviswwong.com/try-snort-ruls.html</a></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/ATTACK/">#ATTACK</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Snort使用手册详细版「起手篇」</div>
+      <div>https://orangey.info/2022/09/23/122619481/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>橙留香</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年9月23日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/09/23/122431881/" title="和平精英辅助APK逆向分析">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">和平精英辅助APK逆向分析</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/09/23/119462162/" title="「干货」关于Android APK应用程序安全，你了解多少？">
+                        <span class="hidden-mobile">「干货」关于Android APK应用程序安全，你了解多少？</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  <article id="comments" lazyload>
+    
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1e96aec5ac46370916fa","clientSecret":"ee5e97a65cf34e9fe31e15ab0421a94968237f5e","repo":"ogGitalk","owner":"ananasOrangey","admin":["ananasOrangey"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '250d6ea14512be5eb29cdef2fac841c9'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+  </article>
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://orangey.blog.csdn.net" target="_blank" rel="nofollow noopener"><span>橙留香CSDN博客</span></a> <i class="iconfont icon-love"></i> <a href="https://i.imgtg.com/2022/09/21/gNXxK.png" target="_blank" rel="nofollow noopener"><span>橙留香微信公众号</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

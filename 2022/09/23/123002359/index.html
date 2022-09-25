@@ -1,0 +1,2029 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="橙留香">
+  <meta name="keywords" content="橙留香车联网安全技术博客">
+  
+    <meta name="description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;ananasorangey&#x2F;category11955914.html   0x01 前言关于正则表达式，很多人认为，使用的时候查询下就行，没必要深入学习，但是知识与应用">
+<meta property="og:type" content="article">
+<meta property="og:title" content="入侵检测常用正则表达式手册">
+<meta property="og:url" content="https://orangey.info/2022/09/23/123002359/index.html">
+<meta property="og:site_name" content="车联网安全技术博客 | 橙留香">
+<meta property="og:description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;ananasorangey&#x2F;category11955914.html   0x01 前言关于正则表达式，很多人认为，使用的时候查询下就行，没必要深入学习，但是知识与应用">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/21/gNXxK.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c1bbb25e736541e9a393381451698620.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/3c6a3fd59e614236a821cda1d8d99fb0.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/4efc0f1da65c4cf9912fca481934152a.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="article:published_time" content="2022-09-23T15:50:33.559Z">
+<meta property="article:modified_time" content="2022-09-24T16:42:03.698Z">
+<meta property="article:author" content="橙留香">
+<meta property="article:tag" content="ATTACK">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+  
+  
+  
+  <title>入侵检测常用正则表达式手册 - 车联网安全技术博客 | 橙留香</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"orangey.info","root":"/","version":"1.9.3","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"java"},"copy_btn":false,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>橙留香</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="入侵检测常用正则表达式手册"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-09-23 23:50" pubdate>
+          2022年9月23日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          35k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          <!-- compatible with older versions-->
+          289 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">入侵检测常用正则表达式手册</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <hr>
+<p><strong>也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大</strong></p>
+<p><strong>少走了弯路，也就错过了风景，无论如何，感谢经历</strong></p>
+<hr>
+<p>更多关于Android安全的知识，可前往：<a target="_blank" rel="noopener" href="https://blog.csdn.net/ananasorangey/category11955914.html">https://blog.csdn.net/ananasorangey/category11955914.html</a></p>
+<p><img src="https://i.imgtg.com/2022/09/25/gdpGP.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><img src="https://i.imgtg.com/2022/09/21/gNXxK.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x01-前言"><a href="#0x01-前言" class="headerlink" title="0x01 前言"></a>0x01 前言</h1><p>关于正则表达式，很多人认为，使用的时候查询下就行，没必要深入学习，但是知识与应用永远都是螺旋辩证的关系，有需要查询也无可厚非，但是先掌握知识，可以让应用更创新，更深入，超越他人，必须要先掌握大量的深刻的知识。</p>
+<p>但是学习正则并非易事：知识点琐碎、记忆点多、符号乱，难记忆、难描述、广而深且，说了那么多，开始正文吧</p>
+<p>正则表达式又称规则表达式，计算机科学的一个概念。正则表达式通常被用来检索、替换那些符合某个模式(规则)的文本，是对字符串操作的一种逻辑公式，是用事先定义好的一些特定字符、及这些特定字符的组合，组成一个“规则字符串”，这个“规则字符串”用来表达对字符串的一种过滤逻辑</p>
+<p>正则表达式(regular expression)描述了一种字符串匹配的模式（pattern），可以用来检查一个串是否含有某种子串、将匹配的子串替换或者从某个串中取出符合某个条件的子串等。</p>
+<p>正则表达式使用一种符号系统，允许以最小的努力匹配复杂的文本模式。虽然对于正则表达式的语法没有正式的标准化，但是对于语法的基本元素有一个普遍的共识</p>
+<p>正则表达式是处理字符串的强大工具，它有自己特定的语法结构，有了它，实现字符串的检索、替换、匹配验证、在HTML里提取想要的信息都是简简单单的事</p>
+<p>例如，Windows下用于文件查找的通配符(wildcard)，也就是<code>*和? </code>。如果想查找某个目录下的所有的Word文档的话，搜索<code>*.doc </code>。在Windows这里，<code>* </code>会被解释成任意的字符串。和通配符类似，正则表达式也是用来进行文本匹配的工具，只不过比起通配符，它能更精确地描述你的需求</p>
+<ul>
+<li>例1：匹配以数字开头，并以 abc 结尾的字符串</li>
+</ul>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs perl">  ^    [<span class="hljs-number">0</span>-<span class="hljs-number">9</span>]    +      abc     $<br>定位符  字符集  限定符  普通字符  限定符<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>例2：</li>
+</ul>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs perl">[a-zA-z]+:<span class="hljs-regexp">//</span>[^\s]*<br></code></pre></td></tr></table></figure>
+
+<p><strong>PS</strong>：上面是正则表达式的特定语法规则组合，通过这些组合，就可以得到想要的字符，例如，<code>\s </code>表示匹配任意的空白字符，<code>* </code>代表匹配前面的字符任意多个等等。常用的匹配字符规则如下表：</p>
+<table>
+<thead>
+<tr>
+<th>模式</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>\l	</code></td>
+<td>把下一个字符转换为小写</td>
+</tr>
+<tr>
+<td><code>\L	</code></td>
+<td>把<code>\L </code>到<code>\E </code>之间的字符全部转换为小写</td>
+</tr>
+<tr>
+<td><code>\u	</code></td>
+<td>把下一个字符转换为大写</td>
+</tr>
+<tr>
+<td><code>\U	</code></td>
+<td>把<code>\U </code>到<code>\E </code>之间的字符全部转换为大写</td>
+</tr>
+<tr>
+<td><code>\w	</code></td>
+<td>匹配字母、数字及下划线</td>
+</tr>
+<tr>
+<td><code>\W	</code></td>
+<td>匹配不是字母、数字及下划线的字符；匹配任意不是字母，数字，下划线，汉字的字符</td>
+</tr>
+<tr>
+<td><code>\s	</code></td>
+<td>匹配任意空白字符，相当于<code>&#123;\t\n\r\f&#125;</code></td>
+</tr>
+<tr>
+<td><code>\s*$ </code></td>
+<td>匹配一个字符串的结尾位置零个或多个空白字符</td>
+</tr>
+<tr>
+<td><code>\S	</code></td>
+<td>匹配任意非空白字符；匹配任意不是空白符的字符</td>
+</tr>
+<tr>
+<td><code>\d	</code></td>
+<td>匹配任意数字，等价于[0-9]</td>
+</tr>
+<tr>
+<td><code>\D	</code></td>
+<td>匹配任意非数字字符</td>
+</tr>
+<tr>
+<td><code>\A	</code></td>
+<td>匹配字符串开头</td>
+</tr>
+<tr>
+<td><code>\Z	</code></td>
+<td>匹配字符串的结尾，如果存在换行，只匹配到换行前的字符串</td>
+</tr>
+<tr>
+<td><code>\z	</code></td>
+<td>匹配字符串的结尾，如果存在换行，同时还会匹配换行符</td>
+</tr>
+<tr>
+<td><code>\G	</code></td>
+<td>匹配最后完成匹配的位置</td>
+</tr>
+<tr>
+<td><code>\B </code></td>
+<td>匹配不是单词开头或结束的位置</td>
+</tr>
+<tr>
+<td><code>\b </code></td>
+<td>指定单词的边界，用来匹配一个单词的开头和结尾；匹配且只匹配一个位置，不匹配任何字符</td>
+</tr>
+<tr>
+<td><code>\f	</code></td>
+<td>换页符</td>
+</tr>
+<tr>
+<td><code>\n	</code></td>
+<td>匹配换行符</td>
+</tr>
+<tr>
+<td><code>\t	</code></td>
+<td>匹配制表符</td>
+</tr>
+<tr>
+<td><code>\r	</code></td>
+<td>回车符</td>
+</tr>
+<tr>
+<td><code>\v	</code></td>
+<td>垂直制表符</td>
+</tr>
+<tr>
+<td><code>\v	</code></td>
+<td>垂直制表符</td>
+</tr>
+<tr>
+<td><code>\1…\9 </code></td>
+<td>匹配第n个分组的内容</td>
+</tr>
+<tr>
+<td><code>\10 </code></td>
+<td>匹配第n个分组的内容，如果它经匹配。否则指的是八进制字符码的表达式</td>
+</tr>
+<tr>
+<td><code>\E	</code></td>
+<td>结束<code>\L </code>或<code>\U </code>转换</td>
+</tr>
+<tr>
+<td><code>\p </code></td>
+<td>匹配<code>CR/LF (等同于 \r\n) </code>，用来匹配 DOS 行终止符</td>
+</tr>
+<tr>
+<td><code>\ </code></td>
+<td>转移字符，将后一个字符标记为一个特殊字符</td>
+</tr>
+<tr>
+<td><code>^	</code></td>
+<td>匹配一行字符串的开头；匹配输入字串的开始位置</td>
+</tr>
+<tr>
+<td><code>^\s* </code></td>
+<td>匹配一个字符串的开头位置和随后的零个或多个空白字符</td>
+</tr>
+<tr>
+<td><code>$	</code></td>
+<td>匹配一行字符串的结尾；匹配输入字串的结束位置</td>
+</tr>
+<tr>
+<td><code>$1、$2、...、$99	</code></td>
+<td>与 regexp 中的第 1 到第 99 个子表达式相匹配的文本</td>
+</tr>
+<tr>
+<td><code>$&amp;	</code></td>
+<td>与 regexp 相匹配的子串</td>
+</tr>
+<tr>
+<td><code>$`	</code></td>
+<td>位于匹配子串左侧的文本</td>
+</tr>
+<tr>
+<td><code>$&#39;	</code></td>
+<td>位于匹配子串右侧的文本</td>
+</tr>
+<tr>
+<td><code>$$	</code></td>
+<td>直接量符号</td>
+</tr>
+<tr>
+<td><code>.	</code></td>
+<td>匹配除换行符外的任意字符，当<code>re.DOTALL</code>标记被指定时，则可以匹配包括换行符的任意字符；匹配到除<code>&quot;\n&quot; </code>之外的所有单个字符</td>
+</tr>
+<tr>
+<td><code>[…]	</code></td>
+<td>用来表示一组字符单独列出，比如[amk]匹配a,m,k；表示一个字符集，可以单个列出，如<code>[amk$] </code>；也可以加一个”-“表示一个字符范围，如[a-z]；匹配任意一个字符即可；也可以用补集来匹配不在区间范围内的字符。其做法是把<code>&quot;&quot; </code>作为类别的首个字符；其它地方的<code>&quot;&quot; </code>只会简单匹配<code>&quot;&quot; </code>字符本身，例如[5] 将匹配除<code>&quot;5&quot; </code>之外的任意字符；代表多选一，比如<code>[abc] </code>可以匹配到字母a，也可以匹配到字母b或c</td>
+</tr>
+<tr>
+<td><code>[a-z] </code></td>
+<td>匹配a到z之间的任意元素，<code>\w </code>这个通配符就可以用<code>【a-zA-Z0-9_】 </code>来表示</td>
+</tr>
+<tr>
+<td><code>[^a-n] </code></td>
+<td>补集，匹配除 “a” 到 “n” 的其他字符</td>
+</tr>
+<tr>
+<td><code>[^…] </code></td>
+<td>否定的字符种类. 匹配除了方括号里的任意字符；不在[]中的字符，比如<code>^abc</code>,表示匹配除了a,b,c之外的字符；取反，不能是括号内的任意单个元素</td>
+</tr>
+<tr>
+<td><code>[^x] </code></td>
+<td>匹配除了x以外的任意字符</td>
+</tr>
+<tr>
+<td><code>[^aeiou] </code></td>
+<td>匹配除了aeiou这几个字母以外的任意字符</td>
+</tr>
+<tr>
+<td><code>*	</code></td>
+<td>匹配0个或多个表达式；匹配前面的子表达式0次或多次</td>
+</tr>
+<tr>
+<td><code>*?	</code></td>
+<td>重复任意次，但尽可能少重复</td>
+</tr>
+<tr>
+<td><code>+	</code></td>
+<td>匹配1个或多个表达式；匹配前面的子表达式1次或多次</td>
+</tr>
+<tr>
+<td><code>+?	</code></td>
+<td>重复1次或更多次，但尽可能少重复</td>
+</tr>
+<tr>
+<td><code>？	</code></td>
+<td>匹配0个或1个前面正则表达式定义的片段（非贪婪匹配）；匹配前面的子表达式0次或1次；如果打算同时使用<code>[] 和 ? </code>，千万记得应该把<code>? </code>放在字符集合的外面</td>
+</tr>
+<tr>
+<td><code>?= </code></td>
+<td>正先行断言-存在</td>
+</tr>
+<tr>
+<td><code>?! </code></td>
+<td>负先行断言-排除</td>
+</tr>
+<tr>
+<td><code>?&lt;= </code></td>
+<td>正后发断言-存在</td>
+</tr>
+<tr>
+<td><code>?&lt;! </code></td>
+<td>负后发断言-排除</td>
+</tr>
+<tr>
+<td><code>??	</code></td>
+<td>重复0次或1次，但尽可能少重复</td>
+</tr>
+<tr>
+<td><code>&#123;n&#125;	</code></td>
+<td>精确匹配n个前面的表达式</td>
+</tr>
+<tr>
+<td><code>&#123;n,&#125; </code></td>
+<td>重复n次或更多次</td>
+</tr>
+<tr>
+<td><code>&#123;n,&#125;? </code></td>
+<td>重复n次以上，但尽可能少重复</td>
+</tr>
+<tr>
+<td><code>&#123;n,m&#125;	</code></td>
+<td>匹配n到m次，由前面正则表达式匹配的片段（贪婪匹配）；匹配至少n次，至多m次</td>
+</tr>
+<tr>
+<td><code>&#123;n,m&#125;?	</code></td>
+<td>重复n到m次，但尽可能少重复</td>
+</tr>
+<tr>
+<td><code>a|b	</code></td>
+<td>匹配a或b</td>
+</tr>
+<tr>
+<td><code>( )	</code></td>
+<td>匹配括号内的表达式，也表示一个组；代表把子表达式当做一个独立元素，子表达式允许多重嵌套，但在实际工作中一个遵循适可而止的原则</td>
+</tr>
+<tr>
+<td><code>(?=) </code></td>
+<td>正向前查找</td>
+</tr>
+<tr>
+<td><code>(?!) </code></td>
+<td>负向前查找</td>
+</tr>
+<tr>
+<td><code>(?&lt;=) </code></td>
+<td>正向后查找</td>
+</tr>
+<tr>
+<td><code>(?&lt;name&gt;exp) </code></td>
+<td>匹配exp,并捕获文本到名称为name的组里，也可以写成<code>(?&#39;name&#39;exp) </code></td>
+</tr>
+<tr>
+<td><code>(?&lt;!) </code></td>
+<td>负向后查找</td>
+</tr>
+<tr>
+<td><code>(?m) </code></td>
+<td>分行模式匹配</td>
+</tr>
+<tr>
+<td><code>(?imx) </code></td>
+<td>正则表达式包含三种可选标志：<code>i, m, 或 x </code>。只影响括号中的区域</td>
+</tr>
+<tr>
+<td><code>(?-imx) </code></td>
+<td>正则表达式关闭<code>i, m, 或 x </code>可选标志。只影响括号中的区域</td>
+</tr>
+<tr>
+<td><code>(?: re) </code></td>
+<td>类似<code>(…) </code>，但是不表示一个组；匹配re，不捕获匹配的文本，也不给此分组分配组号</td>
+</tr>
+<tr>
+<td><code>(?imx: re) </code></td>
+<td>在括号中使用<code>i, m, 或 x </code>可选标志</td>
+</tr>
+<tr>
+<td><code>(?-imx: re) </code></td>
+<td>在括号中不使用<code>i, m, 或 x </code>可选标志</td>
+</tr>
+<tr>
+<td><code>(?#comment) </code></td>
+<td>这种类型的分组不对正则表达式的处理产生任何影响，用于提供注释让人阅读</td>
+</tr>
+<tr>
+<td><code>(?= re) </code></td>
+<td>前向肯定界定符。如果所含正则表达式，以<code>… </code>表示，在当前位置成功匹配时成功，否则失败。但一旦所含表达式已经尝试，匹配引擎根本没有提高；模式的剩余部分还要尝试界定符的右边</td>
+</tr>
+<tr>
+<td><code>(?! re) </code></td>
+<td>前向否定界定符。与肯定界定符相反；当所含表达式不能在字符串当前位置匹配时成功</td>
+</tr>
+<tr>
+<td><code>(?&gt; re) </code></td>
+<td>匹配的独立模式，省去回溯</td>
+</tr>
+<tr>
+<td><code>\r\n </code></td>
+<td>Windows 所使用的文本行结束标签</td>
+</tr>
+<tr>
+<td><code>\n\n </code></td>
+<td>在 Linux 上匹配空白行使用</td>
+</tr>
+<tr>
+<td><code>\r\n </code></td>
+<td>同时适用于 Windows 和 Linux 的正则表达式应该包含一个可选的 \r 和一个必须被匹配的 \n</td>
+</tr>
+<tr>
+<td><code>\x </code></td>
+<td>十六进制（逢16进1）数值要用前缀<code>\x </code>来给出</td>
+</tr>
+<tr>
+<td><code>\0 </code></td>
+<td>八进制（逢8进1）数值要用前缀<code>\0 </code>来给出</td>
+</tr>
+<tr>
+<td>&#96;&#96;&#96;</td>
+<td>&#96;&#96;&#96;</td>
+</tr>
+<tr>
+<td><code>x|y </code></td>
+<td>匹配 x 或 y。例如，&#96;&#96;&#96;’z</td>
+</tr>
+</tbody></table>
+<ul>
+<li>标志</li>
+</ul>
+<p>标志也叫模式修正符，因为它可以用来修改表达式的搜索结果。这些标志可以任意的组合使用，它也是整个正则表达式的一部分</p>
+<table>
+<thead>
+<tr>
+<th>标志</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>i</td>
+<td>忽略大小写</td>
+</tr>
+<tr>
+<td>g</td>
+<td>全局搜索</td>
+</tr>
+<tr>
+<td>m</td>
+<td>多行的：锚点元字符<code>^ $ </code>工作范围在每行的起始</td>
+</tr>
+</tbody></table>
+<ul>
+<li>运算符优先级：</li>
+</ul>
+<p>优先级为从上到下，依次降低：</p>
+<table>
+<thead>
+<tr>
+<th>运算符</th>
+<th>说明</th>
+<th>优先级</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>\ </code></td>
+<td>转义符</td>
+<td>最高</td>
+</tr>
+<tr>
+<td><code>()、(?:)、(?=)、[] </code></td>
+<td>括号和中括号</td>
+<td>高</td>
+</tr>
+<tr>
+<td><code>*、+ 、? 、&#123;n&#125; 、&#123;n,&#125; 、&#123;n,m&#125; </code></td>
+<td>限定符</td>
+<td>中</td>
+</tr>
+<tr>
+<td><code>^、$ 、\任何元字符 </code></td>
+<td>定位点和序列</td>
+<td>低</td>
+</tr>
+<tr>
+<td>&#96;&#96;&#96;</td>
+<td>&#96;&#96;&#96;</td>
+<td>选择</td>
+</tr>
+</tbody></table>
+<ul>
+<li>正则表达式的工作机制</li>
+</ul>
+<p>写的任何一个正则直接量或者 RegExp 都会被浏览器编译为一个原生代码程序。第一次匹配是从头个字符开始，匹配成功时，他会查看是否还有其他的路径没有匹配到，如果有的话，回退到上一次成功匹配的位置，然后重复第二步操作，不过此时开始匹配的位置（lastIndex）是上次成功位置加 1</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><code class="hljs perl">    |  编译  |<br><br>    +--------+<br><br>         |<br><br>         ↓<br><br>+----------------+<br><br>|  设置开始位置    |←---------+<br><br>+----------------+          ↑<br><br>         |                  |<br><br>         ↓               其 |<br><br>+----------------+       他 |<br><br>|  匹配 &amp; 回溯    |       路 |<br><br>+----------------+       径 |<br><br>         |                  |<br><br>         ↓                  |<br><br>+----------------+          |<br><br>|  成功 <br><span class="hljs-keyword">or</span><br> 失败   |---------→+<br><br>+----------------+<br></code></pre></td></tr></table></figure>
+
+
+
+<p>在爬虫以及处理数据包中，用得最多的匹配字符，如下：</p>
+<ul>
+<li><code>. </code>：匹配除换行符外的任意字符，当<code>re.DOTALL</code>标记被指定时，则可以匹配包括换行符的任意字符；匹配到除<code>&quot;\n&quot; </code>之外的所有单个字符</li>
+<li><code>* </code>：匹配0个或多个表达式；匹配前面的子表达式0次或多次</li>
+<li><code>? </code>：匹配0个或1个前面正则表达式定义的片段（非贪婪匹配）；匹配前面的子表达式0次或1次</li>
+<li><code>() </code>：匹配括号内的表达式，也表示一个组</li>
+<li><code>\d </code>：匹配任意数字，等价于[0-9]</li>
+<li><code>&#123;n&#125; </code>：精确匹配n个前面的表达式</li>
+<li><code>$ </code>：匹配一行字符串的结尾；匹配输入字串的结束位置</li>
+<li><code>^ </code>：匹配一行字符串的开头；匹配输入字串的开始位置</li>
+<li><code>\b </code>回退（删除）一个字符</li>
+</ul>
+<p>代表着单词的开头或结尾，也就是单词的分界处</p>
+<p>例1：匹配orangey</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs perl">\borangey\b<br></code></pre></td></tr></table></figure>
+
+<p>虽然通常英文的单词是由空格，标点符号或者换行来分隔的，但是<code>\b </code>并不匹配这些单词分隔字符中的任何一个，它只匹配一个位置</p>
+<p>例2：匹配orangey后面的blog</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs perl">\borangey\b.*\bblog\b<br></code></pre></td></tr></table></figure>
+
+<p><strong>PS</strong>：上面正则中<code>. </code>是另一个元字符，匹配除了换行符以外的任意字符。<code>* </code>同样是元字符，不过它代表的不是字符，也不是位置，而是数量——它指定<code>* </code>前边的内容可以连续重复使用任意次以使整个表达式得到匹配。因此，<code>.* </code>连在一起就意味着任意数量的不包含换行的字符。现在<code>\borangey\b.*\bblog\b </code>的意思：先是一个单词orangey，然后是任意个任意字符(但不能是换行)，最后是blog这个单词</p>
+<p><strong>PS</strong>：如果需要更精确的说法，<code>\b </code>匹配这样的位置：它的前一个字符和后一个字符不全是(一个是，一个不是或不存在)<code>\w </code></p>
+<p>正则表达式的语法很令人头疼，即使对经常使用它的人来说也是如此。由于难与读和写，容易出错，利用工具对正则表达式进行测试是否正确，是很需要的，如下是正则表达式在线校验工具：</p>
+<p><a target="_blank" rel="noopener" href="https://c.runoob.com/front-end/854">https://c.runoob.com/front-end/854</a></p>
+<p><a target="_blank" rel="noopener" href="https://tool.oschina.net/regex#">https://tool.oschina.net/regex#</a></p>
+<p><a target="_blank" rel="noopener" href="https://regex101.com/">https://regex101.com</a>    能可视化展示正则匹配结果</p>
+<p><a target="_blank" rel="noopener" href="https://regexper.com/">https://regexper.com</a>    能够直观展示正则表达式的状态机图</p>
+<ul>
+<li>正则表达式在线编写教程文档</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://ihateregex.io/">https://ihateregex.io</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/geongeorge/i-hate-regex">https://github.com/geongeorge/i-hate-regex</a></p>
+<p><a target="_blank" rel="noopener" href="https://deerchao.cn/tutorials/regex/regex.htm">https://deerchao.cn/tutorials/regex/regex.htm</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/lxcnn">https://blog.csdn.net/lxcnn</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/ziishaned/learn-regex/blob/master/translations/README-cn.md">https://github.com/ziishaned/learn-regex/blob/master/translations/README-cn.md</a></p>
+<ul>
+<li>Python正则表达HOWTO 学习教程</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://docs.python.org/zh-cn/3.7/howto/regex.html#regex-howto">https://docs.python.org/zh-cn/3.7/howto/regex.html#regex-howto</a>    </p>
+<h1 id="0x02-发展过程"><a href="#0x02-发展过程" class="headerlink" title="0x02 发展过程"></a>0x02 发展过程</h1><h2 id="2-1-20世纪40年代"><a href="#2-1-20世纪40年代" class="headerlink" title="2.1 20世纪40年代"></a>2.1 20世纪40年代</h2><p>正则表达式最初的想法来自两位神经学家：沃尔特·皮茨与麦卡洛克，他们研究出了一种用数学方式来描述神经网络的模型</p>
+<h2 id="2-2-20世纪50年代"><a href="#2-2-20世纪50年代" class="headerlink" title="2.2 20世纪50年代"></a>2.2 20世纪50年代</h2><p>一位名叫Stephen Kleene的数学科学家发表了一篇题目是《神经网事件的表示法》的论文，利用称之为正则集合的数学符号来描述此模型，引入了正则表达式的概念。正则表达式被作为用来描述其称之为“正则集的代数”的一种表达式，因而采用了“正则表达式”这个术语</p>
+<h2 id="2-3-20世纪60年代"><a href="#2-3-20世纪60年代" class="headerlink" title="2.3 20世纪60年代"></a>2.3 20世纪60年代</h2><p>C语言之父、UNIX之父肯·汤普森把这个“正则表达式”的理论成果用于做一些搜索算法的研究，他描述了一种正则表达式的编译器，于是出现了应该算是最早的正则表达式的编译器qed（这也就成为后来的grep编辑器）。</p>
+<p>Unix使用正则之后，正则表达式不断的发展壮大，然后大规模应用于各种领域，根据这些领域各自的条件需要，又发展出了许多版本的正则表达式，出现了许多的分支。我们把这些分支叫做“流派”。</p>
+<h2 id="2-4-20世纪80年代"><a href="#2-4-20世纪80年代" class="headerlink" title="2.4 20世纪80年代"></a>2.4 20世纪80年代</h2><p>Perl语言诞生了，它综合了其他的语言，用正则表达式作为基础，开创了一个新的流派，Perl流派。</p>
+<p><strong>注</strong>：Perl语言是一种擅长处理文本的语言，Larry在1987年创建，Practical Extraction and Report Language，实用报表提取语言，但因晦涩语法和古怪符号不利于理解和记忆导致很多开发人员并不喜欢</p>
+<h1 id="0x03-量词"><a href="#0x03-量词" class="headerlink" title="0x03 量词"></a>0x03 量词</h1><p>在实际使用中，我们常常需要匹配同一类型的字符多次，比如匹配11位的手机号，我们不可能将 [0-9] 写11遍，此时我们可以使用Quantifiers来实现重复匹配</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs perl"><span class="hljs-string">&#123;n&#125;</span>：匹配 n 次<br>&#123;n,m&#125;：匹配 n-m 次<br>&#123;n,&#125;：匹配 &gt;=n 次<br>?：匹配 <span class="hljs-number">0</span> || <span class="hljs-number">1</span> 次<br>*：匹配 &gt;=<span class="hljs-number">0</span> 次，等价于 &#123;<span class="hljs-number">0</span>,&#125;<br>+：匹配 &gt;=<span class="hljs-number">1</span> 次，等价于 &#123;<span class="hljs-number">1</span>,&#125;<br></code></pre></td></tr></table></figure>
+
+<h1 id="0x04-元字符"><a href="#0x04-元字符" class="headerlink" title="0x04 元字符"></a>0x04 元字符</h1><p>完整的正则表达式由两种字符构成：特殊字符（元字符）和普通字符。元字符表示正则表达式功能的最小单位，如<code>* ^ $ \d </code>等。正则表达式里还有更多的元字符，比如<code>\s</code>匹配任意的空白符，包括空格，制表符(Tab)，换行符，中文全角空格等。<code>\w</code>匹配字母或数字或下划线或汉字等</p>
+<p>元字符：</p>
+<ul>
+<li>基本元字符</li>
+<li>数量元字符</li>
+<li>位置元字符</li>
+<li>特殊元字符</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/c1bbb25e736541e9a393381451698620.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="4-1-基本元字符"><a href="#4-1-基本元字符" class="headerlink" title="4.1 基本元字符"></a>4.1 基本元字符</h2><p>在默认模式，匹配除了换行的任意字符。</p>
+<ul>
+<li><code>\ </code>：转义特殊字符（允许你匹配<code>&#39;*&#39;,&#39;?&#39; </code>，或者此类其他特殊字符）</li>
+<li><code>[] </code>：用于表示一个字符集合</li>
+<li><code>| </code>：<code>A|B </code>，A和B可以是任意正则表达式，创建一个正则表达式，匹配A或者B，任意个正则表达式可以用<code>&#39;|&#39; </code>连接。它也可以在组合内使用</li>
+<li><code>- </code>：可以表示字符范围，通过用<code>&#39;-&#39; </code>将两个字符连起来。比如<code>[a-z] </code>将匹配任何小写ASCII字符，<code>[0-5][0-9] </code>将匹配从00到59的两位数字，<code>[0-9A-Fa-f] </code>将匹配任何十六进制数位</li>
+<li><code>() </code>：匹配器整体为一个原子，即模式单元可以理解为多个原子组成的大原子</li>
+</ul>
+<h3 id="4-1-1-字符转义"><a href="#4-1-1-字符转义" class="headerlink" title="4.1.1 字符转义\ "></a>4.1.1 字符转义<code>\ </code></h3><p>转义特殊字符（允许你匹配’*’,’?’, 或者此类其他特殊字符），或者表示一个特殊序列；要牢记使用反斜杠<code>\ </code>作为转义序列</p>
+<p>例如，查找<code>. </code>或者<code>* </code>，得使用\来取消这些字符的特殊意义，使用<code>\. </code>和<code>\* </code>。当然，要查找<code>\ </code>本身，你也得用<code>\\. </code></p>
+<p>例如：</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs perl">baidu\.com匹配baidu.cn<br>C:\\Windows匹配C:\Windows<br></code></pre></td></tr></table></figure>
+
+<h3 id="4-1-2-字符集合"><a href="#4-1-2-字符集合" class="headerlink" title="4.1.2 字符集合[] "></a>4.1.2 字符集合<code>[] </code></h3><p>用于匹配字符集合中的任意一个字符，常见的字符集有：</p>
+<ul>
+<li><code>[xyz] </code>：匹配 <code>&quot;x&quot;或&quot;y&quot;`&quot;z&quot;` </code></li>
+<li><code>[^xyz] </code>：补集，匹配除<code>&quot;x&quot; &quot;y&quot; &quot;z&quot; </code>的其他字符</li>
+<li><code>[a-z] </code>：匹配从<code>&quot;a&quot; 到 &quot;z&quot; </code>的任意字符</li>
+<li><code>[^a-n] </code>：补集，匹配除<code>&quot;a&quot; 到 &quot;n&quot; </code>的其他字符</li>
+<li><code>[A-Z] </code>：匹配从<code>&quot;A&quot; 到 &quot;Z&quot; </code>的任意字符</li>
+<li><code>[0-9] </code>：匹配从<code>&quot;0&quot; 到 &quot;9&quot; </code>的任意数字</li>
+</ul>
+<p>比如匹配所有的字母和数字可以写成：<code>/[a-zA-Z0-9]/ </code>或者<code>/[a-z0-9]/i </code></p>
+<p>字符可以单独列出，如下：</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：awbwi  <br>正则：[bai]<br>运行结果：匹配<span class="hljs-string">&#x27;a&#x27;</span>，<span class="hljs-string">&#x27;b&#x27;</span>，或者<span class="hljs-string">&#x27;i&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<p>特殊字符在集合中，失去它的特殊含义。如<code>[(+*)] </code>只会匹配这几个文法字符<code>&#39;(&#39;, &#39;+&#39;, &#39;*&#39;, 或&#39;)&#39; </code></p>
+<p>因为已有了对应数字、字母、数字，空白这些字符集合的元字符，所以查找起来会很简单，但如果想匹配没有预定义元字符的字符集合（比如元音字母b,a,i,d,u），应该怎么办？</p>
+<p>很简单，你只需要在方括号里列出它们就行了，像[aeiou]就匹配任何一个英文元音字母，[.?!]匹配标点符号(.或?或!)。</p>
+<p>例1：匹配任何一个英文元音字母或</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs perl">[baidu]<br></code></pre></td></tr></table></figure>
+
+<p>例2：匹配标点符号(.或?或!)</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs perl">[.?!]<br></code></pre></td></tr></table></figure>
+
+<p>也可指定一个字符范围，像<code>[0-9] </code>代表的含意与\d是等价的：一位数字；同理<code>[a-z0-9A-Z_] </code>也完全等同于<code>\w </code>（如果只考虑英文的话）</p>
+<ul>
+<li>更复杂的字符类表达式</li>
+</ul>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs perl">\(?<span class="hljs-number">0</span>\d<span class="hljs-string">&#123;2&#125;</span>[) -]?\d<span class="hljs-string">&#123;8&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>PS</strong>：首先是一个转义字符<code>\(,它能出现0次或1次(?) </code>，然后是一个0，后面跟着2个数字<code>(\d&#123;2&#125;) </code>，然后是<code>)或-或空格 </code>中的一个，它出现1次或不出现<code>(?) </code>，最后是8个数字<code>(\d&#123;8&#125;) </code>。这个表达式可匹配几种格式的电话号码，像<code>(010)77779999，或022-44556677，或02912345678 </code>等</p>
+<p>例3：匹配从00到59的两位数字</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：<span class="hljs-number">0122344567</span>89 <br>正则：[<span class="hljs-number">0</span>-<span class="hljs-number">5</span>][<span class="hljs-number">0</span>-<span class="hljs-number">9</span>]<br>运行结果：匹配<span class="hljs-string">&#x27;01&#x27;</span>，<span class="hljs-string">&#x27;22&#x27;</span>，<span class="hljs-string">&#x27;34&#x27;</span>，或者<span class="hljs-string">&#x27;45&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>PS</strong>：可以表示字符范围，通过用<code>&#39;-&#39; </code>将两个字符连起来。比如<code>[a-z] </code>将匹配任何小写ASCII字符，<code>[0-5][0-9] </code>将匹配从00到59的两位数字，<code>[0-9A-Fa-f] </code>将匹配任何十六进制数位。如果<code>- </code>进行了转义（比如<code>[a\-z] </code>）或者它的位置在首位或者末尾（如<code>[-a]或[a-] </code>），它就只表示普通字符<code>&#39;-&#39; </code></p>
+<p>字符类如<code>\w </code>或者<code>\S </code>在集合内可以接受，它们可以匹配的字符由ASCII或LOCALE模式决定</p>
+<ul>
+<li>例1：</li>
+</ul>
+<p>匹配以字母a开头的单词——先是某个单词开始处(<code>\b </code>)，然后是字母a，然后是任意数量的字母或数字(<code>\w* </code>)，最后是单词结束处(<code>\b </code>)</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs perl">\ba\w*\b<br></code></pre></td></tr></table></figure>
+
+
+<ul>
+<li>例2：</li>
+</ul>
+<p>匹配1个或更多连续的数字。这里的<code>+ </code>是和<code>* </code>类似的元字符，不同的是<code>* </code>匹配重复任意次(可能是0次)，而<code>+ </code>则匹配重复1次或更多次</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs perl">\d+<br></code></pre></td></tr></table></figure>
+
+
+
+<ul>
+<li>例3：</li>
+</ul>
+<p>匹配刚好9个字符的单词</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs perl">\b\w<span class="hljs-string">&#123;9&#125;\b</span><br></code></pre></td></tr></table></figure>
+
+<p>不在集合范围内的字符可以通过取反来进行匹配。如果集合首字符是<code>&#39;^&#39; </code>，所有不在集合内的字符将会被匹配，比如<code>[^5] </code>将匹配所有字符，除了<code>&#39;5&#39; </code>，<code>[^^] </code>将匹配所有字符，除了<code>&#39;^&#39;.^ </code>如果不在集合首位，就没有特殊含义</p>
+<ul>
+<li>例4：</li>
+</ul>
+<p>验证填写账号必须为3位到10位数字时</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs perl">^\d&#123;<span class="hljs-number">3</span>,<span class="hljs-number">10</span>&#125;$<br></code></pre></td></tr></table></figure>
+
+<p><strong>PS</strong>：元字符<code>^ </code>（和数字6在同一个键位上的符号）和<code>$ </code>都匹配一个位置，这和<code>\b </code>有点类似。<code>^ </code>匹配你要用来查找的字符串的开头，<code>$ </code>匹配结尾</p>
+<blockquote>
+
+<p>{3,10}的意思是重复的次数不能少于3次，不能多于10次，否则都不匹配</p>
+<p>因为使用了<code>^ </code>和<code>$ </code>，所以输入的整个字符串都要用来和<code>\d&#123;3,10&#125; </code>来匹配，也就是说整个输入必须是3到10个数字，如果输入的账号能匹配这个正则表达式的话，既满足要求；对于<code>\d&#123;3,10&#125; </code>而言，使用这样的方法就只能保证字符串里包含3到10连续位数字，而不是整个字符串就是3到10位数字。</p>
+<p>和忽略大小写的选项类似，有些正则表达式处理工具还有一个处理多行的选项。如果选中了这个选项，<code>^和$ </code>的意义就变成了匹配行的开始处和结束处</p>
+</blockquote>
+
+
+<ul>
+<li>例5：</li>
+</ul>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：TM1<br>正则：[^TM]<br>运行结果：<span class="hljs-number">1</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="4-1-3-任意正则表达式逻辑或"><a href="#4-1-3-任意正则表达式逻辑或" class="headerlink" title="4.1.3 任意正则表达式逻辑或| "></a>4.1.3 任意正则表达式逻辑或<code>| </code></h3><p>A|B，A和B可以是任意正则表达式，创建一个正则表达式，匹配A或者B，任意个正则表达式可以用<code>&#39;|&#39; </code>连接。</p>
+<p>它也可以在组合内使用。</p>
+<p>扫描目标字符串时，’|’分隔开的正则样式从左到右进行匹配。当一个样式完全匹配时，这个分支就被接受。意思就是，一旦A匹配成功，B就不再进行匹配，即便它能产生一个更好的匹配。或者说’|’操作符绝不贪婪。如果要匹配’|’字符，使用|，或者把它包含在字符集里，比如[|]。</p>
+<ul>
+<li>例5：</li>
+</ul>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：awe<br>正则：[a|w]<br>运行结果：匹配a或w<br><br>文本：wpdmw<br>正则：p|m<br>运行结果：匹配p或m<br></code></pre></td></tr></table></figure>
+
+<h3 id="4-1-4-正则表达式-字符范围"><a href="#4-1-4-正则表达式-字符范围" class="headerlink" title="4.1.4 正则表达式(字符范围) - "></a>4.1.4 正则表达式(字符范围) <code>- </code></h3><figure class="highlight plaintext"><figcaption><span>```可以表示字符范围，通过用```'-' ```将两个字符连起来。比如```[a-z] ```将匹配任何小写ASCII字符，```[0-5][0-9] ```将匹配从00到59的两位数字，```[0-9A-Fa-f] ```将匹配任何十六进制数位。</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs -"><br>例如：查找所有1-5之间的自然数<br><br>```perl<br>文本：012234456789 <br>正则：[1-5]<br>运行结果：匹配&#x27;1&#x27;，&#x27;2&#x27;，&#x27;2&#x27;，&#x27;3&#x27;，&#x27;4&#x27;，&#x27;4&#x27;，或者&#x27;5&#x27;<br></code></pre></td></tr></table></figure>
+
+<p><strong>PS</strong>：可以表示字符范围，通过用<code>&#39;-&#39; </code>将两个字符连起来。比如<code>[a-z] </code>将匹配任何小写ASCII字符，<code>[0-5][0-9] </code>将匹配从00到59的两位数字，<code>[0-9A-Fa-f] </code>将匹配任何十六进制数位。如果<code>- </code>进行了转义（比如<code>[a\-z] </code>）或者它的位置在首位或者末尾（如<code>[-a]或[a-] </code>），它就只表示普通字符<code>&#39;-&#39; </code></p>
+<h3 id="4-1-5-匹配括号内表达式"><a href="#4-1-5-匹配括号内表达式" class="headerlink" title="4.1.5 匹配括号内表达式() "></a>4.1.5 匹配括号内表达式<code>() </code></h3><p>匹配器整体为一个原子，即模式单元可以理解为多个原子组成的大原子</p>
+<p>例如：查找所有1-5之间的自然数</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：<span class="hljs-number">0122344567</span>89 <br>正则：([<span class="hljs-number">1</span>-<span class="hljs-number">5</span>])<br>运行结果：匹配<span class="hljs-string">&#x27;1&#x27;</span>，<span class="hljs-string">&#x27;2&#x27;</span>，<span class="hljs-string">&#x27;2&#x27;</span>，<span class="hljs-string">&#x27;3&#x27;</span>，<span class="hljs-string">&#x27;4&#x27;</span>，<span class="hljs-string">&#x27;4&#x27;</span>，或者<span class="hljs-string">&#x27;5&#x27;</span><br></code></pre></td></tr></table></figure>
+
+
+<h2 id="4-2-数量元字符"><a href="#4-2-数量元字符" class="headerlink" title="4.2 数量元字符"></a>4.2 数量元字符</h2><p>数量元字符：</p>
+<ul>
+<li><code>* </code></li>
+<li><code>+ </code></li>
+<li><code>? </code></li>
+<li><code>*?, +?, ?? </code></li>
+<li><code>&#123;m&#125; </code></li>
+<li><code>&#123;m,n&#125; </code></li>
+<li><code>&#123;m,n&#125;? </code></li>
+</ul>
+<figure class="highlight plaintext"><figcaption><span>```这几个匹配重复的方式了。下面表格是正则表达式中常用的限定符(指定数量的代码，例如```*,&#123;7,13&#125; ```等</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs *,+,&#123;5&#125;,&#123;7,13&#125;"><br>- 常用的限定符<br><br>|模式|描述|<br>|---|---|<br>|```*	```|匹配0个或多个表达式；匹配前面的子表达式0次或多次；代表出现0到多次，可以出现，也可以不出现，出现的话，不限制次数|<br>|```+	```|匹配1个或多个表达式；匹配前面的子表达式1次或多次；代表出现1到多次，也就是至少出现一次的意思|<br>|```？	```|匹配0个或1个前面正则表达式定义的片段（非贪婪匹配）；匹配前面的子表达式0次或1次；代表出现0到1次，比如Http协议的正则就可以用 Https? 表示|<br>|```&#123;n&#125;	```|精确匹配n个前面的表达式；代表出现n次，比如 a&#123;1&#125; 就表示匹配的规则中，字母a只能出现1次|<br>|```&#123;n,&#125; ```|重复n次或更多次；至少出现n次，&#123;0,&#125; 相当于星号，&#123;1,&#125; 相当于加号|<br>|```&#123;n,m&#125;	```|匹配n到m次，由前面正则表达式匹配的片段（贪婪匹配）；匹配至少n次，至多m次；代表出现n到m次，&#123;0,1&#125; 相当于问号|<br><br>### 4.2.1 匹配0个或多个表达式 ```* ```<br><br>对它前面的正则式匹配0到任意次重复，例1：<br><br>```perl<br>文本：121122<br>正则：12*<br>运行结果：匹配&#x27;12&#x27;，&#x27;1&#x27;，或者&#x27;122&#x27;<br># 只重复2，尽量多的匹配字符串<br></code></pre></td></tr></table></figure>
+
+
+<p>例2：重复<code>.0 </code>到任意次，<code>. </code>有代表任意字符，所有<code>d.*c </code>能匹配dc之间包含任意字符</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：d123456cwel<br>正则：d.*c<br>运行结果：d123456c<br></code></pre></td></tr></table></figure>
+
+<h3 id="4-2-2-匹配1个或多个表达式"><a href="#4-2-2-匹配1个或多个表达式" class="headerlink" title="4.2.2 匹配1个或多个表达式 + "></a>4.2.2 匹配1个或多个表达式 <code>+ </code></h3><p>对它前面的正则式匹配1到任意次重复。<code>ab+ </code>会匹配<code>&#39;a&#39; </code>后面跟随1个以上到任意个<code>&#39;b&#39; </code>，它不会匹配<code>&#39;a&#39; </code></p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：ababbbbaabbcaacb<br>正则：ab+<br>运行结果：匹配<span class="hljs-string">&#x27;ab&#x27;</span>，<span class="hljs-string">&#x27;abbbb&#x27;</span>，或者<span class="hljs-string">&#x27;abb&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="4-2-3-非贪婪匹配"><a href="#4-2-3-非贪婪匹配" class="headerlink" title="4.2.3 非贪婪匹配 ? "></a>4.2.3 非贪婪匹配 <code>? </code></h3><p>对它前面的正则式匹配0到1次重复。<code>ab? </code>会匹配<code>&#39;a&#39;或者&#39;ab </code></p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：ababbbbaabbcaacb<br>正则：ab?<br>运行结果：匹配<span class="hljs-string">&#x27;ab&#x27;</span>，<span class="hljs-string">&#x27;ab&#x27;</span>，<span class="hljs-string">&#x27;a&#x27;</span>，<span class="hljs-string">&#x27;ab&#x27;</span>，<span class="hljs-string">&#x27;a&#x27;</span>，或者<span class="hljs-string">&#x27;a&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="4-2-4-懒惰模式"><a href="#4-2-4-懒惰模式" class="headerlink" title="4.2.4 懒惰模式 *?, +?, ?? "></a>4.2.4 懒惰模式 <code>*?, +?, ?? </code></h3><figure class="highlight plaintext"><figcaption><span>```，和```'?' ```的懒惰模式，```'*','+'，'?' ```修饰符都是贪婪的，它们在字符串进行尽可能多的匹配。有时候并不需要这种行为。在修饰符之后添加```'?' ```将使样式以非贪婪方式或者dfn最小方式进行匹配，尽量少的字符将会被匹配</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs '*','+'"><br>```perl<br>文本：ababbbbaabbcaacb<br>正则：ab*?<br>运行结果：匹配&#x27;a&#x27;，&#x27;a&#x27;，&#x27;a&#x27;，&#x27;a&#x27;，&#x27;a&#x27;，或者&#x27;a&#x27;<br></code></pre></td></tr></table></figure>
+
+<h3 id="4-2-5-对其之前的正则式指定匹配m个重复-m"><a href="#4-2-5-对其之前的正则式指定匹配m个重复-m" class="headerlink" title="4.2.5 对其之前的正则式指定匹配m个重复 {m} "></a>4.2.5 对其之前的正则式指定匹配m个重复 <code>&#123;m&#125; </code></h3><p>对其之前的正则式指定匹配m个重复，少于m的话就会导致匹配失败。比如，<code>a&#123;6&#125; </code>将匹配6个<code>&#39;a&#39; </code>，但是不能是5个</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：ababbbbaabbcaacb<br>正则：ab<span class="hljs-string">&#123;2&#125;</span><br>运行结果：匹配<span class="hljs-string">&#x27;abb&#x27;</span>，或者<span class="hljs-string">&#x27;abb&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="4-2-6-对正则式进行m到n次匹配-m-n"><a href="#4-2-6-对正则式进行m到n次匹配-m-n" class="headerlink" title="4.2.6 对正则式进行m到n次匹配 {m,n} "></a>4.2.6 对正则式进行m到n次匹配 <code>&#123;m,n&#125; </code></h3><p>对正则式进行m到n次匹配，在m和n之间取尽量多，比如<code>a&#123;3,5&#125; </code>将匹配3到5个<code>&#39;a&#39; </code>。忽略m意为指定下界为0，忽略n指定上界为无限次。比如<code>a&#123;4,&#125;b </code>将匹配<code>&#39;aaaab&#39;或者10000000个&#39;a&#39;尾随一个&#39;b&#39; </code>，但不能匹配<code>&#39;aaab&#39; </code>。逗号不能省略，否则无法辨别修饰符应该忽略哪个边界</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：ababbbbaabbcaacb<br>正则：ab&#123;<span class="hljs-number">2</span>,&#125;<br>运行结果：匹配<span class="hljs-string">&#x27;abbbb&#x27;</span>，或者<span class="hljs-string">&#x27;abb&#x27;</span><br></code></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：ababbbbaabbcaacb<br>正则：a<span class="hljs-string">&#123;2&#125;</span>b&#123;<span class="hljs-number">2</span>,<span class="hljs-number">4</span>&#125;<br>运行结果：匹配<span class="hljs-string">&#x27;aabb&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：ababbbbaabbcaacb<br>正则：ab&#123;<span class="hljs-number">2</span>,<span class="hljs-number">4</span>&#125;<br>运行结果：匹配<span class="hljs-string">&#x27;abbbb&#x27;</span>，或者<span class="hljs-string">&#x27;abb&#x27;</span><br><span class="hljs-comment"># 匹配前一个字符（或者子表达式至少m次）</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="4-2-6-1-m-n-非贪婪模式"><a href="#4-2-6-1-m-n-非贪婪模式" class="headerlink" title="4.2.6.1 {m,n}? 非贪婪模式"></a>4.2.6.1 <code>&#123;m,n&#125;? </code>非贪婪模式</h4><p><code>&#123;m,n&#125;? </code>修饰符的非贪婪模式，只匹配尽量少的字符次数。比如对于<code>&#39;aaaaaa&#39;，a&#123;3,5&#125; </code>匹配5个<code>&#39;a&#39; </code>，而<code>a&#123;3,5&#125;? </code>只匹配3个<code>&#39;a&#39; </code></p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：ababbbbaabbcaacb<br>正则：ab&#123;<span class="hljs-number">2</span>,<span class="hljs-number">4</span>&#125;?<br>运行结果：匹配<span class="hljs-string">&#x27;abb&#x27;</span>，或者<span class="hljs-string">&#x27;abb&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：aaaaaa<br>正则：a&#123;<span class="hljs-number">3</span>,<span class="hljs-number">5</span>&#125;<br>运行结果：匹配<span class="hljs-string">&#x27;aaaaa&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：ababbbbaabbcaacb<br>正则：a&#123;<span class="hljs-number">3</span>,<span class="hljs-number">5</span>&#125;?<br>运行结果：匹配<span class="hljs-string">&#x27;aaa&#x27;</span>，或者<span class="hljs-string">&#x27;aaa&#x27;</span><br></code></pre></td></tr></table></figure>
+
+
+<h2 id="4-3-位置元字符"><a href="#4-3-位置元字符" class="headerlink" title="4.3 位置元字符"></a>4.3 位置元字符</h2><p>位置元字符：</p>
+<ul>
+<li><code>^ </code></li>
+<li><code>$ </code></li>
+<li><code>\A </code></li>
+<li><code>\Z </code></li>
+<li><code>\b </code></li>
+<li><code>\B </code></li>
+</ul>
+<h3 id="4-3-1"><a href="#4-3-1" class="headerlink" title="4.3.1 ^ "></a>4.3.1 <code>^ </code></h3><p>匹配字符串的开头是否包含正则表达式， 并且在MULTILINE模式也匹配换行后的首个符号</p>
+<ul>
+<li><p>例1：匹配字符串开头是否包含weY</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：Hello Baidu<br>正则：^[weY]<br>运行结果：未匹配成功<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>例2：匹配开头是否包含weH</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：Hello Baidu<br>正则：^[weH]<br>运行结果：H<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>例3：匹配开头是否包含2个以上的a</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：bbaidu<br>正则：^b&#123;<span class="hljs-number">2</span>,&#125;<br>运行结果：bb<br></code></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="4-3-2"><a href="#4-3-2" class="headerlink" title="4.3.2 $ "></a>4.3.2 <code>$ </code></h3><p>匹配字符串尾或者在字符串尾的换行符的前一个字符，在MULTILINE模式下也会匹配换行符之前的文本。foo匹配 <code>&#39;foo&#39; 和 &#39;foobar&#39; </code>，但正则表达式<code>foo$ </code>只匹配 <code>&#39;foo&#39; </code>。在<code>&#39;foo1\nfoo2\n&#39; </code>中搜索<code>foo.$ </code>，通常匹配<code>&#39;foo2&#39; </code>，但在MULTILINE模式下可以匹配到<code>&#39;foo1&#39; </code>；在<code>&#39;foo\n&#39;  </code>中搜索<code>$ </code>会找到两个（空的）匹配：一个在换行符之前，一个在字符串的末尾</p>
+<ul>
+<li><p>例1：</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：baidu<br>正则：baidu<br>运行结果：baidu<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>例2：</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：baidudd<br>正则：baidu<br>运行结果：baidu<br></code></pre></td></tr></table></figure></li>
+</ul>
+<p>例3：</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：baidu<br>正则：baidu$<br>运行结果：baidu<br></code></pre></td></tr></table></figure>
+
+<p>例4：</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：bai du<br>正则：[iu]<br>运行结果：匹配<span class="hljs-string">&#x27;i&#x27;</span>，或者<span class="hljs-string">&#x27;u&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<p>例5：</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：bai du<br>正则：[iu]$<br>运行结果：u<br></code></pre></td></tr></table></figure>
+
+
+<h3 id="4-3-3-b"><a href="#4-3-3-b" class="headerlink" title="4.3.3 \b "></a>4.3.3 <code>\b </code></h3><p>匹配空字符串，但只在单词开始或结尾的位置。一个单词被定义为一个单词字符的序列。注意，通常\b定义为\w和\W字符之间，或者\w和字符串开始&#x2F;结尾的边界，意思就是<code>&#39;\bfoo\b&#39; </code>匹配<code>&#39;foo&#39;,&#39;foo.&#39;,&#39;(foo)&#39;,&#39;bar foo baz&#39; </code>但不匹配’foobar’或者’foo3’。</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：baidu<br>正则：\bbaidu\b<br>运行结果：baidu<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：aaa baidu bb<br>正则：baidu.<br>运行结果：baidu<br></code></pre></td></tr></table></figure>
+
+<p>默认情况下，Unicode字母和数字是在Unicode样式中使用的，但是可以用ASCII标记来更改。如果 LOCALE 标记被设置的话，词的边界是由当前语言区域设置决定的，<code>\b </code>表示退格字符</p>
+<h3 id="4-3-4-B"><a href="#4-3-4-B" class="headerlink" title="4.3.4 \B "></a>4.3.4 <code>\B </code></h3><p>匹配空字符串，但不能在词的开头或者结尾。意思就是<code>&#39;ba\B&#39; </code>匹配<code>&#39;baidu&#39;,&#39;bai&#39;,&#39;bai2&#39; </code>，但不匹配<code>&#39;ba&#39;,&#39;ba.&#39; </code>，或者<code>&#39;ba!&#39; ``````.\B </code>是<code>\b </code>的取非，所以Unicode样式的词语是由Unicode字母，数字或下划线构成的，虽然可以用ASCII标志来改变。如果使用了LOCALE标志，则词的边界由当前语言区域设置</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：baidu<br>正则：ba\B<br>运行结果：ba<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：ba<br>正则：ba\B<br>运行结果：未匹配<br></code></pre></td></tr></table></figure>
+
+<h2 id="4-4-特殊元字符"><a href="#4-4-特殊元字符" class="headerlink" title="4.4 特殊元字符"></a>4.4 特殊元字符</h2><p>在正则表达式中，普通字符表示的还是原来的意思，比如表达式 1 可以匹配到数字 1，表达式 a 可以匹配到字母 a。</p>
+<p>但是如果想要匹配到更多字符的时候，不可能把所有的字符都列一遍，这样就太浪费时间了，那有什么更好的办法呢？特殊元字符能帮到我们的忙</p>
+<p>特殊元字符：</p>
+<ul>
+<li><code>\d </code></li>
+<li><code>\D </code></li>
+<li><code>\s </code></li>
+<li><code>\S </code></li>
+<li><code>\w </code></li>
+<li><code>\W </code></li>
+<li><code>[\b] </code></li>
+<li><code>. </code></li>
+</ul>
+<h3 id="4-4-1-d"><a href="#4-4-1-d" class="headerlink" title="4.4.1 \d "></a>4.4.1 <code>\d </code></h3><p>数字通配符，可以匹配到数字0-9</p>
+<p>对于Unicode (str) 样式：匹配任何Unicode十进制数（就是在Unicode字符目录[Nd]里的字符）。这包括了<code>[0-9] </code>，和很多其他的数字字符。如果设置了ASCII标志，就只匹配<code>[0-9] </code></p>
+<p>对于8位(bytes)样式：匹配任何十进制数，就是<code>[0-9] </code></p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：aa1bb2ccc3dddd4e5ee<br>正则：\d<br>运行结果：匹配<span class="hljs-string">&#x27;1&#x27;</span>，<span class="hljs-string">&#x27;2&#x27;</span>，<span class="hljs-string">&#x27;3&#x27;</span>，<span class="hljs-string">&#x27;4&#x27;</span>，或者<span class="hljs-string">&#x27;5&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="4-4-2-D"><a href="#4-4-2-D" class="headerlink" title="4.4.2  \D "></a>4.4.2  <code>\D </code></h3><p>如果将D大写，则匹配到的是任意非数字，相当于 \d 的反义</p>
+<p>匹配任何非十进制数字的字符。就是<code>\d </code>取非。如果设置了ASCII标志，就相当于<code>[^0-9] </code></p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：aa1bb2ccc3dddd4e5ee<br>正则：\d<br>运行结果：<br>a<br>a<br>b<br>b<br>c<br>c<br>c<br>d<br>d<br>d<br>d<br>e<br>e<br>e<br></code></pre></td></tr></table></figure>
+
+<h3 id="4-4-3-s"><a href="#4-4-3-s" class="headerlink" title="4.4.3 \s "></a>4.4.3 <code>\s </code></h3><p>空白符通配符，可以配到任意空白符，包括回车、换行、换页、制表符等</p>
+<p>对于 Unicode (str) 样式：匹配任何Unicode空白字符（包括<code>[ \t\n\r\f\v]  </code>，还有很多其他字符，比如不同语言排版规则约定的不换行空格）。如果ASCII被设置，就只匹配<code>[ \t\n\r\f\v] </code></p>
+<p>对于8位(bytes)样式：匹配ASCII中的空白字符，就是<code>[ \t\n\r\f\v] </code></p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：aa1bb2c cc3 dddd4e5ee<br>正则：\s<br>运行结果：匹配到两处<br></code></pre></td></tr></table></figure>
+
+<h3 id="4-4-4-空白符"><a href="#4-4-4-空白符" class="headerlink" title="4.4.4 空白符"></a>4.4.4 空白符</h3><p>空白符分为下图中的几类，一般用 <code>\s </code>表示：</p>
+<p><img src="https://img-blog.csdnimg.cn/3c6a3fd59e614236a821cda1d8d99fb0.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>空白符：</p>
+<ul>
+<li>\r：回车符</li>
+<li>\n：换行符</li>
+<li>\f：换页符</li>
+<li>\t：制表符</li>
+<li>\v：垂直制表符</li>
+</ul>
+<h3 id="4-4-5-S"><a href="#4-4-5-S" class="headerlink" title="4.4.5 \S "></a>4.4.5 <code>\S </code></h3><p>如果将S大写，则匹配到的是任意非空白符</p>
+<p>匹配任何非空白字符。就是\s取非。如果设置了ASCII标志，就相当于<code>[^ \t\n\r\f\v] </code></p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：aa1bb2c cc3 dddd4e5ee<br>正则：\S+<br>运行结果：匹配<span class="hljs-string">&#x27;aa1bb2c&#x27;</span>，<span class="hljs-string">&#x27;cc3&#x27;</span>，或者<span class="hljs-string">&#x27;dddd4e5ee&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="4-4-6-w"><a href="#4-4-6-w" class="headerlink" title="4.4.6 \w "></a>4.4.6 <code>\w </code></h3><p>字母数字下划线通配符，可以匹配到任意的字母数字下划线</p>
+<p>对于Unicode (str) 样式：匹配Unicode词语的字符，包含了可以构成词语的绝大部分字符，也包括数字和下划线。</p>
+<p>对于8位(bytes)样式：匹配ASCII字符中的数字和字母和下划线，就是<code>[a-zA-Z0-9_] </code>。如果设置了LOCALE标记，就匹配当前语言区域的数字和字母和下划线</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：aa1Baidubb2c cc3 dddd4e5ee<br>正则：\w+<br>运行结果：匹配<span class="hljs-string">&#x27;aa1Baidubb2c&#x27;</span>，<span class="hljs-string">&#x27;cc3&#x27;</span>，或者<span class="hljs-string">&#x27;dddd4e5ee&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="4-4-7-W"><a href="#4-4-7-W" class="headerlink" title="4.4.7 \W "></a>4.4.7 <code>\W </code></h3><p>如果将W大写，则匹配到的是任意非字母数字下划线</p>
+<p>匹配任何不是单词字符的字符。这与\w正相反。如果使用了ASCII旗标，这就等价于<code>[^a-zA-Z0-9_] </code>。如果使用了LOCALE旗标，则会匹配在当前区域设置中不是字母数字又不是下划线的字符</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：aa1Baidubb无<span class="hljs-number">2</span>ccc3dddd4e5ee<br>正则：\W+<br>运行结果：匹配<span class="hljs-string">&#x27;无&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="4-4-8-b"><a href="#4-4-8-b" class="headerlink" title="4.4.8 [\b] "></a>4.4.8 <code>[\b] </code></h3><p>它只在字符集合内表示退格，比如<code>[\b] </code></p>
+<p>例1：匹配Baidu后面跟1个或更多数字</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs perl">Baidu\d+<br></code></pre></td></tr></table></figure>
+
+<p>例2：匹配一行的第一个单词(或整个字符串的第一个单词，具体匹配哪个意思得看选项设置)</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs perl">^\B+<br></code></pre></td></tr></table></figure>
+
+<h3 id="4-4-9"><a href="#4-4-9" class="headerlink" title="4.4.9 . "></a>4.4.9 <code>. </code></h3><figure class="highlight plaintext"><figcaption><span>```点号通配符，可以匹配到除换行外的任意字符：</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs ."><br>```perl<br>文本：Baidu_*&amp;N&lt;S.x/<br>正则：.<br>运行结果：<br>B<br>a<br>i<br>d<br>u<br>_<br>*<br>&amp;<br>N<br>&lt;<br>S<br>.<br>x<br>/<br></code></pre></td></tr></table></figure>
+
+
+<h1 id="0x05-分枝条件"><a href="#0x05-分枝条件" class="headerlink" title="0x05 分枝条件"></a>0x05 分枝条件</h1><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs perl">\(?<span class="hljs-number">0</span>\d<span class="hljs-string">&#123;2&#125;</span>[) -]?\d<span class="hljs-string">&#123;8&#125;</span><br></code></pre></td></tr></table></figure>
+<p>上面的这个表达式也能匹配010)12345678或(022-87654321这样的“不正确”的格式。此处就需要用到正则表达式中的分枝条件。</p>
+<p>正则表达式里的分枝条件指的是有几种规则，如果满足其中任意一种规则都应该当成匹配，具体方法是用|把不同的规则分隔开，例如：</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs perl"><span class="hljs-number">0</span>\d<span class="hljs-string">&#123;2&#125;</span>-\d<span class="hljs-string">&#123;8&#125;</span>|<span class="hljs-number">0</span>\d<span class="hljs-string">&#123;3&#125;</span>-\d<span class="hljs-string">&#123;7&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>PS</strong>：表达式能匹配两种以连字号分隔的电话号码：一种是三位区号，8位本地号(如010-12345678)，一种是4位区号，7位本地号(0376-2233445)</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs perl">\(<span class="hljs-number">0</span>\d<span class="hljs-string">&#123;2&#125;\)</span>[- ]?\d<span class="hljs-string">&#123;8&#125;</span>|<span class="hljs-number">0</span>\d<span class="hljs-string">&#123;2&#125;</span>[- ]?\d<span class="hljs-string">&#123;8&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>PS</strong>：表达式匹配3位区号的电话号码，其中区号可以用小括号括起来，也可不用，区号与本地号间可用连字号或空格间隔，也可没有间隔</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs perl">\d<span class="hljs-string">&#123;5&#125;</span>-\d<span class="hljs-string">&#123;4&#125;</span>|\d<span class="hljs-string">&#123;5&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>PS</strong>：表达式用于匹配美国的邮政编码。美国邮编的规则是5位数字，或者用连字号间隔的9位数字。这个例子是因为它能说明一个问题：使用分枝条件时，要注意各个条件的顺序。如果你把它改成<code>\d&#123;5&#125;|\d&#123;5&#125;-\d&#123;4&#125; </code>的话，那么就只会匹配5位的邮编(以及9位邮Q编的前5位)。原因是匹配分枝条件时，将会从左到右地测试每个条件，如果满足了某个分枝的话，就不会去再管其它的条件。</p>
+<ul>
+<li><p>例1：文本为：12345-6789</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs perl">\d<span class="hljs-string">&#123;5&#125;</span>|\d<span class="hljs-string">&#123;5&#125;</span>-\d<span class="hljs-string">&#123;4&#125;</span><br></code></pre></td></tr></table></figure>
+<p>运行结果：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs">12345<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>例2：文本为：12345-6789</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs perl">\d<span class="hljs-string">&#123;5&#125;</span>-\d<span class="hljs-string">&#123;4&#125;</span>|\d<span class="hljs-string">&#123;5&#125;</span><br></code></pre></td></tr></table></figure>
+<p>运行结果：</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">12345</span>-<span class="hljs-number">6789</span><br></code></pre></td></tr></table></figure></li>
+</ul>
+<h1 id="0x06-分组"><a href="#0x06-分组" class="headerlink" title="0x06 分组"></a>0x06 分组</h1><p>重复单个字符（直接在字符后面加上限定符就行了），但如果想要重复多个字符该如何做？可用小括号来指定子表达式(也叫做分组)，然后就可指定这个子表达式的重复次数，也可对子表达式进行其它一些操作。</p>
+<p>例1：简单的IP地址匹配表达式</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs perl">(\d&#123;<span class="hljs-number">1</span>,<span class="hljs-number">3</span>&#125;\.)<span class="hljs-string">&#123;3&#125;\d</span>&#123;<span class="hljs-number">1</span>,<span class="hljs-number">3</span>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><strong>PS</strong>：要理解上面的表达式，请按下列顺序分析它：<code>\d&#123;1,3&#125; </code>匹配1到3位的数字，<code>(\d&#123;1,3&#125;\.)&#123;3&#125; </code>匹配三位数字加上一个英文句号(这个整体也就是这个分组)重复3次，最后再加上一个一到三位的数字<code>(\d&#123;1,3&#125;) </code>。但是它也将匹配888.888.888.888这种不可能存在的IP地址。如果能使用算术比较的话，或许能简单地解决这个问题，但是正则表达式中并不提供关于数学的任何功能，所以只能使用冗长的分组，选择，字符类来描述一个正确的IP地址：<code>((2[0-4]\d|25[0-5]|[01]?\d\d?)\.)&#123;3&#125;(2[0-4]\d|25[0-5]|[01]?\d\d?) </code>，理解这个表达式的关键是理解<code>2[0-4]\d|25[0-5]|[01]?\d\d? </code></p>
+<p><strong>备注</strong>：IP地址中每个数字都不能大于255。但<code>01.02.03.04 </code>这样前面带有0的数字，是正确的IP地址，因为IP 地址里的数字可以包含有前导0 (leading zeroes)</p>
+<h1 id="0x07-反义"><a href="#0x07-反义" class="headerlink" title="0x07 反义"></a>0x07 反义</h1><p>查找不属于某个能简单定义的字符类的字符。比如想查找除了数字以外，其它任意字符都行的情况，这时需要用到反义：</p>
+<ul>
+<li>常用的反义代码</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>模式</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>\W	</code></td>
+<td>匹配不是字母、数字及下划线的字符；匹配任意不是字母，数字，下划线，汉字的字符</td>
+</tr>
+<tr>
+<td><code>\S	</code></td>
+<td>匹配任意非空白字符；匹配任意不是空白符的字符</td>
+</tr>
+<tr>
+<td><code>\D	</code></td>
+<td>匹配任意非数字字符</td>
+</tr>
+<tr>
+<td><code>\A	</code></td>
+<td>匹配字符串开头</td>
+</tr>
+<tr>
+<td><code>\Z	</code></td>
+<td>匹配字符串的结尾，如果存在换行，只匹配到换行前的字符串</td>
+</tr>
+<tr>
+<td><code>\G	</code></td>
+<td>匹配最后完成匹配的位置</td>
+</tr>
+<tr>
+<td><code>\B </code></td>
+<td>匹配不是单词开头或结束的位置</td>
+</tr>
+<tr>
+<td><code>[^…] </code></td>
+<td>不在[]中的字符，比如<code>^abc</code>,表示匹配除了a,b,c之外的字符</td>
+</tr>
+<tr>
+<td><code>[^x] </code></td>
+<td>匹配除了x以外的任意字符</td>
+</tr>
+<tr>
+<td><code>[^aeiou] </code></td>
+<td>匹配除了aeiou这几个字母以外的任意字符</td>
+</tr>
+</tbody></table>
+<ul>
+<li>例1：匹配用尖括号括起来的以a开头的字符串</li>
+</ul>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：<br>&lt;<span class="hljs-number">12</span>a526&gt;<br>&lt;a526&gt;<br>正则：&lt;a[^&gt;]+&gt;<br>运行结果：&lt;a526&gt;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>例2：匹配不包含空白符的字符串</li>
+</ul>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：<br>   <span class="hljs-number">2</span>   <br>正则：\S+<br>运行结果：<span class="hljs-number">2</span><br></code></pre></td></tr></table></figure>
+
+<h1 id="0x08-后向引用"><a href="#0x08-后向引用" class="headerlink" title="0x08 后向引用"></a>0x08 后向引用</h1><p>使用小括号指定一个子表达式后，匹配这个子表达式的文本(也就是此分组捕获的内容)，可在表达式或其它程序中作进一步的处理。默认情况下，每个分组会自动拥有一个组号，规则是：从左向右，以分组的左括号为标志，第一个出现的分组的组号为1，第二个为2，以此类推</p>
+<ul>
+<li>常用分组语法</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>分类</th>
+<th>代码&#x2F;语法</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>捕获</td>
+<td><code>(exp) </code></td>
+<td>匹配exp,并捕获文本到自动命名的组里</td>
+</tr>
+<tr>
+<td>捕获</td>
+<td><code>(?&lt;name&gt;exp) </code></td>
+<td>匹配exp,并捕获文本到名称为name的组里，也可以写成<code>(?&#39;name&#39;exp) </code></td>
+</tr>
+<tr>
+<td>捕获</td>
+<td><code>(?:exp) </code></td>
+<td>匹配exp,不捕获匹配的文本，也不给此分组分配组号</td>
+</tr>
+<tr>
+<td>零宽断言</td>
+<td><code>(?=exp) </code></td>
+<td>匹配exp前面的位置</td>
+</tr>
+<tr>
+<td>零宽断言</td>
+<td><code>(?&lt;=exp) </code></td>
+<td>匹配exp后面的位置</td>
+</tr>
+<tr>
+<td>零宽断言</td>
+<td><code>(?!exp) </code></td>
+<td>匹配后面跟的不是exp的位置</td>
+</tr>
+<tr>
+<td>零宽断言</td>
+<td><code>(?&lt;!exp) </code></td>
+<td>匹配前面不是exp的位置</td>
+</tr>
+<tr>
+<td>注释</td>
+<td><code>(?#comment) </code></td>
+<td>这种类型的分组不对正则表达式的处理产生任何影响，用于提供注释让人阅读</td>
+</tr>
+</tbody></table>
+<p>后向引用用于重复搜索前面某个分组匹配的文本，例如：<code>\1代表分组1匹配的文本 </code></p>
+<p>例1：<code>\1用来匹配重复的单词 </code></p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：<br>baidu baidu<br>baidu bai<br>正则：\b(\w+)\b\s+\<span class="hljs-number">1</span>\b<br>运行结果：baidu baidu<br></code></pre></td></tr></table></figure>
+
+<p><strong>PS</strong>：要理解上面的表达式，表达式首先是一个单词，也就是单词开始处和结束处之间的多于一个的字母或数字<code>(\b(\w+)\b) </code>，这个单词会被捕获到编号为1的分组中，然后是1个或几个空白符<code>(\s+) </code>，最后是分组1中捕获的内容（也就是前面匹配的那个单词）<code>(\1) </code></p>
+<p>也可指定子表达式的组名。要指定一个子表达式的组名，使用的语法：<code>(?&lt;Baidu&gt;\w+)(或者把尖括号换成&#39;也行：(?&#39;Word&#39;\w+)) </code>，这样就把<code>\w+ </code>的组名指定为Baidu了。要反向引用这个分组捕获的内容，你可以使用\k<Baidu>，将上个例子改一下：<code>\b(?&lt;Baidu&gt;\w+)\b\s+\k&lt;Baidu&gt;\b </code></p>
+<p>使用小括号的时候，还有很多特定用途的语法。且第三个<code>(?:exp) </code>不会改变正则表达式的处理方式，只是这样的组匹配的内容不会像前两种那样被捕获到某个组里面，也不会拥有组号</p>
+<h1 id="0x09-零宽断言"><a href="#0x09-零宽断言" class="headerlink" title="0x09 零宽断言"></a>0x09 零宽断言</h1><p>先行断言和后发断言都属于非捕获簇(不捕获文本 ，也不针对组合计进行计数). 先行断言用于判断所匹配的格式是否在另一个确定的格式之前, 匹配结果不包含该确定格式(仅作为约束)</p>
+<p>例如, 我们想要获得所有跟在<code>$ </code>符号后的数字，可以使用正后发断言 <code>(?&lt;=\$)[0-9\.]* </code>。 这个表达式匹配<code>$ </code>开头，之后跟着 <code>0,1,2,3,4,5,6,7,8,9, </code>。这些字符可以出现大于等于 0 次</p>
+<p>四个用于查找在某些内容(但并不包括这些内容)之前或之后的东西，也就是说它们像<code>\b,^,$ </code>那样用于指定一个位置，这个位置应该满足一定的条件(即断言)，因此它们也被称为零宽断言</p>
+<ul>
+<li><code>(?=exp) </code>也叫零宽度正预测先行断言，它断言自身出现的位置的后面能匹配表达式exp。比如<code>\b\w+(?=ing\b) </code>，匹配以ing结尾的单词的前面部分(除了ing以外的部分)，如查找<code>I&#39;m singing while you&#39;re dancing. </code>时，它会匹配sing和danc</li>
+<li><code>(?&lt;=exp) </code>也叫零宽度正回顾后发断言，它断言自身出现的位置的前面能匹配表达式exp。比如<code>(?&lt;=\bre)\w+\b </code>会匹配以re开头的单词的后半部分(除了re以外的部分)，例如在查找reading a book时，它匹配ading</li>
+</ul>
+<p>假如，想要给一个很长的数字中每三位间加一个逗号(从右边加起)，可这样查找需要在前面和里面添加逗号的部分，例如：</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：<span class="hljs-number">5678909876</span><br>正则：((?&lt;=\d)\d<span class="hljs-string">&#123;3&#125;</span>)+\b<br>运行结果：<span class="hljs-number">234567890</span><br><br>文本：<span class="hljs-number">5678</span>,<span class="hljs-number">909</span>,<span class="hljs-number">876</span><br>正则：((?&lt;=\d)\d<span class="hljs-string">&#123;3&#125;</span>)+\b<br>运行结果：<span class="hljs-number">678</span><br></code></pre></td></tr></table></figure>
+
+
+<ul>
+<li>例1：匹配以空白符间隔的数字(再次强调，不包括这些空白符)</li>
+</ul>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：<span class="hljs-number">123</span> <span class="hljs-number">5</span> <span class="hljs-number">678</span><br>正则：(?&lt;=\s)\d+(?=\s)<br>运行结果：<span class="hljs-number">5</span><br><br>文本：<span class="hljs-number">1</span> <span class="hljs-number">2</span> <span class="hljs-number">3</span> <span class="hljs-number">4</span> <span class="hljs-number">5</span> <span class="hljs-number">6</span><br>正则：(?&lt;=\s)\d+(?=\s)<br>运行结果：<span class="hljs-number">2</span><br></code></pre></td></tr></table></figure>
+
+<h1 id="0x10-负向零宽断言"><a href="#0x10-负向零宽断言" class="headerlink" title="0x10 负向零宽断言"></a>0x10 负向零宽断言</h1><p>查找不是某个字符或不在某个字符类里的字符的方法(反义)，但是想要确保某个字符没有出现，并不想去匹配它时怎么办？</p>
+<p>例如，想查找这样的单词–它里面出现了字母b，但是q后面跟的不是字母u（匹配包含后面不是字母u的字母b的单词）</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：baidu<br>正则：\b\w*b[^u]\w*\b<br>运行结果：baidu<br></code></pre></td></tr></table></figure>
+
+<p><strong>PS</strong>：如果b出现在单词的结尾的话，像aidub、socaidub，表达式就出问题了。为什么呢？因为<code>[^u] </code>总要匹配一个字符，所以如果b是单词的最后一个字符的话，后面的<code>[^u] </code>将会匹配b后面的单词分隔符(可能是空格，或者是句号或其它的什么)，后面的<code>\w*\b </code>将会匹配下一个单词，例如文本（uaib park）于是正则为<code>\b\w*b[^u]\w*\b </code>就能匹配整个uaib park。负向零宽断言能解决这样的问题，因为它只匹配一个位置，并不消费任何字符，解决上述方法如下：</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：uaib park<br>正则：\b\w*b(?!u)\w*\b<br>运行结果：uaib<br></code></pre></td></tr></table></figure>
+
+<p>零宽度负预测先行断言<code>(?!exp) </code>，断言此位置的后面不能匹配表达式exp。</p>
+<p>例1：匹配三位数字，而且这三位数字的后面不能是数字</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：<span class="hljs-number">123456</span><br>正则：\d<span class="hljs-string">&#123;3&#125;</span>(?!\d)<br>运行结果：<span class="hljs-number">456</span><br></code></pre></td></tr></table></figure>
+
+<p>例2：匹配不包含连续字符串abc的单词</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：<span class="hljs-number">123</span>ad456<br>正则：\b((?!abc)\w)+\b<br>运行结果：<span class="hljs-number">123</span>ad456<br></code></pre></td></tr></table></figure>
+
+<p>同理，<code>(?&lt;!exp) </code>，零宽度负回顾后发断言来断言此位置的前面不能匹配表达式exp：(?&lt;![a-z])\d{7}匹配前面不是小写字母的七位数字。</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：a1234567A7654321<br>正则：(?&lt;![a-z])\d<span class="hljs-string">&#123;7&#125;</span><br>运行结果：<span class="hljs-number">7654321</span><br></code></pre></td></tr></table></figure>
+
+<p>例3：匹配不包含属性的简单HTML标签内里的内容</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：&lt;p&gt;<span class="hljs-number">1</span>&lt;/p&gt;<br>正则：(?&lt;=&lt;(\w+)&gt;).*(?=&lt;\/\<span class="hljs-number">1</span>&gt;)<br>运行结果：<span class="hljs-number">1</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>PS</strong>：<code>(?&lt;=&lt;(\w+)&gt;) </code>指定了这样的前缀：被尖括号括起来的单词(比如可能是<code>&lt;p&gt; </code>)，然后是<code>.* </code>(任意的字符串)，最后是一个后缀<code>(?=&lt;\/\1&gt;) </code>。注意后缀里的<code>\/ </code>，它用到了前面提过的字符转义；<code>\1 </code>则是一个反向引用，引用的正是捕获的第一组，前面的<code>(\w+) </code>匹配的内容，这样如果前缀实际上是<code>&lt;p&gt; </code>的话，后缀就是<code>&lt;/p&gt; </code>了。整个表达式匹配的是<code>&lt;p&gt;和&lt;/p&gt; </code>之间的内容(不包括前缀和后缀本身)</p>
+<h1 id="0x11-注释"><a href="#0x11-注释" class="headerlink" title="0x11 注释"></a>0x11 注释</h1><p>小括号的另一种用途是通过语法(<code>?#comment </code>)来包含注释。例如：</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs perl"><span class="hljs-number">2</span>[<span class="hljs-number">0</span>-<span class="hljs-number">4</span>]\d(?<span class="hljs-comment">#200-249)|25[0-5](?#250-255)|[01]?\d\d?(?#0-199)</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>PS</strong>：要包含注释的话，最好是启用“忽略模式里的空白符”选项，这样在编写表达式时能任意的添加空格，Tab，换行，而实际使用时这些都将被忽略。启用这个选项后，在#后面到这一行结束的所有文本都将被当成注释忽略掉。例如，可以把前面的一个表达式写成这样：</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs perl">(?&lt;=    <span class="hljs-comment"># 断言要匹配的文本的前缀</span><br>&lt;(\w+)&gt; <span class="hljs-comment"># 查找尖括号括起来的内容</span><br>        <span class="hljs-comment"># (即HTML/XML标签)</span><br>)       <span class="hljs-comment"># 前缀结束</span><br>.*      <span class="hljs-comment"># 匹配任意文本</span><br>(?=     <span class="hljs-comment"># 断言要匹配的文本的后缀</span><br>&lt;\/\<span class="hljs-number">1</span>&gt;  <span class="hljs-comment"># 查找尖括号括起来的内容</span><br>        <span class="hljs-comment"># 查找尖括号括起来的内容</span><br>)       <span class="hljs-comment"># 后缀结束</span><br></code></pre></td></tr></table></figure>
+
+<h1 id="0x12-贪婪与懒惰"><a href="#0x12-贪婪与懒惰" class="headerlink" title="0x12 贪婪与懒惰"></a>0x12 贪婪与懒惰</h1><p>正则表达式默认采用贪婪匹配模式，在该模式下意味着会匹配尽可能长的子串。我们可以使用 ? 将贪婪匹配模式转化为惰性匹配模式。</p>
+<ul>
+<li>贪婪模式</li>
+</ul>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs perl">(.*nt) =&gt; People want to try something different.<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>惰性模式</li>
+</ul>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs perl">(.*?nt) =&gt; People want to try something different.<br></code></pre></td></tr></table></figure>
+
+<p>当正则表达式中包含能接受重复的限定符时，通常的行为是（在使整个表达式能得到匹配的前提下）匹配尽可能多的字符</p>
+<ul>
+<li>懒惰限定符</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>模式</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>*?	</code></td>
+<td>重复任意次，但尽可能少重复</td>
+</tr>
+<tr>
+<td><code>+?	</code></td>
+<td>重复1次或更多次，但尽可能少重复</td>
+</tr>
+<tr>
+<td><code>??	</code></td>
+<td>重复0次或1次，但尽可能少重复</td>
+</tr>
+<tr>
+<td><code>&#123;n,&#125;? </code></td>
+<td>重复n次以上，但尽可能少重复</td>
+</tr>
+<tr>
+<td><code>&#123;n,m&#125;? </code></td>
+<td>重复n到m次，但尽可能少重复</td>
+</tr>
+</tbody></table>
+<p>例1：匹配最长的以a开始，以b结束的字符串，被称为贪婪匹配</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：bwwea324bdb<br>正则：a.*b<br>运行结果：a324bdb<br></code></pre></td></tr></table></figure>
+
+<p>有时，更需要懒惰匹配，也就是匹配尽可能少的字符。前面给出的限定符都可以被转化为懒惰匹配模式，只要在它后面加上一个问号<code>? </code>。这样<code>.*? </code>就意味着匹配任意数量的重复，但在能使整个匹配成功的前提下使用最少的重复</p>
+<p>例2：匹配最短的，以a开始，以b结束的字符串，被称为懒惰匹配</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：ta12bwa324bdb<br>正则：a.*?b<br>运行结果：<br>a12b<br>a324b<br></code></pre></td></tr></table></figure>
+
+<p><strong>PS</strong>：应用于bwwea324bdb的话，它会匹配a12b（第二到第五个字符）和a324b（第七到第十一个字符）</p>
+<ul>
+<li>为什么第一个匹配是a12b（第二到第五个字符），而不是a324b（第七到第十一个字符）？</li>
+</ul>
+<p>因为正则表达式有另一条规则，比懒惰<code>／ </code>贪婪规则的优先级更高：最先开始的匹配拥有最高的优先权</p>
+<h1 id="0x13-处理选项"><a href="#0x13-处理选项" class="headerlink" title="0x13 处理选项"></a>0x13 处理选项</h1><p>正则表达式中有几个选项如忽略大小写，处理多行等，这些选项能用来改变处理正则表达式的方式。</p>
+<ul>
+<li>.Net中常用的正则表达式选项：</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>IgnoreCase(忽略大小写)</td>
+<td>匹配时不区分大小写</td>
+</tr>
+<tr>
+<td>Multiline(多行模式)</td>
+<td>更改<code>^和$ </code>的含义，使它们分别在任意一行的行首和行尾匹配，而不仅仅在整个字符串的开头和结尾匹配。(在此模式下，<code>$ </code>的精确含意是：匹配<code>\n </code>之前的位置以及字符串结束前的位置)</td>
+</tr>
+<tr>
+<td>Singleline(单行模式)</td>
+<td>更改<code>. </code>的含义，使它与每一个字符匹配（包括换行符<code>\n </code>）</td>
+</tr>
+<tr>
+<td>IgnorePatternWhitespace(忽略空白)</td>
+<td>忽略表达式中的非转义空白并启用由<code># </code>标记的注释</td>
+</tr>
+<tr>
+<td>ExplicitCapture(显式捕获)</td>
+<td>仅捕获已被显式命名的组</td>
+</tr>
+</tbody></table>
+<p>在<code>C# </code>中，使用<code>Regex(String, RegexOptions) </code>构造函数来设置正则表达式的处理选项。如：<code>Regex regex = new Regex(@&quot;\ba\w&#123;6&#125;\b&quot;,RegexOptions.IgnoreCase) </code></p>
+<ul>
+<li>可以同时使用多行模式和单行模式中的一种？</li>
+</ul>
+<p>不可以，因为这两个选项之间没任何关系，除了它们的名字比较相似以外。事实上，为了避免混淆，在最新的 JavaScript 中，单行模式其实名叫 dotAll，意为点可以匹配所有字符，然而在指定该选项时，用的还是 Singleline 的首字母 s</p>
+<h1 id="0x14-平衡组-x2F-递归匹配"><a href="#0x14-平衡组-x2F-递归匹配" class="headerlink" title="0x14 平衡组&#x2F;递归匹配"></a>0x14 平衡组&#x2F;递归匹配</h1><p>平衡组语法是由<code>.Net Framework </code>支持的；其它语言<code>／ </code>库不一定支持这种功能，或者支持此功能但需要使用不同的语法。</p>
+<ul>
+<li>例1：匹配像<code>( 5 * ( 66 + 20 ) ) </code>的可嵌套的层次性结构</li>
+</ul>
+<p>简单地使用<code>\(.+\) </code>则只会匹配到最左边的左括号和最右边的右括号之间的内容(这里我们讨论的是贪婪模式，懒惰模式也有下面的问题)；假如原来的字符串里的左括号和右括号出现的次数不相等，比如<code>( 9 / ( 5 + 4 ) ) ) </code>，那匹配结果里两者的个数也不会相等。那么，有没有办法在这样的字符串里匹配到最长的，配对的括号之间的内容呢？</p>
+<p>为了避免<code>(和\( </code>的混淆，我们用尖括号代替圆括号。现在如何把<code>xx &lt;aa &lt;bbb&gt; &lt;bbb&gt; aa&gt; yy </code>字符串里，最长的配对的尖括号内的内容捕获出来？</p>
+<p>需要用到以下的语法构造：</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs perl">(?<span class="hljs-string">&#x27;group&#x27;</span>) 把捕获的内容命名为group,并压入堆栈(Stack)<br>(?<span class="hljs-string">&#x27;-group&#x27;</span>) 从堆栈上弹出最后压入堆栈的名为group的捕获内容，如果堆栈本来为空，则本分组的匹配失败<br>(?(group)yes|<span class="hljs-keyword">no</span>) 如果堆栈上存在以名为group的捕获内容的话，继续匹配yes部分的表达式，否则继续匹配<span class="hljs-keyword">no</span>部分<br>(?!) 零宽负向先行断言，由于没有后缀表达式，试图匹配总是失败<br></code></pre></td></tr></table></figure>
+
+<p>需要将每碰到了左括号，就再压入一个”Open”，每碰到一个右括号，就弹出一个，到了最后就看看堆栈是否为空；如果不为空那就证明左括号比右括号多，那匹配就应该失败。正则表达式引擎会进行回溯(放弃最前面或最后面的一些字符)，尽量使整个表达式得到匹配</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs perl">&lt;                   <span class="hljs-comment">#最外层的左括号</span><br>  [^&lt;&gt;]*            <span class="hljs-comment">#它后面非括号的内容</span><br>  (<br>      (<br>        (?<span class="hljs-string">&#x27;Open&#x27;</span>&lt;)  <span class="hljs-comment">#左括号，压入&quot;Open&quot;</span><br>        [^&lt;&gt;]*      <span class="hljs-comment">#左括号后面的内容</span><br>      )+<br>      (<br>        (?<span class="hljs-string">&#x27;-Open&#x27;</span>&gt;) <span class="hljs-comment">#右括号，弹出一个&quot;Open&quot;</span><br>        [^&lt;&gt;]*      <span class="hljs-comment">#右括号后面的内容</span><br>      )+<br>  )*<br>  (?(Open)(?!))     <span class="hljs-comment">#最外层的右括号前检查</span><br>                    <span class="hljs-comment">#若还有未弹出的&quot;Open&quot;</span><br>                    <span class="hljs-comment">#则匹配失败</span><br><br>&gt;                <span class="hljs-comment">#最外层的右括号</span><br></code></pre></td></tr></table></figure>
+
+<p>平衡组的一个最常见的应用就是匹配HTML，例如匹配嵌套的<div>标签：</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs perl">&lt;div[^&gt;]*&gt;[^&lt;&gt;]*(((?<span class="hljs-string">&#x27;Open&#x27;</span>&lt;div[^&gt;]*&gt;)[^&lt;&gt;]*)+((?<span class="hljs-string">&#x27;-Open&#x27;</span>&lt;<span class="hljs-regexp">/div&gt;)[^&lt;&gt;]*)+)*(?(Open)(?!))&lt;/di</span>v&gt;.<br></code></pre></td></tr></table></figure>
+
+
+
+
+
+<h1 id="0x15-前后查找"><a href="#0x15-前后查找" class="headerlink" title="0x15 前后查找"></a>0x15 前后查找</h1><p>在同一个搜索模式里可以使用多个前后查找表达式，向前查找指定了一个必须匹配但不在结果中返回的模式，实际就是一个以<code>?= </code>开头的子表达式；向后查找指定了一个必须匹配但不在结果中返回的模式，实际就是一个以<code>?&lt;= </code>结尾的子表达式；向前查找模式的长度是可变的，可以包含<code>\ 和 + </code>之类的元字符；向后查找模式只能是固定长度</p>
+<p>前后查找必须用<code>! </code>替换掉<code>= </code>来取非</p>
+<p>有了前后查找，就可以对最终的匹配结果包含哪些内容做出精确的控制。前后查找操作使我们可以利用子表达式来指定文本匹配操作发生的位置，并收到只匹配不消费的效果</p>
+<p>前后查找的操作符：</p>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>(?=) </code></td>
+<td>正向前查找</td>
+</tr>
+<tr>
+<td><code>(?!) </code></td>
+<td>负向前查找</td>
+</tr>
+<tr>
+<td><code>(?&lt;=) </code></td>
+<td>正向后查找</td>
+</tr>
+<tr>
+<td><code>(?&lt;!) </code></td>
+<td>负向后查找</td>
+</tr>
+</tbody></table>
+<p>例1：匹配HTML标签里面的title内容</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：&lt;title&gt;百度一下，你就知道&lt;<span class="hljs-regexp">/title&gt;</span><br><span class="hljs-regexp">正则：&lt;title&gt;(.*?)&lt;/</span>title&gt;<br>运行结果：&lt;title&gt;百度一下，你就知道&lt;/title&gt;<br></code></pre></td></tr></table></figure>
+
+<p>例2：匹配出一对标签之间的文本</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：&lt;head&gt;&lt;TITLE&gt;Hello Baidu&lt;<span class="hljs-regexp">/title&gt;&lt;/</span>head&gt;<br>正则：&lt;[Tt][Ii][Tt][Ll][Ee]&gt;.*?&lt;<span class="hljs-regexp">/[Tt][Ii][Tt][Ll][Ee]&gt;</span><br><span class="hljs-regexp">运行结果：&lt;TITLE&gt;Hello Baidu&lt;/</span>title&gt;<br><br>文本：&lt;head&gt;&lt;TITLE&gt;Hello Baidu&lt;<span class="hljs-regexp">/title&gt;&lt;/</span>head&gt;<br>正则：&lt;head&gt;&lt;TITLE&gt;Hello Baidu&lt;<span class="hljs-regexp">/title&gt;&lt;/</span>head&gt;<br>运行结果：&lt;head&gt;&lt;TITLE&gt;Hello Baidu&lt;<span class="hljs-regexp">/title&gt;&lt;/</span>head&gt;<br></code></pre></td></tr></table></figure>
+
+<p><strong>PS</strong>：<code>&lt;[Tt][Ii][Tt][Ll][Ee]&gt; </code>表示不区分大小写，这个模式匹配到了title标签以及它们之间的文本，但是并不完美，因为只想要title标签之间的文本，而不包括标签本身。为了解决类似的问题，就需要用到前后查找的方法</p>
+<h2 id="15-1-向前查找"><a href="#15-1-向前查找" class="headerlink" title="15.1 向前查找"></a>15.1 向前查找</h2><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：&lt;head&gt;&lt;TITLE&gt;Hello Baidu&lt;<span class="hljs-regexp">/title&gt;&lt;/</span>head&gt;<br>正则：&lt;[Tt][Ii][Tt][Ll][Ee]&gt;.*?(?=&lt;<span class="hljs-regexp">/[Tt][Ii][Tt][Ll][Ee]&gt;)</span><br><span class="hljs-regexp">运行结果：&lt;TITLE&gt;Hello Baidu</span><br><span class="hljs-regexp"></span><br><span class="hljs-regexp">文本：&lt;head&gt;&lt;TITLE&gt;Hello Baidu&lt;/</span>title&gt;&lt;<span class="hljs-regexp">/head&gt;</span><br><span class="hljs-regexp">正则：&lt;head&gt;&lt;TITLE&gt;Hello Baidu&lt;/</span>title&gt;&lt;<span class="hljs-regexp">/head&gt;</span><br><span class="hljs-regexp">运行结果：&lt;head&gt;&lt;TITLE&gt;Hello Baidu&lt;/</span>title&gt;&lt;/head&gt;<br></code></pre></td></tr></table></figure>
+
+<p>可以看到，后面个<code>&lt;/title&gt; </code>已经没有了，但是前面个还在，那要用到我们的向后查找#看一个提取https的例子</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：&lt;head&gt;&lt;TITLE&gt;https:<span class="hljs-regexp">//</span>orangey.blog.csdn.net/&lt;<span class="hljs-regexp">/title&gt;&lt;/</span>head&gt;<br>正则：.+(?=:)<br>运行结果：&lt;head&gt;&lt;TITLE&gt;https<br></code></pre></td></tr></table></figure>
+
+<h2 id="15-2-向后查找"><a href="#15-2-向后查找" class="headerlink" title="15.2 向后查找"></a>15.2 向后查找</h2><p>向后查找操作符是<code>?&lt;= </code>。并不是所有的语言都支持向后查找，JavaScript就不支持，java语言支持向后查找。</p>
+<p>比如要查找文本当中的价格（以<code>$ </code>开头，后面跟数字），结果不包含货币符号：</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：category1:$136.<span class="hljs-number">25</span>,category2:$28,category3:$88.<span class="hljs-number">60</span><br>正则：(?&lt;=\$)\d+(\.\d+)?<br>运行结果：匹配<span class="hljs-string">&#x27;136.25&#x27;</span>，<span class="hljs-string">&#x27;28&#x27;</span>，或者<span class="hljs-string">&#x27;88.60&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<p>分析：<code>(?&lt;=\$) </code>模式匹配<code>$ </code>，<code>\d+(\.\d+)? </code>模式匹配整数或小数。从结果可以看出，结果不没有包括货币符号，只匹配出了价格。如果不使用向后查找，情况会是什么样呢？使用模式<code>$\d+(\.\d+)? </code>，这样会把<code>$ </code>包含在结果中。使用模式<code>\d+(\.\d+)? </code>，又会把<code>categery1(23) </code>中的数字也匹配出来，都不是我们想要的。</p>
+<p><strong>注</strong>：向前查找模式的长度是可变的，它们可以包含<code>.、*、+ </code>之类的元字符；而向后查找模式只能是固定长度，不能包含<code>.、*、+ </code>之类的元字符。</p>
+<h3 id="15-2-1-前后查找"><a href="#15-2-1-前后查找" class="headerlink" title="15.2.1 前后查找"></a>15.2.1 前后查找</h3><p>把向前查找和向后查找结合起来使用，即可解决前面HTML标签之间的文本的问题：</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：&lt;head&gt;&lt;TITLE&gt;Hello Baidu&lt;<span class="hljs-regexp">/title&gt;&lt;/</span>head&gt;<br>正则：(?&lt;=&lt;[Tt][Ii][Tt][Ll][Ee]&gt;).*?(?=&lt;/[Tt][Ii][Tt][Ll][Ee]&gt;)<br>运行结果：Hello Baidu<br></code></pre></td></tr></table></figure>
+
+<p><strong>分析</strong>：从结果可以看出，问题完美的解决了。<code>(?&lt;=&lt;[Tt][Ii][Tt][Ll][Ee]&gt;) </code>是一个向后操作，它匹配<code>&lt;title&gt; </code>但不消费它，<code>(?=&lt;/[Tt][Ii][Tt][Ll][Ee]&gt;) </code>是一个向前操作，它匹配<code>&lt;/title&gt; </code>但不消费它。最终返回的匹配结果只包含了标签之间的文本了</p>
+<h3 id="15-2-2-前后查找取非"><a href="#15-2-2-前后查找取非" class="headerlink" title="15.2.2 前后查找取非"></a>15.2.2 前后查找取非</h3><p>前面说到的向前查找和向后查找通常都是用来匹配文本，其目的是为了确定将被返回的匹配结果的文本的位置（通过指定匹配结果的前后必须是哪些文本）。这种用法叫正向前查找和正向后查找。还有一种负向前查找和负向后查找，是查找那些不与给定模式相匹配的文本</p>
+<p>比如一段文本中即有价格（以<code>$ </code>开头，后面跟数字）和数量，但我们要找出价格和数量，先来看查找价格：</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：I paid $3<span class="hljs-number">0</span> <span class="hljs-keyword">for</span> <span class="hljs-number">10</span> apples, <span class="hljs-number">15</span> oranges, <span class="hljs-keyword">and</span> <span class="hljs-number">10</span> pears. I saved $5 onthis order<br>正则：(?&lt;=\$)\d+<br>运行结果：匹配<span class="hljs-string">&#x27;30&#x27;</span>，或者<span class="hljs-string">&#x27;5&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<p>查找数量：</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：I paid $3<span class="hljs-number">0</span> <span class="hljs-keyword">for</span> <span class="hljs-number">10</span> apples, <span class="hljs-number">15</span> oranges, <span class="hljs-keyword">and</span> <span class="hljs-number">10</span> pears. I saved $5 onthis order.<br>正则：\b(?&lt;!\$)\d+\b<br>运行结果：匹配<span class="hljs-string">&#x27;10&#x27;</span>，<span class="hljs-string">&#x27;15&#x27;</span>，或者<span class="hljs-string">&#x27;10&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>分析</strong>：<code>(?&lt;!\$) </code>表示一个负向后查找，它使得结果只包含那些不以<code>$ </code>开头的数值</p>
+<h1 id="0x16-回溯引用"><a href="#0x16-回溯引用" class="headerlink" title="0x16 回溯引用"></a>0x16 回溯引用</h1><p>回溯引用是正则表达式内的一个“动态”的正则表达式，让我们根据实际的情况变化进行匹配。</p>
+<p>回溯引用允许正则表达式模式引用前面的匹配结果，回溯引用指的是模式的后半部分引用在前半部分中定义的子表达式，可以把回溯引用想象成变量</p>
+<p>回溯引用只能用来引用模式里的子表达式，回溯引用匹配通常从 1 开始计数<code>（\1）</code>，如果子表达式的相对位置发生了变化，整个模式也许就不能再完成原来的工作</p>
+<p>回溯引用查找时，使用<code>\n </code>；替换时，使用<code>$n </code></p>
+<p>回溯引用在对文本进行重新排版时，把文本分解成多个子表达式的做法往往非常有用，可以对文本的排版效果做出更精准的控制</p>
+<p>例如：原本匹配<code>&lt;h1&gt;&lt;/h1&gt; </code>之间的内容，但你知道HTML有多级标题后，想把每一级的标题内容都提取出来</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：&lt;h1&gt;Hello Baidu&lt;<span class="hljs-regexp">/h1&gt;</span><br><span class="hljs-regexp">正则：&lt;h[1-6]&gt;.*?&lt;/</span>h[<span class="hljs-number">1</span>-<span class="hljs-number">6</span>]&gt;<br>运行结果：匹配<span class="hljs-string">&#x27;&lt;h1&gt;Hello Baidu&lt;/h1&gt;&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>注</strong>：将HTML页面内所有的标题内容全部匹配出来。即<code>&lt;h1&gt;&lt;/h1&gt; </code>到<code>&lt;h6&gt;&lt;/h6&gt; </code>的内容都可以被提取出来。但是写正则表达式困难的不是匹配到想要的内容，而是尽可能的不匹配到不想要的内容，例如下面的例子：</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：&lt;h1&gt;Hello Baidu&lt;<span class="hljs-regexp">/h5&gt;</span><br><span class="hljs-regexp">正则：&lt;h[1-6]&gt;.*?&lt;/</span>h[<span class="hljs-number">1</span>-<span class="hljs-number">6</span>]&gt;<br>运行结果：匹配<span class="hljs-string">&#x27;&lt;h1&gt;Hello Baidu&lt;/h5&gt;&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<p>发现正则表达式同样会把这里面的Hello Baidu匹配出来。这时候就是回溯引用的重要作用。下面就是一个示例：</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：&lt;h1&gt;Hello Baidu&lt;<span class="hljs-regexp">/h5&gt;</span><br><span class="hljs-regexp">正则：&lt;h([1-6])&gt;.*?&lt;/</span>h\<span class="hljs-number">1</span>&gt;<br>运行结果：未匹配成功<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：&lt;h1&gt;Hello Baidu&lt;<span class="hljs-regexp">/h1&gt;</span><br><span class="hljs-regexp">正则：&lt;h([1-6])&gt;.*?&lt;/</span>h\<span class="hljs-number">1</span>&gt;<br>运行结果：匹配<span class="hljs-string">&#x27;&lt;h1&gt;Hello Baidu&lt;/h1&gt;&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>注</strong>：<code>\1 </code>，原本那个位置应该是<code>[1-6] </code>，但是却写的是<code>\1 </code>，之前说过，转义符<code>\ </code>干的活，就是把特殊的字符转成一般的字符，把一般的字符转成特殊字符。普普通通的数字1被转移成什么呢？在这里1表示第一个子表达式，也就是说，它是动态的，是随着前面第一个子表达式的匹配到的东西而变化的。比方说前面的子表达式内是<code>[1-6] </code>，在实际字符串中找到了1，那么后面的<code>\1 </code>就是1，如果前面的子表达式在实际字符串中找到了2，那么后面的<code>\1 </code>就是2；类似的，<code>\2,\3,.... </code>就代表第二个第三个子表达式。</p>
+<p>所以，回溯引用是正则表达式内的一个“动态”的正则表达式，让你根据实际的情况变化进行匹配。</p>
+<h1 id="0x17-大小写转换"><a href="#0x17-大小写转换" class="headerlink" title="0x17 大小写转换"></a>0x17 大小写转换</h1><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs perl">\E  end，表示大小写转换的结束范围<br>\l  low，表示把下一个字符转为小写<br>\L  Low，表示把\L与\E之间的字符转为小写<br>\u  up，表示把下一个字符转为大写<br>\U  Up，表示把\U与\E之间的字符转为大写<br></code></pre></td></tr></table></figure>
+
+<h1 id="0x18-分组"><a href="#0x18-分组" class="headerlink" title="0x18 分组"></a>0x18 分组</h1><p>通常情况下，我们有两种场景会使用到分组。一是：对一个子表达式进行重复；二是：想要获取到子表达式匹配到的内容</p>
+<ul>
+<li>对子表达式进行重复</li>
+</ul>
+<p>如果需要重复单个字符，直接在字符后面加上限定符即可，例如<code>a+ </code>表示匹配1个或一个以上的a，<code>a? </code>表示匹配0个或1个a。但是我们如果要对多个字符进行重复的话，就需要用到分组 。比如：<code>(ab)&#123;3&#125; </code>表示 ab 字符重复3次</p>
+<p>正则中常用的限定符如下:</p>
+<table>
+<thead>
+<tr>
+<th>表达式</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>X ? </code></td>
+<td>X ，一次或一次也没有</td>
+</tr>
+<tr>
+<td><code>X * </code></td>
+<td>X ，零次或多次</td>
+</tr>
+<tr>
+<td><code>X + </code></td>
+<td>X ，一次或多次</td>
+</tr>
+<tr>
+<td><code>X &#123; n &#125; </code></td>
+<td>X ，恰好 n 次</td>
+</tr>
+<tr>
+<td><code>X &#123; n,&#125; </code></td>
+<td>X ，至少 n 次</td>
+</tr>
+<tr>
+<td><code>X &#123; n,m &#125; </code></td>
+<td>X ，至少 n 次，但是不超过 m 次</td>
+</tr>
+</tbody></table>
+<ul>
+<li>获取到子表达式匹配到的内容</li>
+</ul>
+<p>比如表达式: <code>[a-z]*\d*[a-z]* </code>，它表示<code>a-z </code>的字符重复0到多次，后面紧跟0到多个数字，后面再跟上多个<code>a-z </code>的字符。显然，字符串 abcd324232efg 是满足匹配的串。那么，如果我们只想要获取到匹配串中数字 324232 后面的串 efg 呢？</p>
+<p>这时，就可以通过分组的方式来改写正则表达式:<code>[a-z]*\d*([a-z]*) </code>。这样，我们就可以通过获取第 1 个分组匹配到的内容来达到目的。</p>
+<h2 id="18-1-分组的使用方法"><a href="#18-1-分组的使用方法" class="headerlink" title="18.1 分组的使用方法"></a>18.1 分组的使用方法</h2><p>正则中通过小括号<code>“()” </code>来指定需要重复的子表达式，然后再加上限定符对这个子表达式进行重复。</p>
+<p>例如：<code>(abc)? </code>表示0个或1个abc 。一组括号里面的表达式就表示一个分组</p>
+<h2 id="18-2-捕获组"><a href="#18-2-捕获组" class="headerlink" title="18.2 捕获组"></a>18.2 捕获组</h2><p>分组可以分为两种形式，捕获组和非捕获组。</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs perl">a(bc)           圆括弧会创建一个捕获性分组，它会捕获匹配项“bc” -&gt; Try it! (https:<span class="hljs-regexp">//</span>orangey.blog.csdn.net)<br>a(?:bc)*        使用 “?:” 会使捕获分组失效，只需要匹配前面的“a” -&gt; Try it! (https:<span class="hljs-regexp">//</span>orangey.blog.csdn.net)<br>a(?&lt;foo&gt;bc)     使用 “?&lt;foo&gt;” 会为分组配置一个名称 -&gt; Try it! (https:<span class="hljs-regexp">//</span>orangey.blog.csdn.net)<br></code></pre></td></tr></table></figure>
+
+<p>捕获性圆括号 () 和非捕获性圆括弧 (?:) 对于从字符串或数据中抽取信息非常重要</p>
+<p>捕获组和非捕获组的区别就是：捕获组表示的分组会捕获文本（即:匹配字符），而非捕获组表示的分组不会捕获文本。</p>
+<p>捕获组可以通过从左到右计算其开括号来编号 。例如，在表达式<code>(A)(B(C)) </code>中，存在四个这样的组：</p>
+<table>
+<thead>
+<tr>
+<th>分组编号</th>
+<th>分组编号对应的子表达式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td><code>(A)(B(C)) </code></td>
+</tr>
+<tr>
+<td>1</td>
+<td><code>(A) </code></td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>(B(C)) </code></td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>(C) </code></td>
+</tr>
+</tbody></table>
+<p><strong>注意</strong>：第0个分组始终代表整个表达式</p>
+<blockquote>
+
+<p>分组的序号可以通过 Back 引用（反向引用） 在表达式中使用，也可以在匹配操作完成后从匹配器检索出分组匹配到的内容。反向引用的知识将会在后续的文章中进行分析。</p>
+</blockquote>
+
+<p>单纯说到捕获，意思是匹配表达式，但捕获通常和分组联系在一起，也就是“捕获组”</p>
+<p>捕获组：</p>
+<ul>
+<li>匹配子表达式的内容，把匹配结果保存到内存中以数字编号或显示命名的组里(可以把它想象为java中的array和map)，以深度优先进行编号，之后可以通过序号或名称来使用这些匹配结果</li>
+<li>捕获组的表达式为： (exp) ，这个语法跟上面讲到的分组的概念是一样的，只是捕获将匹配到的分组，保存在了内存中，留待后面使用。具体怎么时候他不管，他只需要把匹配到的分组保存在内存中就可以了。</li>
+</ul>
+<p>有一种情况当在匹配的过程中，需要与已经捕获到的分组进行匹配，这时就需要使用到保存在内存中的捕获组了，这种使用方式就被称为： 反向引用 </p>
+<p>例1：想拿到成对的字符</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs perl">aa12bb23cc34<br></code></pre></td></tr></table></figure>
+
+<p><strong>PS</strong>：通过断言或者其他方式是办不到的，那我们能否在匹配的过程中将匹配到的一个字符先保存在内存中，然后匹配下一个字符时再与上一个字符相比较，如果相等，就说明匹配成了，拿到了成对的字符了。</p>
+<p>首先先写一个匹配单个字符分组的表达式：</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：aa12bb23cc34<br>正则：(\w)<br>运行结果：<br>a<br>a<br><span class="hljs-number">1</span><br><span class="hljs-number">2</span><br>b<br>b<br><span class="hljs-number">2</span><br><span class="hljs-number">3</span><br>c<br>c<br><span class="hljs-number">3</span><br><span class="hljs-number">4</span><br></code></pre></td></tr></table></figure>
+
+<p>那当匹配时捕获到一个字符分组时，需要将该字符引用出来，与下一个字符想比较，期望匹配的下一个字符也与我当前保存的字符相等，那么表达式就如下：</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：aa12bb23cc34<br>正则：(\w)\<span class="hljs-number">1</span><br>运行结果：<br>aa<br>bb<br>cc<br></code></pre></td></tr></table></figure>
+
+<p><strong>PS</strong>：<code>\1 </code>表示的是，当前正则表达式匹配到的 第1个 分组，那就意味着，<code>\2 </code>表示第2个分组</p>
+<p>接下来需要做的就是，对捕获到的第2个分组进行反向引用，具体的表达式为：</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs perl">文本：aa12bb23cc34<br>正则：(\w)(\w)\<span class="hljs-number">2</span><br>运行结果：<br><span class="hljs-number">2</span>bb<br><span class="hljs-number">3</span>cc<br></code></pre></td></tr></table></figure>
+
+
+<h2 id="18-3-分组使用示例"><a href="#18-3-分组使用示例" class="headerlink" title="18.3 分组使用示例"></a>18.3 分组使用示例</h2><p>在一个完整的正则中，如果只想获取到某个子表达式匹配到的内容，就可以通过分组来达到目的。</p>
+<p>比如:待匹配串：<code>abcd324232efg </code>想要获取到这个字符串中第二次连续出现的字母子串efg</p>
+<p>可以通过分组的方式书写正则: <code>[a-z]*\d*([a-z]*) </code>。可以看到，通过子表达式<code>([a-z]*) </code>来匹配第二次连续出现的字母子串，并且通过()添加了分组，这样，就可以通过分组来获取到相应的匹配内容了。</p>
+<h1 id="0x19-其它"><a href="#0x19-其它" class="headerlink" title="0x19 其它"></a>0x19 其它</h1><p>还有很多东西没有提到，未提到的元素的列表，包含语法和简单的说明。</p>
+<p>如果安装了MSDN Library，也可在里面找到<code>.Net </code>下正则表达式详细的文档。</p>
+<p>没安装MSDN Library，可以在线查看关于正则表达式语言元素的MSDN在线文档：</p>
+<p><a target="_blank" rel="noopener" href="https://docs.microsoft.com/zh-cn/dotnet/standard/base-types/regular-expression-language-quick-reference?redirectedfrom=MSDN">https://docs.microsoft.com/zh-cn/dotnet/standard/base-types/regular-expression-language-quick-reference?redirectedfrom=MSDN</a></p>
+<p><img src="https://img-blog.csdnimg.cn/4efc0f1da65c4cf9912fca481934152a.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>\a	</code></td>
+<td>报警字符(打印它的效果是电脑嘀一声)</td>
+</tr>
+<tr>
+<td><code>\b	</code></td>
+<td>通常是单词分界位置，但如果在字符类里使用代表退格</td>
+</tr>
+<tr>
+<td><code>\t	</code></td>
+<td>制表符，Tab</td>
+</tr>
+<tr>
+<td><code>\r	</code></td>
+<td>回车</td>
+</tr>
+<tr>
+<td><code>\v	</code></td>
+<td>竖向制表符</td>
+</tr>
+<tr>
+<td><code>\f	</code></td>
+<td>换页符</td>
+</tr>
+<tr>
+<td><code>\n	</code></td>
+<td>换行符</td>
+</tr>
+<tr>
+<td><code>\e	</code></td>
+<td>Escape</td>
+</tr>
+<tr>
+<td><code>\0nn </code></td>
+<td>ASCII代码中八进制代码为nn的字符</td>
+</tr>
+<tr>
+<td><code>\xnn </code></td>
+<td>ASCII代码中十六进制代码为nn的字符</td>
+</tr>
+<tr>
+<td><code>\unnnn </code></td>
+<td>Unicode代码中十六进制代码为nnnn的字符</td>
+</tr>
+<tr>
+<td><code>\cN </code></td>
+<td>ASCII控制字符。比如<code>\cC </code>代表Ctrl+C</td>
+</tr>
+<tr>
+<td><code>\A	</code></td>
+<td>字符串开头(类似<code>^ </code>，但不受处理多行选项的影响)</td>
+</tr>
+<tr>
+<td><code>\Z	</code></td>
+<td>字符串结尾或行尾(不受处理多行选项的影响)</td>
+</tr>
+<tr>
+<td><code>\z	</code></td>
+<td>字符串结尾(类似<code>$ </code>，但不受处理多行选项的影响)</td>
+</tr>
+<tr>
+<td><code>\G	</code></td>
+<td>当前搜索的开头</td>
+</tr>
+<tr>
+<td><code>\p&#123;name&#125; </code></td>
+<td>Unicode中命名为name的字符类，例如<code>\p&#123;IsGreek&#125; </code></td>
+</tr>
+<tr>
+<td><code>(?&gt;exp) </code></td>
+<td>贪婪子表达式</td>
+</tr>
+<tr>
+<td><code>(?&lt;x&gt;-&lt;y&gt;exp) </code></td>
+<td>平衡组</td>
+</tr>
+<tr>
+<td><code>(?im-nsx:exp) </code></td>
+<td>在子表达式exp中改变处理选项</td>
+</tr>
+<tr>
+<td><code>(?im-nsx) </code></td>
+<td>为表达式后面的部分改变处理选项</td>
+</tr>
+<tr>
+<td>&#96;&#96;&#96;(?(exp)yes</td>
+<td>no) &#96;&#96;&#96;</td>
+</tr>
+<tr>
+<td><code>(?(exp)yes) </code></td>
+<td>同上，只是使用空表达式作为no</td>
+</tr>
+<tr>
+<td>&#96;&#96;&#96;(?(name)yes</td>
+<td>no) &#96;&#96;&#96;</td>
+</tr>
+<tr>
+<td><code>(?(name)yes) </code></td>
+<td>同上，只是使用空表达式作为no</td>
+</tr>
+</tbody></table>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br></pre></td><td class="code"><pre><code class="hljs perl">^a   a开头，例如ab/a1<br><br>~a$    a结尾，例如ba/<span class="hljs-number">1</span>a<br><br>^ab$   a开头，b结尾，就是ab<br><br>ab.   ab后面跟上<span class="hljs-number">1</span>个字符，点表示除\n（换行符），\r（回车符）的任意字符 ，例如abc/ab1<br><br>^a.b$   a开头，b结尾，中间一个任意字符，例如a1b/acb<br><br>ab*    a后面跟<span class="hljs-number">0</span>个及以上的b，例如a/ab/abb<br><br>ab+   a后面跟<span class="hljs-number">1</span>个及以上的b，例如ab/abb<br><br>ab?   a后面跟<span class="hljs-number">0</span>个或者<span class="hljs-number">1</span>个b，仅表示a/ab <br><br>ab.*   ab后面跟<span class="hljs-number">0</span>个及以上的字符，例如ab/abc/ab123 <br><br>.*ab   ab之前有<span class="hljs-number">0</span>个及以上的字符，例如<span class="hljs-number">1</span>ab/aab/<span class="hljs-number">1</span>aaab <br><br>ab\.com   表示ab.com，所有正则特殊符号如果按照原意，必须转义处理<br><br><br><br><br><br>ab<span class="hljs-string">&#123;1&#125;</span>   a后跟<span class="hljs-number">1</span>个b，数字只能是自然数 <br><br>ab&#123;<span class="hljs-number">1</span>,<span class="hljs-number">3</span>&#125;   a后跟<span class="hljs-number">1</span>到<span class="hljs-number">3</span>个b，ab/abb/abbb中的<span class="hljs-number">1</span>个 <br><br>ab&#123;<span class="hljs-number">1</span>,&#125;    a后跟<span class="hljs-number">1</span>个及以上的b，例如ab/abb/abbbbb <br><br>^.<span class="hljs-string">&#123;3&#125;</span>$   任意相连<span class="hljs-number">3</span>个字符的字符串，例如<span class="hljs-number">111</span>/a1a/bbb <br><br>a|b|<span class="hljs-number">2</span>   a/b/<span class="hljs-number">2</span>中的<span class="hljs-number">1</span>个 <br><br>a|bc   a/bc中的<span class="hljs-number">1</span>个 <br><br>(a|b)cd   acd/bcd中的<span class="hljs-number">1</span>个  <br><br>[ab]cd   acd/bcd中的<span class="hljs-number">1</span>个<br><br>[^ab]cd   不能是acd/bcd中任何<span class="hljs-number">1</span>个 <br><br>[a-z]ab   ab之前是a到z某个字符，例如aab/zab/rab <br><br>[A-Z]ab   ab之前是A到Z的某个字符，例如Aab/Rab <br><br>[<span class="hljs-number">0</span>-<span class="hljs-number">9</span>]ab   ab之前是<span class="hljs-number">0</span>到<span class="hljs-number">9</span>的某个字符，例如0ab/<span class="hljs-number">7</span>ab <br><br>[<span class="hljs-number">0</span>-<span class="hljs-number">8</span>a-<span class="hljs-keyword">x</span>]ab   ab之前<span class="hljs-number">0</span>-<span class="hljs-number">8</span>或者a-<span class="hljs-keyword">x</span>的某个字符 <br><br>[^<span class="hljs-number">0</span>-<span class="hljs-number">8</span>a-<span class="hljs-keyword">x</span>]ab   ab之前不能是<span class="hljs-number">0</span>-<span class="hljs-number">8</span>或者a-<span class="hljs-keyword">x</span>的某个字符<br><br><br><br><br><br><br>a\b    \b是字符串边界（本身不是字符），a后面必须有空白字符，匹配a c<br><br>\ba   a前面必须有空白字符 <br><br>a\B   \B是不能有边界，a后面不能有空白字符，a  c不符合要求 <br><br>\Ba   a前面不能有空白字符 <br><br>\d   [<span class="hljs-number">0</span>-<span class="hljs-number">9</span>]中的<span class="hljs-number">1</span>个 <br><br>\D   [^<span class="hljs-number">0</span>-<span class="hljs-number">9</span>]，不能有[<span class="hljs-number">0</span>-<span class="hljs-number">9</span>]这些字符 <br><br>\w   大小写字母，数字，下划线的字符集[A-Za-z<span class="hljs-number">0</span>-<span class="hljs-number">9_</span>]中的<span class="hljs-number">1</span>个，里面包含下划线 <br><br>\W   [^A-Za-z<span class="hljs-number">0</span>-<span class="hljs-number">9_</span>]，不能有[A-Za-z<span class="hljs-number">0</span>-<span class="hljs-number">9_</span>]中的字符<br><br><br><br><br><br>\t   水平制表符，对应 \cI或\x09，a\tb表示ab之间有<span class="hljs-number">1</span>个水平制表符<br><br>\n   换行符，对应\cJ或\x0a，a\nb 表示ab之间有<span class="hljs-number">1</span>个换行符 <br><br>\v    垂直制表符，对应\cK或\x0b，a\vb表示ab之间有<span class="hljs-number">1</span>个垂直制表符 <br><br>\f    换页符，对应\cL或\x0c，a\fb表示ab之间有<span class="hljs-number">1</span>个换页符，文档上下页之间的空字符 <br><br>\r   回车符，对应\cM或\x0d，a\r\b表示ab之间有<span class="hljs-number">1</span>个回车符 <br><br>\s   匹配任何空白字符的集合，[\f\n\r\t\v]隶属于\s，[\f\n\r\t\v]不等于\s，例如空格 <br><br>\S   匹配任何非空白字符的集合，与 \s正好相反<br><br><br><br><br><br><br><br><br><br><br><br>[:alpha:]   任何字母<br><br>[:digit:]   任何数字  <br><br>[:alnum:]   任何字母和数字  <br><br>[:space:]   任何空白字符  <br><br>[:upper:]   任何大写字母  <br><br>[:lower:]   任何小写字母  <br><br>[:punct:]   任何标点符号 <br><br>[:xdigit:]  任何<span class="hljs-number">16</span>进制的数字，含有[<span class="hljs-number">0</span>-<span class="hljs-number">9</span>a-fA-F]<br>PS：使用范围有限，php编码，notepad++也ok<br><br><br><br>a\nb\nc，a\cJb\cJc，a\x0ab\x0ac（<span class="hljs-number">16</span>进制）<br><br><br><br><br><br><br><br><br>a\w+b   匹配a1b2b，不是a1b<br><br>a\w+?b   倾向匹配a1b2b中的a1b <br><br>?   尽可能少匹配字符，适用于+*?&#123;n,m&#125;&#123;n,&#125; <br><br>(?i)ABCD   (?i)表示忽略其后字符的大小写，可以匹配ABCD，也可以abcd <br><br>(?s)ab.*cd   (?s)促使点可以表示所有字符，包括\n，\r，属于能量加成 <br><br>(?m)^\d+\w+$   例如一个含有\n的完整字符被分割匹配 <br><br>(?m)促使^可以匹配字符串开头以及行的开头，\n之后 <br><br>(?m)促使$可以匹配字符串结尾以及行的结尾，\n之前<br><br><br><br><br><br><br><br><br>a(?:b|c)   等同a(b|c)或ab|ac <br><br>a(?=b|c|d)   a的右侧必须有b/c/d中的<span class="hljs-number">1</span>个 <br><br>a(?!b|c|d)   a的右侧不能有b/c/d中的<span class="hljs-number">1</span>个 <br><br>(?&lt;!b|c|d)a   a的左侧不能有b/c/d中的<span class="hljs-number">1</span>个 <br><br>(?&lt;=b|c|d)a   a的左侧必须有b/c/d中的<span class="hljs-number">1</span>个 <br><br>(\d)\<span class="hljs-number">1</span>   连续<span class="hljs-number">2</span>个相同数字，(\d)\<span class="hljs-number">1</span><span class="hljs-string">&#123;1&#125;</span> <br><br>(\d)(\d)\<span class="hljs-number">2</span>   连续<span class="hljs-number">3</span>个相同的数字，(\d)\<span class="hljs-number">1</span><span class="hljs-string">&#123;2&#125;</span> <br><br>(\d)(\d)(\d)\<span class="hljs-number">3</span>   连续<span class="hljs-number">4</span>个相同的数字，(\d)\<span class="hljs-number">1</span><span class="hljs-string">&#123;3&#125;</span> <br><br>(\d)\<span class="hljs-number">1</span><span class="hljs-string">&#123;1&#125;</span>(\d)\<span class="hljs-number">2</span><span class="hljs-string">&#123;1&#125;</span>   例如<span class="hljs-number">1122</span>，<span class="hljs-number">1133</span>，<span class="hljs-number">2244</span>，<span class="hljs-number">1111</span><br><br>(<span class="hljs-number">0</span>(?=<span class="hljs-number">1</span>)|<span class="hljs-number">1</span>(?=<span class="hljs-number">2</span>)|<span class="hljs-number">2</span>(?=<span class="hljs-number">3</span>)|<span class="hljs-number">3</span>(?=<span class="hljs-number">4</span>)|<span class="hljs-number">4</span>(?=<span class="hljs-number">5</span>)|<span class="hljs-number">5</span>(?=<span class="hljs-number">6</span>)|<span class="hljs-number">6</span>(?=<span class="hljs-number">7</span>)|<span class="hljs-number">7</span>(?=<span class="hljs-number">8</span>)|<span class="hljs-number">8</span>(?=<span class="hljs-number">9</span>)|<span class="hljs-number">9</span>(?=<span class="hljs-number">0</span>))<span class="hljs-string">&#123;0&#125;\d</span>     任意<span class="hljs-number">1</span>个数字匹配 <br><br>(<span class="hljs-number">0</span>(?=<span class="hljs-number">1</span>)|<span class="hljs-number">1</span>(?=<span class="hljs-number">2</span>)|<span class="hljs-number">2</span>(?=<span class="hljs-number">3</span>)|<span class="hljs-number">3</span>(?=<span class="hljs-number">4</span>)|<span class="hljs-number">4</span>(?=<span class="hljs-number">5</span>)|<span class="hljs-number">5</span>(?=<span class="hljs-number">6</span>)|<span class="hljs-number">6</span>(?=<span class="hljs-number">7</span>)|<span class="hljs-number">7</span>(?=<span class="hljs-number">8</span>)|<span class="hljs-number">8</span>(?=<span class="hljs-number">9</span>)|<span class="hljs-number">9</span>(?=<span class="hljs-number">0</span>))<span class="hljs-string">&#123;1&#125;\d</span>       <span class="hljs-number">2</span>个连续升序数字为一组 <br><br>(<span class="hljs-number">0</span>(?=<span class="hljs-number">1</span>)|<span class="hljs-number">1</span>(?=<span class="hljs-number">2</span>)|<span class="hljs-number">2</span>(?=<span class="hljs-number">3</span>)|<span class="hljs-number">3</span>(?=<span class="hljs-number">4</span>)|<span class="hljs-number">4</span>(?=<span class="hljs-number">5</span>)|<span class="hljs-number">5</span>(?=<span class="hljs-number">6</span>)|<span class="hljs-number">6</span>(?=<span class="hljs-number">7</span>)|<span class="hljs-number">7</span>(?=<span class="hljs-number">8</span>)|<span class="hljs-number">8</span>(?=<span class="hljs-number">9</span>)|<span class="hljs-number">9</span>(?=<span class="hljs-number">0</span>))<span class="hljs-string">&#123;2&#125;\d</span>    <span class="hljs-number">3</span>个连续升序数字为一组<br><br>((<span class="hljs-number">0</span>(?=<span class="hljs-number">1</span>)|<span class="hljs-number">1</span>(?=<span class="hljs-number">2</span>)|<span class="hljs-number">2</span>(?=<span class="hljs-number">3</span>)|<span class="hljs-number">3</span>(?=<span class="hljs-number">4</span>)|<span class="hljs-number">4</span>(?=<span class="hljs-number">5</span>)|<span class="hljs-number">5</span>(?=<span class="hljs-number">6</span>)|<span class="hljs-number">6</span>(?=<span class="hljs-number">7</span>)|<span class="hljs-number">7</span>(?=<span class="hljs-number">8</span>)|<span class="hljs-number">8</span>(?=<span class="hljs-number">9</span>)|<span class="hljs-number">9</span>(?=<span class="hljs-number">0</span>))<span class="hljs-string">&#123;1&#125;\d</span>)\<span class="hljs-number">1</span><span class="hljs-string">&#123;1&#125;</span>      例如<span class="hljs-number">1212</span>是一组<br>PS：字母雷同，降序雷同<br><br><br><br><br><br><br><br><br><span class="hljs-comment"># Domain</span><br><br>www.baidu.com<br>[a-zA-Z<span class="hljs-number">0</span>-<span class="hljs-number">9</span>][-a-zA-Z<span class="hljs-number">0</span>-<span class="hljs-number">9</span>]&#123;<span class="hljs-number">0</span>,<span class="hljs-number">62</span>&#125;(\.[a-zA-Z<span class="hljs-number">0</span>-<span class="hljs-number">9</span>][-a-zA-Z<span class="hljs-number">0</span>-<span class="hljs-number">9</span>]&#123;<span class="hljs-number">0</span>,<span class="hljs-number">62</span>&#125;)+<br>(\w&#123;<span class="hljs-number">1</span>,<span class="hljs-number">20</span>&#125;\.)+\w&#123;<span class="hljs-number">1</span>,<span class="hljs-number">10</span>&#125;   简化版   <br><span class="hljs-number">65535</span>（端口数量）   <span class="hljs-number">63</span>（域名中子域名字段不超过）   <span class="hljs-number">253</span>（域名总长度不超过）<br><br><span class="hljs-comment"># IPV4</span><br><br><span class="hljs-number">192.168</span>.<span class="hljs-number">100.100</span><br>((\d)|([<span class="hljs-number">1</span>-<span class="hljs-number">9</span>]\d)|(<span class="hljs-number">1</span>\d<span class="hljs-string">&#123;2&#125;</span>)|(<span class="hljs-number">2</span>[<span class="hljs-number">0</span>-<span class="hljs-number">4</span>]\d)|(<span class="hljs-number">25</span>[<span class="hljs-number">0</span>-<span class="hljs-number">5</span>])\.)<span class="hljs-string">&#123;3&#125;</span>(<span class="hljs-number">25</span>[<span class="hljs-number">0</span>-<span class="hljs-number">5</span>]|(<span class="hljs-number">2</span>[<span class="hljs-number">0</span>-<span class="hljs-number">4</span>]\d)|(<span class="hljs-number">1</span>\d<span class="hljs-string">&#123;2&#125;</span>)|([<span class="hljs-number">1</span>-<span class="hljs-number">9</span>]\d)|(\d))  <br>(\d)   ([<span class="hljs-number">1</span>-<span class="hljs-number">9</span>]\d)   (<span class="hljs-number">1</span>\d<span class="hljs-string">&#123;2&#125;</span>)   (<span class="hljs-number">2</span>[<span class="hljs-number">0</span>-<span class="hljs-number">4</span>]\d)   (<span class="hljs-number">25</span>[<span class="hljs-number">0</span>-<span class="hljs-number">5</span>])<br>(\d&#123;<span class="hljs-number">1</span>,<span class="hljs-number">3</span>&#125;\.)<span class="hljs-string">&#123;3&#125;\d</span>&#123;<span class="hljs-number">1</span>,<span class="hljs-number">3</span>&#125;   简化版<br>\d&#123;<span class="hljs-number">1</span>,<span class="hljs-number">3</span>&#125;<br><br><span class="hljs-comment">#  邮箱</span><br><br><span class="hljs-number">123456</span>@qq.com<br>\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*<br>\w+@\w+\.[a-z]&#123;<span class="hljs-number">2</span>,&#125;   简化版   <br><br><span class="hljs-comment"># 手机号</span><br><br><span class="hljs-number">188</span> <span class="hljs-number">6450</span> <span class="hljs-number">0763</span><br>((<span class="hljs-number">13</span>[<span class="hljs-number">0</span>-<span class="hljs-number">9</span>])|(<span class="hljs-number">14</span>[<span class="hljs-number">5</span>,<span class="hljs-number">7</span>])|(<span class="hljs-number">15</span>[<span class="hljs-number">0</span>-<span class="hljs-number">3</span>,<span class="hljs-number">5</span>-<span class="hljs-number">9</span>])|(<span class="hljs-number">17</span>[<span class="hljs-number">0</span>,<span class="hljs-number">3</span>,<span class="hljs-number">5</span>-<span class="hljs-number">8</span>])|(<span class="hljs-number">18</span>[<span class="hljs-number">0</span>-<span class="hljs-number">9</span>])|<span class="hljs-number">166</span>|<span class="hljs-number">198</span>|<span class="hljs-number">199</span>|<span class="hljs-number">147</span>)\d<span class="hljs-string">&#123;8&#125;</span><br><span class="hljs-number">1</span>\d<span class="hljs-string">&#123;10&#125;</span>   简化版<br><br><span class="hljs-comment"># 身份证号</span><br><br><span class="hljs-number">36</span> <span class="hljs-number">07</span> <span class="hljs-number">24</span> <span class="hljs-number">19981016</span> <span class="hljs-number">601</span> <span class="hljs-number">3</span><br>[<span class="hljs-number">1</span>-<span class="hljs-number">9</span>]\d<span class="hljs-string">&#123;5&#125;</span>(<span class="hljs-number">18</span>|<span class="hljs-number">19</span>|<span class="hljs-number">20</span>)\d<span class="hljs-string">&#123;2&#125;</span>((<span class="hljs-number">0</span>[<span class="hljs-number">1</span>-<span class="hljs-number">9</span>])|(<span class="hljs-number">1</span>[<span class="hljs-number">0</span>-<span class="hljs-number">2</span>]))(([<span class="hljs-number">0</span>-<span class="hljs-number">2</span>][<span class="hljs-number">1</span>-<span class="hljs-number">9</span>])|<span class="hljs-number">10</span>|<span class="hljs-number">20</span>|<span class="hljs-number">30</span>|<span class="hljs-number">31</span>)\d<span class="hljs-string">&#123;3&#125;</span>[<span class="hljs-number">0</span>-<span class="hljs-number">9</span>Xx]<br>\d<span class="hljs-string">&#123;17&#125;</span>[\dxX]   简化版<br><br><br><br><br><br><br><br><br><br>通配符<br><span class="hljs-keyword">mkdir</span> ceshi  touch ceshi.txt <span class="hljs-number">1</span>.txt c.txt<br><br>ls *.txt<br><br>find /root/ceshi -name <span class="hljs-string">&#x27;c*.txt&#x27;</span><br>找到root目录下，c开头的txt文档，找到c.txt，ceshi.txt<br><br>find /root/ceshi -name <span class="hljs-string">&#x27;?eshi.txt&#x27;</span><br>找到结尾是eshi的txt文档，找到ceshi.txt<br><br>find /root/ceshi -name <span class="hljs-string">&#x27;[ceshi].txt&#x27;</span><br>范围内的<span class="hljs-number">1</span>个字符，找到c.txt<br><br>find /root/ceshi -name <span class="hljs-string">&#x27;[!ceshi].txt&#x27;</span><br>范围之外的<span class="hljs-number">1</span>个字符，<span class="hljs-number">1</span>.txt，!可以用^代替<br></code></pre></td></tr></table></figure>
+
+
+
+<p><strong>参考链接</strong>：</p>
+<p><a target="_blank" rel="noopener" href="https://deerchao.cn/tutorials/regex/regex.htm">https://deerchao.cn/tutorials/regex/regex.htm</a></p>
+<p><a target="_blank" rel="noopener" href="https://docs.microsoft.com/zh-cn/dotnet/standard/base-types/regular-expressions">https://docs.microsoft.com/zh-cn/dotnet/standard/base-types/regular-expressions</a></p>
+<p><a target="_blank" rel="noopener" href="https://docs.microsoft.com/zh-cn/dotnet/api/system.text.regularexpressions.regex?view=net-6.0">https://docs.microsoft.com/zh-cn/dotnet/api/system.text.regularexpressions.regex?view=net-6.0</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.regular-expressions.info/">https://www.regular-expressions.info/</a></p>
+<p><a target="_blank" rel="noopener" href="https://weblogs.asp.net/whaggard/377025">https://weblogs.asp.net/whaggard/377025</a></p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/lX0-GjqYBUo4KncrpngcTw">https://mp.weixin.qq.com/s/lX0-GjqYBUo4KncrpngcTw</a></p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/tfzsPRiEjDGfO1BoPNu2RA">https://mp.weixin.qq.com/s/tfzsPRiEjDGfO1BoPNu2RA</a></p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/7rflGRsMioF3S2TX8TP_1Q">https://mp.weixin.qq.com/s/7rflGRsMioF3S2TX8TP_1Q</a></p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/0sVMQDstgIZEpYZUvRNadg">https://mp.weixin.qq.com/s/0sVMQDstgIZEpYZUvRNadg</a></p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/JnmjFVg9IuLMgOKV8Z918g">https://mp.weixin.qq.com/s/JnmjFVg9IuLMgOKV8Z918g</a></p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=MzI3NjY1OTA0NQ==&amp;mid=2247484108&amp;idx=1&amp;sn=66ee027ffe1bbdf08ea0616f9d648277&amp;chksm=eb736cc6dc04e5d0be33c3c9756b6dc37379f0e27f6982ec214fa85f70a42b303cf455f13766&amp;scene=178&amp;cur_album_id=2245264853273903105#rd">https://mp.weixin.qq.com/s?__biz=MzI3NjY1OTA0NQ==&amp;mid=2247484108&amp;idx=1&amp;sn=66ee027ffe1bbdf08ea0616f9d648277&amp;chksm=eb736cc6dc04e5d0be33c3c9756b6dc37379f0e27f6982ec214fa85f70a42b303cf455f13766&amp;scene=178&amp;cur_album_id=2245264853273903105#rd</a></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/ATTACK/">#ATTACK</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>入侵检测常用正则表达式手册</div>
+      <div>https://orangey.info/2022/09/23/123002359/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>橙留香</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年9月23日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/09/23/123353195/" title="「干货」从ATT&amp;CK看车联网安全如何落地企业SOC之基础知识篇">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">「干货」从ATT&amp;CK看车联网安全如何落地企业SOC之基础知识篇</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/09/23/122264566/" title="Android奇淫run-as命令，调用系统受UID限制的API">
+                        <span class="hidden-mobile">Android奇淫run-as命令，调用系统受UID限制的API</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  <article id="comments" lazyload>
+    
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1e96aec5ac46370916fa","clientSecret":"ee5e97a65cf34e9fe31e15ab0421a94968237f5e","repo":"ogGitalk","owner":"ananasOrangey","admin":["ananasOrangey"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '39091bf4acd3ad3b43fe3445b1828f34'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+  </article>
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://orangey.blog.csdn.net" target="_blank" rel="nofollow noopener"><span>橙留香CSDN博客</span></a> <i class="iconfont icon-love"></i> <a href="https://i.imgtg.com/2022/09/21/gNXxK.png" target="_blank" rel="nofollow noopener"><span>橙留香微信公众号</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
