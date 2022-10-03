@@ -1,0 +1,758 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="橙留香">
+  <meta name="keywords" content="橙留香车联网安全技术博客">
+  
+    <meta name="description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  Android安全付费专栏长期更新，本篇最新内容请前往：  [车联网安全自学篇] Android安全之APK应用程序签名异常的检测方法  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;ananasorangey&#x2F;ca">
+<meta property="og:type" content="article">
+<meta property="og:title" content="「Android 安全」APK应用程序签名异常的检测方法">
+<meta property="og:url" content="https://orangey.info/2022/09/24/126548441/index.html">
+<meta property="og:site_name" content="车联网安全技术博客 | 橙留香">
+<meta property="og:description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  Android安全付费专栏长期更新，本篇最新内容请前往：  [车联网安全自学篇] Android安全之APK应用程序签名异常的检测方法  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;ananasorangey&#x2F;ca">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/21/gNXxK.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/72a501e064eb4fbd8082b802a226739a.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2ac7070f51c94d8eadb82c97ac7f8657.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c990e7efd19f426e8edc2b22ea5ed1a4.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/724ba3e7f7aa47c6a3b97c708a2dd9dd.png">
+<meta property="article:published_time" content="2022-09-24T09:40:03.257Z">
+<meta property="article:modified_time" content="2022-09-24T17:21:09.795Z">
+<meta property="article:author" content="橙留香">
+<meta property="article:tag" content="AndroidSecurity">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+  
+  
+  
+  <title>「Android 安全」APK应用程序签名异常的检测方法 - 车联网安全技术博客 | 橙留香</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"orangey.info","root":"/","version":"1.9.3","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"java"},"copy_btn":false,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>橙留香</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="「Android 安全」APK应用程序签名异常的检测方法"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-09-24 17:40" pubdate>
+          2022年9月24日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          6.4k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          <!-- compatible with older versions-->
+          54 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">「Android 安全」APK应用程序签名异常的检测方法</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <div id="readmore-container"><hr>
+<p><strong>也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大</strong></p>
+<p><strong>少走了弯路，也就错过了风景，无论如何，感谢经历</strong></p>
+<hr>
+<p>Android安全付费专栏长期更新，本篇最新内容请前往：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://orangey.blog.csdn.net/article/details/126548441">[车联网安全自学篇] Android安全之APK应用程序签名异常的检测方法</a></li>
+</ul>
+<p>更多关于Android安全的知识，可前往：<a target="_blank" rel="noopener" href="https://blog.csdn.net/ananasorangey/category11955914.html">https://blog.csdn.net/ananasorangey/category11955914.html</a></p>
+<p><img src="https://i.imgtg.com/2022/09/25/gdpGP.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><img src="https://i.imgtg.com/2022/09/21/gNXxK.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x01-APK应用程序签名异常的检测方法"><a href="#0x01-APK应用程序签名异常的检测方法" class="headerlink" title="0x01 APK应用程序签名异常的检测方法"></a>0x01 APK应用程序签名异常的检测方法</h1><p>要在Android上安装APK必须要进行数字签名，数字签名用于验证应用程序更新的所有者身份，验证的目的是为了防止APK应用程序被篡改或修改APK来包含恶意代码</p>
+<p>对 APK 进行签名时，会附加一个公钥证书，这个证书是将 APK 应用程序与开发者和开发者的私钥进行关联</p>
+<p><strong>注</strong>：在调试模式下构建应用时，Android SDK 会使用专门为调试目的创建的调试密钥对我们要打包的APK应用程序进行签名，需要注意使用调试密钥签名的应用并不会在大多数APK应用商店中被接受和允许上架</p>
+<p>应用程序的<a target="_blank" rel="noopener" href="https://developer.android.com/studio/publish/app-signing.html">最终发布版本(上线生产版本)</a>必须使用有效的发布版本的密钥进行签名。在 Android Studio 中，APK可手动或通过创建分配给发布构建类型的签名配置来对应用进行APK的签名</p>
+<p>Android 9（API 级别 28）之前的 Android 上，所有的应用程序更新都需要使用相同的证书进行签名，所以开发者可以考虑<a target="_blank" rel="noopener" href="https://developer.android.com/studio/publish/app-signing#considerations">使用 25 年或更长的有效期</a></p>
+<p><strong>注</strong>：需要注意，如果在 Google Play 上发布的应用必须使用有效期在 2033 年 10 月 22 日之后结束的密钥进行签名</p>
+<p>三种 APK 签名方案：</p>
+<ul>
+<li>v1 方案：JAR 签名</li>
+<li>v2 方案：APK 签名方案 v2</li>
+<li>v3 方案：APK 签名方案 v3</li>
+</ul>
+<p>与 v1 方案相比，Android 7.0（API 级别 24）及更高版本支持的 v2 签名，且提供了更高的安全性和性能。Android 9（API 级别 28）及以上版本支持的 V3 签名，使应用程序能够更改其签名密钥，作为APK 更新的一部分，此功能通过允许同时使用新&#x2F;旧密钥，保证了兼容性和应用程序的持续可用性。需要注意对于每个签名方案，发布APK版本也应该始终通过之前内部评估好的方案进行签名</p>
+<p>在做静态分析（当然动态分析时跟这个一样，将APK导出来用jarsigner或apksigner工具来验证APK的签名是否异常）APK时，我们要确认几个重要的信息，比如APK的发布版本是 Android 7.0（API 级别 24）及更高版本的 v1 和 v2 方案以及 Android 9（API 级别 28）及更高版本的所有三个方案进行签名，且 APK 应用程序中的签名证书是属于开发者的</p>
+<p>我们可以使用 Android SDK 构建工具的修订版 24.0.3 及更高版本中提供的 apksigner 工具为 APK 签名，并确保 APK 的签名能够在 APK 支持的所有版本的 Android 平台上成功通过验证，此处我们是主要是利用apksigner 工具来验证APK的签名是否是属于正确的开发者的，apksigner 工具它的位置在<code>[SDK-Path] /build-tools/[版本]</code>。它位于<code>[SDKPath]/build-tools/[version]</code>，更多详情请前往：<a target="_blank" rel="noopener" href="https://developer.android.com/studio/command-line/apksigner?hl=zh-cn#usage">https://developer.android.com/studio/command-line/apksigner?hl=zh-cn#usage</a></p>
+<p><img src="https://img-blog.csdnimg.cn/72a501e064eb4fbd8082b802a226739a.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>我们可以使用apksigner工具来验证 APK的 签名，apksigner 默认安装位置位于：<code>C:\Users\xxx\AppData\Local\Android\Sdk\build-tools\33.0.0\lib</code>下，随后执行如下命令：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs c">$ java -jar C:\Users\xxx\AppData\Local\Android\Sdk\build-tools\<span class="hljs-number">33.0</span><span class="hljs-number">.0</span>\lib\apksigner.jar verify --verbose vuls.apk<br>Verifies<br>Verified using v1 <span class="hljs-title function_">scheme</span> <span class="hljs-params">(JAR signing)</span>: <span class="hljs-literal">true</span><br>Verified using v2 <span class="hljs-title function_">scheme</span> <span class="hljs-params">(APK Signature Scheme v2)</span>: <span class="hljs-literal">true</span><br>Verified using v3 <span class="hljs-title function_">scheme</span> <span class="hljs-params">(APK Signature Scheme v3)</span>: <span class="hljs-literal">false</span><br>Verified using v3.1 <span class="hljs-title function_">scheme</span> <span class="hljs-params">(APK Signature Scheme v3<span class="hljs-number">.1</span>)</span>: <span class="hljs-literal">false</span><br>Verified using v4 <span class="hljs-title function_">scheme</span> <span class="hljs-params">(APK Signature Scheme v4)</span>: <span class="hljs-literal">false</span><br>Verified <span class="hljs-keyword">for</span> SourceStamp: <span class="hljs-literal">false</span><br>Number of signers: 1<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/2ac7070f51c94d8eadb82c97ac7f8657.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>当然，我们也可以使用 jarsigner 工具来检查APK的签名证书的内容，但需要注意在调试证书时，Common Name (CN)属性要设置为 “Android Debug”</p>
+<p>使用调试证书签名的 APK 的输出，这里我们使用JAVA自带的jarsigner工具来做签名，如何签名的命令如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><code class="hljs c">$ jarsigner -verify -verbose -certs vuls.apk<br><br>sm      <span class="hljs-number">14112</span> Fri Nov <span class="hljs-number">30</span> <span class="hljs-number">00</span>:<span class="hljs-number">00</span>:<span class="hljs-number">00</span> CST <span class="hljs-number">1979</span> AndroidManifest.xml<br><br>      &gt;&gt;&gt; 签名者<br>      X<span class="hljs-number">.509</span>, C=US, O=Android, CN=Android Debug<br>      [证书的有效期为<span class="hljs-number">18</span><span class="hljs-number">-6</span><span class="hljs-number">-6</span> 下午<span class="hljs-number">12</span>:<span class="hljs-number">41</span>至<span class="hljs-number">48</span><span class="hljs-number">-5</span><span class="hljs-number">-29</span> 下午<span class="hljs-number">12</span>:<span class="hljs-number">41</span>]<br>      [无效的证书链: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target]<br><br>sm          <span class="hljs-number">6</span> Fri Nov <span class="hljs-number">30</span> <span class="hljs-number">00</span>:<span class="hljs-number">00</span>:<span class="hljs-number">00</span> CST <span class="hljs-number">1979</span> META-INF/android.arch.core_runtime.version<br><br>      &gt;&gt;&gt; 签名者<br>      X<span class="hljs-number">.509</span>, C=US, O=Android, CN=Android Debug<br>      [证书的有效期为<span class="hljs-number">18</span><span class="hljs-number">-6</span><span class="hljs-number">-6</span> 下午<span class="hljs-number">12</span>:<span class="hljs-number">41</span>至<span class="hljs-number">48</span><span class="hljs-number">-5</span><span class="hljs-number">-29</span> 下午<span class="hljs-number">12</span>:<span class="hljs-number">41</span>]<br>      [无效的证书链: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target]<br><br>sm          <span class="hljs-number">6</span> Fri Nov <span class="hljs-number">30</span> <span class="hljs-number">00</span>:<span class="hljs-number">00</span>:<span class="hljs-number">00</span> CST <span class="hljs-number">1979</span> META-INF/android.arch.lifecycle_livedata-core.version<br><br>（... ...此处省略一堆内容）<br><br>     &gt;&gt;&gt; 签名者<br>      X<span class="hljs-number">.509</span>, C=US, O=Android, CN=Android Debug<br>      [证书的有效期为<span class="hljs-number">18</span><span class="hljs-number">-6</span><span class="hljs-number">-6</span> 下午<span class="hljs-number">12</span>:<span class="hljs-number">41</span>至<span class="hljs-number">48</span><span class="hljs-number">-5</span><span class="hljs-number">-29</span> 下午<span class="hljs-number">12</span>:<span class="hljs-number">41</span>]<br>      [无效的证书链: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target]<br><br><br>  s = 已验证签名 <br>  m = 在清单中列出条目<br>  k = 在密钥库中至少找到了一个证书<br>  i = 在身份作用域内至少找到了一个证书<br><br>- 由 <span class="hljs-string">&quot;C=US, O=Android, CN=Android Debug&quot;</span> 签名<br>    摘要算法: SHA1 (弱)<br>    签名算法: SHA1withRSA (弱), <span class="hljs-number">1024</span> 位密钥 (弱)<br><br>jar 已验证。<br><br>警告: <br>此 jar 包含其证书链无效的条目。原因: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target<br>此 jar 包含其签名者证书为自签名证书的条目。<br>SHA1 摘要算法被视为存在安全风险。此算法将在未来的更新中被禁用。<br>SHA1withRSA 签名算法被视为存在安全风险。此算法将在未来的更新中被禁用。<br>RSA 签名密钥的密钥大小 <span class="hljs-number">1024</span> 被视为存在安全风险。此密钥大小将在未来的更新中被禁用。<br>此 jar 包含的签名没有时间戳。如果没有时间戳, 则在其中任一签名者证书到期 (最早为 <span class="hljs-number">2048</span><span class="hljs-number">-05</span><span class="hljs-number">-29</span>) 之后, 用户可能无法验证此 jar。<br><br>签名者证书将于 <span class="hljs-number">2048</span><span class="hljs-number">-05</span><span class="hljs-number">-29</span> 到期。<br></code></pre></td></tr></table></figure>
+
+<p>上面可以看到出现了许多”CertPath not validated”错误，这个错误在 Java SDK 7 及以上版本才有，如果想忽略这个错误，我们可以使用 Android SDK 构建工具的修订版 24.0.3 及更高版本中提供的 apksigner 工具为 APK 签名来代替JAVA JDK自带的 jarsigner 工具来验证APK的证书链，如下：</p>
+<ul>
+<li><p>检查 APK 的签名是否可在 APK 支持的所有 Android 平台上被确认为有效：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">$ apksigner verify vuls.apk<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>检查 APK 的签名是否可在 Android 4.0.3（API 级别 15）及更高版本上被确认为有效：</p>
+</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">$ apksigner verify --min-sdk-version <span class="hljs-number">15</span> vuls.apk<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/c990e7efd19f426e8edc2b22ea5ed1a4.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>另外签名配置可以通过 <code>Android Studio</code>或 <code>build.gradle</code>中的 signingConfig 块进行管理。要同时激活 v1和 v2 以及 v3 方案，必须设置以下值：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c">v1SigningEnabled <span class="hljs-literal">true</span><br>v2SigningEnabled <span class="hljs-literal">true</span><br>v3SigningEnabled <span class="hljs-literal">true</span><br></code></pre></td></tr></table></figure>
+
+
+
+<p>在官方的 Android 开发者文档中，提供了几种配置应用发布的最佳实践</p>
+<figure class="highlight plaintext"><figcaption><span>Studio Signature Version V1/ V2```：</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs Android">- V1 (jar Signature)<br>  - V1: Jar Signature 来自 JDK，可对签名后的文件，作适当修改，并重新压缩<br>  - V1 签名不保护 APK 的某些部分，例如 ZIP 元数据。APK 验证程序需要处理大量不可信（尚未经过验证）的数据结构，然后会舍弃不受签名保护的数据。这会导致相当大的受攻击面。此外，APK 验证程序必须解压所有已压缩的条目，而这需要花费更多时间和内存。为了解决这些问题，Android 7.0 中引入了 APK 签名方案 v2<br>- V2 (```Full APK Signature```)<br>  - V2: Android 7.0 (Nougat) 引入的一项新的签名方案，不能对签名后的 APK作任何修改，包括重新解压。因为它是针对字节进行的签名，所以任何改动都会影响最终结果<br>- V3<br>  - V3：在 Android 9 中，v2 方案已更新为 v3 方案（也称为v2+），以便在签名分块中包含其他信息，但在其他方面保持相同的工作方式，该方案会对 APK 的内容进行哈希处理和签名，然后将生成的“APK 签名分块”插入到 APK 中<br><br>APK 签名方案详情，请移步Android 官网的介绍：https://source.android.com/docs/security/apksigning?hl=zh-cn<br><br>![在这里插入图片描述](https://img-blog.csdnimg.cn/cee0fa092a574d99a6395de24a34bda0.png)<br><br><br>只勾选v1签名所有机型都能用，如果只勾选V2签名7.0以下机型会在直接安装完后显示未安装，7.0及以上机型使用V2的方式验证成功安装，同时勾选V1和V2对所有机型成功安装，或者在Gradle 文件中修改，如下：<br><br>```c<br>signingConfigs &#123;  <br>    debug &#123;  <br>        v1SigningEnabled true  <br>        v2SigningEnabled true<br>        v3SigningEnabled true<br>    &#125;  <br>    release &#123;  <br>        v1SigningEnabled true  <br>        v2SigningEnabled true  <br>        v3SigningEnabled true<br>    &#125;  <br>&#125; <br></code></pre></td></tr></table></figure>
+
+<p>来说说为什么我们要推荐使用v1和v2共同使用呢？因为在2020年的时候Google公布的“Janus”漏洞，可使攻击者将Dex附加到原有的apk之上，绕过签名认证，在执行时优先执行附加的dex文件，这个漏洞直接影响<code>Android 5.0~8.0</code>上所有基于<code>signature scheme V1</code>签名的APK。这里说哈，对应APK应用程序来说签名确是唯一的，是用来证明是谁开发的是否是盗版或恶意APK，那么假如正版应用被恶意修改，其签名也会随之被破坏，需要重新签名才能安装到Android上，而且市面上各种APK应用商店和手机应用助手类的工具，往往通过包名和签名来判断一个APK应用程序是否是盗版或恶意APK应用程序</p>
+<p><strong>注</strong>：在官方的 Android 开发者文档中，官方提供了几种配置应用发布的方式，详情请移步：<a target="_blank" rel="noopener" href="https://developer.android.com/studio/publish/preparing#publishing-configure">https://developer.android.com/studio/publish/preparing#publishing-configure</a></p>
+<p><img src="https://img-blog.csdnimg.cn/724ba3e7f7aa47c6a3b97c708a2dd9dd.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><strong>参考链接</strong>：</p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/daemon369/p/3227309.html">https://www.cnblogs.com/daemon369/p/3227309.html</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/OWASP/owasp-mstg/blob/master/Document/0x05i-Testing-Code-Quality-and-Build-Settings.md">https://github.com/OWASP/owasp-mstg/blob/master/Document/0x05i-Testing-Code-Quality-and-Build-Settings.md</a></p>
+<p><a target="_blank" rel="noopener" href="https://support.google.com/googleplay/android-developer/answer/9848633?hl=zh-Hans">https://support.google.com/googleplay/android-developer/answer/9848633?hl=zh-Hans</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/beyond702/article/details/56281068">https://blog.csdn.net/beyond702/article/details/56281068</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/271474cd1d91">https://www.jianshu.com/p/271474cd1d91</a></p>
+<hr>
+<p><strong>你以为你有很多路可以选择，其实你只有一条路可以走</strong></p>
+<hr>
+</div>
+
+			<link rel="stylesheet" type="text/css" href="https://qiniu.techgrow.cn/readmore/dist/hexo.css">
+			<script src="https://qiniu.techgrow.cn/readmore/dist/readmore.js" type="text/javascript"></script>
+			<script>
+			var isMobile = navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i);
+			if (!isMobile) {
+				try {
+					var plugin = new ReadmorePlugin();
+					plugin.init({
+						"id": "readmore-container",
+						"blogId": "25525-4637332244353-147",
+						"name": "橙留香Park",
+						"qrcode": "https://i.imgtg.com/2022/10/03/mjCQ1.jpg",
+						"keyword": "验证码",
+						"lockToc": "yes",
+						"type": "hexo",
+						"random": "1",
+						"interval": "60",
+						"expires": "1",
+						"height": "auto"
+					});
+				} catch(e) {
+					console.warn("readmore plugin occurred error: " + e.name + " | " + e.message);
+				}
+			}
+			</script>
+		
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/AndroidSecurity/">#AndroidSecurity</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>「Android 安全」APK应用程序签名异常的检测方法</div>
+      <div>https://orangey.info/2022/09/24/126548441/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>橙留香</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年9月24日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/09/24/126600829/" title="关于Linux+Windows安装r2Frida环境配置及使用，你必须知道的那些事">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">关于Linux+Windows安装r2Frida环境配置及使用，你必须知道的那些事</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/09/24/126349620/" title="「干货」剪贴板+键盘缓存+UI界面+自动截屏敏感信息挖掘">
+                        <span class="hidden-mobile">「干货」剪贴板+键盘缓存+UI界面+自动截屏敏感信息挖掘</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  <article id="comments" lazyload>
+    
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1e96aec5ac46370916fa","clientSecret":"ee5e97a65cf34e9fe31e15ab0421a94968237f5e","repo":"ogGitalk","owner":"ananasOrangey","admin":["ananasOrangey"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: 'aef3275a14ab1878b05c405f88f10202'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+  </article>
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://orangey.blog.csdn.net" target="_blank" rel="nofollow noopener"><span>橙留香CSDN博客</span></a> <i class="iconfont icon-love"></i> <a href="https://i.imgtg.com/2022/09/21/gNXxK.png" target="_blank" rel="nofollow noopener"><span>橙留香微信公众号</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

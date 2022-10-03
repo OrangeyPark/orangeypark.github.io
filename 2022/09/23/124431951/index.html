@@ -1,0 +1,1475 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="橙留香">
+  <meta name="keywords" content="橙留香车联网安全技术博客">
+  
+    <meta name="description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  Android安全付费专栏长期更新，本篇最新内容请前往：  [车联网安全自学篇] Android安全之数据存储与数据安全【大集合】  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;ananasorangey&#x2F;cate">
+<meta property="og:type" content="article">
+<meta property="og:title" content="「干货」关于Android 数据存储与数据安全，你了解多少？">
+<meta property="og:url" content="https://orangey.info/2022/09/23/124431951/index.html">
+<meta property="og:site_name" content="车联网安全技术博客 | 橙留香">
+<meta property="og:description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  Android安全付费专栏长期更新，本篇最新内容请前往：  [车联网安全自学篇] Android安全之数据存储与数据安全【大集合】  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;ananasorangey&#x2F;cate">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/21/gNXxK.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e4ad82355d7e4040b48db923077c44ff.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_11,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/354134b53e9240cf8802aa210afcc564.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/0fd3d30e822147aab2f76814656f5d22.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/77516c4e8ed24e5984b336e540b62639.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/91e7cef20455407d88bc6144d68c505c.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/031fcb7e31074276aceb3598c1dee3c1.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/a5d2eff100d041d39308ac1660376142.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/77918927a8624966bdbb391dd9cdab1f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_15,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/67783439e07c4b69a1d28dfad9ee144a.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5475896d08994cc39792da8519925dfe.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/f962af61f2d34a7ebefce44d9b4fb560.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_15,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/0d4271003af546fcaa656922e7825a85.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/7b8cc83bb2f24655b439b1873410bf5a.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/3550e928e2cc4af283a6a75dd9451230.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_15,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/b247832c5f59479db90806e1410f3b3c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5d8ea79fcff74e588fbbc5fef2a26054.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_15,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/34f936f0a55e4ec1a38f98e78a741bc1.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/4ae02edd524948c19fa0f6e246badc26.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/9fd6a772c7b74ec4b06bb37cdecf5d6f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_16,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/9d29475a3a9446ab8c781e5647e1fcf4.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/405636757bba4090a6c85330178f7fc5.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/a2306ac285134dfea9edfb3f3028ef1e.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/bbd54d066c1c4e17b900894df0d9ab3c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/dfe817b5c43c41329921a37cb6ff1cb6.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/dbd75fb7c78d4728acabc36d245007ab.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/561d2ed7be09467f8f2905d0fa63d6bd.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/6b1d418197d3443eb72bb49af6dc0696.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c9f5fe229a0942b0aae63a8bbb311675.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/42a874b1c76c4424825906ea9a3fc0c7.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/bd56d87b969d446b99d90dc813b3cfc0.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/7c90999642704c04ba18b74d3a0e7a95.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/94f68dd517ec487fa55b27618fb87958.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_15,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/ba2c904ec499481585857b937d4b5f50.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5ed045a92ee6410b9227a761331932f4.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/131d96d1afc9409db5fe8ee498ef147b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/00919b2f74b248d2969eb38a9217979c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/9f0133e105d54fa6963788dcf260e1c6.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/71d96a41e1fa47a9806971000ec1e62f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/68cba6deca6e4a14a352778b2e23ab8f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/85ac8ea88ea74cfc9d531fa1bbfdf2fd.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/641add3feff34fbb90aff4a1656521b9.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_13,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/771b39c3c7944e098c92386244b0d699.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_15,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/22a56375d8a54810985b900fefa8b9e6.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/459f9a2b928d496fad192abf6242628f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/a2dcc6fce152421bafca3fd5a56d6975.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c04844aecc0e4c92ac963db2e76cfcdf.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c380c7e3a4a242c8ba6aa8237791c2ca.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/af4719215cc44e6aa69d5494ad32fab1.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_15,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/0dcef35b328f40b3be27218028eac4cf.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_14,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/deac40d27e134f3588387c38fb8141bc.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_15,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/03f04e5c51d7489ca7f239375a41e2f6.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_15,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/76cd0109d25545e5ae17df2cba98c2e7.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_15,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/672470063cd0434aa17f73f32fcc2c94.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2ffea240e2b24fdc9ce15ce74e37ceb1.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/4c02872f4a8d4bd4b140234cf8a837b9.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/3b1afb034656436da1456cf387531862.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/7b0db127c15d4d0892229510db2d5ee5.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_12,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c57247016fb94f7dbf2ec6153b8e53fe.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="article:published_time" content="2022-09-23T15:50:33.606Z">
+<meta property="article:modified_time" content="2022-09-24T16:45:08.565Z">
+<meta property="article:author" content="橙留香">
+<meta property="article:tag" content="AndroidSecurity">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+  
+  
+  
+  <title>「干货」关于Android 数据存储与数据安全，你了解多少？ - 车联网安全技术博客 | 橙留香</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"orangey.info","root":"/","version":"1.9.3","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"java"},"copy_btn":false,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>橙留香</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="「干货」关于Android 数据存储与数据安全，你了解多少？"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-09-23 23:50" pubdate>
+          2022年9月23日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          36k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          <!-- compatible with older versions-->
+          299 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">「干货」关于Android 数据存储与数据安全，你了解多少？</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <div id="readmore-container"><hr>
+<p><strong>也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大</strong></p>
+<p><strong>少走了弯路，也就错过了风景，无论如何，感谢经历</strong></p>
+<hr>
+<p>Android安全付费专栏长期更新，本篇最新内容请前往：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://orangey.blog.csdn.net/article/details/124431951">[车联网安全自学篇] Android安全之数据存储与数据安全【大集合】</a></li>
+</ul>
+<p>更多关于Android安全的知识，可前往：<a target="_blank" rel="noopener" href="https://blog.csdn.net/ananasorangey/category11955914.html">https://blog.csdn.net/ananasorangey/category11955914.html</a></p>
+<p><img src="https://i.imgtg.com/2022/09/25/gdpGP.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><img src="https://i.imgtg.com/2022/09/21/gNXxK.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x01-前言"><a href="#0x01-前言" class="headerlink" title="0x01 前言"></a>0x01 前言</h1><h2 id="1-1-数据存储是啥？"><a href="#1-1-数据存储是啥？" class="headerlink" title="1.1 数据存储是啥？"></a>1.1 数据存储是啥？</h2><p>安卓使用了类似Unix中的文件系统来进行本地数据存储，用到的文件系统有十几种，如FAT32、EXT等。在安卓系统中的一切皆文件，因此可以使用命令来查看对应的信息，例如查看文件系统详情：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">adb shell cat /proc/filesystems<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/e4ad82355d7e4040b48db923077c44ff.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_11,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload></p>
+<p>典型的文件系统根目录如下：</p>
+<p><img src="https://img-blog.csdnimg.cn/354134b53e9240cf8802aa210afcc564.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>Android在filesystems这个文件中存储了许多详细信息，比如内置应用、通过谷歌Play商店安装的应用等。任何人如果拥有物理访问权限，都能轻易从中获得许多敏感信息，如照片、密码、GPS位置信息、浏览历史或者公司数据等。开发人员应该确保数据存储安全，要不然将会对用户及数据产生安全风险，甚至导致严重的黑客攻击。</p>
+<ol>
+<li>&#x2F;data：存储应用数据（&#x2F;data&#x2F;data目录用于存储与应用相关的私人数据，如共享首选项、缓存、第三方库等。通常，应用在安装完成后会存储如下信息）</li>
+</ol>
+<p>例如：这里以一个vuls的APP为例，访问对应的&#x2F;data&#x2F;data加包名等信息，可以看到只有特定的用户(u0_a33)才能访问这个目录，其他的应用则不能，如下所示</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">adb shell ls -l /data/data/ddns.android.vuls<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/0fd3d30e822147aab2f76814656f5d22.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ol start="2">
+<li>&#x2F;proc：一种伪文件系统（也即虚拟文件系统），存储的是当前内核运行状态的一系列特殊文件，用户可以通过这些文件查看有关系统硬件及当前正在运行进程的信息，甚至可以通过更改其中某些文件来改变内核的运行状；存储与进程、文件系统、设备等相关的数据，在反入侵当中该目录也很关键的一种手段，例如检测系统是否被提权，可以通过父子进程的uid关系来判断（单一的判断会存在许多误报问题，需综合来检测）以及检测进程注入可以监测&#x2F;proc下的进程UID、PID信息，如果发现进程的PID或UID有修改，则存在提权行为等等</li>
+</ol>
+<p><img src="https://img-blog.csdnimg.cn/77516c4e8ed24e5984b336e540b62639.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><strong>备注</strong>：基于&#x2F;proc文件系统如上所述的特殊性，其内的文件也常被称作虚拟文件，并具有一些独特的特点。例如，其中有些文件虽然使用查看命令查看时会返回大量信息，但文件本身的大小却会显示为0字节。此外，这些特殊文件中大多数文件的时间及日期属性通常为当前系统时间和日期，这跟它们随时会被刷新（存储于RAM中）有关；为了查看及使用上的方便，这些文件通常会按照相关性进行分类存储于不同的目录甚至子目录中，如&#x2F;proc&#x2F;scsi目录中存储的就是当前系统上所有SCSI设备的相关信息，&#x2F;proc&#x2F;N中存储的则是系统当前正在运行的进程的相关信息，其中N为正在运行的进程（可以想象得到，在某进程结束后其相关目录则会消失）；大多数虚拟文件可以使用文件查看命令如cat、more或者less进行查看，有些文件信息表述的内容可以一目了然，但也有文件的信息却不怎么具有可读性。不过，这些可读性较差的文件在使用一些命令如apm、free、lspci或top查看时却可以有着不错的表现</p>
+<ul>
+<li><p>进程目录中的常见文件介绍</p>
+<ul>
+<li>cmdline：启动当前进程的完整命令僵尸进程目录中的此文件不包含任何信息</li>
+<li>cwd：指向当前进程运行目录的一个符号链接 </li>
+<li>environ：当前进程的环境变量列表，彼此间用空字符（NULL）隔开；变量用大写字母表示，其值用小写字母表示</li>
+<li>exe：指向启动当前进程的可执行文件（完整路径）的符号链接，通过&#x2F;proc&#x2F;N&#x2F;exe可以启动当前进程的一个拷贝</li>
+<li>fd：这是个目录，包含当前进程打开的每一个文件的文件描述符（file descriptor），这些文件描述符是指向实际文件的一个符号链接</li>
+<li>limits：当前进程所使用的每一个受限资源的软限制、硬限制和管理单元，此文件仅可由实际启动当前进程的UID用户读取；（2.6.24以后的内核版本支持此功能）</li>
+<li>maps：当前进程关联到的每个可执行文件和库文件在内存中的映射区域及其访问权限所组成的列表</li>
+<li>mem：当前进程所占用的内存空间，由open、read和lseek等系统调用使用，不能被用户读取</li>
+<li>root：指向当前进程运行根目录的符号链接，在Unix和Linux系统上，通常采用chroot命令使每个进程运行于独立的根目录</li>
+<li>stat：当前进程的状态信息，包含一系统格式化后的数据列，可读性差，通常由ps命令使用</li>
+<li>statm：当前进程占用内存的状态信息，通常以“页面”（page）表示</li>
+<li>status：与stat所提供信息类似，但可读性较好，如下所示，每行表示一个属性信息</li>
+<li>task：目录文件，包含由当前进程所运行的每一个线程的相关信息，每个线程的相关信息文件均保存在一个由线程号（tid）命名的目录中，这类似于其内容类似于每个进程目录中的内容；（内核2.6版本以后支持此功能）</li>
+</ul>
+</li>
+<li><p>&#x2F;proc目录下常见的文件介绍 </p>
+<ul>
+<li>&#x2F;proc&#x2F;apm：高级电源管理（APM）版本信息及电池相关状态信息，通常由apm命令使用</li>
+<li>&#x2F;proc&#x2F;buddyinfo：用于诊断内存碎片问题的相关信息文件</li>
+<li>&#x2F;proc&#x2F;cmdline：在启动时传递至内核的相关参数信息，这些信息通常由lilo或grub等启动管理工具进行传递</li>
+<li>&#x2F;proc&#x2F;cpuinfo：处理器的相关信息的文件</li>
+<li>&#x2F;proc&#x2F;crypto：系统上已安装的内核使用的密码算法及每个算法的详细信息列表</li>
+<li>&#x2F;proc&#x2F;devices：系统已经加载的所有块设备和字符设备的信息，包含主设备号和设备组名（与主设备号对应的设备类型）</li>
+<li>&#x2F;proc&#x2F;diskstats：每块磁盘设备的磁盘I&#x2F;O统计信息列表；（内核2.5.69以后的版本支持此功能）</li>
+<li>&#x2F;proc&#x2F;dma：每个正在使用且注册的ISA DMA通道的信息列表</li>
+<li>&#x2F;proc&#x2F;execdomains：内核当前支持的执行域（每种操作系统独特“个性”）信息列表</li>
+<li>&#x2F;proc&#x2F;fb：帧缓冲设备列表文件，包含帧缓冲设备的设备号和相关驱动信息</li>
+<li>&#x2F;proc&#x2F;filesystems：当前被内核支持的文件系统类型列表文件，被标示为nodev的文件系统表示不需要块设备的支持；通常mount一个设备时，如果没有指定文件系统类型将通过此文件来决定其所需文件系统的类型</li>
+<li>&#x2F;proc&#x2F;interrupts：X86或X86_64体系架构系统上每个IRQ相关的中断号列表；多路处理器平台上每个CPU对于每个I&#x2F;O设备均有自己的中断号</li>
+<li>&#x2F;proc&#x2F;iomem：每个物理设备上的记忆体（RAM或者ROM）在系统内存中的映射信息</li>
+<li>&#x2F;proc&#x2F;ioports：当前正在使用且已经注册过的与物理设备进行通讯的输入-输出端口范围信息列表；如下面所示，第一列表示注册的I&#x2F;O端口范围，其后表示相关的设备</li>
+<li>&#x2F;proc&#x2F;kallsyms：模块管理工具用来动态链接或绑定可装载模块的符号定义，由内核输出；（内核2.5.71以后的版本支持此功能）；通常这个文件中的信息量相当大</li>
+<li>&#x2F;proc&#x2F;kcore：系统使用的物理内存，以ELF核心文件（core file）格式存储，其文件大小为已使用的物理内存（RAM）加上4KB；这个文件用来检查内核数据结构的当前状态，因此，通常由GBD通常调试工具使用，但不能使用文件查看命令打开此文件</li>
+<li>&#x2F;proc&#x2F;kmsg：此文件用来保存由内核输出的信息，通常由&#x2F;sbin&#x2F;klogd或&#x2F;bin&#x2F;dmsg等程序使用，不要试图使用查看命令打开此文件</li>
+<li>&#x2F;proc&#x2F;loadavg：保存关于CPU和磁盘I&#x2F;O的负载平均值，其前三列分别表示每1秒钟、每5秒钟及每15秒的负载平均值，类似于uptime命令输出的相关信息；第四列是由斜线隔开的两个数值，前者表示当前正由内核调度的实体（进程和线程）的数目，后者表示系统当前存活的内核调度实体的数目；第五列表示此文件被查看前最近一个由内核创建的进程的PID</li>
+<li>&#x2F;proc&#x2F;locks：保存当前由内核锁定的文件的相关信息，包含内核内部的调试数据；每个锁定占据一行，且具有一个惟一的编号；如下输出信息中每行的第二列表示当前锁定使用的锁定类别，POSIX表示目前较新类型的文件锁，由lockf系统调用产生，FLOCK是传统的UNIX文件锁，由flock系统调用产生；第三列也通常由两种类型，ADVISORY表示不允许其他用户锁定此文件，但允许读取，MANDATORY表示此文件锁定期间不允许其他用户任何形式的访问</li>
+<li>&#x2F;proc&#x2F;mdstat：保存RAID相关的多块磁盘的当前状态信息，在没有使用RAID机器上</li>
+<li>&#x2F;proc&#x2F;meminfo：系统中关于当前内存的利用状况等的信息，常由free命令使用；可以使用文件查看命令直接读取此文件，其内容显示为两列，前者为统计属性，后者为对应的值</li>
+<li>&#x2F;proc&#x2F;mounts：在内核2.4.29版本以前，此文件的内容为系统当前挂载的所有文件系统，在2.4.19以后的内核中引进了每个进程使用独立挂载名称空间的方式，此文件则随之变成了指向&#x2F;proc&#x2F;self&#x2F;mounts（每个进程自身挂载名称空间中的所有挂载点列表）文件的符号链接；&#x2F;proc&#x2F;self是一个独特的目录</li>
+<li>&#x2F;proc&#x2F;modules：当前装入内核的所有模块名称列表，可以由lsmod命令使用，也可以直接查看；如下所示，其中第一列表示模块名，第二列表示此模块占用内存空间大小，第三列表示此模块有多少实例被装入，第四列表示此模块依赖于其它哪些模块，第五列表示此模块的装载状态（Live：已经装入；Loading：正在装入；Unloading：正在卸载），第六列表示此模块在内核内存（kernel memory）中的偏移量；</li>
+<li>&#x2F;proc&#x2F;partitions：块设备每个分区的主设备号（major）和次设备号（minor）等信息，同时包括每个分区所包含的块（block）数目（如下面输出中第三列所示）</li>
+<li>&#x2F;proc&#x2F;pci：内核初始化时发现的所有PCI设备及其配置信息列表，其配置信息多为某PCI设备相关IRQ信息，可读性不高，可以用“&#x2F;sbin&#x2F;lspci –vb”命令获得较易理解的相关信息；在2.6内核以后，此文件已为&#x2F;proc&#x2F;bus&#x2F;pci目录及其下的文件代替</li>
+<li>&#x2F;proc&#x2F;slabinfo：在内核中频繁使用的对象（如inode、dentry等）都有自己的cache，即slab pool，而&#x2F;proc&#x2F;slabinfo文件列出了这些对象相关slap的信息</li>
+<li>&#x2F;proc&#x2F;stat：实时追踪自系统上次启动以来的多种统计信息<ul>
+<li>“cpu”行后的八个值分别表示以1&#x2F;100（jiffies）秒为单位的统计值（包括系统运行于用户模式、低优先级用户模式，运系统模式、空闲模式、I&#x2F;O等待模式的时间等）</li>
+<li>“intr”行给出中断的信息，第一个为自系统启动以来，发生的所有的中断的次数；然后每个数对应一个特定的中断自系统启动以来所发生的次数</li>
+<li>“ctxt”给出了自系统启动以来CPU发生的上下文交换的次数</li>
+<li>“btime”给出了从系统启动到现在为止的时间，单位为秒</li>
+<li>“processes (total_forks) 自系统启动以来所创建的任务的个数目</li>
+<li>“procs_running”：当前运行队列的任务的数目</li>
+<li>“procs_blocked”：当前被阻塞的任务的数目</li>
+</ul>
+</li>
+<li>&#x2F;proc&#x2F;swaps：当前系统上的交换分区及其空间利用信息，如果有多个交换分区的话，则会每个交换分区的信息分别存储于&#x2F;proc&#x2F;swap目录中的单独文件中，而其优先级数字越低，被使用到的可能性越大</li>
+<li>&#x2F;proc&#x2F;uptime：系统上次启动以来的运行时间，如下所示，其第一个数字表示系统运行时间，第二个数字表示系统空闲时间，单位是秒</li>
+<li>&#x2F;proc&#x2F;version：当前系统运行的内核版本号</li>
+<li>&#x2F;proc&#x2F;vmstat：当前系统虚拟内存的多种统计数据，信息量可能会比较大，这因系统而有所不同，可读性较好</li>
+<li>&#x2F;proc&#x2F;zoneinfo：内存区域（zone）的详细信息列表，信息量较大</li>
+</ul>
+</li>
+<li><p>&#x2F;proc&#x2F;sys目录详解：abi、crypto、debug、dev、fs、kernel、net、user、vm；与&#x2F;proc下其它文件的“只读”属性不同的是，管理员可对&#x2F;proc&#x2F;sys子目录中的许多文件内容进行修改以更改内核的运行特性，事先可以使用“ls -l”命令查看某文件是否“可写入”。写入操作通常使用类似于<code>“echo  DATA &gt; /path/to/your/filename”</code>的格式进行。需要注意的是，即使文件可写，其一般也不可以使用编辑器进行编辑</p>
+</li>
+<li><p>&#x2F;proc&#x2F;sys&#x2F;debug 子目录：此目录通常是一空目录</p>
+</li>
+<li><p>&#x2F;proc&#x2F;sys&#x2F;dev 子目录：为系统上特殊设备提供参数信息文件的目录，其不同设备的信息文件分别存储于不同的子目录中，如大多数系统上都会具有的&#x2F;proc&#x2F;sys&#x2F;dev&#x2F;cdrom和&#x2F;proc&#x2F;sys&#x2F;dev&#x2F;raid（如果内核编译时开启了支持raid的功能） 目录，其内存储的通常是系统上cdrom和raid的相关参数信息文件</p>
+</li>
+</ul>
+<ol start="3">
+<li>&#x2F;sdcard：SD卡用于增加存储容量（随着Android大版本的不断迭代，原本的外置存储基本上都没有了，取而代之的是内置sdcard）</li>
+</ol>
+<p><img src="https://img-blog.csdnimg.cn/91e7cef20455407d88bc6144d68c505c.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="1-2-本地数据存储有哪些？"><a href="#1-2-本地数据存储有哪些？" class="headerlink" title="1.2 本地数据存储有哪些？"></a>1.2 本地数据存储有哪些？</h2><p>存储应用数据有如下四种：</p>
+<ul>
+<li>共享首选项</li>
+<li>SQLite数据库</li>
+<li>内部存储</li>
+<li>外部存储</li>
+</ul>
+<p>Android系统提供了以下四种Android应用本地存储方式：<code>Shared Preferences、SQLite Databases、Internal Storage、External Storage</code>等存储方式。Shared Preferences是一种轻量级的基于XML文件存储的键值对(key-value)数据的数据存储方式，一般用于储存应用的配置等信息</p>
+<p>除了外部存储方式，其他存储方式都将数据存放在&#x2F;data&#x2F;data目录下的文件夹中，其中包含缓存、数据库、文件以及共享首选项这四个文件夹。每个文件夹分别用于存放与应用相关的特定类型的数据：</p>
+<ul>
+<li>app_webview：主要用于存储webview加载过程中的数据，例如Cookie，LocalStorage等(webview本地缓存文件)</li>
+<li>cache：主要用于存储使用应用过程中产生的缓存数据(用于存放缓存文件)</li>
+<li>databases：主要用于存储数据库类型的数据，包含SQLite数据库文件。平常创建的数据库文件就是存储在这里(数据库文件)</li>
+<li>files：用于存放与应用相关的文件，可以在该目录下存储配置文件，敏感数据等(应用自己创建的文件)</li>
+<li><code>lib -&gt; /data/app-lib/eu.chainfire.supersu-1</code>：存放应用需要的或导入的so库文件</li>
+<li>shared_prefs：使用XML格式存放应用的偏好设置，用于存储SharedPreference文件(Shared Preferences 文件)。我们使用SharedPreference的时候只指定了文件名，并没有指定存储路径，其实SP的文件就是保存到了这个目录下</li>
+</ul>
+<p>共享首选项（Shared Preferences）：</p>
+<ul>
+<li>共享首选项是一些XML文件，它们以键值对的形式存储应用的非敏感设置信息。所存储的数据类型通常是boolean、float、int、long和string等</li>
+</ul>
+<p>SQLite数据库：</p>
+<ul>
+<li>SQLite数据库是基于文件的轻量级数据库，通常用于移动环境。安卓系统同样支持SQLite框架，因此你经常会发现许多使用SQLite数据库存储数据的应用。由于安卓系统在安全性方面的限制，应用存储在SQLite数据库中的数据默认不能被其他应用访问</li>
+</ul>
+<p>内部存储：</p>
+<ul>
+<li>内部存储也被称为设备的内部存储，可以将文件存储到内部存储空间。由于能被直接访问，因此它能快速响应内存访问请求，与应用相关的全部数据几乎都在这里被使用。从逻辑上来说，它是手机的硬盘。在安装过程中，每个应用都在&#x2F;data&#x2F;data&#x2F;&lt;应用包名&gt;&#x2F;下创建了各自的文件目录，这些目录对每个应用都是私有的，其他应用没有访问权限。当用户卸载应用后，这些目录中的文件将会被删除</li>
+</ul>
+<p>外部存储：</p>
+<ul>
+<li>外部存储是安卓系统中一种用于存储文件的全局可读写的存储机制。任何应用都能访问外部存储区域并读写文件，由于这一特性，敏感文件不应该存储在这里。开发人员需要在AndroidManifest.xml中声明合适的权限才能进行这些操作。</li>
+</ul>
+<p>本地存储会涉及到两大方面的安全问题，存储的数据和存储的方式。存储数据的安全主要是指，本地数据库中是否存储了敏感信息，包括身份证号码、银行卡号、账号密码等。对于敏感数据的定义根据不同的业务场景会有不同，读者可以根据自身情况自行把握。存储方式的安全，主要是指如何进行敏感数据存储的，如是否对敏感数据做了明文存储，是否存在本地sql注入，是否对数据的访问权限做了合理控制等。</p>
+<p><strong>以下是四种本地存储方式的介绍</strong>：  </p>
+<ol>
+<li>文件存储数据</li>
+</ol>
+<p>文件存储方式主要是使用IO流操作读写sdcard上的文件，比如应用程序数据文件夹下的某一文件被其他应用读取、写入等操作，其核心原理为： Context提供了两个方法来打开数据文件里的文件IO流 FileInputStream openFileInput(String name); FileOutputStream(Stringname , int mode),这两个方法第一个参数用于指定文件名，第二个参数指定打开文件的模式。不过权限需要在AndroidManifest.xml文件上进行配置：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java">&lt;uses-permission  android:name=<span class="hljs-string">&quot;android.permission.MOUNT_UNMOUNT_FILESYSTEMS&quot;</span>/&gt; &lt;uses-permission  android:name=<span class="hljs-string">&quot;android.permission.WRITE_EXTERNAL_STORAGE&quot;</span>/&gt;<br></code></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>SQLite数据库存储数据</li>
+</ol>
+<p>SQLite是轻量级嵌入式数据库引擎，支持 SQL 语言，并且只利用很少的内存就有很好的性能，是android等主流移动设备上的复杂数据存储引擎。SQLiteDatabase类为我们提供了很多种方法，支持增删查改等基本的数据库操作。程序运行生成的<code>*.db</code>文件一般位于<code>/data/data/&lt;package name&gt;/databases/*db</code></p>
+<ol start="3">
+<li>使用ContentProvider存储数据</li>
+</ol>
+<p>ContentProvider主要用于程序之间的数据交换，这些数据包括文件数据、数据库数据和其他类型的数据。一个程序可以通过实现一个Content Provider的抽象接口将数据暴露出去，其他的应用程序可以通过统一的接口保存、读取、修改、添加、删除此Content Provider的各种数据（涉及到一定权限）。Content Provider中使用的查询字符串有别于标准的SQL查询。很多诸如<code>select, add, delete, modify</code>等操作我们都使用一种特殊的URI来进行，这种URI由3个部分组成<code>&quot;content://&quot;</code>，代表数据的路径，和一个可选的标识数据的ID</p>
+<ol start="4">
+<li>使用SharedPreferences存储数据</li>
+</ol>
+<p>该存储方式通常用来存储应用的配置信息，保存方式基于XML文件存储的key-value键值对数据，一般作为数据存储的一种补充。SharedPreferences对象本身只能获取数据而不支持存储和修改，存储修改是通过SharedPreferences.edit()获取的内部接口Editor对象实现。 SharedPreferences本身是一个接口，程序无法直接创建SharedPreferences实例，只能通过Context提供的<code>getSharedPreferences(String name, intmode)</code>方法来获取实例。存储路径为：<code>/data/data/&lt;package name&gt;/shared_prefs</code>目录下</p>
+<p><strong>以下是网络存储方式的介绍</strong>：  </p>
+<ol>
+<li>除了四种存储都是将数据存储在本地设备上，除此之外，Android APP也通过网络来实现数据的存储和获取。一般调用WebService返回的数据或是解析HTTP协议实现网络数据交互，不过前提是需要在配置文件（AndroidManifest.xml）中设置访问网络权限：</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java">&lt;uses-permission android:name=<span class="hljs-string">&quot;android.permission.INTERNET&quot;</span> /&gt;<br></code></pre></td></tr></table></figure>
+
+
+<p><strong>Shared Preferences存储安全风险源于以下两方面</strong>：</p>
+<ul>
+<li>开发者在创建文件时没有正确的选取合适的创建模式(<code>MODE_PRIVATE、MODE_WORLD_READABLE以及MODE_WORLD_WRITEABLE</code>)进行权限控制</li>
+<li>开发者过度依赖Android系统内部存储安全机制，将用户信息、密码等敏感重要的信息明文存储在Shared Preferences文件中，导致攻击者可通过root手机来查看敏感信息<ul>
+<li>如果使用MODE_WORLD_READABLE模式创建Shared Preferences文件，使得其他应用对该Shared Preferences文件具备可读的权限</li>
+<li>使用MODE_WORLD_WRITEABLE模式创建Shared Preferences文件并含有<code>&quot;android:sharedUserId&quot;</code>属性值，使得其他应用对该应用的Shared Preferences文件具备可写的权限。</li>
+</ul>
+</li>
+</ul>
+<p>在本地信息存储方面，一般主要从SQLite数据库文件和SharedPreferances配置文件是否泄漏敏感信息进行安全测试。此外通过反编译APP，分析源代码获取数据存储过程——&gt;存储路径——&gt;敏感数据文件方面进行考量</p>
+<h2 id="1-3-工具"><a href="#1-3-工具" class="headerlink" title="1.3 工具"></a>1.3 工具</h2><ul>
+<li>adb</li>
+<li>Android模拟器或真实手机</li>
+<li>Android Studio</li>
+<li>DDMS（File Explorer）</li>
+<li>SQLite Expert</li>
+</ul>
+<h1 id="0x02-共享首选项（Shared-Preferences）"><a href="#0x02-共享首选项（Shared-Preferences）" class="headerlink" title="0x02  共享首选项（Shared Preferences）"></a>0x02  共享首选项（Shared Preferences）</h1><p>Shared Preferences 通常被用来保存少量的数据，其文件默认被存储在应用目录下的shared_prefs目录下。Shared Preferences 文件其实就是 xml 文件，里面的数据一般以键值对的形式存储</p>
+<ol>
+<li><strong>案例1</strong></li>
+</ol>
+<p>可以使用SharedPreferences类来创建共享首选项。下面这段代码用于在account_dangerous.xml和account_safe.xml文件中存储用户名和密码：</p>
+<p><img src="https://img-blog.csdnimg.cn/031fcb7e31074276aceb3598c1dee3c1.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>获取SharedPreferences对象，获取SharedPreferences对象，第一个参数是指定 SharedPreferences 文件名，第二个参数是指定操作模式</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java">getSharedPreferences (String name, <span class="hljs-type">int</span> mode)<br></code></pre></td></tr></table></figure>
+<p>其操作模式有以下几种：</p>
+<ul>
+<li>MODE_PRIVATE（私有模式，也是默认的模式。此模式下文件只能被当前APP或者与当前APP具有相同 user ID 的APP读取）</li>
+<li>MODE_WORLD_READABLE（除了自己访问外还可以被其它应该程序读取）</li>
+<li>MODE_WORLD_WRITEABLE（除了自己访问外还可以被其它应该程序读取和写入）</li>
+<li>MODE_MULTI_PROCESS（用于处理本应用操作此文件时多线程的问题）</li>
+</ul>
+<p>从上面的描述中可以发现，当存有敏感数据的 SharedPreferences 文件被赋予 MODE_WORLD_READABLE 或 MODE_WORLD_WRITEABLE 时，是会存在安全问题的。我们来查看一下对应的文件权限看看：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">adb shell ls -al /data/data/ddns.android.vuls/shared_prefs<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/a5d2eff100d041d39308ac1660376142.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>如上图可以看到 account_dangerous.xml 的权限为 -rw-rw-rw- ，代表了所有应用对其具有读写权限；account_safe.xml 的权限为-rw-rw—- ，代表了只能被当前APP或者与当前APP具有相同 user ID 的APP读取</p>
+<p>先保存一个账号（11sw）+密码（11ws）</p>
+<p><img src="https://img-blog.csdnimg.cn/77918927a8624966bdbb391dd9cdab1f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_15,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">ls /data/data/ddns.android.vuls/shared_prefs<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/67783439e07c4b69a1d28dfad9ee144a.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>共享首选项文件下查看是否有刚刚我们填写的账号和密码：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c">cat  /data/data/ddns.android.vuls/shared_prefs/account_dangerous.xml<br>cat  /data/data/ddns.android.vuls/shared_prefs/account_safe.xml<br></code></pre></td></tr></table></figure>
+<p>或</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c">adb pull /data/data/ddns.android.vuls/shared_prefs/account_dangerous.xml<br>adb pull /data/data/ddns.android.vuls/shared_prefs/account_safe.xml<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/5475896d08994cc39792da8519925dfe.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ol start="2">
+<li><strong>案例2</strong></li>
+</ol>
+<p>大家看到的上面这个案例可能会以为这是演示的案例，在真实中是不会发生这种事情的，但往往相反，这里以一个PIN锁的APP来做为演示，如下：</p>
+<p><strong>Whatsapp Lock APK</strong>：<a target="_blank" rel="noopener" href="https://apkpure.com/cn/lock-for-whatsapp/com.securechat.lockwhatsapp">https://apkpure.com/cn/lock-for-whatsapp/com.securechat.lockwhatsapp</a></p>
+<p>先去创建一个PIN 码先，博主同学这里密码以1233为密码保存了</p>
+<p><img src="https://img-blog.csdnimg.cn/f962af61f2d34a7ebefce44d9b4fb560.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_15,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>然后查看com.securechat.lockwhatsapp（该APP的包名）。进入shared_prefs下有一个xml文件，直接查看一下，哟吼还真的有我们刚刚保存的PIN码，PIN密码以明文存储</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">cat /data/data/com.securechat.lockwhatsapp/shared_prefs/MyCustomNamedPreference.xml<br></code></pre></td></tr></table></figure>
+
+<p>我们先输入一个错误的密码来看看会提示我们输入的PIne码错误</p>
+<p><img src="https://img-blog.csdnimg.cn/0d4271003af546fcaa656922e7825a85.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>再输入缓存中的PIN密码试试，哟呵成功咯</p>
+<p><img src="https://img-blog.csdnimg.cn/7b8cc83bb2f24655b439b1873410bf5a.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>该应用具有PIN码恢复功能，以便在忘记PIN码的情况下找回。但是你需要回答密保问题。密保问题及其答案同样以明文的方式直接存储在</p>
+<p><img src="https://img-blog.csdnimg.cn/3550e928e2cc4af283a6a75dd9451230.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_15,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>然后只需要在对应的位置输入1111，即可绕过PIN码登录</p>
+<p><img src="https://img-blog.csdnimg.cn/b247832c5f59479db90806e1410f3b3c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/5d8ea79fcff74e588fbbc5fef2a26054.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_15,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x03-SQLite数据库"><a href="#0x03-SQLite数据库" class="headerlink" title="0x03 SQLite数据库"></a>0x03 SQLite数据库</h1><p>SQLite数据库是基于文件的轻量级数据库，扩展名通常为.db或.sqlite。安卓系统完全支持SQLite数据库。应用中的其他类都能访问应用创建的数据库，但其他应用则不能访问。</p>
+<p>通过编程的方式扩展SQLiteOpenHelper类，从而实现数据库的插入和读取，并将来自用户的数值插入一个名为accounts的表中，存储用户名和密码</p>
+<p><img src="https://img-blog.csdnimg.cn/34f936f0a55e4ec1a38f98e78a741bc1.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>查看com.securechat.lockwhatsapp（该APP的包名）下的.db文件，这里我们将其pull出来用SQLite打开，然后将.db拖放到浏览器窗口</p>
+<p>SQLite下载：<a target="_blank" rel="noopener" href="http://www.sqlitebrowser.org/blog/version-3-12-2-released/">http://www.sqlitebrowser.org/blog/version-3-12-2-released/</a></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c">adb shell ls /data/data/ddns.android.vuls/databases<br>adb pull /data/data/ddns.android.vuls/databases/account.db<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/4ae02edd524948c19fa0f6e246badc26.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>可以看到Android APP在本地的account.db中存储了账号和密码</p>
+<p><img src="https://img-blog.csdnimg.cn/9fd6a772c7b74ec4b06bb37cdecf5d6f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_16,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="3-1-用户字典缓存"><a href="#3-1-用户字典缓存" class="headerlink" title="3.1 用户字典缓存"></a>3.1 用户字典缓存</h2><p>用户字典是大多数移动设备所具有的一个非常方便的功能，能够让键盘记住用户经常输入的词组。当使用键盘输入特定的词组时，它能自动提供一些补全建议。安卓系统同样具有这一功能，它将常用词组存放在&#x2F;data&#x2F;data&#x2F;&lt;应用包名&gt;&#x2F;databases下的一个名为user_dict.db的文件中。如果允许缓存输入安卓应用的敏感信息，那么任何人都可以通过浏览&#x2F;data&#x2F;data&#x2F;&lt;应用包名&gt;&#x2F;databases下的user_dict.db文件或使用其内容提供程序的URI访问这些数据</p>
+<p>如果攻击者通过用户字典的内容提供程序访问里面的内容，就可以轻易读取和搜集其中的有用信息。这里的利用方式与SQLite数据库处理.db文件的方式一样，将user_dict.db数据库文件从设备中拉取到计算机上，然后丢到SQLite浏览器中</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">adb shell pull  /data/data/&lt;应用包名&gt;/databases/user_dict.db<br></code></pre></td></tr></table></figure>
+
+<h2 id="3-2-NOSQL数据库"><a href="#3-2-NOSQL数据库" class="headerlink" title="3.2 NOSQL数据库"></a>3.2 NOSQL数据库</h2><p>一般来讲，Android使用的数据库都是自带的SQLite数据库。Web重量级的MySQL、Orcacle、CouchDB、NoSQL等都不适用于Android项目的开发，只是说这些数据库不适用，但同样可以用于移动应用，其中MongoDB（属于NOSQL数据库）是当前最流行的NoSQL数据库产品之一，它使用类似于JSON（JavaScript对象表示法）的语法将数据存储为文档。与其它本地存储技术类似，如果NoSQL数据库通过不安全的方式存储数据，就可能会被利用</p>
+<p><strong>介绍一下，当前NoSQL数据库有哪些，如下</strong>：</p>
+<ul>
+<li>MongoDB</li>
+</ul>
+<p>MongoDB 是个面向文档的数据库，使用 JSON 风格的数据格式。它非常适合于网站的数据存储、内容管理与缓存应用，并且通过配置可以实现复制与高可用性功能。</p>
+<p>MongoDB 具有很强的可伸缩性，性能表现优异。它使用 C++ 编写，基于文档存储。此外，MongoDB 还支持全文检索、跨 WAN 与 LAN 的高可用性、易于实现的复制、水平扩展、基于文档的丰富查询、在数据处理与聚合等方面具有很强的灵活性。</p>
+<ul>
+<li>Cassandra</li>
+</ul>
+<p>这是个 Apache 软件基金会的项目，Cassandra 是个分布式数据库，支持分散的数据存储，可以实现容错以及无单点故障等。换句话说，“Cassandra 非常适合于那些无法忍受数据丢失的应用”。</p>
+<ul>
+<li>CouchDB</li>
+</ul>
+<p>这也是 Apache 软件基金会的一个项目，CouchDB 是另一个面向文档的数据库，以 JSON 格式存储数据。它兼容于 ACID，像 MongoDB 一样，CouchDB 也可以用于存储网站的数据与内容，以及提供缓存等。你可以通过 JavaScript 在 CouchDB 上运行 MapReduce 查询。此外，CouchDB 还提供了一个非常方便的基于 Web 的管理控制台。它非常适合于 Web 应用。</p>
+<ul>
+<li>Hypertable</li>
+</ul>
+<p>Hypertable 模仿的是 Google 的 BigTable 数据库系统。Hypertable 的创建者将“成为高可用、PB 规模的数据库开源标准”作为 Hypertable 的目标。换言之，Hypertable 的设计目标是跨越多个廉价的服务器可靠地存储大量数据。</p>
+<ul>
+<li>Redis</li>
+</ul>
+<p>这是个开源、高级的键值存储。由于在键中使用了 hash、set、string、sorted set 及 list，因此 Redis 也称作数据结构服务器。这个系统可以帮助你执行原子操作，比如说增加 hash 中的值、集合的交集运算、字符串拼接、差集与并集等。Redis 通过内存中的数据集实现了高性能。此外，该数据库还兼容于大多数编程语言。</p>
+<ul>
+<li>Riak</li>
+</ul>
+<p>Riak 是最为强大的分布式数据库之一，它提供了轻松且可预测的伸缩能力，向用户提供了快速测试、原型与应用部署能力，从而简化应用的开发过程。</p>
+<ul>
+<li>Neo4j</li>
+</ul>
+<p>Neo4j 是一款 NoSQL 图型数据库，具有非常高的性能。它拥有一个健壮且成熟的系统的所有特性，向程序员提供了灵活且面向对象的网络结构，可以让开发者充分享受到拥有完整事务特性的数据库的所有好处。相较于 RDBMS，Neo4j 还对某些应用提供了不少性能改进。</p>
+<ul>
+<li>Hadoop HBase</li>
+</ul>
+<p>HBase 是一款可伸缩、分布式的大数据存储。它可以用在数据的实时与随机访问的场景下。HBase 拥有模块化与线性的可伸缩性，并且能够保证读写的严格一致性。HBase 提供了一个 Java API，可以实现轻松的客户端访问；提供了可配置且自动化的表分区功能；还有 Bloom 过滤器以及 block 缓存等特性。</p>
+<ul>
+<li>Couchbase</li>
+</ul>
+<p>虽然 Couchbase 是 CouchDB 的派生，不过它已经成为了一款功能完善的数据库产品。它向文档数据库转移的趋势会让 MongoDB 感到压力。每个节点上它都是多线程的，这是个非常主要的可伸缩性优势，特别是当托管在自定义或是 Bare-Metal 硬件上时更是如此。借助于一些非常棒的集成特性，诸如与 Hadoop 的集成，Couchbase 对于数据存储来说是个非常不错的选择。</p>
+<ul>
+<li>MemcacheDB</li>
+</ul>
+<p>这是个分布式的键值存储系统，我们不应该将其与缓存解决方案搞混；相反，它是个持久化存储引擎，用于数据存储并以非常快速且可靠的方式检索数据。它遵循 memcache 协议。其存储后端用于 Berkeley DB 中，支持诸如复制与事务等特性。</p>
+<ul>
+<li>REVENDB</li>
+</ul>
+<p>RAVENDB 是第二代开源数据库，它面向文档存储并且无模式，这样就可以轻松将对象存储到其中了。它提供了非常灵活且快速的查询，通过对复制、多租与分片提供开箱即用的支持使得我们可以非常轻松地实现伸缩功能。它对 ACID 事务提供了完整的支持，同时又能保证数据的安全性。除了高性能之外，它还通过 bundle 提供了轻松的可扩展性。</p>
+<ul>
+<li>Voldemort</li>
+</ul>
+<p>这是个自动复制的分布式存储系统。它提供了自动化的数据分区功能，透明的服务器失败处理、可插拔的序列化功能、独立的节点、数据版本化以及跨越各种数据中心的数据分发功能。</p>
+<p><strong>项目地址</strong>：<a target="_blank" rel="noopener" href="https://github.com/pilgr/Paper">https://github.com/pilgr/Paper</a></p>
+<p>NoSql在Android上应用得不多，Paper是目前刚出现的性能比较好而且比较小巧的一款</p>
+<p>NoSQL是一种数据库技术，此时我们要想查看数据库目录，但这里只有files目录。缺少数据库目录是因为使用files目录存储数据库调用的模型。如下图：</p>
+<p><img src="https://img-blog.csdnimg.cn/9d29475a3a9446ab8c781e5647e1fcf4.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>貌似看起来是直接调用对应的模型去做的调用？Android 还是不太懂，那就先放放，咋们换下一个案例看看</p>
+<p><strong>项目地址</strong>：<a target="_blank" rel="noopener" href="https://github.com/Reone/KVStorage">https://github.com/Reone/KVStorage</a></p>
+<p>NoSQL，泛指非关系型的数据库。KVStorage属于键值(Key-Value)存储数据库。注意KVStorage并不完全属于NoSQL，其底层由sqlite实现。具体操作的细节跟SQlite数据库差不多，就不一 一复述，如下图：</p>
+<p><img src="https://img-blog.csdnimg.cn/405636757bba4090a6c85330178f7fc5.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x03-内部存储"><a href="#0x03-内部存储" class="headerlink" title="0x03 内部存储"></a>0x03 内部存储</h1><p>一说内部存储，有人可能会和内存混淆在一起，其实这两个概念很好区分，内部存储是用于持久化存储的，属于ROM，手机关机或者退出App数据是不会丢失的，而内存是RAM，退出App或者关机之后数据就会丢失。所以，内部存储不是内存。所谓的内部存储，其实是手机ROM上的一块存储区域，主要用于存储系统以及应用程序的数据。内部存储在Android系统对应的根目录是 &#x2F;data&#x2F;data&#x2F;，这个目录普通用户是无权访问的，用户需要root权限才可以查看</p>
+<p>内部存储是Android APP存储数据的另一种方式，通常存放在<code>/data/data/&lt;应用包名&gt;</code>中的文件夹里。以 某个APP为例，其本地存储位置为<code>/data/data/eu.chainfire.supersu</code></p>
+<p><img src="https://img-blog.csdnimg.cn/a2306ac285134dfea9edfb3f3028ef1e.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs /data/data```目录是按照应用的包名来组织的，每个应用都是属于自己的内部存储目录，而且目录的名称就是该应用的包名，这个目录是在安装应用的时候自动创建的，当应用被卸载后，该目录也会被系统自动删除。所以，如果你将数据存储于内部存储中，其实就是把数据存储到自己应用包名对应的内部存储目录中。每个应用的内部存储目录都是私有的，也就是说内部存储目录下的文件只能被应用自己访问到，其他应用是没有权限访问的。应用访问自己的内部存储目录时不需要申请任何权限。"><br>- app_webview：主要用于存储webview加载过程中的数据，例如Cookie，LocalStorage等(webview本地缓存文件)<br>- cache：主要用于存储使用应用过程中产生的缓存数据(用于存放缓存文件)<br>- databases：主要用于存储数据库类型的数据，包含SQLite数据库文件。平常创建的数据库文件就是存储在这里(数据库文件)<br>- files：用于存放与应用相关的文件，可以在该目录下存储配置文件，敏感数据等(应用自己创建的文件)<br>- ```lib -&gt; /data/app-lib/eu.chainfire.supersu-1```：存放应用需要的或导入的so库文件<br>- shared_prefs：使用XML格式存放应用的偏好设置，用于存储SharedPreference文件(Shared Preferences 文件)。我们使用SharedPreference的时候只指定了文件名，并没有指定存储路径，其实SP的文件就是保存到了这个目录下<br><br><br><br>那么有哪些API可以获取到内部存储目录呢，我们主要是使用Context类提供的接口来访问内部存储目录，如下：<br><br><br>```java<br>//获取的目录是/data/user/0/package_name，<br>//即应用内部存储的根目录<br>getDataDir()  <br><br>//获取的目录是/data/user/0/package_name/files，<br>//即应用内部存储的files目录<br>getFilesDir() <br><br>//获取的目录是/data/user/0/package_name/cache，<br>//即应用内部存储的cache目录<br>getCacheDir() <br><br>//获取的目录是/data/user/0/package_name/app_name，<br>//如果该目录不存在，系统会自动创建该目录<br>getDir(String name, int mode) <br></code></pre></td></tr></table></figure>
+
+<p>通过Context访问程序的私有目录：</p>
+<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs stata">Context提供的路径都有一个特点，都是当前<span class="hljs-keyword">App</span>私有的，其他的<span class="hljs-keyword">App</span>无权限访问。即这些目录是当前应用程序的私有目录<br></code></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>getFilesDir</td>
+<td>获取的 <code>data/data/程序包名/files </code>这个目录</td>
+</tr>
+<tr>
+<td>getCatch</td>
+<td>获取的<code>data/data/程序包名/catch </code>这个目录</td>
+</tr>
+<tr>
+<td>getExternalCacheDir</td>
+<td>获取的是<code>mnt/sdcard/Android/程序包名/catch</code>这个目录</td>
+</tr>
+<tr>
+<td><code>getExternalFilesDir(type:String)</code></td>
+<td>获取指定类型的文件目录位于<code>mnt/sdcard/Android/程序包名/files/&lt;指定类型的目录(例如 Downlaod))&gt;</code></td>
+</tr>
+</tbody></table>
+<p>通过Environment类访问手机的公有目录：</p>
+<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs arduino">通过Environment类获取目录是程序的公有目录，因为是操作<span class="hljs-built_in">SD</span>卡，所以在需要有读写<span class="hljs-built_in">SD</span>卡的权限，并且在Android <span class="hljs-number">6.0</span> 及以上的机器的时候，还需要动态申请权限<br></code></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Environment.getExternalStorageState()</td>
+<td>获取当前SD卡的状态</td>
+</tr>
+<tr>
+<td><code>Environment.getExternalStoragePublicDirectory(type:String)</code></td>
+<td>获取SD卡指指定类型的目录</td>
+</tr>
+</tbody></table>
+<p><strong>注</strong>：获取到对应的目录后，就可以对目录下的文件进行读写。但发现代码中获取的内部存储根目录是 <code>/data/user/0</code>，并不是前面提到的<code>/data/data</code>，这是怎么回事呢？因为在Android4.2以后增加了多用户的功能，为了适应多用户的功能，原来的<code>/data/data/</code>相当于直接链接到当前用户文件夹的，变成了<code>/data/user/0/</code>，所以在代码中打印出来的路径是<code>/data/user/0</code>，而不是<code>/data/data</code>，说白了<code>/data/data</code>和<code>/data/user/0/</code>是一个东西。内部存储空间容量有限，如果内部存储空间被用完，系统会报内存不足。所以，不要把所有的数据都放到内部存储中，所以开发人员会把较敏感的应用数据放在内部存储中，而其他的数据可以放在外部存储中</p>
+<p><img src="https://img-blog.csdnimg.cn/bbd54d066c1c4e17b900894df0d9ab3c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>将手机上的文件拉到本地进行分析</p>
+<figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs haskell"><span class="hljs-title">adb</span> pull /<span class="hljs-class"><span class="hljs-keyword">data</span>/<span class="hljs-keyword">data</span>/eu.chainfire.supersu</span><br></code></pre></td></tr></table></figure>
+
+<p>首先为了分析方便，可能需要在模拟器或手机设备上安装一下 busybox。因为 Android 系统虽然是基于linux的，但是很多基本命令都被阉割了，而busybox里面集成了常用的命令</p>
+<p>下载对应的文件：<a target="_blank" rel="noopener" href="https://busybox.net/">https://busybox.net/</a> </p>
+<p>将busybox文件 push 到手机</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c">adb push busybox /data/tmp/busybox<br>adb shell <br>cd/data/tmp<br>chmod <span class="hljs-number">755</span> busybox<br>./busybox mount -o rw,remount /  <br>./busybox cp busybox /sbin<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><figcaption><span>linux 下的strings 命令来提取字符串信息</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs *.so```可以使用ida进行反编译查看其中的信息，也可以使用"><br>```c<br>strings libosal.so<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><figcaption><span>notepad++进行分析。比如 mac.xml 文件中就存储了手机的 mac 地址信息</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs *.xml```可以使用"><br>```*.db```可以使用 SQLite browser 来浏览分析。其官方地址为http://sqlitebrowser.org/<br><br><br>```*journa```为日志文件，一般无需分析。<br><br>其他类型文件可以使用 notepad++ 查看或者自行搜索对应文件的打开工具<br><br>那么，内部存储攻击，在攻击者可以物理接触设备时，攻击者就可以读取设备的个人信息和存储的数据。当攻击者获取到root权限之后会让攻击更复杂<br><br>内部文件存储通常用来存储一些比较大的数据，比如说图片、视频之类的。通过内部文件存储，你可以存储任意类型的数据，与 SharedPreferences 类似，其也有几种存储模式，如下：<br>- MODE_PRIVATE（私有模式，也是默认的模式。此模式下文件只能被当前APP或者与当前APP具有相同 user ID 的APP读取）<br>- MODE_WORLD_READABLE（除了自己访问外还可以被其它应该程序读取）<br>- MODE_WORLD_WRITEABLE（除了自己访问外还可以被其它应该程序读取和写入）<br>- MODE_APPEND（检查文件是否存在，存在就往面追加，不存在就创建一个文件）<br><br>当使用 MODE_WORLD_READABLE 或 MODE_WORLD_WRITEABLE 模式存储敏感信息的时候，就会造成安全问题，代码如下：<br><br>![在这里插入图片描述](https://img-blog.csdnimg.cn/be81f3d3b6db4369b85ecd1213cb15a1.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16)<br><br><br><br>查看一下对应的文件权限，可发现account_dangerous.txt 的权限为 -rw-rw-rw- ，代表所有应用对其具有读写权限<br><br>```c<br>adb shell ls -al /data/data/ddns.android.vuls/files<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/dfe817b5c43c41329921a37cb6ff1cb6.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x04-外部存储"><a href="#0x04-外部存储" class="headerlink" title="0x04 外部存储"></a>0x04 外部存储</h1><p>大家应该也知道只要使用了APP ，某些数据就会存储下来。在安卓 APP 的本地存储通常会在两个地方：内部存储和外部存储。内部存储通常是指手机本身的存储空间，而外部存储主要是指 sdcard 的存储空间</p>
+<p>在内部存储中的数据对应用来说是私密的，用户和其他应用都没有访问权限，而外部存储中的数据是可以被其他应用或用户访问甚至删除的，用户可以通过USB方式和PC之间交互外部存储中的数据。我们平常在Android手机的文件管理工具下看到的目录其实就是外部存储。</p>
+<p>在Android4.4以前，外部存储就是指SD卡，手机自带的存储就是内部存储；但是在Android4.4以后，随着手机机身存储越来越大，手机的机身存储已经可以满足大多数用户的需求，所以很多手机都不需要再安装SD卡。此时外部存储和内部存储都位于手机机身存储上，他们只是同一个存储介质上的不同存储区域。但是很多手机还是保留了SD卡插槽，方便用户自行拓展。如果手机安装了SD卡，那么很显然SD卡目录也属于外部存储目录。这时手机都有了两个外部存储空间，一个位于手机机身存储上，一个位于SD卡上。但是随着机身存储越累越大，SD卡一般可能只适用于转移文件，对于一般应用来说应该也不会把数据写到外置的SD卡上了，所以这里主要以机身存储为例来分析外部存储。</p>
+<p>和内部存储不同的是，外部存储根据存储特点不同分为两种类型：外部私有存储和外部共有存储。先来看外部私有存储</p>
+<p>外部存储是安卓系统中另一个重要的存储机制。一些知名的应用都将数据存储在外部存储（即SD卡）中。将数据存储到SD卡时需要特别注意，因为它是全局可读写的。用户甚至可以轻松将SD卡从设备上移除，然后挂载到另一台设备中，以便访问和读取其中的数据。</p>
+<h2 id="4-1-外部私有存储目录"><a href="#4-1-外部私有存储目录" class="headerlink" title="4.1 外部私有存储目录"></a>4.1 外部私有存储目录</h2><p>通常来说，应用涉及到的持久化数据一般分为两类：应用相关数据和应用无关数据。前者是指应用使用的数据信息，比如一些配置信息，调试信息，缓存文件等。当应用被卸载，这些信息也应该被随之删除，避免占用不必要的存储空间。例如下面两种场景：</p>
+<ul>
+<li>在用户使用应用过程中，产生的文件，图片，视频，音频等数据，这些数据不太敏感但是占用空间比较大，卸载App时不希望这些数据继续保留在用户手机中。</li>
+<li>当应用发生闪退时，希望把一些闪退信息保存下来，让用户获取闪退信息文件后通过特定渠道发送给开发人员进行问题定位。同样的，这些信息在卸载App后也不希望继续留在用户手机中。</li>
+</ul>
+<p>对于问题一，我们可以直接把数据存储在内部存储中，但是考虑到内部存储空间有限，把这些数据存储到内部存储会浪费内部存储的空间。对于问题二，普通用户（指没有root权限的用户）无法直接查看其中的文件，把数据直接存储在内部存储中是行不通的。这些数据有一个共同点就是他们的生命周期和应用是一致的，而且不太适合于放在内部存储中。为了存储这种类型的数据，Android规定来一个专门的存储空间，这个空间被称为外部私有存储空间。外部私有存储空间属于外部存储，对于某个应用来说，外部私有存储的根目录（这里暂时不考虑SD卡）是 <code>/storage/emulated/0/Android/data/package_name</code>，这个目录有点类似于内部存储目录，都是以包名来命名私有存储空间的</p>
+<p>外部私有存储空间有以下特点：</p>
+<ul>
+<li>内部私有存储中的数据会随着App的卸载一起删除</li>
+<li>仅仅安装应用不会在<code>/storage/emulated/0/Android/data/</code>目录下生成该应用的外部私有存储目录，只有在应用中调用API访问外部私有存储目录时，才会创建以package_name命名的私有存储目录</li>
+<li>App在访问自己的外部私有存储目录时不需要任何权限</li>
+<li>自 Android 7.0 开始，系统对外部存储目录中 应用私有目录的访问权限进一步限制。其他 App 无法通过 <code>file:// </code>这种形式的 Uri 直接读写其他应用的外部私有存储目录，而是需要通过 FileProvider 访问</li>
+</ul>
+<p>可以通过以下方式来获取外部私有存储目录：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-number">1.</span>getExternalCacheDir() <br><span class="hljs-comment">/*获取到的目录是/storage/emulated/0/Android/data/package_name/cache，如果该目录不存在，调用这个方法会自动创建该目录。*/</span><br><br><span class="hljs-number">2.</span>getExternalFilesDir(String type) <br><span class="hljs-comment">/* 1.如果type为&quot;&quot;，那么获取到的目录是 /storage/emulated/0/Android/data/package_name/files</span><br><span class="hljs-comment">   2.如果type不为空，则会在/storage/emulated/0/Android/data/package_name/files目录下创建一个以传入的type值为名称的目录，例如你将type设为了test，那么就会创建/storage/emulated/0/Android/data/package_name/files/test目录，这个其实有点类似于内部存储getDir方法传入的name参数。但是android官方推荐使用以下的type类型</span><br><span class="hljs-comment">   public static String DIRECTORY_MUSIC = &quot;Music&quot;;</span><br><span class="hljs-comment">   public static String DIRECTORY_PODCASTS = &quot;Podcasts&quot;;</span><br><span class="hljs-comment">   public static String DIRECTORY_RINGTONES = &quot;Ringtones&quot;;</span><br><span class="hljs-comment">   public static String DIRECTORY_ALARMS = &quot;Alarms&quot;;</span><br><span class="hljs-comment">   public static String DIRECTORY_NOTIFICATIONS = &quot;Notifications&quot;;</span><br><span class="hljs-comment">   public static String DIRECTORY_PICTURES = &quot;Pictures&quot;;</span><br><span class="hljs-comment">   public static String DIRECTORY_MOVIES = &quot;Movies&quot;;</span><br><span class="hljs-comment">   public static String DIRECTORY_DOWNLOADS = &quot;Download&quot;;</span><br><span class="hljs-comment">   public static String DIRECTORY_DCIM = &quot;DCIM&quot;;</span><br><span class="hljs-comment">   public static String DIRECTORY_DOCUMENTS = &quot;Documents&quot;;*/</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="4-2-外部共有存储目录"><a href="#4-2-外部共有存储目录" class="headerlink" title="4.2 外部共有存储目录"></a>4.2 外部共有存储目录</h2><p>外部存储目录还有一个存储空间就是外部共有存储目录，顾名思义，外部共有存储目录存储的数据无论对应用还是用户都是可见的应用只要有外部访问权限，就可以读取外部公共目录下的文件。外部公共目录主要存放和应用无关的数据，这些数据在卸载App的时候不会被删除</p>
+<p>外部共有存储目录有以下特点：</p>
+<ul>
+<li>当卸载App时，共有存储目录下的文件不会被删除</li>
+<li>应用在访问外部公有目录之前，首先要申请外部存储权限，在Android6.0以后，外部存储权限还要动态申请</li>
+<li>任何应用只要有外部存储权限，都可以访问共有存储目录下的数据</li>
+</ul>
+<p>可以通过以下方式来访问外部公共存储目录：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-number">1.</span>Environment.getExternalStorageDirectory() <br><span class="hljs-comment">//获取到的目录是/storage/emulated/0,这个也是外部存储的根目录</span><br><br><span class="hljs-number">2.</span>Environment.getExternalStoragePublicDirectory(String type) <br><span class="hljs-comment">/* 1.如果type为&quot;&quot;，那么获取到的目录是外部存储的根目录即  /storage/emulated/0</span><br><span class="hljs-comment">   2.如果type不为空，则会在/storage/emulated/0目录下创建一个以传入的type值为名称的目录，例如你将type设为了test，那么就在外部存储根目录下创建test目录，这个方法和getExternalFilesDir的用法一样。android官方推荐使用以下的type类型，我们在SK卡的根目录下也经常可以看到下面的某些目录。</span><br><span class="hljs-comment">   public static String DIRECTORY_MUSIC = &quot;Music&quot;;</span><br><span class="hljs-comment">   public static String DIRECTORY_PODCASTS = &quot;Podcasts&quot;;</span><br><span class="hljs-comment">   public static String DIRECTORY_RINGTONES = &quot;Ringtones&quot;;</span><br><span class="hljs-comment">   public static String DIRECTORY_ALARMS = &quot;Alarms&quot;;</span><br><span class="hljs-comment">   public static String DIRECTORY_NOTIFICATIONS = &quot;Notifications&quot;;</span><br><span class="hljs-comment">   public static String DIRECTORY_PICTURES = &quot;Pictures&quot;;</span><br><span class="hljs-comment">   public static String DIRECTORY_MOVIES = &quot;Movies&quot;;</span><br><span class="hljs-comment">   public static String DIRECTORY_DOWNLOADS = &quot;Download&quot;;</span><br><span class="hljs-comment">   public static String DIRECTORY_DCIM = &quot;DCIM&quot;;</span><br><span class="hljs-comment">   public static String DIRECTORY_DOCUMENTS = &quot;Documents&quot;;*/</span><br></code></pre></td></tr></table></figure>
+
+
+<h2 id="4-3-外部存储和内部存储的对比"><a href="#4-3-外部存储和内部存储的对比" class="headerlink" title="4.3 外部存储和内部存储的对比"></a>4.3 外部存储和内部存储的对比</h2><p>要区分外部存储和内部存储，我们最好从逻辑上来理解这两个概念，而不是从物理上。虽然在Android4.4以前，逻辑上和物理上是统一的，但是Android4.4以后，随着外置SD卡的使用越来越少，内部存储和外部存储和物理介质的内外就没有任何关系了。首先通过一个图来说明下外部存储和内部存储与物理存储的关系</p>
+<p>外部存储和内部存储的对比如下表所示</p>
+<table>
+<thead>
+<tr>
+<th>-</th>
+<th>内部存储</th>
+<th>私有存储空间(外部存储)</th>
+<th>共有存储空间(外部存储)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>生命周期</td>
+<td>和宿主APP生命周期相同</td>
+<td>和宿主APP生命周期相同</td>
+<td>和宿主APP生命周期无关</td>
+</tr>
+<tr>
+<td>宿主APP访问权限</td>
+<td>直接访问，无需权限</td>
+<td>直接访问，无需权限</td>
+<td>需申请EXTERNAL_STORAGE读写权限</td>
+</tr>
+<tr>
+<td>其它APP访问权限</td>
+<td>无权限访问</td>
+<td>7.0以前，通过file:&#x2F;&#x2F;形式的URI访问<br>7.0以后，通过FileProvider访问</td>
+<td>需申请EXTERNAL_STORAGE读写权限</td>
+</tr>
+<tr>
+<td>用户访问权限</td>
+<td>需要root权限</td>
+<td>直接访问，无需权限</td>
+<td>直接访问，无需权限</td>
+</tr>
+<tr>
+<td>存储数据特点</td>
+<td>数据比较敏感且应用先关</td>
+<td>数据不敏感且和应用相关</td>
+<td>数据不敏感且和应用无关</td>
+</tr>
+<tr>
+<td>API</td>
+<td>getDataDir()<br>getFilesDir()<br>getCacheDir()<br>getDir(name,mode)</td>
+<td>getExternalCacheDir()<br>getExternalFilesDir(type)</td>
+<td>Environment.getExternalStorageDirectory()<br>Environment.getExternalStoragePublicDirectory(type)</td>
+</tr>
+</tbody></table>
+<p>Android 包含以下访问外部存储中的文件的权限：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c">READ_EXTERNAL_STORAGE<br>允许应用访问外部存储设备中的文件<br>WRITE_EXTERNAL_STORAGE<br>允许应用在外部存储设备中写入和修改文件。API <span class="hljs-number">19</span> 开始，拥有此权限的应用也会自动获得 READ_EXTERNAL_STORAGE 权限<br></code></pre></td></tr></table></figure>
+
+<p>从 Android 4.4（API 19）开始，在“应用特定的目录（“私有文件目录”）”中读取或写入文件不再需要任何与存储相关的权限</p>
+<p>因此，如果您的应用支持 Android 4.3（API 18）及更低版本，并且您只想访问应用特定的目录（“私有文件目录”），则可以添加 maxSdkVersion 属性，声明仅在较低版本的 Android 上请求权限：（这里可能有坑，会和Android6.0权限有点小问题，慎用。）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs java">&lt;manifest&gt;<br>    &lt;uses-permission android:name=<span class="hljs-string">&quot;android.permission.WRITE_EXTERNAL_STORAGE&quot;</span><br>                     android:maxSdkVersion=<span class="hljs-string">&quot;18&quot;</span> /&gt;<br>&lt;/manifest&gt;<br></code></pre></td></tr></table></figure>
+
+<p>具体说明：</p>
+<ul>
+<li>如果应用需要访问其他应用的文件或者“公共文件目录”，则需要在清单中配置存储权限，且不能添加 maxSdkVersion 属性</li>
+<li>如果应用只需要访问应用特定的目录即私有文件目录：（这种情况实际中很少）<ul>
+<li>如果应用仅支持 API 19 及之后版本，则不需要在清单中配置存储权限。</li>
+<li>如果应用还支持 API 18 及更低版本，则需要在清单中配置存储权限，且可以添加 maxSdkVersion 属性，声明仅在较低版本的 Android 上请求权限。</li>
+<li>maxSdkVersion 这里可能有坑，会和Android6.0权限有点小问题，慎用</li>
+</ul>
+</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/1cf28923795b">https://www.jianshu.com/p/1cf28923795b</a></p>
+<p>那么在分析外部存储的时候，首先去反编译一下 APK 文件，在AndroidManifest.xml 文件中查看一下是否申请了外部存储相关权限，如下：</p>
+<p><img src="https://img-blog.csdnimg.cn/dbd75fb7c78d4728acabc36d245007ab.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>如果没有申请相关权限，就可以不用去分析外部存储的文件了。</p>
+<p>一般外部存储的目录为 &#x2F;sdcard&#x2F;Android&#x2F;data&#x2F;app pacakge name，比如 vuls的外部存储目录为&#x2F;sdcard&#x2F;Android&#x2F;data&#x2F;ddns.android.vuls。其文件分析方法与内部存储一致</p>
+<p>我们在进行敏感信息检查的时候，不要只局限于内部存储和外部存储。APK 文件本身包含的敏感信息我们也不应该错过，给出几个例子如下：</p>
+<ol>
+<li>AndroidManifest.xml 文件</li>
+</ol>
+<p>很多应用会在此文件中的 meta-data 标签中保存一些秘钥信息或者硬编码密码等等</p>
+<ol start="2">
+<li>反编译后的代码文件中</li>
+</ol>
+<p>比如说很多加密秘钥</p>
+<ol start="3">
+<li>其他任何可以分析的地方，比如资源文件、so库文件等等</li>
+</ol>
+<h2 id="4-4-案例"><a href="#4-4-案例" class="headerlink" title="4.4 案例"></a>4.4 案例</h2><p>例如，将应用数据存储在外部存储，也就是SD卡中</p>
+<p><img src="https://img-blog.csdnimg.cn/561d2ed7be09467f8f2905d0fa63d6bd.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>如上图，Android APP使用了<code>Environment.getExternalStorageDirectory（）</code>方法将账号密码存放在SD卡的&#x2F;ddns&#x2F;account.txt下。这样，任何恶意应用都能读取账号密码，如果能联网的情况下还能造成更大的危害，控制用户设备并把对应的APP外部存储文件下的账号密码发到攻击者在远程的服务器上。应用要访问外部存储，还需要在AndroidManifest.xml文件中声明WRITE_EXTERNAL_STORAGE权限，如下：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">uses-permission</span> <span class="hljs-attr">android:name</span>=<span class="hljs-string">&quot;android.permission.WRITE_EXTERNAL_STORAGE&quot;</span> /&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/6b1d418197d3443eb72bb49af6dc0696.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/c9f5fe229a0942b0aae63a8bbb311675.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x05-备份技术"><a href="#0x05-备份技术" class="headerlink" title="0x05 备份技术"></a>0x05 备份技术</h1><p>前面说的许多存储例子基本上是Root的，接下来说说如何利用备份功能在未Root的设备上查看应用的内部存储。利用特定应用或设备的备份文件来检查其安全问题</p>
+<p>工具地址：<a target="_blank" rel="noopener" href="https://github.com/nelenkov/android-backup-extractor">Android backup extractor</a></p>
+<p>之前写过一篇备份文件利用的文章，此处就不再讲解了，文章地址如下：</p>
+<p><a target="_blank" rel="noopener" href="https://orangey.blog.csdn.net/article/details/122151416">[车联网安全自学篇] Android安全之Android中allowBackup属性浅析【案例讲解】</a></p>
+<p>从上面的了解中，大家不难看出敏感信息不应该以明文存储，如果想要安全地存储数据需要花费很大的精力。尽量不要将敏感信息存储到设备上，而应该将它放到服务器上。如果必须选择放到本地设备上的话，一定要在存储数据时使用加密算法，例如使用androidx.security库，帮我们对保存到共享首选项的数据进行加密，下载地址：<a target="_blank" rel="noopener" href="https://developer.android.com/jetpack/androidx/releases/security">https://developer.android.com/jetpack/androidx/releases/security</a></p>
+<p><img src="https://img-blog.csdnimg.cn/42a874b1c76c4424825906ea9a3fc0c7.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>如果想要对SQLite数据库进行加密，可以选择SQLCipher，下载地址：<a target="_blank" rel="noopener" href="https://www.zetetic.net/sqlcipher/">https://www.zetetic.net/sqlcipher/</a></p>
+<p><img src="https://img-blog.csdnimg.cn/bd56d87b969d446b99d90dc813b3cfc0.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><strong>注</strong>：当使用类似AES等对称加密算法时，密钥管理是一个问题。此时，可使用基于密码加密（PBE）的方法，这样的话，密钥就会基于用户输入的密码生成；如果考虑使用散列来加密，那就选择一个强的散列算法并对其加盐</p>
+<h1 id="0x06-其它的一些存储安全介绍"><a href="#0x06-其它的一些存储安全介绍" class="headerlink" title="0x06 其它的一些存储安全介绍"></a>0x06 其它的一些存储安全介绍</h1><h2 id="6-1-Android-APP权限"><a href="#6-1-Android-APP权限" class="headerlink" title="6.1 Android APP权限"></a>6.1 Android APP权限</h2><p>在Linux操作系统上，所有设备都是文件，文件的属性有读、写和可执行（先忽略强制位与冒险位），每个用户一个UID，root用户是超级管理员。没有经过权限许可的话，各个普通用户之间是不能互相操作对方的文件的，这样一来，当root用户给文件设置权限时，就需要说明这个属性是给属主定义的，还是给一组用户定义的，还是给属主和组之外的用户定义的。所以，在chmod这个设置文件属性的命令中，可以看到”chmod 777 filename“这样奇怪的命令，其意义是777三个位置，分别代表属主、组和其他用户，7这个数，本身又代表1+2+4，1代表可执行权限，2代表写权限，4代表读权限。所以这个命令是指将这个文件让所有用户拥有该文件的所有权限</p>
+<p>Android作为Linux操作系统，其权限机制，其实是对Linux权限机制的封装和扩展。由于Linux的硬件就是文件，所以Android上面的对于操作硬件和读写文件的能力，都可以归结为对文件的权限。为了让每个进程都拥有自己独立的权限，Android让每个java程序都拥有一个java虚拟机，又让每个java虚拟机进程属于单独一个用户，这样进程之间就独立了，一个不拥有root权限的进程，是不可能访问其他进程的文件和资源的。所有，大部分Android提供的权限，其实都是使用文件权限来实现的。所以，在Android的框架代码中，根本看不到权限的检查代码，我之前找到了activityManagerService和PackageManagerService，以为其中的checkPermission就是权限检查的代码，但跟踪之后才发现，那些只不过是对外提供的SDK接口，并不被使用在Android程序执行时的权限检查，会在每次执行API的时候都去检查权限</p>
+<p>由上所知，Andorid 是基于 Linux 开发的，在用户管理方面继承了 Linux 的部分特性，但是也有很大的不同。在传统的 Linux 中，很多个应用可能都是由一个 UID 运行的，但是在 Android 中，每个 APP 都以独立的用户身份运行在独立的沙盒中。系统会为每个 APP 创建单独的 UID 和 GID。APP在单独的进程中运行，并且只能够访问自己的资源</p>
+<p>如下图，APP数据目录只属于自己的用户和组，并且无权访问其他应用的数据：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">adb shell ls -al /data/data<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/7c90999642704c04ba18b74d3a0e7a95.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>通常 APP 会被分配 10000 到 99999 范围内的 uid 和 gid，并根据一定的规则映射为用户名和组名（uid 0是root用户，系统用户在不同版本Linux中的UID范围：<code>UID:1~499或UID:1~999</code>，普通用户在不同版本Linux中的UID范围：UID:500-65535或UID:1000-65535）</p>
+<p>比如下图中，uid 和 gid 都是 10057，而用户名和组名就为 u0_a40</p>
+<p><img src="https://img-blog.csdnimg.cn/94f68dd517ec487fa55b27618fb87958.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_15,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>现在同学们，应该也知悉了APP 要使用特定的功能，一般需要申请相应的权限，例如要读写sd卡的话就肯定会去申请 sd卡读写权限。如上图系统就会在 groups 里面添加对应权限的gid，这样应用就具有了 sdcard_rw 组的权限了，即拥有了 sd卡读写权限</p>
+<ul>
+<li>检测方法</li>
+</ul>
+<p>查看ContentWrapper类的getSharedPreferences方法、Content类的getSharedPreferences方法、Activity类的getPreferences方法和PreferenceManager类的setSharedPreferencesMode方法中对文件权限的设置，如果设置了MODE_WORLD_READABLE或者MODE_WORLD_WRITEABLE，则该文件就可以被第三方应用所访问，就认为有该风险</p>
+<h3 id="6-1-1-修复建议"><a href="#6-1-1-修复建议" class="headerlink" title="6.1.1 修复建议"></a>6.1.1 修复建议</h3><ul>
+<li>避免使用<code>MODE_WORLD_WRITEABLE</code>和<code>MODE_WORLD_READABLE</code>模式创建进程间通信的文件，此处即为Shared Preferences</li>
+<li>避免将密码等敏感数据信息明文存储在Shared Preferences中，即使Android系统内部存储安全机制，使得内部存储文件可不让其他应用读写，但是在Android系统root之后，该安全机制将失效而导致信息泄露</li>
+<li>避免滥用<code>&quot;android:sharedUserId&quot;</code>属性，建议不要在使用<code>&quot;android:sharedUserId&quot;</code>属性的同时，对应用使用测试签名，否则其他应用拥有<code>&quot;android:sharedUserId&quot;</code>属性值和测试签名时，将会访问到内部存储文件数据</li>
+</ul>
+<h2 id="6-2-日志安全"><a href="#6-2-日志安全" class="headerlink" title="6.2 日志安全"></a>6.2 日志安全</h2><p>为了便于开发调试, Android 提供了用于日志打印输出的工具类: android.util.Log。日志输出分为不同的等级：VERBOSE（全部信息）、DEBUG（调试信息）、INFO（一般信息）、WARN（警告信息）、ERROR（错误信息）、ASSERT（断言信息）。对应的方法如下：</p>
+<table>
+<thead>
+<tr>
+<th>Log类方法</th>
+<th>级别</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>v(tag, message)</td>
+<td>VERBOSE</td>
+<td>显示全部信息</td>
+</tr>
+<tr>
+<td>d(tag, message)</td>
+<td>DEBUG</td>
+<td>显示调试信息</td>
+</tr>
+<tr>
+<td>i(tag, message)</td>
+<td>INFO</td>
+<td>显示一般信息</td>
+</tr>
+<tr>
+<td>w(tag, message)</td>
+<td>WARN</td>
+<td>显示警告信息</td>
+</tr>
+<tr>
+<td>e(tag, message)</td>
+<td>ERROR</td>
+<td>显示错误信息</td>
+</tr>
+<tr>
+<td>println(Log.ASSERT, tag, message)</td>
+<td>ASSERT</td>
+<td>显示断言信息</td>
+</tr>
+</tbody></table>
+<p>以上的日志级别从上到下依次升高，例如，当查看日志时，DEBUG 级别会输出 VERBOSE 级别的信息，而 VERBOSE 级别不会输出 DEBUG 级别的信息</p>
+<p><strong>优先级排序如下</strong>：</p>
+<ul>
+<li>VERBOSE（全部信息）——》DEBUG（调试信息）——》INFO（一般信息）——》WARN（警告信息）——》ERROR（错误信息）——》ASSERT（断言信息）</li>
+</ul>
+<p>开发者在开发应用时，通常都会埋点（插入日志）进行调试，若没有对日志信息进行管理那么就有可能导致敏感信息泄露的风险，给攻击者提供了便利。例如：通信交互的日志，造成的网络数据安全，服务器安全；用户个人信息日志，造成账号和密码的泄露；其它关键日志信息，给攻击者提供攻击的便利。</p>
+<p><strong>检查日志敏感信息的方式分为两种</strong>：</p>
+<ul>
+<li>静态检测：安全检测平台通常用的检测手段，但是误报率高，需要检测方或开发者校验，通常扫描：Log类的方法调用，System类的日志输出方法调用</li>
+<li>动态监测：使用工具直接查看日志，但需要人工操作点击软件各个信息界面，不一定可以把每种情况照顾到</li>
+</ul>
+<p>从上面的两种方式来讲，使用静态方式加校验可以把java层的日志信息很好的去掉，但是对于native层（JNI）就显的无力，那么可以考虑使用动静结合方式进行综合的评测。</p>
+<p><strong>检测方法</strong>：</p>
+<ul>
+<li>1）使用安全平台静态扫描代码，收集代码内日志输出的点</li>
+<li>2）使用工具动态查看日志的输出信息，记录敏感日志</li>
+<li>3）人工复核静态扫描的日志输出点，对敏感日志、关键信息日志进行日志关闭处理</li>
+<li>4）综合静态和动态结果，得出最终的结论</li>
+</ul>
+<p><strong>日志查看的方法</strong>：</p>
+<p>Logcat 是一个命令行工具，用于转储系统消息日志，包括设备抛出错误时的堆栈轨迹，以及从您的应用使用 Log 类写入的消息。使用 Android Studio 自带的 Logcat 工具来查看日志在 Android Studio 中查看，或从DDMS  Logcat 窗口查看日志消息，以及使用<code>adb logcat</code>命令查看</p>
+<p><img src="https://img-blog.csdnimg.cn/ba2c904ec499481585857b937d4b5f50.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h3 id="6-2-1-安全风险项"><a href="#6-2-1-安全风险项" class="headerlink" title="6.2.1 安全风险项"></a>6.2.1 安全风险项</h3><p>通常开发人员在使用日志的过程中，常常在打包 release 版本的 apk 文件时，忘记关掉相关日志代码，此时就会造成安全隐患</p>
+<p>对日志进行统一管理，当上架应用市场时，应生成一个无敏感日志信息的安装包</p>
+<ol>
+<li>被恶意程序读取敏感信息</li>
+</ol>
+<p>要读取系统日志，需要申请 <code>android.permission.READ_LOGS</code>权限。该权限在 Android 4.1 版本之前是所有应用都可以申请的，代表普通应用能够轻易获取任意应用的日志信息。在 Android 4.1 版本之后，只有系统应用才能够申请这个权限，也就是说虽然普通应用无法获取其他应用日志信息，但是在 Root的手机上，恶意应用还是可以获取其他应用日志信息的。</p>
+<ol start="2">
+<li>泄漏程序逻辑</li>
+</ol>
+<p>其实更多的场景中，日志信息可能会泄漏整个应用的逻辑，为逆向分析提供便利。一种常见的日志使用错误就是配置日志开关，在 release 版本中，只是把开关关掉。但是虽然开发人员把日志打印的代码关闭了，在正常情况下不会打印输出日志，可是所有日志记录的代码还都在，攻击者只要反编译APK重新打包 apk 或者找到对应调用日志的smali代码hook 一下将日志开关打开，就可以再次看到日志输出。</p>
+<p>当开发人员在做APP开发时，需要设置调试开关打印Log，下面列举出3种方法：</p>
+<ul>
+<li>方法一：直接赋值</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">boolean</span> <span class="hljs-variable">DEBUG</span> <span class="hljs-operator">=</span> <span class="hljs-literal">true</span>;<span class="hljs-comment">//false</span><br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>方法二：设置BuildConfig.DEBUG的值</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">boolean</span> <span class="hljs-variable">DEBUG</span> <span class="hljs-operator">=</span> BuildConfig.DEBUG；<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>方法三：设置Log.isLoggable的值</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">boolean</span> <span class="hljs-variable">DEBUG</span> <span class="hljs-operator">=</span> Log.isLoggable(TAG, Log.DEBUG)；<br></code></pre></td></tr></table></figure>
+
+<p>当然这里可能还有很多别的设置方法，由于个人局限就没有写了。下面我们来看看上面3种方法各自的特点：</p>
+<ul>
+<li>方法一比较直观明了，可以清楚的知道是否允许打印Log</li>
+<li>方法二和编译模式绑定，如果是release版的就不会打印Log，如果是debug版的话就会打印Log</li>
+<li>方法三通过设置property属性来打印Log</li>
+</ul>
+<p>从三种方法的特点来看，第一种和第二种方法至少需要编译两个版本的软件用于发布和调试，第三种方法只需要编译一个版本既可以，在需要查看Log的时候，通过设置property即可查看Log</p>
+<p>例如：以下代码，只要修改<code>getDecideResult()</code>的返回值为 true 即可</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">//各个Log级别定义的值，级别越高值越大</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> <span class="hljs-variable">VERBOSE</span> <span class="hljs-operator">=</span> <span class="hljs-number">2</span>;<br><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> <span class="hljs-variable">DEBUG</span> <span class="hljs-operator">=</span> <span class="hljs-number">3</span>;<br><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> <span class="hljs-variable">INFO</span> <span class="hljs-operator">=</span> <span class="hljs-number">4</span>;<br><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> <span class="hljs-variable">WARN</span> <span class="hljs-operator">=</span> <span class="hljs-number">5</span>;<br><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> <span class="hljs-variable">ERROR</span> <span class="hljs-operator">=</span> <span class="hljs-number">6</span>;<br><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> <span class="hljs-variable">ASSERT</span> <span class="hljs-operator">=</span> <span class="hljs-number">7</span>;<br><br></code></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">String</span> <span class="hljs-variable">TAG</span> <span class="hljs-operator">=</span> “testDemo”;<br><br><span class="hljs-keyword">private</span> <span class="hljs-type">boolean</span> <span class="hljs-variable">VERBOSE</span> <span class="hljs-operator">=</span> Log.isLoggable(TAG, Log.VERBOSE);<br><span class="hljs-keyword">private</span> <span class="hljs-type">boolean</span> <span class="hljs-variable">DEBUG</span> <span class="hljs-operator">=</span> Log.isLoggable(TAG, Log.DEBUG);<br><span class="hljs-keyword">private</span> <span class="hljs-type">boolean</span> <span class="hljs-variable">INFO</span> <span class="hljs-operator">=</span> Log.isLoggable(TAG, Log.INFO);<br><span class="hljs-keyword">private</span> <span class="hljs-type">boolean</span> <span class="hljs-variable">WARN</span> <span class="hljs-operator">=</span> Log.isLoggable(TAG, Log.WARN);<br><span class="hljs-keyword">private</span> <span class="hljs-type">boolean</span> <span class="hljs-variable">ERROR</span> <span class="hljs-operator">=</span> Log.isLoggable(TAG, Log.ERROR);<br><span class="hljs-keyword">private</span> <span class="hljs-type">boolean</span> <span class="hljs-variable">ASSERT</span> <span class="hljs-operator">=</span> Log.isLoggable(TAG, Log.ASSERT);<br><span class="hljs-keyword">private</span> <span class="hljs-type">boolean</span> <span class="hljs-variable">SUPPRESS</span> <span class="hljs-operator">=</span> Log.isLoggable(TAG, -<span class="hljs-number">1</span>);<br></code></pre></td></tr></table></figure>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs vim">adb <span class="hljs-keyword">shell</span> setprop <span class="hljs-built_in">log</span>.<span class="hljs-keyword">tag</span>.testDemo D<br></code></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">onCreate</span><span class="hljs-params">()</span>&#123;<br>    <span class="hljs-keyword">if</span> (DEBUG)&#123;<br>        Log.d(TAG, <span class="hljs-string">&quot;onCreate  WWW&quot;</span>);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>如上，当log.tag.testDeme值为D时，DEBUG在为true，Log.d()里的内容才能正常输出</p>
+<p>这里以一个实际案例，如下，我们把isLoggable设置为-1时，属性设置为DEBUG时不会输出任何日志，如下：</p>
+<p><img src="https://img-blog.csdnimg.cn/5ed045a92ee6410b9227a761331932f4.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>当APP使用Log.isLoggable并定义为全局变量时，我们可以setprop后重启app打印相关的Log。那frameworks中如果有Log.isLoggable要怎么打印呢？只需要执行下面3步即可：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs java">adb shell setprop log.tag.&lt;TAG&gt; D<br>adb shell stop<br>adb shell start<br></code></pre></td></tr></table></figure>
+
+<p>adb shell stop会杀掉zygote进程以及所有由zygote孵化而来的子进程。adb shell start则会重启zygote进程，再由zygote进程启动其它Android核心进程。当zygote重新启动时，会重新加载framework相关资源，而此时属性已经设置。</p>
+<p><img src="https://img-blog.csdnimg.cn/131d96d1afc9409db5fe8ee498ef147b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>通过<code>adb shell setprop</code>设置相应的级别和代码中Log.isLoggable设置的级别比较，当Log.isLoggable设置的级别大于或等于setprop设置的级别时，Log开关即打开，就可以打印Log了。同时，我们设置的S级别的Log，怎么样都不会打印Log。我们没有setprop任何Log级别时，默认打印的是设置Info级别的Log，从这里我们也可以知道，在实际代码Log开关定义中，最好设置成DEBUG级别，这样就可以通过setprop来设置是否需要打印Log</p>
+<p>如下设置为DEBUG时的输出，如下：</p>
+<p><img src="https://img-blog.csdnimg.cn/00919b2f74b248d2969eb38a9217979c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/9f0133e105d54fa6963788dcf260e1c6.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>代码给同学们附上，如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">package</span> com.example.testpoc4;<br><br><span class="hljs-keyword">import</span> androidx.appcompat.app.AppCompatActivity;<br><br><span class="hljs-keyword">import</span> android.os.Bundle;<br><span class="hljs-keyword">import</span> android.util.Log;<br><span class="hljs-keyword">import</span> android.widget.TextView;<br><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">MainActivity</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">AppCompatActivity</span> &#123;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">String</span> <span class="hljs-variable">TAG</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;Main&quot;</span>;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">boolean</span> <span class="hljs-variable">DEBUG</span> <span class="hljs-operator">=</span> Log.isLoggable(TAG, Log.DEBUG);<br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-keyword">protected</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">onCreate</span><span class="hljs-params">(Bundle savedInstanceState)</span> &#123;<br><br><br>        <span class="hljs-built_in">super</span>.onCreate(savedInstanceState);<br>        setContentView(R.layout.activity_main);<br><br>        <span class="hljs-keyword">if</span> (DEBUG)&#123;<br>            Log.d(TAG, <span class="hljs-string">&quot;onCreate Orangey Love5&quot;</span>);<br>        &#125;<br>    &#125;<br><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="6-2-2-缓解措施"><a href="#6-2-2-缓解措施" class="headerlink" title="6.2.2  缓解措施"></a>6.2.2  缓解措施</h3><p>可以通过在 ProGuard 中配置规则来删除对应的日志代码，例如vuls漏洞应用的代码中使用了 Log.* 和 System.out.println 记录了日志，如下：</p>
+<p><img src="https://img-blog.csdnimg.cn/71d96a41e1fa47a9806971000ec1e62f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>可以通过添加以下 ProGuard 的规则来删除相应的代码，如下：</p>
+<ol>
+<li>去掉log日志</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs java">-assumenosideeffects <span class="hljs-keyword">class</span> <span class="hljs-title class_">android</span>.util.Log&#123;<br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">v</span><span class="hljs-params">(...)</span>;<br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">i</span><span class="hljs-params">(...)</span>;<br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">w</span><span class="hljs-params">(...)</span>;<br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">d</span><span class="hljs-params">(...)</span>;<br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">e</span><span class="hljs-params">(...)</span>;<br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">println</span><span class="hljs-params">(...)</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+<ol start="2">
+<li>去掉System.out.println 和System.out.print输出</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs java">-assumenosideeffects <span class="hljs-keyword">class</span> <span class="hljs-title class_">java</span>.io.PrintStream &#123;<br>      <span class="hljs-keyword">public</span> *** println(...);<br>      <span class="hljs-keyword">public</span> *** print(...);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/68cba6deca6e4a14a352778b2e23ab8f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>此时，反编译后对应的log日志代码等都不再显示，如下：</p>
+<p><img src="https://img-blog.csdnimg.cn/85ac8ea88ea74cfc9d531fa1bbfdf2fd.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="6-3-TextView-安全"><a href="#6-3-TextView-安全" class="headerlink" title="6.3 TextView 安全"></a>6.3 TextView 安全</h2><p>TextView 是很常见安卓控件，如果不恰当使用也会造成一些安全风险。比如说以下界面，有几个安全隐患：</p>
+<ul>
+<li>显示类型</li>
+<li>截屏攻击</li>
+<li>剪切板安全</li>
+</ul>
+<h3 id="6-3-1-显示类型"><a href="#6-3-1-显示类型" class="headerlink" title="6.3.1 显示类型"></a>6.3.1 显示类型</h3><p>首先，密码框是明文显示的，容易被窥屏或者截屏获取敏感信息。可通过在 EditText 标签中指定 android:inputType 为 textPassword，来让密码进行掩码显示</p>
+<p><img src="https://img-blog.csdnimg.cn/641add3feff34fbb90aff4a1656521b9.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_13,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h3 id="6-3-2-截屏攻击"><a href="#6-3-2-截屏攻击" class="headerlink" title="6.3.2 截屏攻击"></a>6.3.2 截屏攻击</h3><p>不过在 EditText 标签中指定 android:inputType 为 textPassword，来让密码进行掩码显示并不能抵御截屏获取敏感信息。在 Android 5.0之前，要实现截屏需要有 root 权限，但Android 5.0 之后，Google 开放了录屏 API，无需 root 权限就能够截屏了。比如说以下图片中依然可以看到输入的密码明文，只是输入后变成了掩码，但只要能录屏，一样存在风险，如下图：</p>
+<p><img src="https://img-blog.csdnimg.cn/771b39c3c7944e098c92386244b0d699.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_15,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>可以在承载的 Activity 中，加入以下代码来防止截屏获取敏感信息，如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@Override</span><br><span class="hljs-keyword">protected</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">onCreate</span><span class="hljs-params">(Bundle savedInstanceState)</span> &#123;<br>        <span class="hljs-built_in">super</span>.onCreate(savedInstanceState);<br>        getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE,<br>                WindowManager.LayoutParams.FLAG_SECURE);<br>        setContentView(R.layout.activity_sp);<br><br>        etUsername = findViewById(R.id.et_sp_username);<br>        etPassword = findViewById(R.id.et_sp_password);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/22a56375d8a54810985b900fefa8b9e6.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>为了验证效果，我们做以下实验来验证：</p>
+<ul>
+<li>在以下界面（未做防护），执行命令<code>adb shell screencap -p /sdcard/1.png </code>进行截屏。</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">adb shell screencap -p /sdcard/<span class="hljs-number">1.</span>png<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/459f9a2b928d496fad192abf6242628f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>在以下界面（做了防护），执行命令<code>adb shell screencap -p /sdcard/2.png </code>进行截屏</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">adb shell screencap -p /sdcard/<span class="hljs-number">2.</span>png<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/a2dcc6fce152421bafca3fd5a56d6975.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/c04844aecc0e4c92ac963db2e76cfcdf.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>看一下截图文件，发现 1.png 大小正常而 2.png 大小为 0 字节，说明成功阻止了屏幕截图的攻击，如下图：</p>
+<p><img src="https://img-blog.csdnimg.cn/c380c7e3a4a242c8ba6aa8237791c2ca.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/af4719215cc44e6aa69d5494ad32fab1.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_15,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/0dcef35b328f40b3be27218028eac4cf.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_14,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/deac40d27e134f3588387c38fb8141bc.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_15,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h3 id="6-3-3-剪切板安全"><a href="#6-3-3-剪切板安全" class="headerlink" title="6.3.3 剪切板安全"></a>6.3.3 剪切板安全</h3><p>在 Android 中，由于 Android 操作系统的规范或 Android 操作系统提供的功能，应用程序实现难以保证安全。如果这些功能被恶意第三方滥用或被用户随意使用，就有导致信息泄露等安全问题的风险</p>
+<p>复制和粘贴是用户经常随意使用的功能。例如，许多用户使用这些功能将邮件或网页中需要记住的奇怪信息或重要信息存储在记事本中，或者从存储密码以防忘记的记事本中复制或粘贴密码。这些操作看起来非常非常正常，但实际上可能存在用户处理信息被盗的潜在风险。</p>
+<p>此风险与 Android 系统中的复制和粘贴机制有关。用户或应用程序复制的信息会存储在名为剪贴板的缓冲区中。当用户或应用程序粘贴时，剪贴板中存储的信息将分发到其他应用程序。因此，此剪贴板功能存在导致信息泄露的风险。这是因为剪贴板实体在系统中仅有一个，任何应用程序都可以使用 ClipboardManager 随时获取剪贴板中存储的信息。这意味着用户复制&#x2F;剪切的所有信息都有可能泄露给恶意应用程</p>
+<p>在文本框中经常会使用到复制粘贴的功能，这个时候数据是保存在剪切板中的。而剪切板是安卓系统提供的功能，所有的应用都可以访问，并且无需特殊权限申请。如果在剪切板中存储了敏感信息，就存在泄漏的风险。比如以下的应用通过监控剪切板内容，成功获取了身份证号码</p>
+<p><img src="https://img-blog.csdnimg.cn/03f04e5c51d7489ca7f239375a41e2f6.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_15,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>演示如下：</p>
+<p><img src="https://img-blog.csdnimg.cn/76cd0109d25545e5ae17df2cba98c2e7.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_15,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">package</span> com.example.testpoc4;<br><br><span class="hljs-keyword">import</span> androidx.appcompat.app.AppCompatActivity;<br><br><span class="hljs-keyword">import</span> android.content.ClipData;<br><span class="hljs-keyword">import</span> android.content.ClipboardManager;<br><span class="hljs-keyword">import</span> android.os.Bundle;<br><span class="hljs-keyword">import</span> android.view.View;<br><span class="hljs-keyword">import</span> android.widget.Button;<br><span class="hljs-keyword">import</span> android.widget.Toast;<br><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">MainActivity</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">AppCompatActivity</span> &#123;<br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-keyword">protected</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">onCreate</span><span class="hljs-params">(Bundle savedInstanceState)</span> &#123;<br>        <span class="hljs-built_in">super</span>.onCreate(savedInstanceState);<br>        setContentView(R.layout.activity_main);<br><br>        <span class="hljs-comment">// 获取控件id</span><br>        <span class="hljs-type">Button</span> <span class="hljs-variable">button</span> <span class="hljs-operator">=</span> findViewById(R.id.button);<br>        <span class="hljs-comment">// 监听点击事件</span><br>        button.setOnClickListener(<span class="hljs-keyword">new</span> <span class="hljs-title class_">View</span>.OnClickListener() &#123;<br>            <span class="hljs-meta">@Override</span><span class="hljs-comment">// 获取剪贴板内容并在打印出来</span><br>            <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">onClick</span><span class="hljs-params">(View v)</span> &#123;<br>                <span class="hljs-type">ClipboardManager</span> <span class="hljs-variable">cm</span> <span class="hljs-operator">=</span> (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);<br>                <span class="hljs-type">ClipData</span> <span class="hljs-variable">data</span> <span class="hljs-operator">=</span> cm.getPrimaryClip();<br>                ClipData.<span class="hljs-type">Item</span> <span class="hljs-variable">item</span> <span class="hljs-operator">=</span> data.getItemAt(<span class="hljs-number">0</span>);<br>                <span class="hljs-type">String</span> <span class="hljs-variable">content</span> <span class="hljs-operator">=</span> item.getText().toString();<br><br>                Toast.makeText(MainActivity.<span class="hljs-built_in">this</span>,content,Toast.LENGTH_SHORT).show();<br>            &#125;<br>        &#125;);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/672470063cd0434aa17f73f32fcc2c94.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h3 id="6-3-4-缓解措施"><a href="#6-3-4-缓解措施" class="headerlink" title="6.3.4 缓解措施"></a>6.3.4 缓解措施</h3><p>可以采用以下方法来禁用剪切板相关功能：</p>
+<ul>
+<li>通过禁用长按视图也可禁止复制&#x2F;剪切，可在 xml 布局文件中指定禁用长按视图在 EditText 中加入属性 android:longClickable&#x3D;”false”</li>
+</ul>
+<p>如果视图在应用程序中显示敏感信息，并且允许在视图（例如 EditText）中复制&#x2F;剪切信息，则信息可能通过剪贴板泄露。因此，必须在显示敏感信息的视图中禁用复制&#x2F;剪切</p>
+<p><img src="https://img-blog.csdnimg.cn/2ffea240e2b24fdc9ce15ce74e37ceb1.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>重写 EditText 的回调方法，从 EditText 字符串选择的菜单中删除复制&#x2F;剪切项目（从字符串选择菜单中删除 android.R.id.copy和android.R.id.cut）</li>
+</ul>
+<p>通过 TextView.setCustomSelectionActionMODECallback() 方法，可以自定义选择字符串时的菜单。通过使用此功能，如果在选择字符串时可以从菜单中删除复制&#x2F;剪切项目，用户将无法再复制&#x2F;剪切字符串。</p>
+<p><img src="https://img-blog.csdnimg.cn/4c02872f4a8d4bd4b140234cf8a837b9.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/3b1afb034656436da1456cf387531862.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="6-4-键盘缓存安全"><a href="#6-4-键盘缓存安全" class="headerlink" title="6.4 键盘缓存安全"></a>6.4 键盘缓存安全</h2><p>大部分中文应用弹出的默认键盘是简体中文输入法键盘，在输入用户名和密码的时候，如果使用简体中文输入法键盘，输入英文字符和数字字符的用户名和密码时，会自动启动系统输入法自动更正提示，然后用户的输入记录会被缓存下来</p>
+<p>系统键盘缓存最方便拿到的就是利用系统输入法自动更正的字符串输入记录。 缓存文件的地址应该是下面的这个路径：</p>
+<p><img src="https://img-blog.csdnimg.cn/7b0db127c15d4d0892229510db2d5ee5.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_12,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>导出该缓存文件，查看内容，一切输入记录都是明文存储的。因为系统不会把所有的用户输入记录都当作密码等敏感信息来处理。 一般情况下，一个常规用户高频率出现的字符串就是用户名和密码</p>
+<p>所以，一般银行客户端app输入密码时都不使用系统键盘，而使用自己定制的键盘，主要原因如下：</p>
+<ul>
+<li>避免第三方读取系统键盘缓存</li>
+<li>防止屏幕录制 （自己定制的键盘按键不加按下效果）</li>
+</ul>
+<h3 id="6-4-1-缓解措施"><a href="#6-4-1-缓解措施" class="headerlink" title="6.4.1 缓解措施"></a>6.4.1 缓解措施</h3><p>在文本框输入的内容，有时候会被输入法缓存，以提升用户体验。但是在涉及到敏感信息输入框的时候，就可能会造成信息泄漏。可以指定 android:inputType 为 textNoSuggestions 来缓解该风险，如下：</p>
+<p><img src="https://img-blog.csdnimg.cn/c57247016fb94f7dbf2ec6153b8e53fe.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><strong>注</strong>：上述涉及到的风险点通常需要根据应用的类型进行判断，例如如银行类 APP可能需要规避本文中的风险，而工具类 APP 则无需考虑大部分本文的风险点</p>
+<p><strong>参考链接</strong>：</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/u010889616/article/details/80961161">https://blog.csdn.net/u010889616/article/details/80961161</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/a39bc4b3a1a6">https://www.jianshu.com/p/a39bc4b3a1a6</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_25518029/article/details/120033975">https://blog.csdn.net/qq_25518029/article/details/120033975</a></p>
+<p><a target="_blank" rel="noopener" href="https://cloud.tencent.com/developer/article/1146619">https://cloud.tencent.com/developer/article/1146619</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_35993502/article/details/119561898">https://blog.csdn.net/qq_35993502/article/details/119561898</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.jssec.org/dl/android_securecoding_cn/6_difficult_problems.html">https://www.jssec.org/dl/android_securecoding_cn/6_difficult_problems.html</a></p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/bWjm9RRcKCuoo0NMOHC9NA">https://mp.weixin.qq.com/s/bWjm9RRcKCuoo0NMOHC9NA</a></p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/NwPjJyn0ZaCQAK3ue69wfg">https://mp.weixin.qq.com/s/NwPjJyn0ZaCQAK3ue69wfg</a></p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/QjP9Rk_ZKFjQs8dPXshnRA">https://mp.weixin.qq.com/s/QjP9Rk_ZKFjQs8dPXshnRA</a></p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/f8tIbMGG6JsutcpT47k2dw">https://mp.weixin.qq.com/s/f8tIbMGG6JsutcpT47k2dw</a></p>
+<hr>
+<p><strong>你以为你有很多路可以选择，其实你只有一条路可以走</strong></p>
+<hr>
+</div>
+
+			<link rel="stylesheet" type="text/css" href="https://qiniu.techgrow.cn/readmore/dist/hexo.css">
+			<script src="https://qiniu.techgrow.cn/readmore/dist/readmore.js" type="text/javascript"></script>
+			<script>
+			var isMobile = navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i);
+			if (!isMobile) {
+				try {
+					var plugin = new ReadmorePlugin();
+					plugin.init({
+						"id": "readmore-container",
+						"blogId": "25525-4637332244353-147",
+						"name": "橙留香Park",
+						"qrcode": "https://i.imgtg.com/2022/10/03/mjCQ1.jpg",
+						"keyword": "验证码",
+						"lockToc": "yes",
+						"type": "hexo",
+						"random": "1",
+						"interval": "60",
+						"expires": "1",
+						"height": "auto"
+					});
+				} catch(e) {
+					console.warn("readmore plugin occurred error: " + e.name + " | " + e.message);
+				}
+			}
+			</script>
+		
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/AndroidSecurity/">#AndroidSecurity</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>「干货」关于Android 数据存储与数据安全，你了解多少？</div>
+      <div>https://orangey.info/2022/09/23/124431951/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>橙留香</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年9月23日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/09/23/124604890/" title="浅析关于Android 工程模式，你必须知道的那些事">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">浅析关于Android 工程模式，你必须知道的那些事</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/09/23/124602736/" title="「干货」关于IoT安全该如何入门？你必须知道的那些事「3万字详解」">
+                        <span class="hidden-mobile">「干货」关于IoT安全该如何入门？你必须知道的那些事「3万字详解」</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  <article id="comments" lazyload>
+    
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1e96aec5ac46370916fa","clientSecret":"ee5e97a65cf34e9fe31e15ab0421a94968237f5e","repo":"ogGitalk","owner":"ananasOrangey","admin":["ananasOrangey"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '232ce4c30c5432962539f8c31b6232b3'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+  </article>
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://orangey.blog.csdn.net" target="_blank" rel="nofollow noopener"><span>橙留香CSDN博客</span></a> <i class="iconfont icon-love"></i> <a href="https://i.imgtg.com/2022/09/21/gNXxK.png" target="_blank" rel="nofollow noopener"><span>橙留香微信公众号</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

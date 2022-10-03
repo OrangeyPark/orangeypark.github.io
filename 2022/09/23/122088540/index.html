@@ -1,0 +1,1377 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="橙留香">
+  <meta name="keywords" content="橙留香车联网安全技术博客">
+  
+    <meta name="description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  Android安全付费专栏长期更新，本篇最新内容请前往：  [车联网安全自学篇] Android安全之Android的so文件分析  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;ananasorangey&#x2F;cate">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android so文件分析「详细版」">
+<meta property="og:url" content="https://orangey.info/2022/09/23/122088540/index.html">
+<meta property="og:site_name" content="车联网安全技术博客 | 橙留香">
+<meta property="og:description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  Android安全付费专栏长期更新，本篇最新内容请前往：  [车联网安全自学篇] Android安全之Android的so文件分析  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;ananasorangey&#x2F;cate">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/21/gNXxK.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/1153ba5616644713b8cf563acf05906e.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/f5a58591a77c4f67ac1788ac9e6339fc.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/089c064f4e534309b6defd286a5b3bf0.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5c6955ca925b4850b5221e80e7952337.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/cd77c3a169484bf5bf104a5ed331064d.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="article:published_time" content="2022-09-23T15:50:33.528Z">
+<meta property="article:modified_time" content="2022-09-24T16:38:55.655Z">
+<meta property="article:author" content="橙留香">
+<meta property="article:tag" content="AndroidSecurity">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+  
+  
+  
+  <title>Android so文件分析「详细版」 - 车联网安全技术博客 | 橙留香</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"orangey.info","root":"/","version":"1.9.3","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"java"},"copy_btn":false,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>橙留香</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Android so文件分析「详细版」"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-09-23 23:50" pubdate>
+          2022年9月23日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          33k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          <!-- compatible with older versions-->
+          276 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Android so文件分析「详细版」</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <div id="readmore-container"><hr>
+<p><strong>也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大</strong></p>
+<p><strong>少走了弯路，也就错过了风景，无论如何，感谢经历</strong></p>
+<hr>
+<p>Android安全付费专栏长期更新，本篇最新内容请前往：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://orangey.blog.csdn.net/article/details/122088540">[车联网安全自学篇] Android安全之Android的so文件分析</a></li>
+</ul>
+<p>更多关于Android安全的知识，可前往：<a target="_blank" rel="noopener" href="https://blog.csdn.net/ananasorangey/category11955914.html">https://blog.csdn.net/ananasorangey/category11955914.html</a></p>
+<p><img src="https://i.imgtg.com/2022/09/25/gdpGP.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><img src="https://i.imgtg.com/2022/09/21/gNXxK.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x01-前言"><a href="#0x01-前言" class="headerlink" title="0x01 前言"></a>0x01 前言</h1><p>开发Android应用时，有时候Java层的编码不能满足实现需求，就需要到C&#x2F;C++实现后生成SO文件，再用System.loadLibrary()加载进行调用，成为JNI层的实现。常见的场景如：加解密算法，音视频编解码等。在生成SO文件时，需要考虑适配市面上不同手机CPU架构，而生成支持不同平台的SO文件进行兼容。目前Android共支持七种不同类型的CPU架构，分别是：ARMv5，ARMv7 (从2010年起)，x86 (从2011年起)，MIPS (从2012年起)，ARMv8，MIPS64和x86_64 (从2014年起)</p>
+<p>so库一般是程序里面核心代码块，通过Android提供的NDK技术将核心代码用安全性更高的C&#x2F;C++语言实现并提供给Java层调用来保证程序核心代码的安全。</p>
+<p>高性能的代码一般都会采取C&#x2F;C++实现，通过Android的NDK技术来让Java层直接使用。其安全性相对于Java会高很多，相对于Java代码来说其反编译难度要大很多，但对于经验丰富的破解者来说，仍然是很容易的事，可以通过暴力破解或国外高价工具来将其破解。应用的关键性功能或算法，都会在so中实现，如果so被逆向，应用的关键性代码和算法都将会暴露</p>
+<p><strong>注</strong>：elf 文件是 linux 底下二进制文件，可以理解为 windows 下的PE文件，在 Android 中可以比作dll，方便函数的移植，在常用于保护 Android 软件，增加逆向难度。</p>
+<ul>
+<li>解析 elf 文件有啥子用？<br>1、so 加固<br>2、用于 frida(xposed) 的检测</li>
+</ul>
+<h1 id="0x02-ELF文件格式解析"><a href="#0x02-ELF文件格式解析" class="headerlink" title="0x02 ELF文件格式解析"></a>0x02 ELF文件格式解析</h1><p>可执行和可链接格式(Executable and Linkable Format，缩写为ELF)，常被称为ELF格式，在计算机科学中，是一种用于执行档、目的档、共享库和核心转储的标准文件格式</p>
+<p>so 文件大体上可分为四部分，一般来说从上往下是ELF头部-&gt;Pargarm头部-&gt;节区(Section)-&gt;节区头，其中，除了ELF头部在文件位置固定不变外，其余三部分的位置都不固定。整体结构图可以参考非虫大佬的那张图，图片如下：</p>
+<p><img src="https://img-blog.csdnimg.cn/1153ba5616644713b8cf563acf05906e.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/qintangtao/android.cracking.doc/blob/master/ELF%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F%E5%88%86%E6%9E%90-%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%AE%9E%E9%AA%8C%E5%AE%A4.pdf">https://github.com/qintangtao/android.cracking.doc/blob/master/ELF%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F%E5%88%86%E6%9E%90-%E5%8C%97%E4%BA%AC%E5%A4%A7%E5%AD%A6%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%AE%9E%E9%AA%8C%E5%AE%A4.pdf</a></p>
+<h2 id="2-1-ultraedit工具"><a href="#2-1-ultraedit工具" class="headerlink" title="2.1 ultraedit工具"></a>2.1 ultraedit工具</h2><p>地址：<a target="_blank" rel="noopener" href="http://www.ultraedit.cn/">http://www.ultraedit.cn</a></p>
+<h2 id="2-2-ELF文件主四种类型"><a href="#2-2-ELF文件主四种类型" class="headerlink" title="2.2 ELF文件主四种类型"></a>2.2 ELF文件主四种类型</h2><ul>
+<li>可重定位文件（Relocatable File） 包含适合于与其他目标文件链接来创建可执行文件或者共享目标文件的代码和数据</li>
+<li>可执行文件（Executable File） 包含适合于执行的一个程序，此文件规定了 exec() 如何创建一个程序的进程映像</li>
+<li>共享目标文件（Shared Object File） 包含可在两种上下文中链接的代码和数据。首先链接编辑器可以将它和其它可重定位文件和共享目标文件一起处理，生成另外一个目标文件。其次，动态链接器（Dynamic Linker）可能将它与某个可执行文件以及其它共享目标一起组合，创建进程映像</li>
+</ul>
+<p>Android中so文件就是ELF文件，所以我们需要了解ELF文件的格式。如何详细了解ELF文件？最好的方法就是手动写一个工具类来解析一个ELF文件</p>
+<h2 id="2-3-cygwin安装教程"><a href="#2-3-cygwin安装教程" class="headerlink" title="2.3 cygwin安装教程"></a>2.3 cygwin安装教程</h2><p>Windows ELF文件解析工具：<a target="_blank" rel="noopener" href="https://cygwin.com/">https://cygwin.com</a></p>
+<p>安装如下工具包：</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs awk">binutils:		<span class="hljs-regexp">//</span> 工具集，用于编译 c<br>gcc-core:		<span class="hljs-regexp">//</span> 编译 c<br>gcc-g++			<span class="hljs-regexp">//</span> 编译 c++<br>gcc-mingw-core:	<span class="hljs-regexp">//</span> windows 编译 c（不一定需要）<br>gdb:			<span class="hljs-regexp">//</span> 调试<br>make:			<span class="hljs-regexp">//</span> makefile<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/f5a58591a77c4f67ac1788ac9e6339fc.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><img src="https://img-blog.csdnimg.cn/089c064f4e534309b6defd286a5b3bf0.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>然后配置环境变量</p>
+<figure class="highlight livescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs livescript">cygwin64安装路径<span class="hljs-string">\bin</span><br>cygwin64安装路径<span class="hljs-string">\sbin</span><br>cygwin64安装路径<span class="hljs-string">\usr\sbin</span><br><br></code></pre></td></tr></table></figure>
+<p>然后运行一下查看是否安装成功</p>
+<figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs ada">$cygcheck.exe -c cygwin<br>Cygwin <span class="hljs-keyword">Package</span> <span class="hljs-title">Information</span><br><span class="hljs-keyword">Package</span>              <span class="hljs-title">Version        Status</span><br>cygwin               <span class="hljs-number">3.3</span>.<span class="hljs-number">2</span>-<span class="hljs-number">1</span>        OK<br></code></pre></td></tr></table></figure>
+
+
+<h1 id="0x03-Linux-下的readelf命令"><a href="#0x03-Linux-下的readelf命令" class="headerlink" title="0x03 Linux 下的readelf命令"></a>0x03 Linux 下的readelf命令</h1><ul>
+<li><p>查看so文件的头部信息</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs c">$ readelf -h libsqlite.so<br>ELF Header:<br>  Magic:   <span class="hljs-number">7f</span> <span class="hljs-number">45</span> <span class="hljs-number">4</span>c <span class="hljs-number">46</span> <span class="hljs-number">01</span> <span class="hljs-number">01</span> <span class="hljs-number">01</span> <span class="hljs-number">00</span> <span class="hljs-number">00</span> <span class="hljs-number">00</span> <span class="hljs-number">00</span> <span class="hljs-number">00</span> <span class="hljs-number">00</span> <span class="hljs-number">00</span> <span class="hljs-number">00</span> <span class="hljs-number">00</span> <br>  Class:                             ELF32<br>  Data:                              <span class="hljs-number">2&#x27;</span>s complement, little endian<br>  Version:                           <span class="hljs-number">1</span> (current)<br>  OS/ABI:                            UNIX - System V<br>  ABI Version:                       <span class="hljs-number">0</span><br>  Type:                              DYN (Shared object file)<br>  Machine:                           Intel <span class="hljs-number">80386</span><br>  Version:                           <span class="hljs-number">0x1</span><br>  Entry point address:               <span class="hljs-number">0x0</span><br>  Start of program headers:          <span class="hljs-number">52</span> (bytes into file)<br>  Start of section headers:          <span class="hljs-number">651124</span> (bytes into file)<br>  Flags:                             <span class="hljs-number">0x0</span><br>  Size of this header:               <span class="hljs-number">52</span> (bytes)<br>  Size of program headers:           <span class="hljs-number">32</span> (bytes)<br>  Number of program headers:         <span class="hljs-number">7</span><br>  Size of section headers:           <span class="hljs-number">40</span> (bytes)<br>  Number of section headers:         <span class="hljs-number">23</span><br>  Section header <span class="hljs-built_in">string</span> table index: <span class="hljs-number">22</span><br></code></pre></td></tr></table></figure>
+</li>
+<li><p>查看so文件的节（Section）头的信息</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br></pre></td><td class="code"><pre><code class="hljs c">$ readelf -s libsqlite.so<br>Symbol table <span class="hljs-string">&#x27;.dynsym&#x27;</span> contains <span class="hljs-number">262</span> entries:<br>   Num:    Value  Size Type    Bind   Vis      Ndx Name<br>     <span class="hljs-number">0</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> NOTYPE  LOCAL  DEFAULT  UND <br>     <span class="hljs-number">1</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND __cxa_finalize<br>     <span class="hljs-number">2</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND __cxa_atexit<br>     <span class="hljs-number">3</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND __stack_chk_fail<br>     <span class="hljs-number">4</span>: <span class="hljs-number">00008</span>ab0    <span class="hljs-number">35</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_compileoption_get<br>     <span class="hljs-number">5</span>: <span class="hljs-number">00008b</span>80    <span class="hljs-number">39</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_mutex_free<br>     <span class="hljs-number">6</span>: <span class="hljs-number">00008b</span>b0    <span class="hljs-number">39</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_mutex_enter<br>     <span class="hljs-number">7</span>: <span class="hljs-number">00008b</span>e0    <span class="hljs-number">41</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_mutex_try<br>     <span class="hljs-number">8</span>: <span class="hljs-number">00008</span>c10    <span class="hljs-number">39</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_mutex_leave<br>     <span class="hljs-number">9</span>: <span class="hljs-number">00008</span>c40    <span class="hljs-number">78</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_vfs_unregister<br>    <span class="hljs-number">10</span>: <span class="hljs-number">00008</span>d20     <span class="hljs-number">3</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_release_memory<br>    <span class="hljs-number">11</span>: <span class="hljs-number">00008e20</span>    <span class="hljs-number">40</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_msize<br>    <span class="hljs-number">12</span>: <span class="hljs-number">00009000</span>   <span class="hljs-number">168</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_stricmp<br>    <span class="hljs-number">13</span>: <span class="hljs-number">000090b</span>0   <span class="hljs-number">159</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_strnicmp<br>    <span class="hljs-number">14</span>: <span class="hljs-number">00009150</span>   <span class="hljs-number">230</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_compileoption_use<br>    <span class="hljs-number">15</span>: <span class="hljs-number">0007f</span>26c   <span class="hljs-number">381</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> __moddi3<br>    <span class="hljs-number">16</span>: <span class="hljs-number">0007f</span>106   <span class="hljs-number">358</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> __divdi3<br>    <span class="hljs-number">17</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> OBJECT  GLOBAL DEFAULT  UND __stack_chk_guard<br>    <span class="hljs-number">18</span>: <span class="hljs-number">0000b</span>2b0     <span class="hljs-number">8</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_backup_remaining<br>    <span class="hljs-number">19</span>: <span class="hljs-number">0000b</span>2c0     <span class="hljs-number">8</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_backup_pagecount<br>    <span class="hljs-number">20</span>: <span class="hljs-number">0000b</span>3a0    <span class="hljs-number">27</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_sql<br>    <span class="hljs-number">21</span>: <span class="hljs-number">0000b</span>3c0    <span class="hljs-number">31</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_value_type<br>    <span class="hljs-number">22</span>: <span class="hljs-number">0000b</span>3e0    <span class="hljs-number">11</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_user_data<br>    <span class="hljs-number">23</span>: <span class="hljs-number">0000b</span>3f0    <span class="hljs-number">10</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_context_db_handle<br>    <span class="hljs-number">24</span>: <span class="hljs-number">0000b</span>400    <span class="hljs-number">59</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_get_auxdata<br>    <span class="hljs-number">25</span>: <span class="hljs-number">0000b</span>440    <span class="hljs-number">19</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_column_count<br>    <span class="hljs-number">26</span>: <span class="hljs-number">0000b</span>460    <span class="hljs-number">27</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_data_count<br>    <span class="hljs-number">27</span>: <span class="hljs-number">0000b</span>480    <span class="hljs-number">19</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_bind_parameter_co<br>    <span class="hljs-number">28</span>: <span class="hljs-number">0000b</span>4a0    <span class="hljs-number">35</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_bind_parameter_na<br>    <span class="hljs-number">29</span>: <span class="hljs-number">0000b</span>4d0    <span class="hljs-number">19</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_db_handle<br>    <span class="hljs-number">30</span>: <span class="hljs-number">0000b</span>4f0    <span class="hljs-number">30</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_stmt_readonly<br>    <span class="hljs-number">31</span>: <span class="hljs-number">0000b</span>510    <span class="hljs-number">33</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_stmt_busy<br>    <span class="hljs-number">32</span>: <span class="hljs-number">0000b</span>540    <span class="hljs-number">77</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_next_stmt<br>    <span class="hljs-number">33</span>: <span class="hljs-number">0000b</span>590    <span class="hljs-number">34</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_stmt_status<br>    <span class="hljs-number">34</span>: <span class="hljs-number">0000b</span>6d0    <span class="hljs-number">27</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_blob_bytes<br>    <span class="hljs-number">35</span>: <span class="hljs-number">0000b</span>b50    <span class="hljs-number">95</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_set_authorizer<br>    <span class="hljs-number">36</span>: <span class="hljs-number">0000</span>c510    <span class="hljs-number">60</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_strglob<br>    <span class="hljs-number">37</span>: <span class="hljs-number">0000</span>c6d0   <span class="hljs-number">182</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_cancel_auto_exten<br>    <span class="hljs-number">38</span>: <span class="hljs-number">0000</span>ca80    <span class="hljs-number">28</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_vtab_on_conflict<br>    <span class="hljs-number">39</span>: <span class="hljs-number">0000</span>cfe0   <span class="hljs-number">899</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_complete<br>    <span class="hljs-number">40</span>: <span class="hljs-number">0000</span>d370    <span class="hljs-number">18</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_libversion<br>    <span class="hljs-number">41</span>: <span class="hljs-number">00087</span>c00     <span class="hljs-number">9</span> OBJECT  GLOBAL DEFAULT    <span class="hljs-number">8</span> sqlite3_version<br>    <span class="hljs-number">42</span>: <span class="hljs-number">0000</span>d390    <span class="hljs-number">18</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_sourceid<br>    <span class="hljs-number">43</span>: <span class="hljs-number">0000</span>d3b0     <span class="hljs-number">6</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_libversion_number<br>    <span class="hljs-number">44</span>: <span class="hljs-number">0000</span>d3c0     <span class="hljs-number">6</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_threadsafe<br>    <span class="hljs-number">45</span>: <span class="hljs-number">0000</span>d3d0     <span class="hljs-number">8</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_db_mutex<br>    <span class="hljs-number">46</span>: <span class="hljs-number">0000</span>d3e0   <span class="hljs-number">115</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_db_release_memory<br>    <span class="hljs-number">47</span>: <span class="hljs-number">0000</span>d4b0    <span class="hljs-number">11</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_last_insert_rowid<br>    <span class="hljs-number">48</span>: <span class="hljs-number">0000</span>d4c0     <span class="hljs-number">8</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_changes<br>    <span class="hljs-number">49</span>: <span class="hljs-number">0000</span>d4d0     <span class="hljs-number">8</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_total_changes<br>    <span class="hljs-number">50</span>: <span class="hljs-number">0000</span>d560    <span class="hljs-number">92</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_busy_handler<br>    <span class="hljs-number">51</span>: <span class="hljs-number">0000</span>d5c0    <span class="hljs-number">15</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_interrupt<br>    <span class="hljs-number">52</span>: <span class="hljs-number">0000</span>d5d0    <span class="hljs-number">80</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_trace<br>    <span class="hljs-number">53</span>: <span class="hljs-number">0000</span>d620    <span class="hljs-number">80</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_profile<br>    <span class="hljs-number">54</span>: <span class="hljs-number">0000</span>d670    <span class="hljs-number">80</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_commit_hook<br>    <span class="hljs-number">55</span>: <span class="hljs-number">0000</span>d6c0    <span class="hljs-number">80</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_update_hook<br>    <span class="hljs-number">56</span>: <span class="hljs-number">0000</span>d710    <span class="hljs-number">80</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_rollback_hook<br>    <span class="hljs-number">57</span>: <span class="hljs-number">0000</span>d760    <span class="hljs-number">80</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_wal_hook<br>    <span class="hljs-number">58</span>: <span class="hljs-number">0000</span>d7b0    <span class="hljs-number">71</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_limit<br>    <span class="hljs-number">59</span>: <span class="hljs-number">0000</span>d800    <span class="hljs-number">82</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_collation_needed<br>    <span class="hljs-number">60</span>: <span class="hljs-number">0000</span>d860    <span class="hljs-number">82</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_collation_needed1<br>    <span class="hljs-number">61</span>: <span class="hljs-number">0000</span>d8c0     <span class="hljs-number">9</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_get_autocommit<br>    <span class="hljs-number">62</span>: <span class="hljs-number">0000</span>d8d0    <span class="hljs-number">70</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_extended_result_c<br>    <span class="hljs-number">63</span>: <span class="hljs-number">0000</span>d9d0   <span class="hljs-number">143</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_file_control<br>    <span class="hljs-number">64</span>: <span class="hljs-number">0000</span>da60    <span class="hljs-number">68</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_db_filename<br>    <span class="hljs-number">65</span>: <span class="hljs-number">0000</span>dab0    <span class="hljs-number">43</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_db_readonly<br>    <span class="hljs-number">66</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND <span class="hljs-built_in">memset</span><br>    <span class="hljs-number">67</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND <span class="hljs-built_in">memcpy</span><br>    <span class="hljs-number">68</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND <span class="hljs-built_in">strcmp</span><br>    <span class="hljs-number">69</span>: <span class="hljs-number">0000e970</span>   <span class="hljs-number">256</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_uri_parameter<br>    <span class="hljs-number">70</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND pthread_mutex_unlock<br>    <span class="hljs-number">71</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND pthread_mutex_trylock<br>    <span class="hljs-number">72</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND pthread_mutex_lock<br>    <span class="hljs-number">73</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND sysconf<br>    <span class="hljs-number">74</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND geteuid<br>    <span class="hljs-number">75</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND fchown<br>    <span class="hljs-number">76</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND __errno<br>    <span class="hljs-number">77</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND open<br>    <span class="hljs-number">78</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND lseek64<br>    <span class="hljs-number">79</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND gettimeofday<br>    <span class="hljs-number">80</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND sleep<br>    <span class="hljs-number">81</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND dlclose<br>    <span class="hljs-number">82</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND dlsym<br>    <span class="hljs-number">83</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND dlopen<br>    <span class="hljs-number">84</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND <span class="hljs-built_in">memcmp</span><br>    <span class="hljs-number">85</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND <span class="hljs-built_in">strncmp</span><br>    <span class="hljs-number">86</span>: <span class="hljs-number">0000f</span>700    <span class="hljs-number">75</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_bind_parameter_in<br>    <span class="hljs-number">87</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND <span class="hljs-built_in">free</span><br>    <span class="hljs-number">88</span>: <span class="hljs-number">000108e0</span>   <span class="hljs-number">122</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_free<br>    <span class="hljs-number">89</span>: <span class="hljs-number">00011190</span>    <span class="hljs-number">92</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_free_table<br>    <span class="hljs-number">90</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND pthread_mutex_destroy<br>    <span class="hljs-number">91</span>: <span class="hljs-number">00011e60</span>    <span class="hljs-number">17</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_result_double<br>    <span class="hljs-number">92</span>: <span class="hljs-number">00011</span>ec0    <span class="hljs-number">55</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_result_int<br>    <span class="hljs-number">93</span>: <span class="hljs-number">00011f</span>80    <span class="hljs-number">55</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_result_int64<br>    <span class="hljs-number">94</span>: <span class="hljs-number">00012000</span>    <span class="hljs-number">29</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_result_null<br>    <span class="hljs-number">95</span>: <span class="hljs-number">00012020</span>    <span class="hljs-number">65</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_result_error_nome<br>    <span class="hljs-number">96</span>: <span class="hljs-number">000120</span>d0   <span class="hljs-number">141</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_clear_bindings<br>    <span class="hljs-number">97</span>: <span class="hljs-number">00012160</span>    <span class="hljs-number">63</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_result_zeroblob<br>    <span class="hljs-number">98</span>: <span class="hljs-number">00014</span>aa0    <span class="hljs-number">18</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_value_int<br>    <span class="hljs-number">99</span>: <span class="hljs-number">00014</span>ac0     <span class="hljs-number">9</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_value_int64<br>   <span class="hljs-number">100</span>: <span class="hljs-number">00014</span>c20    <span class="hljs-number">28</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_value_double<br>   <span class="hljs-number">101</span>: <span class="hljs-number">00014</span>ce0    <span class="hljs-number">72</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_value_numeric_typ<br>   <span class="hljs-number">102</span>: <span class="hljs-number">00016</span>df0   <span class="hljs-number">238</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_db_config<br>   <span class="hljs-number">103</span>: <span class="hljs-number">00016f</span>90    <span class="hljs-number">39</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_errstr<br>   <span class="hljs-number">104</span>: <span class="hljs-number">00017000</span>   <span class="hljs-number">106</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_busy_timeout<br>   <span class="hljs-number">105</span>: <span class="hljs-number">00017070</span>   <span class="hljs-number">100</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_wal_autocheckpoin<br>   <span class="hljs-number">106</span>: <span class="hljs-number">000176</span>d0   <span class="hljs-number">211</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_set_auxdata<br>   <span class="hljs-number">107</span>: <span class="hljs-number">00018510</span>    <span class="hljs-number">62</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_column_double<br>   <span class="hljs-number">108</span>: <span class="hljs-number">00018550</span>    <span class="hljs-number">60</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_column_int<br>   <span class="hljs-number">109</span>: <span class="hljs-number">00018590</span>    <span class="hljs-number">70</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_column_int64<br>   <span class="hljs-number">110</span>: <span class="hljs-number">000185e0</span>    <span class="hljs-number">58</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_column_value<br>   <span class="hljs-number">111</span>: <span class="hljs-number">00018620</span>    <span class="hljs-number">60</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_column_type<br>   <span class="hljs-number">112</span>: <span class="hljs-number">00018e50</span>    <span class="hljs-number">91</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_uri_int64<br>   <span class="hljs-number">113</span>: <span class="hljs-number">0001</span>a190    <span class="hljs-number">79</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_uri_boolean<br>   <span class="hljs-number">114</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND pthread_mutexattr_init<br>   <span class="hljs-number">115</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND pthread_mutexattr_settype<br>   <span class="hljs-number">116</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND pthread_mutex_init<br>   <span class="hljs-number">117</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND pthread_mutexattr_destroy<br>   <span class="hljs-number">118</span>: <span class="hljs-number">0001</span>afe0    <span class="hljs-number">34</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_column_name16<br>   <span class="hljs-number">119</span>: <span class="hljs-number">00028310</span>    <span class="hljs-number">14</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_value_text16<br>   <span class="hljs-number">120</span>: <span class="hljs-number">0001b</span>010    <span class="hljs-number">34</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_column_name<br>   <span class="hljs-number">121</span>: <span class="hljs-number">000264</span>a0    <span class="hljs-number">14</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_value_text<br>   <span class="hljs-number">122</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND utimes<br>   <span class="hljs-number">123</span>: <span class="hljs-number">0001</span>d8e0   <span class="hljs-number">982</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_db_status<br>   <span class="hljs-number">124</span>: <span class="hljs-number">0001f</span>1c0     <span class="hljs-number">3</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_os_end<br>   <span class="hljs-number">125</span>: <span class="hljs-number">0001f</span>1d0    <span class="hljs-number">81</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_enable_load_exten<br>   <span class="hljs-number">126</span>: <span class="hljs-number">0001f</span>230  <span class="hljs-number">1174</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_config<br>   <span class="hljs-number">127</span>: <span class="hljs-number">0001f</span>6d0  <span class="hljs-number">1404</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_initialize<br>   <span class="hljs-number">128</span>: <span class="hljs-number">0001f</span>f10    <span class="hljs-number">65</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_malloc<br>   <span class="hljs-number">129</span>: <span class="hljs-number">0001f</span>dd0   <span class="hljs-number">111</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_os_init<br>   <span class="hljs-number">130</span>: <span class="hljs-number">0001f</span>c50   <span class="hljs-number">155</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_vfs_find<br>   <span class="hljs-number">131</span>: <span class="hljs-number">0001f</span>cf0    <span class="hljs-number">77</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_sleep<br>   <span class="hljs-number">132</span>: <span class="hljs-number">0001f</span>d40   <span class="hljs-number">137</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_vfs_register<br>   <span class="hljs-number">133</span>: <span class="hljs-number">0001f</span>e40    <span class="hljs-number">89</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_mutex_alloc<br>   <span class="hljs-number">134</span>: <span class="hljs-number">00020060</span>    <span class="hljs-number">54</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_malloc64<br>   <span class="hljs-number">135</span>: <span class="hljs-number">000200</span>a0    <span class="hljs-number">70</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_realloc<br>   <span class="hljs-number">136</span>: <span class="hljs-number">000200f</span>0    <span class="hljs-number">75</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_realloc64<br>   <span class="hljs-number">137</span>: <span class="hljs-number">00020490</span>    <span class="hljs-number">36</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_aggregate_context<br>   <span class="hljs-number">138</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND memmove<br>   <span class="hljs-number">139</span>: <span class="hljs-number">00020</span>cc0    <span class="hljs-number">50</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_result_error<br>   <span class="hljs-number">140</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND localtime<br>   <span class="hljs-number">141</span>: <span class="hljs-number">00021170</span>    <span class="hljs-number">50</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_result_error16<br>   <span class="hljs-number">142</span>: <span class="hljs-number">000211b</span>0   <span class="hljs-number">105</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_result_error_code<br>   <span class="hljs-number">143</span>: <span class="hljs-number">00021220</span>    <span class="hljs-number">73</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_result_error_toob<br>   <span class="hljs-number">144</span>: <span class="hljs-number">000213f</span>0    <span class="hljs-number">39</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_result_blob<br>   <span class="hljs-number">145</span>: <span class="hljs-number">000214f</span>0    <span class="hljs-number">39</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_result_text<br>   <span class="hljs-number">146</span>: <span class="hljs-number">00021710</span>    <span class="hljs-number">39</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_result_text16<br>   <span class="hljs-number">147</span>: <span class="hljs-number">00021740</span>    <span class="hljs-number">39</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_result_text16be<br>   <span class="hljs-number">148</span>: <span class="hljs-number">00021770</span>    <span class="hljs-number">39</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_result_text16le<br>   <span class="hljs-number">149</span>: <span class="hljs-number">000217</span>a0    <span class="hljs-number">68</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_result_blob64<br>   <span class="hljs-number">150</span>: <span class="hljs-number">000217f</span>0   <span class="hljs-number">117</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_result_text64<br>   <span class="hljs-number">151</span>: <span class="hljs-number">000221e0</span>    <span class="hljs-number">15</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_result_value<br>   <span class="hljs-number">152</span>: <span class="hljs-number">0007f</span>4fc   <span class="hljs-number">317</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> __umoddi3<br>   <span class="hljs-number">153</span>: <span class="hljs-number">0007f</span>3e9   <span class="hljs-number">275</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> __udivdi3<br>   <span class="hljs-number">154</span>: <span class="hljs-number">00026090</span>    <span class="hljs-number">99</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_vsnprintf<br>   <span class="hljs-number">155</span>: <span class="hljs-number">00026100</span>    <span class="hljs-number">58</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_snprintf<br>   <span class="hljs-number">156</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND dlerror<br>   <span class="hljs-number">157</span>: <span class="hljs-number">00026400</span>    <span class="hljs-number">14</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_value_bytes<br>   <span class="hljs-number">158</span>: <span class="hljs-number">00026410</span>    <span class="hljs-number">60</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_column_bytes<br>   <span class="hljs-number">159</span>: <span class="hljs-number">00026450</span>    <span class="hljs-number">14</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_value_bytes16<br>   <span class="hljs-number">160</span>: <span class="hljs-number">00026460</span>    <span class="hljs-number">60</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_column_bytes16<br>   <span class="hljs-number">161</span>: <span class="hljs-number">000264f</span>0    <span class="hljs-number">79</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_value_blob<br>   <span class="hljs-number">162</span>: <span class="hljs-number">00026600</span>    <span class="hljs-number">60</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_column_blob<br>   <span class="hljs-number">163</span>: <span class="hljs-number">00026860</span>    <span class="hljs-number">60</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_column_text<br>   <span class="hljs-number">164</span>: <span class="hljs-number">00028320</span>    <span class="hljs-number">60</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_column_text16<br>   <span class="hljs-number">165</span>: <span class="hljs-number">00028360</span>    <span class="hljs-number">14</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_value_text16be<br>   <span class="hljs-number">166</span>: <span class="hljs-number">00028370</span>    <span class="hljs-number">14</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_value_text16le<br>   <span class="hljs-number">167</span>: <span class="hljs-number">00029970</span>   <span class="hljs-number">199</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_log<br>   <span class="hljs-number">168</span>: <span class="hljs-number">00029</span>a90   <span class="hljs-number">178</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_status64<br>   <span class="hljs-number">169</span>: <span class="hljs-number">00029b</span>50    <span class="hljs-number">82</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_status<br>   <span class="hljs-number">170</span>: <span class="hljs-number">00029b</span>b0    <span class="hljs-number">67</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_memory_used<br>   <span class="hljs-number">171</span>: <span class="hljs-number">00029</span>c00    <span class="hljs-number">67</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_memory_highwater<br>   <span class="hljs-number">172</span>: <span class="hljs-number">00029</span>d90    <span class="hljs-number">39</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_create_module<br>   <span class="hljs-number">173</span>: <span class="hljs-number">00029</span>dc0    <span class="hljs-number">39</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_create_module_v2<br>   <span class="hljs-number">174</span>: <span class="hljs-number">00029</span>df0   <span class="hljs-number">134</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_vtab_config<br>   <span class="hljs-number">175</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND <span class="hljs-built_in">strlen</span><br>   <span class="hljs-number">176</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND getpid<br>   <span class="hljs-number">177</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND time<br>   <span class="hljs-number">178</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND fsync<br>   <span class="hljs-number">179</span>: <span class="hljs-number">0002</span>d430    <span class="hljs-number">79</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_errcode<br>   <span class="hljs-number">180</span>: <span class="hljs-number">0002</span>d480    <span class="hljs-number">79</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_extended_errcode<br>   <span class="hljs-number">181</span>: <span class="hljs-number">0002</span>d4d0   <span class="hljs-number">200</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_errmsg<br>   <span class="hljs-number">182</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND <span class="hljs-built_in">realloc</span><br>   <span class="hljs-number">183</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND <span class="hljs-built_in">malloc</span><br>   <span class="hljs-number">184</span>: <span class="hljs-number">0002</span>d9d0    <span class="hljs-number">49</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_bind_blob<br>   <span class="hljs-number">185</span>: <span class="hljs-number">0002</span>da10    <span class="hljs-number">83</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_bind_blob64<br>   <span class="hljs-number">186</span>: <span class="hljs-number">0002</span>da70    <span class="hljs-number">49</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_bind_text<br>   <span class="hljs-number">187</span>: <span class="hljs-number">0002</span>dab0   <span class="hljs-number">130</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_bind_text64<br>   <span class="hljs-number">188</span>: <span class="hljs-number">0002</span>db40    <span class="hljs-number">49</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_bind_text16<br>   <span class="hljs-number">189</span>: <span class="hljs-number">0002</span>db80   <span class="hljs-number">100</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_bind_double<br>   <span class="hljs-number">190</span>: <span class="hljs-number">0002</span>dbf0   <span class="hljs-number">126</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_bind_int64<br>   <span class="hljs-number">191</span>: <span class="hljs-number">0002</span>dc70    <span class="hljs-number">57</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_bind_int<br>   <span class="hljs-number">192</span>: <span class="hljs-number">0002</span>dcb0    <span class="hljs-number">64</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_bind_null<br>   <span class="hljs-number">193</span>: <span class="hljs-number">0002</span>dcf0   <span class="hljs-number">126</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_bind_zeroblob<br>   <span class="hljs-number">194</span>: <span class="hljs-number">0002</span>dd70   <span class="hljs-number">329</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_bind_value<br>   <span class="hljs-number">195</span>: <span class="hljs-number">0002e300</span>   <span class="hljs-number">331</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_create_function_v<br>   <span class="hljs-number">196</span>: <span class="hljs-number">0002e450</span>    <span class="hljs-number">98</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_create_function<br>   <span class="hljs-number">197</span>: <span class="hljs-number">0002e4</span>c0   <span class="hljs-number">162</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_create_function16<br>   <span class="hljs-number">198</span>: <span class="hljs-number">0002e570</span>   <span class="hljs-number">230</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_overload_function<br>   <span class="hljs-number">199</span>: <span class="hljs-number">0002e820</span>   <span class="hljs-number">108</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_create_collation_<br>   <span class="hljs-number">200</span>: <span class="hljs-number">0002e890</span>    <span class="hljs-number">74</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_create_collation<br>   <span class="hljs-number">201</span>: <span class="hljs-number">0002e8</span>e0   <span class="hljs-number">145</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_create_collation1<br>   <span class="hljs-number">202</span>: <span class="hljs-number">0002e980</span>   <span class="hljs-number">210</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_errmsg16<br>   <span class="hljs-number">203</span>: <span class="hljs-number">0003</span>ac00   <span class="hljs-number">228</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_soft_heap_limit64<br>   <span class="hljs-number">204</span>: <span class="hljs-number">0003</span>acf0    <span class="hljs-number">48</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_soft_heap_limit<br>   <span class="hljs-number">205</span>: <span class="hljs-number">0003</span>ad20   <span class="hljs-number">168</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_vmprintf<br>   <span class="hljs-number">206</span>: <span class="hljs-number">0003</span>add0    <span class="hljs-number">55</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_mprintf<br>   <span class="hljs-number">207</span>: <span class="hljs-number">0003b</span>600  <span class="hljs-number">1427</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_load_extension<br>   <span class="hljs-number">208</span>: <span class="hljs-number">0003</span>c0c0   <span class="hljs-number">576</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_randomness<br>   <span class="hljs-number">209</span>: <span class="hljs-number">0009f</span>e64     <span class="hljs-number">4</span> OBJECT  GLOBAL DEFAULT   <span class="hljs-number">19</span> sqlite3_temp_directory<br>   <span class="hljs-number">210</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND getenv<br>   <span class="hljs-number">211</span>: <span class="hljs-number">0004</span>a020  <span class="hljs-number">1917</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_backup_step<br>   <span class="hljs-number">212</span>: <span class="hljs-number">0004</span>c4f0   <span class="hljs-number">320</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_backup_init<br>   <span class="hljs-number">213</span>: <span class="hljs-number">0005b</span>b30   <span class="hljs-number">219</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_backup_finish<br>   <span class="hljs-number">214</span>: <span class="hljs-number">0005b</span>d60    <span class="hljs-number">11</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_close<br>   <span class="hljs-number">215</span>: <span class="hljs-number">0005b</span>d70    <span class="hljs-number">14</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_close_v2<br>   <span class="hljs-number">216</span>: <span class="hljs-number">0005</span>c430   <span class="hljs-number">240</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_wal_checkpoint_v2<br>   <span class="hljs-number">217</span>: <span class="hljs-number">0005</span>c520    <span class="hljs-number">66</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_wal_checkpoint<br>   <span class="hljs-number">218</span>: <span class="hljs-number">0005</span>d2f0   <span class="hljs-number">135</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_finalize<br>   <span class="hljs-number">219</span>: <span class="hljs-number">0005</span>d380    <span class="hljs-number">87</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_blob_close<br>   <span class="hljs-number">220</span>: <span class="hljs-number">0005</span>d530    <span class="hljs-number">54</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_blob_read<br>   <span class="hljs-number">221</span>: <span class="hljs-number">0005</span>d570    <span class="hljs-number">54</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_blob_write<br>   <span class="hljs-number">222</span>: <span class="hljs-number">0005</span>d5b0   <span class="hljs-number">152</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_reset<br>   <span class="hljs-number">223</span>: <span class="hljs-number">000677f</span>0  <span class="hljs-number">1022</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_exec<br>   <span class="hljs-number">224</span>: <span class="hljs-number">000666b</span>0  <span class="hljs-number">3816</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_step<br>   <span class="hljs-number">225</span>: <span class="hljs-number">00067710</span>   <span class="hljs-number">219</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_blob_reopen<br>   <span class="hljs-number">226</span>: <span class="hljs-number">00079</span>d10    <span class="hljs-number">39</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_prepare_v2<br>   <span class="hljs-number">227</span>: <span class="hljs-number">0006e700</span>  <span class="hljs-number">1720</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_blob_open<br>   <span class="hljs-number">228</span>: <span class="hljs-number">00079</span>ab0    <span class="hljs-number">39</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_prepare<br>   <span class="hljs-number">229</span>: <span class="hljs-number">00079</span>ec0    <span class="hljs-number">49</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_prepare16<br>   <span class="hljs-number">230</span>: <span class="hljs-number">00079f</span>00    <span class="hljs-number">49</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_prepare16_v2<br>   <span class="hljs-number">231</span>: <span class="hljs-number">0007</span>d360   <span class="hljs-number">442</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_declare_vtab<br>   <span class="hljs-number">232</span>: <span class="hljs-number">0007</span>da70   <span class="hljs-number">756</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_table_column_meta<br>   <span class="hljs-number">233</span>: <span class="hljs-number">0007</span>dd70   <span class="hljs-number">527</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_get_table<br>   <span class="hljs-number">234</span>: <span class="hljs-number">0007e150</span>  <span class="hljs-number">1349</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_test_control<br>   <span class="hljs-number">235</span>: <span class="hljs-number">0007e6</span>a0   <span class="hljs-number">211</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_auto_extension<br>   <span class="hljs-number">236</span>: <span class="hljs-number">0007e780</span>   <span class="hljs-number">113</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_reset_auto_extens<br>   <span class="hljs-number">237</span>: <span class="hljs-number">0007e800</span>   <span class="hljs-number">233</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_shutdown<br>   <span class="hljs-number">238</span>: <span class="hljs-number">0009f</span>e60     <span class="hljs-number">4</span> OBJECT  GLOBAL DEFAULT   <span class="hljs-number">19</span> sqlite3_data_directory<br>   <span class="hljs-number">239</span>: <span class="hljs-number">0007e8</span>f0   <span class="hljs-number">134</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_complete16<br>   <span class="hljs-number">240</span>: <span class="hljs-number">0007</span>eff0    <span class="hljs-number">29</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_open<br>   <span class="hljs-number">241</span>: <span class="hljs-number">0007f</span>010    <span class="hljs-number">29</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_open_v2<br>   <span class="hljs-number">242</span>: <span class="hljs-number">0007f</span>030   <span class="hljs-number">210</span> FUNC    GLOBAL DEFAULT    <span class="hljs-number">7</span> sqlite3_open16<br>   <span class="hljs-number">243</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND close<br>   <span class="hljs-number">244</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND access<br>   <span class="hljs-number">245</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND getcwd<br>   <span class="hljs-number">246</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND stat<br>   <span class="hljs-number">247</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND fstat<br>   <span class="hljs-number">248</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND ftruncate<br>   <span class="hljs-number">249</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND fcntl<br>   <span class="hljs-number">250</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND read<br>   <span class="hljs-number">251</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND write<br>   <span class="hljs-number">252</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND fchmod<br>   <span class="hljs-number">253</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND unlink<br>   <span class="hljs-number">254</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND mkdir<br>   <span class="hljs-number">255</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND rmdir<br>   <span class="hljs-number">256</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND mmap<br>   <span class="hljs-number">257</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND munmap<br>   <span class="hljs-number">258</span>: <span class="hljs-number">00000000</span>     <span class="hljs-number">0</span> FUNC    GLOBAL DEFAULT  UND mremap<br>   <span class="hljs-number">259</span>: <span class="hljs-number">0009f</span>e4c     <span class="hljs-number">0</span> NOTYPE  GLOBAL DEFAULT  ABS _edata<br>   <span class="hljs-number">260</span>: <span class="hljs-number">0009f</span>e4c     <span class="hljs-number">0</span> NOTYPE  GLOBAL DEFAULT  ABS __bss_start<br>   <span class="hljs-number">261</span>: <span class="hljs-number">000</span>a025c     <span class="hljs-number">0</span> NOTYPE  GLOBAL DEFAULT  ABS _end<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>查看so文件的程序段头信息（Program）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs c">$ readelf -l libsqlite.so<br><br>Elf file type is <span class="hljs-title function_">DYN</span> <span class="hljs-params">(Shared object file)</span><br>Entry point 0x0<br>There are 7 program headers, starting at offset 52<br><br>Program Headers:<br>  Type           Offset   VirtAddr   PhysAddr   FileSiz MemSiz  Flg Align<br>  PHDR           0x000034 0x00000034 0x00000034 0x000e0 0x000e0 R   0x4<br>  LOAD           0x000000 0x00000000 0x00000000 0x9c610 0x9c610 R E 0x1000<br>  LOAD           0x09d060 0x0009e060 0x0009e060 0x01dec 0x021fc RW  0x1000<br>  DYNAMIC        0x09ddf4 0x0009edf4 0x0009edf4 0x000f8 0x000f8 RW  0x4<br>  GNU_EH_FRAME   0x09a32c 0x0009a32c 0x0009a32c 0x022e4 0x022e4 R   0x4<br>  GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RW  0<br>  GNU_RELRO      0x09d060 0x0009e060 0x0009e060 0x00fa0 0x00fa0 RW  0x20<br><br> Section to Segment mapping:<br>  Segment Sections...<br>   00     <br>   01     .dynsym .dynstr .hash .rel.dyn .rel.plt .plt .text .rodata .eh_frame .eh_frame_hdr <br>   02     .data.rel.ro.local .fini_array .data.rel.ro .init_array .dynamic .got .got.plt .data .bss <br>   03     .dynamic <br>   04     .eh_frame_hdr <br>   05     <br>   06     .data.rel.ro.local .fini_array .data.rel.ro .init_array .dynamic .got .got.plt<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>查看so文件的全部内容</p>
+<figure class="highlight tap"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><code class="hljs tap">$ readelf -a libsqlite.so<br><br>ELF Header:<br>  Magic:   7f<span class="hljs-number"> 45 </span>4c<span class="hljs-number"> 46 </span>01<span class="hljs-number"> 01 </span>01<span class="hljs-number"> 00 </span>00<span class="hljs-number"> 00 </span>00<span class="hljs-number"> 00 </span>00<span class="hljs-number"> 00 </span>00<span class="hljs-number"> 00 </span><br>  Class:                             ELF32<br>  Data:                              2&#x27;s complement, little endian<br>  Version:                          <span class="hljs-number"> 1 </span>(current)<br>  OS/ABI:                            UNIX - System V<br>  ABI Version:                       0<br>  Type:                              DYN (Shared object file)<br>  Machine:                           Intel 80386<br>  Version:                           0x1<br>  Entry point address:               0x0<br>  Start of program headers:         <span class="hljs-number"> 52 </span>(bytes into file)<br>  Start of section headers:         <span class="hljs-number"> 651124 </span>(bytes into file)<br>  Flags:                             0x0<br>  Size of this header:              <span class="hljs-number"> 52 </span>(bytes)<br>  Size of program headers:          <span class="hljs-number"> 32 </span>(bytes)<br>  Number of program headers:         7<br>  Size of section headers:          <span class="hljs-number"> 40 </span>(bytes)<br>  Number of section headers:         23<br>  Section header string table index: 22<br><br>Section Headers:<br>  [Nr] Name              Type            Addr     Off    Size   ES Flg Lk Inf Al<br>  [ 0]                   NULL           <span class="hljs-number"> 00000000 </span>000000<span class="hljs-number"> 000000 </span>00     <span class="hljs-number"> 0 </span> <span class="hljs-number"> 0 </span> 0<br>  [ 1] .dynsym           DYNSYM         <span class="hljs-number"> 00000114 </span>000114<span class="hljs-number"> 001060 </span>10   A <span class="hljs-number"> 2 </span> <span class="hljs-number"> 1 </span> 4<br>  [ 2] .dynstr           STRTAB         <span class="hljs-number"> 00001174 </span>001174 00126c<span class="hljs-number"> 00 </span>  A <span class="hljs-number"> 0 </span> <span class="hljs-number"> 0 </span> 1<br>  [ 3] .hash             HASH            000023e0 0023e0<span class="hljs-number"> 000734 </span>04   A <span class="hljs-number"> 1 </span> <span class="hljs-number"> 0 </span> 4<br>  [ 4] .rel.dyn          REL             00002b14 002b14 001b10<span class="hljs-number"> 08 </span>  A <span class="hljs-number"> 1 </span> <span class="hljs-number"> 0 </span> 4<br>  [ 5] .rel.plt          REL            <span class="hljs-number"> 00004624 </span>004624 0001b8<span class="hljs-number"> 08 </span> AI <span class="hljs-number"> 1 </span><span class="hljs-number"> 17 </span> 4<br>  [ 6] .plt              PROGBITS        000047e0 0047e0<span class="hljs-number"> 000380 </span>04  AX <span class="hljs-number"> 0 </span> <span class="hljs-number"> 0 </span>16<br>  [ 7] .text             PROGBITS        00004b60 004b60 07cae1<span class="hljs-number"> 00 </span> AX <span class="hljs-number"> 0 </span> <span class="hljs-number"> 0 </span>16<br>  [ 8] .rodata           PROGBITS       <span class="hljs-number"> 00081660 </span>081660 008cc0<span class="hljs-number"> 00 </span>  A <span class="hljs-number"> 0 </span> <span class="hljs-number"> 0 </span>32<br>  [ 9] .eh_frame         PROGBITS        0008a320 08a320 01000c<span class="hljs-number"> 00 </span>  A <span class="hljs-number"> 0 </span> <span class="hljs-number"> 0 </span> 4<br>  [10] .eh_frame_hdr     PROGBITS        0009a32c 09a32c 0022e4<span class="hljs-number"> 00 </span>  A <span class="hljs-number"> 0 </span> <span class="hljs-number"> 0 </span> 4<br>  [11] .data.rel.ro.loca PROGBITS        0009e060 09d060 000a58<span class="hljs-number"> 00 </span> WA <span class="hljs-number"> 0 </span> <span class="hljs-number"> 0 </span>32<br>  [12] .fini_array       FINI_ARRAY      0009eab8 09dab8<span class="hljs-number"> 000008 </span>04  WA <span class="hljs-number"> 0 </span> <span class="hljs-number"> 0 </span> 4<br>  [13] .data.rel.ro      PROGBITS        0009eac0 09dac0<span class="hljs-number"> 000330 </span>00  WA <span class="hljs-number"> 0 </span> <span class="hljs-number"> 0 </span>32<br>  [14] .init_array       INIT_ARRAY      0009edf0 09ddf0<span class="hljs-number"> 000004 </span>04  WA <span class="hljs-number"> 0 </span> <span class="hljs-number"> 0 </span> 1<br>  [15] .dynamic          DYNAMIC         0009edf4 09ddf4 0000f8<span class="hljs-number"> 08 </span> WA <span class="hljs-number"> 2 </span> <span class="hljs-number"> 0 </span> 4<br>  [16] .got              PROGBITS        0009eeec 09deec 00001c<span class="hljs-number"> 00 </span> WA <span class="hljs-number"> 0 </span> <span class="hljs-number"> 0 </span> 4<br>  [17] .got.plt          PROGBITS        0009ef08 09df08 0000e8<span class="hljs-number"> 00 </span> WA <span class="hljs-number"> 0 </span> <span class="hljs-number"> 0 </span> 4<br>  [18] .data             PROGBITS        0009f000 09e000 000e4c<span class="hljs-number"> 00 </span> WA <span class="hljs-number"> 0 </span> <span class="hljs-number"> 0 </span>32<br>  [19] .bss              NOBITS          0009fe60 09ee4c 0003fc<span class="hljs-number"> 00 </span> WA <span class="hljs-number"> 0 </span> <span class="hljs-number"> 0 </span>32<br>  [20] .comment          PROGBITS       <span class="hljs-number"> 00000000 </span>09ee4c<span class="hljs-number"> 000035 </span>01  MS <span class="hljs-number"> 0 </span> <span class="hljs-number"> 0 </span> 1<br>  [21] .note.gnu.gold-ve NOTE           <span class="hljs-number"> 00000000 </span>09ee84 00001c<span class="hljs-number"> 00 </span>    <span class="hljs-number"> 0 </span> <span class="hljs-number"> 0 </span> 4<br>  [22] .shstrtab         STRTAB         <span class="hljs-number"> 00000000 </span>09eea0 0000d3<span class="hljs-number"> 00 </span>    <span class="hljs-number"> 0 </span> <span class="hljs-number"> 0 </span> 1<br>Key to Flags:<br>  W (write), A (alloc), X (execute), M (merge), S (strings), I (info),<br>  L (link order), O (extra OS processing required), G (group), T (TLS),<br>  C (compressed), x (unknown), o (OS specific), E (exclude),<br>  p (processor specific)<br>... ...(后面内容太多，此处省略)<br></code></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="3-1-readelf常用命令"><a href="#3-1-readelf常用命令" class="headerlink" title="3.1 readelf常用命令"></a>3.1 readelf常用命令</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs c">-a --all 相当于指定--file-header --program-headers --sections --symbols --relocs --dynamic --notes和--version-info<br>-h --file-header 显示文件开头的ELF头中包含的信息<br>-l --program-headers --segments 显示文件的segment头中包含的信息（如果有）<br>-S --sections --section-headers 显示文件的section头中包含的信息（如果有）<br>-g --section-groups 显示文件的section group中包含的信息（如果有）<br>-t --section-details 显示详细的section信息。意味着-S<br>-s --symbols --syms 显示文件的symbol table section中的条目（如果有）<br>-e --headers 显示文件中的所有headers。相当于-h -l -S<br>-n --notes 显示NOTE <span class="hljs-title function_">segment</span><span class="hljs-params">(和/或)</span>section的内容（如果有）<br>-r --relocs 显示文件relocation section的内容（如果有）<br>-u --unwind 显示文件的unwind section的内容（如果有）。目前仅支持IA64 ELF文件的unwind section<br>-d --dynamic 显示文件dynamic section的内容（如果有）<br>-V --version-info 显示文件中version section的内容，如果存在<br>-A --arch-specific 显示文件中特定于体系结构的信息（如果有）<br>-D --use-dynamic 显示符号时，此选项使readelf使用文件dynamic section中的符号表，而不是symbol section中的符号表<br>-x &lt;number or name&gt; --hex-dump=&lt;number or name&gt; 以十六进制字节显示indecated section的内容。一个数字通过索引section表标识一个特定的section;任何其他<span class="hljs-built_in">string</span>标识目标文件中具有该名称的所有section<br>-R &lt;number or name&gt; --relocated-dump=&lt;number or name&gt; 以十六进制字节显示indecated section的内容。一个数字通过索引section表标识一个特定的section;任何其他<span class="hljs-built_in">string</span>标识目标文件中具有该名称的所有section，该section的内容将在显示之前重新定位。<br>-p &lt;number or name&gt; --<span class="hljs-built_in">string</span>-dump=&lt;number or name&gt; 将indicated section的内容显示为可打印字符串。一个数字通过索引section表标识一个特定的section;任何其他<span class="hljs-built_in">string</span>标识目标文件中具有该名称的所有section<br>-c --archive-index 显示二进制归档的header部分中包含的文件符号索引信息。对ar执行与t命令相同的功能，但不使用BFD库<br>-w[lLiaprmfFsoR] --debug-dump[=rawline,=decodedline,=info,=abbrev,=pubnames,=aranges,=macro,=frames,=frames-interp,=str,=loc,=Ranges] 显示文件中debug section的内容（如果存在）。 如果后面有一个可选的字母或单词，则只会转储在这些特定部分中找到的数据<br>注意：=codedline选项将显示.debug_line section解释后的内容，而=rawline选项将以原始格式转储内容<br>-I --histogram 显示符号表的内容时，显示桶列表长度的直方图。<br>-v --version 显示readelf的版本号<br>-W --wide 不破坏输出线以适应<span class="hljs-number">80</span>列。 默认情况下，readelf会断开<span class="hljs-number">64</span>位ELF文件的section header和segment 列表行，以便它们适合<span class="hljs-number">80</span>列。 此选项使readelf打印每个节标题resp。 每个segment只有一行，在<span class="hljs-number">80</span>列以上的终端上可读性更高<br>-H --help 显示readelf理解的命令行选项。<br>@file<br>从文件中读取命令行选项。读取的选项将替换原始@file选项。 如果文件不存在或无法读取，则该选项将按字面处理，而不会被删除。<br>文件中的选项由空格分隔。通过用单引号或双引号括起整个选项，可以在选项中包含空格字符。可以通过在字符前加上反斜杠来包含任何字符（包括反斜杠）。该文件本身可能包含其他@file选项; 任何此类选项将以递归方式处理。<br></code></pre></td></tr></table></figure>
+
+<h1 id="0x04-分析ELF文件"><a href="#0x04-分析ELF文件" class="headerlink" title="0x04 分析ELF文件"></a>0x04 分析ELF文件</h1><p>分析一个so文件，该文件是xx.apk的</p>
+<p>ELF文件头结构定义在“&#x2F;usr&#x2F;include&#x2F;elf.h”头文件下，ELF文件有32位版本和64位版本，故其头文件结构也有32位结构和64位结构，分别定义为Elf32_Ehdr和Elf64_Ehdr。两种版本文件内容一样，只是有些成员的大小不一样。</p>
+<h2 id="4-1-ELF-Header的结构体"><a href="#4-1-ELF-Header的结构体" class="headerlink" title="4.1 ELF Header的结构体"></a>4.1 ELF Header的结构体</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">define</span> EI_NIDENT	16</span><br><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">elf32_hdr</span>&#123;</span><br>  <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span>	e_ident[EI_NIDENT];<br>  Elf32_Half	e_type;<br>  Elf32_Half	e_machine;<br>  Elf32_Word	e_version;<br>  Elf32_Addr	e_entry;  <span class="hljs-comment">/* Entry point */</span><br>  Elf32_Off	e_phoff;<br>  Elf32_Off	e_shoff;<br>  Elf32_Word	e_flags;<br>  Elf32_Half	e_ehsize;<br>  Elf32_Half	e_phentsize;<br>  Elf32_Half	e_phnum;<br>  Elf32_Half	e_shentsize;<br>  Elf32_Half	e_shnum;<br>  Elf32_Half	e_shstrndx;<br>&#125; Elf32_Ehdr;<br></code></pre></td></tr></table></figure>
+
+<h3 id="4-1-1-字段意思"><a href="#4-1-1-字段意思" class="headerlink" title="4.1.1 字段意思"></a>4.1.1 字段意思</h3><figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">e_ident</span> 数组：前<span class="hljs-number">4</span>个字节为.ELF，是 elf 标志头，第 <span class="hljs-number">5</span> 个字节为该文件标志符，为 <span class="hljs-number">1</span> 代表这是一个 <span class="hljs-number">32</span> 位的 elf 文件，后面几个字节代表版本等信息<br><span class="hljs-attribute">e_type</span> 字段：表示是可执行文件还是链接文件等，安卓上的 so 文件就是分享文件，一般该字段为 <span class="hljs-number">3</span><br><span class="hljs-attribute">e_machine</span> 字段：该字段标志该文件运行在什么机器架构上，例如 ARM<br><span class="hljs-attribute">e_version</span> 字段：该字段表示当前 so 文件的版本信息，一般为 <span class="hljs-number">1</span><br><span class="hljs-attribute">e_entry</span> 字段：该字段是一个偏移地址，为程序启动的地址<br><span class="hljs-attribute">e_phoff</span> 字段：该字段也是一个偏移地址，指向程序头 (Pargram Header) 的起始地址<br><span class="hljs-attribute">e_shoff</span> 字段：该字段是一个偏移地址，指向节区头 (Section Header) 的起始地址<br><span class="hljs-attribute">e_flags</span> 字段：该字段表示该文件的权限，常见的值有 <span class="hljs-number">1</span>、<span class="hljs-number">2</span>、<span class="hljs-number">4</span>，分别代表 read、write、exec<br><span class="hljs-attribute">e_ehsize</span> 字段：该字段表示 elf 文件头部大小，一般固定为 <span class="hljs-number">52</span><br><span class="hljs-attribute">e_phentsize</span> 字段：该字段表示程序头 (Program Header) 大小，一般固定为 <span class="hljs-number">32</span><br><span class="hljs-attribute">e_phnum</span> 字段：该字段表示文件中有几个程序头<br><span class="hljs-attribute">e_shentsize</span>: 该字段表示节区头 (Section Header) 大小，一般固定为 <span class="hljs-number">40</span><br><span class="hljs-attribute">e_shnum</span> 字段：该字段表示文件中有几个节区头<br><span class="hljs-attribute">e_shstrndx</span> 字段：该字段是一个数字，这个表明了.shstrtab 节区(这个节区存储着所有节区的名字，例如.text)的节区头是第几个<br></code></pre></td></tr></table></figure>
+<p><strong>注</strong>：这几个是比较重要的参数(修改so文件时会用到)：e_phoff、e_shoff、e_phnum、e_shstrndx</p>
+<p><img src="https://img-blog.csdnimg.cn/5c6955ca925b4850b5221e80e7952337.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>或者使用010Editor的ELF模板也可以看到ELF Header结构</p>
+<p>下载地址：<a target="_blank" rel="noopener" href="https://www.sweetscape.com/010editor/">https://www.sweetscape.com/010editor/</a></p>
+<p><img src="https://img-blog.csdnimg.cn/cd77c3a169484bf5bf104a5ed331064d.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>e_ident</li>
+</ul>
+<p>e_ident是一个16字节的数组，这个数组按位置从左到右都是有特定含义，每个数组元素的下标在标准中还存在别称，如byte0的下标0别名为EI_MAG0，如下：</p>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>元素下标值</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>EI_MAG0</td>
+<td>0</td>
+<td>文件标识</td>
+</tr>
+<tr>
+<td>EI_MAG1</td>
+<td>1</td>
+<td>文件标识</td>
+</tr>
+<tr>
+<td>EI_MAG2</td>
+<td>2</td>
+<td>文件标识</td>
+</tr>
+<tr>
+<td>EI_MAG3</td>
+<td>3</td>
+<td>文件标识</td>
+</tr>
+<tr>
+<td>EI_CLASS</td>
+<td>4</td>
+<td>文件类</td>
+</tr>
+<tr>
+<td>EI_DATA</td>
+<td>5</td>
+<td>数据编码</td>
+</tr>
+<tr>
+<td>EI_VERSION</td>
+<td>6</td>
+<td>文件版本</td>
+</tr>
+<tr>
+<td>EI_PAD</td>
+<td>7</td>
+<td>补齐字节开始处</td>
+</tr>
+<tr>
+<td>EI_NIDENT</td>
+<td>16</td>
+<td>e_ident[]大小</td>
+</tr>
+</tbody></table>
+<p>e_ident[EI_MAG0]e_ident[EI_MAG3]即e_ident[0]e_ident[3]被称为魔数（Magic Number）,其值一般为0x7f,‘E’,‘L’,‘F’。</p>
+<p>e_ident[EI_CLASS]（即e_ident[4]）识别目标文件运行在目标机器的类别，取值可为三种值：ELFCLASSNONE（0）非法类别；ELFCLASS32（1）32位目标；ELFCLASS64（2）64位目标。</p>
+<p>e_ident[EI_DATA]（即e_ident[5]）：给出处理器特定数据的数据编码方式。即大端还是小端方式。取值可为3种：ELFDATANONE（0）非法数据编码；ELFDATA2LSB（1）高位在前；ELFDATA2MSB（2）低位在前。</p>
+<ul>
+<li>e_type</li>
+</ul>
+<p>e_type表示elf文件的类型，如下:</p>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>取值</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ET_NONE</td>
+<td>0</td>
+<td>未知目标文件格式</td>
+</tr>
+<tr>
+<td>ET_REL</td>
+<td>1</td>
+<td>可重定位文件</td>
+</tr>
+<tr>
+<td>ET_EXEC</td>
+<td>2</td>
+<td>可执行文件</td>
+</tr>
+<tr>
+<td>ET_DYN</td>
+<td>3</td>
+<td>共享目标文件</td>
+</tr>
+<tr>
+<td>ET_CORE</td>
+<td>4</td>
+<td>Core 文件（转储格式）</td>
+</tr>
+<tr>
+<td>ET_LOPROC</td>
+<td>0xff00</td>
+<td>特定处理器文件</td>
+</tr>
+<tr>
+<td>ET_HIPROC</td>
+<td>0xffff</td>
+<td>特定处理器文件</td>
+</tr>
+<tr>
+<td>ET_LOPROC~ET_HIPROC</td>
+<td>0xff00~0xffff</td>
+<td>特定处理器文件</td>
+</tr>
+</tbody></table>
+<ul>
+<li>e_machine</li>
+</ul>
+<p>e_machine表示目标体系结构类型：</p>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>取值</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>EM_NONE</td>
+<td>0</td>
+<td>未指定</td>
+</tr>
+<tr>
+<td>EM_M32</td>
+<td>1</td>
+<td>AT&amp;T WE 32100</td>
+</tr>
+<tr>
+<td>EM_SPARC</td>
+<td>2</td>
+<td>SPARC</td>
+</tr>
+<tr>
+<td>EM_386</td>
+<td>3</td>
+<td>Intel 80386</td>
+</tr>
+<tr>
+<td>EM_68K</td>
+<td>4</td>
+<td>Motorola 68000</td>
+</tr>
+<tr>
+<td>EM_88K</td>
+<td>5</td>
+<td>Motorola 88000</td>
+</tr>
+<tr>
+<td>EM_860</td>
+<td>7</td>
+<td>Intel 80860</td>
+</tr>
+<tr>
+<td>EM_MIPS</td>
+<td>8</td>
+<td>MIPS RS3000</td>
+</tr>
+<tr>
+<td>others</td>
+<td>9~</td>
+<td>预留</td>
+</tr>
+</tbody></table>
+<ul>
+<li>e_entry</li>
+</ul>
+<p>e_entry表示程序入口地址<br>这 个sum.o的进入点是0x0(e_entry)，这表面Relocatable objects不会有程序进入点。所谓程序进入点是指当程序真正执行起来的时候，其第一条要运行的指令的运行时地址。因为Relocatable objects file只是供再链接而已，所以它不存在进入点。而可执行文件test和动态库.so都存在所谓的进入点，且可执行文件的e_entry指向C库中的_start，而动态库.so中的进入点指向 call_gmon_start。<br>如上图中e_entry &#x3D; 0xD8B0，我们用ida打开该文件看到确实是_start()函数的地址</p>
+<p>图片xxx</p>
+<h2 id="4-2-解析ELF文件的头部信息"><a href="#4-2-解析ELF文件的头部信息" class="headerlink" title="4.2 解析ELF文件的头部信息"></a>4.2 解析ELF文件的头部信息</h2><p>一个ELF文件中到底有哪些具体的 sections，由包含在这个ELF文件中的 section head table(SHT)决定。在SHT中，针对每一个section，都设置有一个条目（entry），用来描述对应的这个section，其内容主要包括该 section 的名称、类型、大小以及在整个ELF文件中的字节偏移位置等等。我们也可以在TISCv1.2规范中找到SHT表中条目的C结构定义：</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs awk">typedef struct&#123;<br>    Elf32_Word sh_name;   <span class="hljs-regexp">//</span>节区名，是节区头部字符串表节区（Section Header String Table Section）的索引。名字是一个 NULL 结尾的字符串。<br>    Elf32_Word sh_type;    <span class="hljs-regexp">//</span>为节区类型<br>    Elf32_Word sh_flags;    <span class="hljs-regexp">//</span>节区标志<br>    Elf32_Addr sh_addr;    <span class="hljs-regexp">//</span>如果节区将出现在进程的内存映像中，此成员给出节区的第一个字节应处的位置。否则，此字段为 <span class="hljs-number">0</span>。<br>    Elf32_Off sh_offset;    <span class="hljs-regexp">//</span>此成员的取值给出节区的第一个字节与文件头之间的偏移。<br>    Elf32_Word sh_size;   <span class="hljs-regexp">//</span>此 成 员 给 出 节 区 的 长 度 （ 字 节 数 ）。<br>    Elf32_Word sh_link;   <span class="hljs-regexp">//</span>此成员给出节区头部表索引链接。其具体的解释依赖于节区类型。<br>    Elf32_Word sh_info;       <span class="hljs-regexp">//</span>此成员给出附加信息，其解释依赖于节区类型。<br>    Elf32_Word sh_addralign;    <span class="hljs-regexp">//</span>某些节区带有地址对齐约束.<br>    Elf32_Word sh_entsize;    <span class="hljs-regexp">//</span>某些节区中包含固定大小的项目，如符号表。对于这类节区，此成员给出每个表项的长度字节数。<br>&#125;Elf32_Shdr;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>sh_type</li>
+</ul>
+<p>sh_type的取值如下:</p>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>取值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>SHT_NULL</td>
+<td>0</td>
+<td>此值标志节区头部是非活动的，没有对应的节区。此节区头部中的其他成员取值无意义</td>
+</tr>
+<tr>
+<td>SHT_PROGBITS</td>
+<td>1</td>
+<td>此节区包含程序定义的信息，其格式和含义都由程序来解释</td>
+</tr>
+<tr>
+<td>SHT_SYMTAB</td>
+<td>2</td>
+<td>此节区包含一个符号表。目前目标文件对每种类型的节区都只能包含一个，不过这个限制将来可能发生变化。一般，SHT_SYMTAB 节区提供用于链接编辑（指 ld 而言）的符号，尽管也可用来实现动态链接</td>
+</tr>
+<tr>
+<td>SHT_STRTAB</td>
+<td>3</td>
+<td>此节区包含字符串表。目标文件可能包含多个字符串表节区</td>
+</tr>
+<tr>
+<td>SHT_RELA</td>
+<td>4</td>
+<td>此节区包含重定位表项，其中可能会有补齐内容（addend），例如 32 位目标文件中的 Elf32_Rela 类型。目标文件可能拥有多个重定位节区</td>
+</tr>
+<tr>
+<td>SHT_HASH</td>
+<td>5</td>
+<td>此节区包含符号哈希表。所有参与动态链接的目标都必须包含一个符号哈希表。目前，一个目标文件只能包含一个哈希表，不过此限制将来可能会解除</td>
+</tr>
+<tr>
+<td>SHT_DYNAMIC</td>
+<td>6</td>
+<td>此节区包含动态链接的信息。目前一个目标文件中只能包含一个动态节区，将来可能会取消这一限制</td>
+</tr>
+<tr>
+<td>SHT_NOTE</td>
+<td>7</td>
+<td>此节区包含以某种方式来标记文件的信息</td>
+</tr>
+<tr>
+<td>SHT_NOBITS</td>
+<td>8</td>
+<td>这 种 类 型 的 节 区 不 占 用 文 件 中 的 空 间 ， 其 他 方 面 和SHT_PROGBITS 相似。尽管此节区不包含任何字节，成员sh_offset 中还是会包含概念性的文件偏移</td>
+</tr>
+<tr>
+<td>SHT_REL</td>
+<td>9</td>
+<td>此节区包含重定位表项，其中没有补齐（addends），例如 32 位目标文件中的 Elf32_rel 类型。目标文件中可以拥有多个重定位节区</td>
+</tr>
+<tr>
+<td>SHT_SHLIB</td>
+<td>10</td>
+<td>此节区被保留，不过其语义是未规定的。包含此类型节区的程序与 ABI 不兼容</td>
+</tr>
+<tr>
+<td>SHT_DYNSYM</td>
+<td>11</td>
+<td>作为一个完整的符号表，它可能包含很多对动态链接而言不必要的符号。因此，目标文件也可以包含一个 SHT_DYNSYM 节区，其中保存动态链接符号的一个最小集合，以节省空间</td>
+</tr>
+<tr>
+<td>SHT_LOPROC</td>
+<td>0X70000000</td>
+<td>这一段（包括两个边界），是保留给处理器专用语义的</td>
+</tr>
+<tr>
+<td>SHT_HIPROC</td>
+<td>OX7FFFFFFF</td>
+<td>这一段（包括两个边界），是保留给处理器专用语义的</td>
+</tr>
+<tr>
+<td>SHT_LOUSER</td>
+<td>0X80000000</td>
+<td>此值给出保留给应用程序的索引下界</td>
+</tr>
+<tr>
+<td>SHT_HIUSER</td>
+<td>0X8FFFFFFF</td>
+<td>此值给出保留给应用程序的索引上界</td>
+</tr>
+</tbody></table>
+<ul>
+<li>sh_flag</li>
+</ul>
+<p>sh_flag标志着此节区是否可以修改，是否可以执行，如下定义：</p>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>取值</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>SHF_WRITE</td>
+<td>0x1</td>
+<td>节区包含进程执行过程中将可写的数据</td>
+</tr>
+<tr>
+<td>SHF_ALLOC</td>
+<td>0x2</td>
+<td>此节区在进程执行过程中占用内存。某些控制节区并不出现于目标文件的内存映像中，对于那些节区，此位应设置为 0</td>
+</tr>
+<tr>
+<td>SHF_EXECINSTR</td>
+<td>0x4</td>
+<td>节区包含可执行的机器指令</td>
+</tr>
+<tr>
+<td>SHF_MASKPROC</td>
+<td>0xF0000000</td>
+<td>所有包含于此掩码中的四位都用于处理器专用的语义</td>
+</tr>
+</tbody></table>
+<ul>
+<li>sh_link 和 sh_info 字段</li>
+</ul>
+<p>sh_link和sh_info字段的具体含义依赖于sh_type的值：</p>
+<table>
+<thead>
+<tr>
+<th>sh_type</th>
+<th>sh_link</th>
+<th>sh_info</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>SHT_DYNAMIC</td>
+<td>此节区中条目所用到的字符串表格的节区头部索引</td>
+<td>0</td>
+</tr>
+<tr>
+<td>SHT_HASH</td>
+<td>此哈希表所适用的符号表的节区头部索引</td>
+<td>0</td>
+</tr>
+<tr>
+<td>SHT_REL</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>SHT_RELA</td>
+<td>相关符号表的节区头部索引</td>
+<td>重定位所适用的节区的节区头部索引</td>
+</tr>
+<tr>
+<td>SHT_SYMTAB</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>SHT_DYNSYM</td>
+<td>相关联的字符串表的节区头部索引</td>
+<td>最后一个局部符号（绑定 STB_LOCAL）的符号表索引值加一</td>
+</tr>
+<tr>
+<td>其它</td>
+<td>SHN_UNDEF</td>
+<td>0</td>
+</tr>
+</tbody></table>
+<h3 id="4-2-1-Section"><a href="#4-2-1-Section" class="headerlink" title="4.2.1 Section"></a>4.2.1 Section</h3><p>有些节区是系统预订的，一般以点开头号，因此，我们有必要了解一些常用到的系统节区</p>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>属性</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>.bss</td>
+<td>SHT_NOBITS</td>
+<td>SHF_ALLOC + SHF_WRITE</td>
+<td>包含将出现在程序的内存映像中的为初始化数据。根据定义，当程序开始执行，系统将把这些数据初始化为 0。此节区不占用文件空间</td>
+</tr>
+<tr>
+<td>.comment</td>
+<td>SHT_PROGBITS</td>
+<td>-</td>
+<td>包含版本控制信息</td>
+</tr>
+<tr>
+<td>.data</td>
+<td>SHT_PROGBITS</td>
+<td>SHF_ALLOC +  SHF_WRITE</td>
+<td>这些节区包含初始化了的数据，将出现在程序的内存映像中</td>
+</tr>
+<tr>
+<td>.data1</td>
+<td>SHT_PROGBITS</td>
+<td>SHF_ALLOC + SHF_WRITE</td>
+<td>这些节区包含初始化了的数据，将出现在程序的内存映像中</td>
+</tr>
+<tr>
+<td>.debug</td>
+<td>SHT_PROGBITS</td>
+<td>-</td>
+<td>此节区包含用于符号调试的信息</td>
+</tr>
+<tr>
+<td>.dynamic</td>
+<td>SHT_DYNAMIC</td>
+<td>-</td>
+<td>此节区包含动态链接信息。节区的属性将包含 SHF_ALLOC 位。是否 SHF_WRITE 位被设置取决于处理器</td>
+</tr>
+<tr>
+<td>.dynstr</td>
+<td>SHT_STRTAB</td>
+<td>SHF_ALLOC</td>
+<td>此节区包含用于动态链接的字符串，大多数情况下这些字符串代表了与符号表项相关的名称</td>
+</tr>
+<tr>
+<td>.dynsym</td>
+<td>SHT_DYNSYM</td>
+<td>SHF_ALLOC</td>
+<td>此节区包含了动态链接符号表</td>
+</tr>
+<tr>
+<td>.fini</td>
+<td>SHT_PROGBITS</td>
+<td>SHF_ALLOC + SHF_EXECINSTR</td>
+<td>此节区包含了可执行的指令，是进程终止代码的一部分。程序正常退出时，系统将安排执行这里的代码</td>
+</tr>
+<tr>
+<td>.got</td>
+<td>SHT_PROGBITS</td>
+<td>-</td>
+<td>此节区包含全局偏移表</td>
+</tr>
+<tr>
+<td>.hash</td>
+<td>SHT_HASH</td>
+<td>SHF_ALLOC</td>
+<td>此节区包含了一个符号哈希表</td>
+</tr>
+<tr>
+<td>.init</td>
+<td>SHT_PROGBITS</td>
+<td>SHF_ALLOC + SHF_EXECINSTR</td>
+<td>此节区包含了可执行指令，是进程初始化代码的一部分。当程序开始执行时，系统要在开始调用主程序入口之前（通常指 C 语言的 main 函数）执行这些代码</td>
+</tr>
+<tr>
+<td>.interp</td>
+<td>SHT_PROGBITS</td>
+<td>-</td>
+<td>此节区包含程序解释器的路径名。如果程序包含一个可加载的段，段中包含此节区，那么节区的属性将包含 SHF_ALLOC 位，否则该位为 0</td>
+</tr>
+<tr>
+<td>.line</td>
+<td>SHT_PROGBITS</td>
+<td>-</td>
+<td>此节区包含符号调试的行号信息，其中描述了源程序与机器指令之间的对应关系。其内容是未定义的</td>
+</tr>
+<tr>
+<td>.note</td>
+<td>SHT_NOTE</td>
+<td>-</td>
+<td>此节区中包含注释信息，有独立的格式</td>
+</tr>
+<tr>
+<td>.plt</td>
+<td>SHT_PROGBITS</td>
+<td>-</td>
+<td>此节区包含过程链接表（procedure linkage table）</td>
+</tr>
+<tr>
+<td>.relname和.relaname</td>
+<td>SHT_REL和SHT_RELA</td>
+<td>-</td>
+<td>这些节区中包含了重定位信息。如果文件中包含可加载的段，段中有重定位内容，节区的属性将包含 SHF_ALLOC 位，否则该位置 0。传统上 name 根据重定位所适用的节区给定。例如 .text 节区的重定位节区名字将是：.rel.text 或者 .rela.text</td>
+</tr>
+<tr>
+<td>.rodata和.rodata1</td>
+<td>SHT_PROGBITS和SHF_ALLOC</td>
+<td>-</td>
+<td>这些节区包含只读数据，这些数据通常参与进程映像的不可写段</td>
+</tr>
+<tr>
+<td>.shstrtab</td>
+<td>SHT_STRTAB</td>
+<td>-</td>
+<td>此节区包含节区名称</td>
+</tr>
+<tr>
+<td>.strtab</td>
+<td>SHT_STRTAB</td>
+<td>-</td>
+<td>此节区包含字符串，通常是代表与符号表项相关的名称。如果文件拥有一个可加载的段，段中包含符号串表，节区的属性将包含SHF_ALLOC 位，否则该位为 0</td>
+</tr>
+<tr>
+<td>.symtab</td>
+<td>SHT_SYMTAB</td>
+<td>-</td>
+<td>此节区包含一个符号表。如果文件中包含一个可加载的段，并且该段中包含符号表，那么节区的属性中包含SHF_ALLOC 位，否则该位置为 0</td>
+</tr>
+<tr>
+<td>.text</td>
+<td>SHT_PROGBITS</td>
+<td>SHF_ALLOC + SHF_EXECINSTR</td>
+<td>此节区包含程序的可执行指令</td>
+</tr>
+</tbody></table>
+<p>下面我们分析一些so文件中重要的Section，包括<br>符号表、重定位表、GOT表等。</p>
+<ul>
+<li>符号表(.dynsym)</li>
+</ul>
+<p>符号表包含用来定位、重定位程序中符号定义和引用的信息，简单的理解就是符号表记录了该文件中的所有符号，所谓的符号就是经过修饰了的函数名或者变量名，不同的编译器有不同的修饰规则。例如符号_ZL15global_static_a，就是由global_static_a变量名经过修饰而来。</p>
+<p>符号表项的格式如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> &#123;</span>  <br>     Elf32_Word st_name;      <span class="hljs-comment">//符号表项名称。如果该值非0，则表示符号名的字符串表索引(offset)，否则符号表项没有名称。</span><br>     Elf32_Addr st_value;       <span class="hljs-comment">//符号的取值。依赖于具体的上下文，可能是一个绝对值、一个地址等等。</span><br>     Elf32_Word st_size;         <span class="hljs-comment">//符号的尺寸大小。例如一个数据对象的大小是对象中包含的字节数。</span><br>     <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> st_info;    <span class="hljs-comment">//符号的类型和绑定属性。</span><br>     <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> st_other;  <span class="hljs-comment">//该成员当前包含 0，其含义没有定义。</span><br>     Elf32_Half st_shndx;        <span class="hljs-comment">//每个符号表项都以和其他节区的关系的方式给出定义。此成员给出相关的节区头部表索引。</span><br>&#125; Elf32_sym;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>字符串表（.dynstr）</li>
+</ul>
+<p>符号表的st_name是符号名的字符串表中的索引，那么字符串表中肯定存放着所有符号的名称字符串</p>
+<ul>
+<li>重定位表</li>
+</ul>
+<p>重定位表在ELF文件中扮演很重要的角色，首先我们得理解重定位的概念，程序从代码到可执行文件这个过程中，要经历编译器，汇编器和链接器对代码的处理。然而编译器和汇编器通常为每个文件创建程序地址从0开始的目标代码，但是几乎没有计算机会允许从地址0加载你的程序。如果一个程序是由多个子程序组成的，那么所有的子程序必需要加载到互不重叠的地址上。_重定位就是为程序不同部分分配加载地址，调整程序中的数据和代码以反映所分配地址的过程。_简单的言之，则是将程序中的各个部分映射到合理的地址上来。<br>换句话来说，重定位是将符号引用与符号定义进行连接的过程。例如，当程序调用了一个函数时，相关的调用指令必须把控制传输到适当的目标执行地址。<br>具体来说，就是把符号的value进行重新定位。</p>
+<p>可重定位文件必须包含如何修改其节区内容的信息，从而允许可执行文件和共享目标文件保存进程的程序映象的正确信息。这就是重定位表项做的工作。重定位表项的格式如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> &#123;</span>  <br>    Elf32_Addr r_offset;     <span class="hljs-comment">//重定位动作所适用的位置（受影响的存储单位的第一个字节的偏移或者虚拟地址）</span><br>    Elf32_Word r_info;       <span class="hljs-comment">//要进行重定位的符号表索引，以及将实施的重定位类型（哪些位需要修改，以及如何计算它们的取值）</span><br>                                         <span class="hljs-comment">//其中 .rel.dyn 重定位类型一般为R_386_GLOB_DAT和R_386_COPY；.rel.plt为R_386_JUMP_SLOT</span><br>&#125; Elf32_Rel; <br></code></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> &#123;</span>  <br>   Elf32_Addr r_offset;  <br>   Elf32_Word r_info;  <br>   Elf32_Word r_addend;    <span class="hljs-comment">//给出一个常量补齐，用来计算将被填充到可重定位字段的数值。</span><br>&#125; Elf32_Rela;<br></code></pre></td></tr></table></figure>
+
+<p>对 r_info 成员使用 ELF32_R_TYPE 宏运算可得到重定位类型，使用 ELF32_R_SYM 宏运算可得到符号在符号表里的索引值。 三种宏的具体定义如下：</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs lisp">#define ELF32_R_SYM(<span class="hljs-name">i</span>) ((<span class="hljs-name">i</span>)&gt;&gt;8)<br>#define ELF32_R_TYPE(<span class="hljs-name">i</span>) ((<span class="hljs-name">unsigned</span> char)(<span class="hljs-name">i</span>))<br>#define ELF32_R_INFO(<span class="hljs-name">s</span>, <span class="hljs-literal">t</span>) (((<span class="hljs-name">s</span>)&lt;&lt;8) + (<span class="hljs-name">unsigned</span> char)(<span class="hljs-name">t</span>))<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>常见的重定位表类型：</li>
+</ul>
+<p>.rel.text：重定位的地方在.text段内，以offset指定具体要定位位置。在链接时候由链接器完成。.rel.text属于普通重定位辅助段 ,他由编译器编译产生，存在于obj文件内。连接器连接时，他用于最终可执行文件或者动态库的重定位。通过它修改原obj文件的.text段后，合并到最终可执行文件或者动态文件的.text段。其类型一般为R_386_32和R_386_PC32。</p>
+<p>.rel.dyn：重定位的地方在.got段内。主要是针对外部数据变量符号。例如全局数据。重定位在程序运行时定位，一般是在.init段内。定位过程：获得符号对应value后，根据rel.dyn表中对应的offset，修改.got表对应位置的value。另外，.rel.dyn 含义是指和dyn有关，一般是指在程序运行时候，动态加载。区别于rel.plt，rel.plt是指和plt相关，具体是指在某个函数被调用时候加载。我个人理解这个Section的作用是，在重定位过程中，动态链接器根据r_offset找到.got对应表项，来完成对.got表项值的修改。</p>
+<p><strong>注</strong>：</p>
+<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs jboss-cli"><span class="hljs-string">.rel.dyn</span>和<span class="hljs-string">.rel.plt</span>是动态定位辅助段。<br>由连接器产生，存在于可执行文件或者动态库文件内。<br>借助这两个辅助段可以动态修改对应<span class="hljs-string">.got</span>和<span class="hljs-string">.got.plt</span>段，<br>从而实现运行时重定位<br></code></pre></td></tr></table></figure>
+
+<p>.rel.plt：重定位的地方在.got.plt段内（注意也是.got内,具体区分而已）。 主要是针对外部函数符号。一般是函数首次被调用时候重定位。首次调用时会重定位函数地址，把最终函数地址放到.got内，以后读取该.got就直接得到最终函数地址。我个人理解这个Section的作用是，在重定位过程中，动态链接器根据r_offset找到.got对应表项，来完成对.got表项值的修改。</p>
+<p>.plt段（过程链接表）：所有外部函数调用都是经过一个对应桩函数，这些桩函数都在.plt段内。具体调用外部函数过程是：<br>调用对应桩函数—&gt;桩函数取出.got表表内地址—&gt;然后跳转到这个地址.如果是第一次,这个跳转地址默认是桩函数本身跳转处地址的下一个指令地址(目的是通过桩函数统一集中取地址和加载地址),后续接着把对应函数的真实地址加载进来放到.got表对应处,同时跳转执行该地址指令.以后桩函数从.got取得地址都是真实函数地址了。</p>
+<p>.got（全局偏移表）</p>
+<h3 id="4-2-2-Program-Header-Table"><a href="#4-2-2-Program-Header-Table" class="headerlink" title="4.2.2 Program Header Table"></a>4.2.2 Program Header Table</h3><p>程序头部（Program Header）描述与程序执行直接相关的目标文件结构信息。用来在文件中定位各个段的映像。同时包含其他一些用来为程序创建映像所必须的信息。<br>可执行文件或者共享目标文件的程序头部是一个结构数组，每个结构描述了一个段或者系统准备程序执行所必须的其他信息。目标文件的“段”包含一个或者多个“节区”，也就是“段内容（Segment Contents）”。程序头部仅对可执行文件和共享目标文件有意义。</p>
+<p>程序头部的数据结构如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> &#123;</span>  <br>    Elf32_Word p_type;           <span class="hljs-comment">//此数组元素描述的段的类型，或者如何解释此数组元素的信息。 </span><br>    Elf32_Off  p_offset;           <span class="hljs-comment">//此成员给出从文件头到该段第一个字节的偏移</span><br>    Elf32_Addr p_vaddr;         <span class="hljs-comment">//此成员给出段的第一个字节将被放到内存中的虚拟地址</span><br>    Elf32_Addr p_paddr;        <span class="hljs-comment">//此成员仅用于与物理地址相关的系统中。System V忽略所有应用程序的物理地址信息。</span><br>    Elf32_Word p_filesz;         <span class="hljs-comment">//此成员给出段在文件映像中所占的字节数。可以为0。</span><br>    Elf32_Word p_memsz;     <span class="hljs-comment">//此成员给出段在内存映像中占用的字节数。可以为0。</span><br>    Elf32_Word p_flags;         <span class="hljs-comment">//此成员给出与段相关的标志。</span><br>    Elf32_Word p_align;        <span class="hljs-comment">//此成员给出段在文件中和内存中如何对齐。</span><br>&#125; Elf32_phdr;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>p_type</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>取值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>PT_NULL</td>
+<td>0</td>
+<td>此数组元素未用。结构中其他成员都是未定义的</td>
+</tr>
+<tr>
+<td>PT_LOAD</td>
+<td>1</td>
+<td>此数组元素给出一个可加载的段，段的大小由 p_filesz 和 p_memsz描述。文件中的字节被映射到内存段开始处。如果 p_memsz 大于p_filesz，“剩余”的字节要清零。p_filesz 不能大于 p_memsz。可加载的段在程序头部表格中根据 p_vaddr 成员按升序排列</td>
+</tr>
+<tr>
+<td>PT_DYNAMIC</td>
+<td>2</td>
+<td>数组元素给出动态链接信息</td>
+</tr>
+<tr>
+<td>PT_INTERP</td>
+<td>3</td>
+<td>数组元素给出一个 NULL 结尾的字符串的位置和长度，该字符串将被当作解释器调用。这种段类型仅对与可执行文件有意义（尽管也可能在共享目标文件上发生）。在一个文件中不能出现一次以上。如果存在这种类型的段，它必须在所有可加载段项目的前面</td>
+</tr>
+<tr>
+<td>PT_NOTE</td>
+<td>4</td>
+<td>此数组元素给出附加信息的位置和大小</td>
+</tr>
+<tr>
+<td>PT_SHLIB</td>
+<td>5</td>
+<td>此段类型被保留，不过语义未指定。包含这种类型的段的程序与 ABI不符</td>
+</tr>
+<tr>
+<td>PT_PHDR</td>
+<td>6</td>
+<td>此类型的数组元素如果存在，则给出了程序头部表自身的大小和位置，既包括在文件中也包括在内存中的信息。此类型的段在文件中不能出现一次以上。并且只有程序头部表是程序的内存映像的一部分时才起作用。如果存在此类型段，则必须在所有可加载段项目的前面</td>
+</tr>
+<tr>
+<td>PT_LOPROC~PT_HIPROC</td>
+<td>0x70000000~0x7fffffff</td>
+<td>此范围的类型保留给处理器专用语义</td>
+</tr>
+</tbody></table>
+<p>上面如果看的太复杂，那就记点简单点：</p>
+<ul>
+<li><p>文件的最开始几个字节给出如何解释文件的提示信息。这些信息独立于处理器，也独立于文件中的其余内容</p>
+<ul>
+<li>e_phoff：是程序头（Program Header）内容在整个文件的偏移值，可以用这个偏移值来定位程序头的开始位置，用于解析程序头信息</li>
+<li>e_shoff：是段头（Section Header）内容在这个文件的偏移值，可以用这个偏移值来定位段头的开始位置，用于解析段头信息</li>
+<li>e_phnum：是程序头的个数</li>
+<li>e_shnum：是段头的个数</li>
+<li>e_shstrndx：是String段在整个段列表中的索引值，用于后面定位String段的位置</li>
+</ul>
+</li>
+<li><p>解析程序头信息</p>
+<ul>
+<li>可执行文件或者共享目标文件的程序头部是一个结构数组，每个结构描述了一个段或者系统准备程序执行所必需的其他信息。目标文件的“段”包含一个或者多个“节区”，也就是“段内容”（SegmentContents）。程序头部仅对可执行文件和共享目标文件有意义。可执行目标文件在ELF头部的e_phentsize和e_phnum成员中给出其自身程序头部的大小。</li>
+</ul>
+</li>
+</ul>
+<p>补充点：<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?src=11&amp;timestamp=1637745305&amp;ver=3456&amp;signature=5gUPAnPavLW8c3xT0FUO0JZqSPyWStpYdj9KLSItDiW0ILpbAPRcbn*JAqc6HvvgcDa*Y8QKfzGTiSjWgSdgAuZQMSdsmre376If-qas9DpeuxhltD6qx7oE0bfNzc-Z&amp;new=1%E3%80%82">https://mp.weixin.qq.com/s?src=11&amp;timestamp=1637745305&amp;ver=3456&amp;signature=5gUPAnPavLW8c3xT0FUO0JZqSPyWStpYdj9KLSItDiW0ILpbAPRcbn*JAqc6HvvgcDa*Y8QKfzGTiSjWgSdgAuZQMSdsmre376If-qas9DpeuxhltD6qx7oE0bfNzc-Z&amp;new=1。</a> 信安之路的so文件解析详解</p>
+<p>基础实践了解：<a target="_blank" rel="noopener" href="https://github.com/s0wr0b1ndef/pwn2exploit/blob/master/PWN%E4%B9%8BELF%E8%A7%A3%E6%9E%90.md">https://github.com/s0wr0b1ndef/pwn2exploit/blob/master/PWN%E4%B9%8BELF%E8%A7%A3%E6%9E%90.md</a></p>
+<h2 id="0x05-编写so解析类"><a href="#0x05-编写so解析类" class="headerlink" title="0x05 编写so解析类"></a>0x05 编写so解析类</h2><p>待补充</p>
+<p><strong>参考链接</strong>：</p>
+<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/8cf24df30dba">https://www.jianshu.com/p/8cf24df30dba</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/mergerly/article/details/94585901?spm=1001.2101.3001.6650.8&amp;utm_medium=distribute.pc_relevant.none-task-blog-2~default~OPENSEARCH~default-9.essearch_pc_relevant&amp;depth_1-utm_source=distribute.pc_relevant.none-task-blog-2~default~OPENSEARCH~default-9.essearch_pc_relevant">https://blog.csdn.net/mergerly/article/details/94585901?spm=1001.2101.3001.6650.8&amp;utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EOPENSEARCH%7Edefault-9.essearch_pc_relevant&amp;depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EOPENSEARCH%7Edefault-9.essearch_pc_relevant</a></p>
+<p><a target="_blank" rel="noopener" href="http://www.choudan.net/2013/11/16/Linux%E8%BF%9B%E7%A8%8B%E5%9C%B0%E5%9D%80%E7%A9%BA%E9%97%B4%E5%86%8D%E5%AD%A6%E4%B9%A0.html">http://www.choudan.net/2013/11/16/Linux%E8%BF%9B%E7%A8%8B%E5%9C%B0%E5%9D%80%E7%A9%BA%E9%97%B4%E5%86%8D%E5%AD%A6%E4%B9%A0.html</a></p>
+<p><a target="_blank" rel="noopener" href="http://www.choudan.net/2013/10/25/Linux%E8%BF%9B%E7%A8%8B%E5%9C%B0%E5%9D%80%E7%A9%BA%E9%97%B4%E5%AD%A6%E4%B9%A0%28%E4%BA%8C%29.html">http://www.choudan.net/2013/10/25/Linux%E8%BF%9B%E7%A8%8B%E5%9C%B0%E5%9D%80%E7%A9%BA%E9%97%B4%E5%AD%A6%E4%B9%A0%28%E4%BA%8C%29.html</a> </p>
+<p><a target="_blank" rel="noopener" href="http://blog.chinaunix.net/uid-52437-id-3029374.html">http://blog.chinaunix.net/uid-52437-id-3029374.html</a></p>
+<hr>
+<p><strong>你以为你有很多路可以选择，其实你只有一条路可以走</strong></p>
+<hr>
+</div>
+
+			<link rel="stylesheet" type="text/css" href="https://qiniu.techgrow.cn/readmore/dist/hexo.css">
+			<script src="https://qiniu.techgrow.cn/readmore/dist/readmore.js" type="text/javascript"></script>
+			<script>
+			var isMobile = navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i);
+			if (!isMobile) {
+				try {
+					var plugin = new ReadmorePlugin();
+					plugin.init({
+						"id": "readmore-container",
+						"blogId": "25525-4637332244353-147",
+						"name": "橙留香Park",
+						"qrcode": "https://i.imgtg.com/2022/10/03/mjCQ1.jpg",
+						"keyword": "验证码",
+						"lockToc": "yes",
+						"type": "hexo",
+						"random": "1",
+						"interval": "60",
+						"expires": "1",
+						"height": "auto"
+					});
+				} catch(e) {
+					console.warn("readmore plugin occurred error: " + e.name + " | " + e.message);
+				}
+			}
+			</script>
+		
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/AndroidSecurity/">#AndroidSecurity</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Android so文件分析「详细版」</div>
+      <div>https://orangey.info/2022/09/23/122088540/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>橙留香</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年9月23日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/09/23/121448565/" title="ADB命令总结？看这一篇就够了「收藏版」">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">ADB命令总结？看这一篇就够了「收藏版」</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/09/23/118888796/" title="车联网安全常见术语科普">
+                        <span class="hidden-mobile">车联网安全常见术语科普</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  <article id="comments" lazyload>
+    
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1e96aec5ac46370916fa","clientSecret":"ee5e97a65cf34e9fe31e15ab0421a94968237f5e","repo":"ogGitalk","owner":"ananasOrangey","admin":["ananasOrangey"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '9641e532e1cd1dca697e1ce39d6b1982'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+  </article>
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://orangey.blog.csdn.net" target="_blank" rel="nofollow noopener"><span>橙留香CSDN博客</span></a> <i class="iconfont icon-love"></i> <a href="https://i.imgtg.com/2022/09/21/gNXxK.png" target="_blank" rel="nofollow noopener"><span>橙留香微信公众号</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

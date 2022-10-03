@@ -1,0 +1,1607 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="橙留香">
+  <meta name="keywords" content="橙留香车联网安全技术博客">
+  
+    <meta name="description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  Android安全付费专栏长期更新，本篇最新内容请前往：  [车联网安全自学篇] Android安全之静态方式逆向APK应用浅析【手动注入smali+】+【IDA Pro静态分析so文件】+【IDA Pro基础使用讲解】  更多关于Android安全的知识">
+<meta property="og:type" content="article">
+<meta property="og:title" content="「干货」静态逆向APK应用浅析「手动注入smali」+「IDA Pro静态分析so文件」+「IDA Pro基础使用讲解」">
+<meta property="og:url" content="https://orangey.info/2022/09/23/123520495/index.html">
+<meta property="og:site_name" content="车联网安全技术博客 | 橙留香">
+<meta property="og:description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  Android安全付费专栏长期更新，本篇最新内容请前往：  [车联网安全自学篇] Android安全之静态方式逆向APK应用浅析【手动注入smali+】+【IDA Pro静态分析so文件】+【IDA Pro基础使用讲解】  更多关于Android安全的知识">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://mmbiz.qpic.cn/mmbiz_png/3VOFdKPc3kDiaUh1aUwMFjPlCia3ChCZZG2iabp8JJEgofHmvQpn9DJyHNv1U84mqbhIcrBSfkIKticzYqZUrNse1g/0?wx_fmt=png">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/21/gNXxK.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e085f7b85e174864abbb18900a9c5ac2.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5215612ce1534f16918a99d52a6f2bad.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/14aed1e274f04299aa8a663b2fb77549.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/89cafb73727d47cf8612fefeba7c181a.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5af24ca4c4924329835ca26115feb4c7.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5e00605a9d5d4cb2ab5553cb5f291372.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/11f3c3721fd948b09a7628cfa8900da6.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/67a64dfc8d9b4fb7a081c615651eab1e.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/7cede16c80a646a2ba76c1741cda8365.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_15,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/4bc0cf10daea42d29ce44c28ede425b4.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/f5662af5a0fc4bb18a38c4817729a03e.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/524fdfd27f774c1fa3644bf14ac24e68.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_8,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d9d0d70e34c841d38f5e1c285a03c7cf.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/cc73255e3cd447a48f9b71d73ad46899.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/bcf3dbc13f6748cdac042806da3f5f78.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/dbdff631c1f640c1b67728efc581f637.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/1fee71ea198f4b3ba2ea17d181c8a541.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/295bf97c20dd4f1598efee4cf21dc1fd.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_18,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/f97e7ce64f2645c9a9a1ec7efc45d0bd.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_17,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5f32208ac6a14d47a018370dc1103e50.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/ffb13162580847db9568714feded8fbc.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/f9474ed0b21543f795312a4b8334c956.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_13,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/b11887b3b6004f62888296b36eefee4e.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/09be02702a8b44c1b34bbe19f3f0f90f.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d457b2a0e5b44fc6b86cbe5c3fa377cc.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_17,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/60592b70921c4eba94f1f0d334f2b153.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/428a3d4216544d25899035f05e445642.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c690ca2d40e3418e8c30781f7100297a.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/57d2023f95574747bc1c0787ec140f2a.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2a09e33310e24202a6b07cc294a62fb2.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/3a2c0ef1961d4b83abff83d9d924989d.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/1d91fc9afcf14af3914c599c33b8d2ea.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/aa954a4680be47dfb2bd3338d48e759b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/a19a51a0c6834ed4b14860f263f128f5.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/87e608a195a847ef816b110b966f0f00.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/1240f927b35641639b78ad599b67bd00.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/6485befb6201463db00dfe8ced65746b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c5a250354fec47a291d2ea8b3b96ddf7.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/f092b5ff546d4cc79a1c07d2191dd00c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8f866216c29045e0ade67ea75b85946f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/108a1e426d24415da936a91b5d4ecb4b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8612e27477d44dbea36bab91fe7abd90.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5d976d7ce1b144f2978bfa232b0e49bd.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/7a5f5cd1dbd341ceaebda0adadd149bf.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e098ca815fcf4f0c8b971389ae193151.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e5e900a8c3a543669125caa11ab80542.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d375daf51a514b37810f47f4eca4e037.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/6504ee29e64043e7b4896549832d6129.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/31fc3b38fa2d49809fabd03e73ac8e71.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/df0d4b56f14b4aeabf726e6c65cdddbb.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/82eaf733cc144ea0a8e4d4a7e0050f10.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e39a5b535fa7493a8b79cfb9693bc73b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/0ab951143c5147a691da501efba940f8.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/6c582361fa4540d6a07cd2c5a8cf5d91.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/3e68c8710fa048a0ab0ee3949636c78b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8247d1560a7c48f090a572bd000e1f5b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/7cfd5894aad24fafa0943f8867aa4b03.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/ddaecd6ddd6d4257bc7b5154e0e53f20.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/1868d41a3d894a62962a5b52a35a24f2.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d75a6aa616bb4e96b994a55bce88d54c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c9037c46935b454f802c7e00a947c63d.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e2f7306f7e6c4950ace46aa160fad747.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/43fad263dc314f31b62896a97047c796.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8996449e409e406d895dfb11d1425e86.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/11f58a1869d14ed4ab2b97017d8f0b02.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/cc76e0b5ef9a4b048233bfd6e224c5ab.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/39b4665ca4404525af67abfa0dcd69ee.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/ce4ddd5b4e214791b7193cc59a65eb2c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/b6b281eac1a149c98e2b24502ffaf6b8.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/708d723885f64ce7b8a906cae84da90f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/33b2c455eaef4326a2c69615ff14b809.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/cce38c152c354e788490c4b8304de497.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8d5c322082074821b3ba12cb14788b77.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/731cfb18cb9d441a9338ea5bcf3cf534.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d515939771234da59783fd7ee428858b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d3d7d8c1d9e140f6bbbcb65c9554664d.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/0dfbe553fc7941a8975e513d06cc9e80.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/46a891ba7dd14538841613cd28fd75e2.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8ff7beb5c4704d4998dd085e7802b265.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e1524ff6b6914f79a787b7a304f890dc.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2790d13d0bb143f9b5a24d1591b73b94.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/a3b0dfdda3f74b7986a070afdba1b4b1.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/75f77bee60e843ed9db5392b5b9f691f.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5f126aa5ce114caf963a9afc2727d30a.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/022aefb3433046ecb9c4dd3a8afd9d0f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e6ca6778bf9d48caaa1a0ae8ceca8bbf.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2764abfb3ab344ff9ec6307ceed380f5.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/710afda63ece4218a74c15fe4936bf46.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/6ff97aa240514961b098e53c97a5feee.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/05ca9e8b88b24630920a0cc3a2b7194f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d36cd4ef2fb14784bfa1d83b89b043b6.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c4a7a40b19344649a1d747f91506d216.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/fa7caa5fa9264c709c9eea09edab2527.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/007c0521ed7b4ef8a7a2a5487d5899ad.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/98e2dd0263ce40249223758f8e5b9398.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/08730bb3390b477fbf144db23fba9154.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/f8421fff3edf43f08fa2050362fd3679.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/3e6d921f239c4362962e90dfedd261c5.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/967d306037a84153a2c4b449c96e5bc9.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/cb686ac9ee534a838e773705cfafae05.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/934860a1920c48b68ad7ca397fbfd199.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/4d813a5daa3d48b4b6b09ad1a794b8bc.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/1ce8fd7f8bd74210b173ee5affb6bddc.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/46a85f02dccf4c1f9530f3c0c4cb2c66.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/9c0f13f36f664fd68ab465d8158829a7.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/ca11f3ba861e4797b7bdeebd44fe4f53.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/77c9d4d96a9949f4a546cfeb0b4db25f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/b71e3b74fc214e6dbec9fc9cd9624e4b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/6a2e92baf6f2427280887cef5972c9cc.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/6b0d46cc22eb47578697b50d921ee257.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8daa5c1b42ed460e86fb8c138054eb52.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/f2467bc01914407e96895c9423a133de.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/b51e71d001b74da1a35eab8229a75f86.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d322e8d8c92a456ebd0a12c11575c23e.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d102bbf3e1b44bcd841564284d4730f3.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/76a81b8a35c445019cb4ad49fdc7f2ac.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8cfeea3439e24619a8399050e09c8b67.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/a0dad26232c349d5992d669c5a812574.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/858d914a804348c1bac9cbda2e5cad8f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/b2a26dd68c7240fc8b85195704b5e571.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2872be353e364774be728261b169acda.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/b632f0ef47884546b54c58db4148f9a2.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/ebb9773b04e546ffaa6c7c2ce78d1f1a.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/3cde54307e934a1a9eca28e25070da50.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/abec2ea57a6042539b93b04c22824615.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/70646ece72244c41830645eaa3fa10ae.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/7e39eedd1b87436caebf4b0fb1d9cb68.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/52ac048266814794b6dc53d0d9722d56.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/37f684cbd174425283e2e0a24adaeb2c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c6968c193cf047e7923ac3c717b06dd7.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2cc082b1d8cd4ac1b917e67bb3f9839b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/af5cc5f460124352bc0c4c849ac546d0.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/bd8acb4748a54fdf999982e22cafd340.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/bb61384aa9ac4820837852dab2782934.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/4d3cb9df91b74123983bdbc0ff0969e4.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/a27d267bf91345e6b42c2a6aa5dc7caa.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/89a57715c0e14a11890936a5fa9dadf5.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/45d7418dcdc7431391aaeb2b315d505c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/01b12a307c8947bc9ae969ce992ca60b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8ff518c9159248f5aa09a0ea4e4d0149.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/9ae8b84b9abc4e9ca925e80b252fdc75.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/f9950d43a1c04577a9c5dc491ea64b9f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/ab8329045bf143829395998f7aa41937.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e1f160682c0e4b11b219e3a5d131500c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/b61b1f6881f7456f98ff5d87cc1d63db.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/6d39b9ae1ef24a1da2a325c72b81a4a3.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8e065486c23d4c5baac92c2bf5980008.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/413c0e10d2344ddcb9ed6e4aaff13ea3.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/433412d37b4848d3a66f09b4d75b654f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e35a6c5187a3400b9589c802a1f0eaf7.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c446cec9bd084914867ba5d17732e2ed.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/1d465185f0ec443ca946f331a947e273.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/bf00904ff3d84f3b94ef50f4dd93b4bd.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/52c96905fd0142e8b37a083d5bbf0795.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8ca0437e858f4aada777deaa2b80de9c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/f1812f70c4bf47d1aa5d651487974ad0.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/687ade5ed9ab41d79716f46fa12865e8.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/25593e1311da4c53bbb7e3e36762bdf0.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d36185a7f08f467e816cb3f8f4a5c031.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="article:published_time" content="2022-09-23T15:50:33.575Z">
+<meta property="article:modified_time" content="2022-09-24T09:26:08.672Z">
+<meta property="article:author" content="橙留香">
+<meta property="article:tag" content="AndroidSecurity">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://mmbiz.qpic.cn/mmbiz_png/3VOFdKPc3kDiaUh1aUwMFjPlCia3ChCZZG2iabp8JJEgofHmvQpn9DJyHNv1U84mqbhIcrBSfkIKticzYqZUrNse1g/0?wx_fmt=png">
+  
+  
+  
+  <title>「干货」静态逆向APK应用浅析「手动注入smali」+「IDA Pro静态分析so文件」+「IDA Pro基础使用讲解」 - 车联网安全技术博客 | 橙留香</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"orangey.info","root":"/","version":"1.9.3","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"java"},"copy_btn":false,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>橙留香</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="「干货」静态逆向APK应用浅析「手动注入smali」+「IDA Pro静态分析so文件」+「IDA Pro基础使用讲解」"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-09-23 23:50" pubdate>
+          2022年9月23日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          26k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          <!-- compatible with older versions-->
+          215 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">「干货」静态逆向APK应用浅析「手动注入smali」+「IDA Pro静态分析so文件」+「IDA Pro基础使用讲解」</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <div id="readmore-container"><hr>
+<p><strong>也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大</strong></p>
+<p><strong>少走了弯路，也就错过了风景，无论如何，感谢经历</strong></p>
+<hr>
+<p>Android安全付费专栏长期更新，本篇最新内容请前往：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://orangey.blog.csdn.net/article/details/123520495">[车联网安全自学篇] Android安全之静态方式逆向APK应用浅析【手动注入smali+】+【IDA Pro静态分析so文件】+【IDA Pro基础使用讲解】</a></li>
+</ul>
+<p>更多关于Android安全的知识，可前往：<a target="_blank" rel="noopener" href="https://blog.csdn.net/ananasorangey/category11955914.html">https://blog.csdn.net/ananasorangey/category11955914.html</a></p>
+<p><img src="https://mmbiz.qpic.cn/mmbiz_png/3VOFdKPc3kDiaUh1aUwMFjPlCia3ChCZZG2iabp8JJEgofHmvQpn9DJyHNv1U84mqbhIcrBSfkIKticzYqZUrNse1g/0?wx_fmt=png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><img src="https://i.imgtg.com/2022/09/21/gNXxK.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x01-前言"><a href="#0x01-前言" class="headerlink" title="0x01 前言"></a>0x01 前言</h1><p>静态分析是在不运行代码的情况下，采用词法分析、语法分析等各种技术手段对程序文件进行扫描，从而生成程序的反汇编代码，然后通过阅读反汇编代码来掌握程序功能的一种技术。</p>
+<p>静态分析过程的重点工作是阅读反汇编代码，一般需要汇编语言、Smali语言、Java、C&#x2F;C++、Python等语言储备，主流分析工具包括Apktool Box、ApkIDE、Android Killer、GDA等，主要涉及两种分析方法：</p>
+<ul>
+<li>通过阅读反汇编生成的Dalivk字节码来分析软件的内部逻辑</li>
+<li>通过阅读反汇编生成的Java源码来分析软件的内部逻辑</li>
+</ul>
+<p>针对Android逆向技术，也逐渐出现了多种反Android逆向技术，主要是开发人员为了防止应用被Android逆向技术进行分析调试，保障应用安全，在开发过程中所使用的技术。一般包括以下几类技术：</p>
+<ul>
+<li>反反编译技术：通过寻找反编译工具在处理apk或dex文件时的缺陷，然后在软件开发过程中加以利用，使得处理时抛出异常而导致反编译失败</li>
+<li>反静态分析技术：一般包括代码混淆、NDK保护、外壳保护</li>
+<li>反动态调试技术：一般包括检测调试器、检测模拟器等方式</li>
+<li>反回编译技术：一般涉及检查签名、校验保护等</li>
+</ul>
+<p>静态分析里面，除了通过全局搜索一些关键的字符串来找突破点，通常可以添加加log代码，打断点，来追踪代码的执行逻辑</p>
+<p>修改smali代码，添加日志信息即可</p>
+<p>IDA工具查看so中的代码逻辑</p>
+<p><img src="https://img-blog.csdnimg.cn/e085f7b85e174864abbb18900a9c5ac2.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/5215612ce1534f16918a99d52a6f2bad.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>左边栏中有so中的函数，找到指定函数的定义的地方进行查看即可<br>IDA工具也可查看APK文件</p>
+<p><img src="https://img-blog.csdnimg.cn/14aed1e274f04299aa8a663b2fb77549.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/89cafb73727d47cf8612fefeba7c181a.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>查看apk文件中的所有文件，选择classes.dex文件</p>
+<p><img src="https://img-blog.csdnimg.cn/5af24ca4c4924329835ca26115feb4c7.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>打开后，可以看到类和方法名</p>
+<p><img src="https://img-blog.csdnimg.cn/5e00605a9d5d4cb2ab5553cb5f291372.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>使用Ctrl+F 组合键来搜索类名和方法名，或Shirt+F12 查看字符串内容</p>
+<p><img src="https://img-blog.csdnimg.cn/11f3c3721fd948b09a7628cfa8900da6.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x02-静态分析之手动注入smali"><a href="#0x02-静态分析之手动注入smali" class="headerlink" title="0x02 静态分析之手动注入smali"></a>0x02 静态分析之手动注入smali</h1><p><strong>一些基础知识的篇幅，之前的文章里面已经覆盖，此处不再重复唠叨</strong></p>
+<ul>
+<li>[IOV安全入门] 六. Android安全之混淆机制、签名保护的案例浅析</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://orangey.blog.csdn.net/article/details/122090111">https://orangey.blog.csdn.net/article/details/122090111</a></p>
+<ul>
+<li>[IOV安全入门] 十. Android安全之DDMS反调试检测说明</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://orangey.blog.csdn.net/article/details/122264018">https://orangey.blog.csdn.net/article/details/122264018</a></p>
+<ul>
+<li>[IOV安全入门] 十四. Android安全之ARM汇编指令集手册【精简汇总版】</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://orangey.blog.csdn.net/article/details/122431881">https://orangey.blog.csdn.net/article/details/122431881</a></p>
+<ul>
+<li>[IOV安全入门] 十三. Android安全之Smali语法总结【必备】</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://orangey.blog.csdn.net/article/details/122402479">https://orangey.blog.csdn.net/article/details/122402479</a></p>
+<ul>
+<li>反编译APK</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java">java -jar apktool.jar d -f xxx.apk -o xxa<br></code></pre></td></tr></table></figure>
+
+<p>首先，查看AndroidMainfest.xml —&gt; application 标签下，属性 android:debuggable是否为true，如果不为true就将其改为true后回编译</p>
+<p><img src="https://img-blog.csdnimg.cn/67a64dfc8d9b4fb7a081c615651eab1e.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>回编译APK</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java">java -jar apktool.jar b -d 反编译的文件名  -o debug.apk（回编译之后的文件）<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>签名</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java">java -jar signapk.jar .testkey.x509.pem testkey.pk8 debug.apk debug1.apk<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/7cede16c80a646a2ba76c1741cda8365.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_15,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>如果想获取应用的包名和入口Activity 名称即可，通过AndroidMainfest.xml 获取或者通过命令获取</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/4bc0cf10daea42d29ce44c28ede425b4.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<figure class="highlight coq"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs coq">adb shell dumpsys activity <span class="hljs-built_in">top</span><br></code></pre></td></tr></table></figure>
+<ul>
+<li>可以显示当前的Activity</li>
+<li>可以显示View Hierarchy，看view的类信息</li>
+<li>可以显示Handler中的Message信息</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/f5662af5a0fc4bb18a38c4817729a03e.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>但点击安装好的可调试的APP，发现运行的时会闪退，打不开APP，查看log中的日志信息，未发现抛出异常信息</p>
+<p><img src="https://img-blog.csdnimg.cn/524fdfd27f774c1fa3644bf14ac24e68.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_8,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><img src="https://img-blog.csdnimg.cn/d9d0d70e34c841d38f5e1c285a03c7cf.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>如上图，日志中未发现抛出异常信息，猜测应该是APK内部做了校验工作，防止APK被人回编译，校验方式一般为：</p>
+<ul>
+<li><p>对dex做校验，防止修改dex</p>
+</li>
+<li><p>对APK的做签名校验，防止重新打包</p>
+</li>
+<li><p>使用dex2jar反编译java源码</p>
+</li>
+</ul>
+<p>将debug1.apk直接修改后缀，改为debug1.zip，并解压解压后的文件夹中，classes.dex 就是java源码打包后的文件，然后将命令行定位到dex2jar.bat所在目录</p>
+<p>使用命令行：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs">d2j-dex2jar classes.dex<br></code></pre></td></tr></table></figure>
+
+<p>执行上述命令后，会生成classes-dex2jar文件，该文件就是反编译后的java源码文件，最后使用gui查看反编译后的java源码</p>
+<p>反编译出它伪代码后，发现做了代码混淆，但是一些系统回调方法是不能魂系的，例如，某些程序入口一般都是Application或者是MainActivity之处，因为这些Android中的组件类是不能进行混淆的，比如onCreate方法</p>
+<ul>
+<li>首先看这个类有没有静态方法和静态代码块，因为这类的代码会在对象初始化之前运行，可能在这里加载so文件，或者是加密校验等操作</li>
+<li>再看这个类的构造方法</li>
+<li>最后看生命周期方法</li>
+</ul>
+<p>编写日志类MyLog，新建一个项目之后，然后编译成APK，再反编译得到MyLog.smail文件，需要把MyLog.smali的包名信息删除，因为放到root目录下的，意味着这个MyLog类是没有任何包名的，不然最后会报错</p>
+<p>Mylog.smali 文件：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><code class="hljs java">.<span class="hljs-keyword">class</span> <span class="hljs-title class_">public</span> LMyLog;<br>.<span class="hljs-built_in">super</span> Ljava/lang/Object;<br>.source <span class="hljs-string">&quot;MyLog.java&quot;</span><br><br><br># <span class="hljs-keyword">static</span> fields<br>.field <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> TAG:Ljava/lang/String; = <span class="hljs-string">&quot;JW&quot;</span><br><br><br># direct methods<br>.method <span class="hljs-keyword">public</span> constructor &lt;init&gt;()V<br>    .locals <span class="hljs-number">0</span><br><br>    .prologue<br>    .line <span class="hljs-number">5</span><br>    invoke-direct &#123;p0&#125;, Ljava/lang/Object;-&gt;&lt;init&gt;()V<br><br>    <span class="hljs-keyword">return</span>-<span class="hljs-keyword">void</span><br>.end method<br><br>.method <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-title function_">log</span><span class="hljs-params">(Ljava/lang/Object;)</span>V<br>    .locals <span class="hljs-number">3</span><br>    .param p0, <span class="hljs-string">&quot;obj&quot;</span>    # Ljava/lang/Object;<br><br>    .prologue<br>    .line <span class="hljs-number">10</span><br>    const-string v0, <span class="hljs-string">&quot;JW&quot;</span><br><br>    <span class="hljs-keyword">new</span>-instance v1, Ljava/lang/StringBuilder;<br><br>    const-string v2, <span class="hljs-string">&quot;msg:&quot;</span><br><br>    invoke-direct &#123;v1, v2&#125;, Ljava/lang/StringBuilder;-&gt;&lt;init&gt;(Ljava/lang/String;)V<br><br>    invoke-virtual &#123;v1, p0&#125;, Ljava/lang/StringBuilder;-&gt;append(Ljava/lang/Object;)Ljava/lang/StringBuilder;<br><br>    move-result-object v1<br><br>    invoke-virtual &#123;v1&#125;, Ljava/lang/StringBuilder;-&gt;toString()Ljava/lang/String;<br><br>    move-result-object v1<br><br>    invoke-<span class="hljs-keyword">static</span> &#123;v0, v1&#125;, Landroid/util/Log;-&gt;i(Ljava/lang/String;Ljava/lang/String;)I<br><br>    .line <span class="hljs-number">11</span><br>    <span class="hljs-keyword">return</span>-<span class="hljs-keyword">void</span><br>.end method<br><br>.method <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-title function_">print</span><span class="hljs-params">()</span>V<br>    .locals <span class="hljs-number">1</span><br><br>    .prologue<br>    .line <span class="hljs-number">14</span><br>    const-string v0, <span class="hljs-string">&quot;debug...&quot;</span><br><br>    invoke-<span class="hljs-keyword">static</span> &#123;v0&#125;, LMyLog;-&gt;log(Ljava/lang/Object;)V<br><br>    .line <span class="hljs-number">15</span><br>    <span class="hljs-keyword">return</span>-<span class="hljs-keyword">void</span><br>.end method<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>在ShuqiApplication的onCreate方法中插入的日志方法，在.line 42、43、44 下面添加日志方法的smali 语句</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs java">.line <span class="hljs-number">42</span><br>    sput-object p0, Lcom/shuqi/application/ShuqiApplication;-&gt;b:Lcom/shuqi/application/ShuqiApplication;<br>    # 调用一个<span class="hljs-keyword">static</span>的日志静态方法<br>    invoke-<span class="hljs-keyword">static</span> &#123;&#125;, LMyLog;-&gt;print()V<br><br>    .line <span class="hljs-number">43</span><br>    #invoke-<span class="hljs-keyword">static</span> &#123;p0&#125;, Lvr;-&gt;h(Landroid/content/Context;)V<br>    # 调用一个<span class="hljs-keyword">static</span>的日志静态方法<br>    invoke-<span class="hljs-keyword">static</span> &#123;&#125;, LMyLog;-&gt;print()V<br><br>    .line <span class="hljs-number">44</span><br>    invoke-<span class="hljs-keyword">static</span> &#123;v0, v0&#125;, Lab;-&gt;a(ZZ)V<br>    # 调用一个<span class="hljs-keyword">static</span>的日志静态方法<br>    invoke-<span class="hljs-keyword">static</span> &#123;&#125;, LMyLog;-&gt;print()V<br></code></pre></td></tr></table></figure>
+
+<p>在smali文件里要在上个方法调用完之后添加找，，比如：invoke-virtual，invoke-static等，这些指令后面不能有move-result-object，因为这个指令是获取方法的返回值，所以一般是这样加代码的：</p>
+<ul>
+<li><p>在invoke-static&#x2F;invoke-virtual指令返回类型是V之后可以加入</p>
+</li>
+<li><p>在invoke-static&#x2F;invoke-virtual指令返回类型不是V，那么在move-result-object命令之后可以加入。</p>
+</li>
+<li><p>加好了日志代码之后回编译执行，在这个过程中可能会遇到samli语法错误，针对指定的文件修改就可以了，得到回编译的apk</p>
+</li>
+</ul>
+<p>安装并运行APK，并开启日志log的tag</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java">adb logcat -s JW<br></code></pre></td></tr></table></figure>
+
+<p>这里可能还需要改一个vr可以发现在不同的为什么会这样，我们将APK后缀改为zip，然后解压后将里面的classes.dex 用d2x-tools工具反编译为伪代码，然后用jd-gui 打开伪代码，一下打包好的APK，出现在vr.h这个方法</p>
+<p><img src="https://img-blog.csdnimg.cn/cc73255e3cd447a48f9b71d73ad46899.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/bcf3dbc13f6748cdac042806da3f5f78.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><strong>注意</strong>：此处会出现加了smali 程序运行闪退，猜测可能是做了校验，有可能是签名验证。校验不正确的话，直接退出程序。</p>
+<p>如果想为了添加log日志smali代码后，能正常运行程序的话，我们需要使用<code>“#” </code>，注释smali对应的这行代码：<code>vr.h（this） </code>即可解决，这种方式在我们需要定位错误的时候是很管用的</p>
+<p><img src="https://img-blog.csdnimg.cn/dbdff631c1f640c1b67728efc581f637.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/1fee71ea198f4b3ba2ea17d181c8a541.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>如上图，该方法做了签名验证，不正确的话，直接退出程序。那么我们现在要想正常的运行程序的话，直接注释这行代码：<code>vr.h(this)</code>即可绕过</p>
+<h1 id="0x03-IDA-Pro静态分析native代码之前言"><a href="#0x03-IDA-Pro静态分析native代码之前言" class="headerlink" title="0x03 IDA Pro静态分析native代码之前言"></a>0x03 IDA Pro静态分析native代码之前言</h1><p>开始之前介绍的一些之前写的文章里面的基础知识</p>
+<p><strong>常见的寻址方式</strong></p>
+<p>1、立即数寻址</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">MOV R0,#<span class="hljs-number">64</span> (将立即数<span class="hljs-number">64</span>传给寄存器R0)<br></code></pre></td></tr></table></figure>
+<p>2、寄存器寻址</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">ADD R0,R1,R2 (将寄存器R1与寄存器R2的值相加，得到的和传给R0)<br></code></pre></td></tr></table></figure>
+<p>3、寄存器间接寻址</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">LDR R0,[R1] (将寄存器R1中的值作为地址，对这个地址进行寻址获取操作数，取得的操作数传给寄存器R0)<br></code></pre></td></tr></table></figure>
+<p>4、寄存器基址变址寻址</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">LDR R0,[R1,#<span class="hljs-number">4</span>] (将寄存器R1的值+<span class="hljs-number">4</span>作为地址，对这个地址进行寻址获取操作数，取得的操作数传给寄存器R0)<br></code></pre></td></tr></table></figure>
+<p>5、多寄存器寻址</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c">LDMIA R0,&#123;R1,R2,R3,R4&#125; (将R0寄存器的值寻址获得操作数给R1，然后将R0寄存器的值+<span class="hljs-number">4</span>寻址获得操作数给R2，后面R0+<span class="hljs-number">8</span>，R0+<span class="hljs-number">12</span>如此类推)<br><br>LDMIB R0,&#123;R1,R2,R3,R4&#125; (将R0寄存器的值+<span class="hljs-number">4</span>寻址获得操作数给R1,后面R0+<span class="hljs-number">8</span>，R0+<span class="hljs-number">12</span>如此类推)<br></code></pre></td></tr></table></figure>
+<p>6、堆栈寻址</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c">STMFD sp!,&#123;R1-R7,LR&#125; (将R1~R7，LR寄存器的值压入堆栈，满递减堆栈)<br><br>LDMED sp!,&#123;R1-R7,LR&#125; (将堆栈中的数据取回R1~R7，LR寄存器，空递减堆栈)<br><br>LD : load 加载，出栈操作 ST : store 存储，入栈操作 M : multi 多次 F: full 满栈，SP指向最后一个数据 E: empty 空栈，SP指向与最后一个数据相邻的下一个可写入存储单元 D: descending 递减，代表栈的增长方向 A: ascending 递增，代表栈的增长方向<br></code></pre></td></tr></table></figure>
+
+<p><strong>E\F详解</strong></p>
+<p><img src="https://img-blog.csdnimg.cn/295bf97c20dd4f1598efee4cf21dc1fd.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_18,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><strong>D\A详解</strong></p>
+<p><img src="https://img-blog.csdnimg.cn/f97e7ce64f2645c9a9a1ec7efc45d0bd.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_17,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li><p><strong>常用寄存器</strong></p>
+<ul>
+<li>R0-R3：用于参数返回值的传递</li>
+<li>R4-R6,R8,R10-R11：普通的常用寄存器</li>
+<li>R7：栈帧指针，指向前一个保存的栈帧，以及链接寄存器在栈上的地址</li>
+<li>R9：操作系统保留</li>
+<li>R12：又叫IP，指令指针寄存器，CS:IP用于指定指令的起始地址</li>
+<li>R13：又叫SP，栈顶指针</li>
+<li>R14：又叫LR，存放函数的返回地址</li>
+<li>R15：又叫PC，指向下一条指令的地址，也即将将要执行的指令代码</li>
+</ul>
+</li>
+<li><p>常用指令</p>
+<ul>
+<li>ADD：加指令</li>
+<li>SUB：减指令</li>
+<li>STR：寄存器内容入栈</li>
+<li>LDR：寄存器内容出栈</li>
+<li>.W：表示指令宽度，确保生成32位长度指令</li>
+<li>BL\BLX：函数调用，对应ARM与Thumb指令集</li>
+<li>CMP：操作数比较</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdio.h&gt;</span></span><br><span class="hljs-type">int</span> <span class="hljs-title function_">func</span><span class="hljs-params">(<span class="hljs-type">int</span> a,<span class="hljs-type">int</span> b,<span class="hljs-type">int</span> c,<span class="hljs-type">int</span> d,<span class="hljs-type">int</span> e,<span class="hljs-type">int</span> f)</span>&#123;<br>    <span class="hljs-type">int</span> g = a + b + c + d + e + f;<br>    <span class="hljs-keyword">return</span> g;<br>&#125;<br><br>add r0,r1; 将参数a+b求和赋给r0<br>ldr.w r12,[SP]; 将栈顶f的值赋给r12<br>add r0,r2; 将c的值和r0求和赋给r0<br>ldr.w r9,[sp,#<span class="hljs-number">4</span>]; 将栈顶+<span class="hljs-number">4</span>地址的值赋予给r9，即将e赋给r9<br>add r0,r3; 将d与r0求和赋给r0<br>add r0,r12; 将r12与r0求和赋给r0<br>add r0,r9; 将r9与r0求和赋给r0<br><br></code></pre></td></tr></table></figure>
+
+
+<hr>
+<ul>
+<li>IDA Pro</li>
+</ul>
+<p>IDA Pro破解版最新版是一款非常专业的交互式反汇编工具。它不仅能够在众所周知的C&#x2F;C++ 反编译问题中取得突破性的进展，还为二进制分析领域的未来发展奠定了坚实的基础，提供语法高亮、代码折叠、编译错误提示等功能</p>
+<p>静态分析，也就是在不运行二进制程序的情况下直接分析程序中的机器指令等各种信息。通过静态的分析反汇编代码或者伪代码来解出Flag。IDA就是目前最常用到的用来静态分析的反汇编工具，它使用的是递归下降反汇编算法，支持的文件类型也非常丰富，除了常见的PE（Windows下的可执行文件）、ELF（Linux下的可执行文件）格式之外还支持DOS、Java、.NET等文件格式。</p>
+<p>IDA Pro 是一款交互式的反汇编器和调试器，用于对可执行二进制文件做静态分析和动态分析，接下来以 Android native so 库为例，获取密码的方法是native的</p>
+<ul>
+<li>getDbPassword方法，用IDA打开libpsProcess.so文件</li>
+</ul>
+<h2 id="3-1-IDA用法讲解"><a href="#3-1-IDA用法讲解" class="headerlink" title="3.1 IDA用法讲解"></a>3.1 IDA用法讲解</h2><p>IDA安装目录中有三个是我们需要知道的，第一个dbgsrv文件夹是关于远程调试的，例如远程调试安卓或者IOS、linux、windows等机器，需要被调试方开启相应的服务和端口让IDA去连接；第二个是idc文件夹，主要存放一些脚本文件，我们可以利用脚本来进行一些运算，例如字符串提取转换，批量修改和提取内容等操作，不过现在在CTF逆向中一般使用python写脚本解决一些运算；第三个文件夹是插件文件夹，我们可以给IDA安装各种插件，比如识别加密算法、美化IDA显示等等，大家可以去下面吾爱破解去寻找自己喜欢的插件,并学习如何安装和使用。</p>
+<p><a target="_blank" rel="noopener" href="https://www.52pojie.cn/thread-1016307-1-1.html">https://www.52pojie.cn/thread-1016307-1-1.html</a></p>
+<p>剩下的几个文件夹：</p>
+<ul>
+<li>cfg 主要包含各种配置文件，比如基本IDA配置文件ida.cfg</li>
+<li>ids 文件夹主要包含符号文件，这些文件用于描述可被加载到IDA的二进制文件引用的共享库内容</li>
+<li>loaders 文件夹包含在文件加载过程中用于识别可执行文件的ida扩展</li>
+<li>procs 文件夹包含IDA所支持的处理器模块</li>
+<li>sig 文件夹包含IDA在各种模式匹配操作中利用的现有代码的签名</li>
+<li>til 文件夹包含一些类型库信息，IDA通过这些信息记录特定于各种编译器库的数据结构的布局</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/5f32208ac6a14d47a018370dc1103e50.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>IDA分为32位和64位两个版本，在选择反汇编程序的时候要选择对应的IDA版本</p>
+<p><img src="https://img-blog.csdnimg.cn/ffb13162580847db9568714feded8fbc.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="3-2-加载文件"><a href="#3-2-加载文件" class="headerlink" title="3.2 加载文件"></a>3.2 加载文件</h2><p>打开IDA时，会出现提示点击New按钮会让你选择你想要打开的程序，然后在打开的界面中将文件拖拽进去，下面的Previous按钮或者双击下面列表中的项目也可以快速打开之前打开过的文件。</p>
+<p><img src="https://img-blog.csdnimg.cn/f9474ed0b21543f795312a4b8334c956.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_13,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>会弹出下面窗口且正确识别出了程序的版本(80386(PE))，一般默认设置即可，点击确定就可以加载文件进入IDA了（初次使用IDA的时候IDA可能会弹出是否使用“Proximity Browser”的对话框，选择NO即可）</p>
+<p><img src="https://img-blog.csdnimg.cn/b11887b3b6004f62888296b36eefee4e.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>下图中几个文件为IDA加载程序时产生的数据库文件，关闭项目时这几个文件将被存档为一个IDB文件，里面保存着被分析程序的分析结果(例如分析时添加的注释、分析时的界面等)，当被分析文件目录下有对应的数据库文件时，会弹出确认窗口，点击OverWrite就是覆盖，点击Load existing就是加载已存在，如果点击了加载已存在IDA就会打开现有数据库文件，将界面恢复为上次关闭时的状态，上次分析时添加修改的内容也不会变。</p>
+<p><img src="https://img-blog.csdnimg.cn/09be02702a8b44c1b34bbe19f3f0f90f.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>IDA退出时会提示如下图，默认时保存分析时的数据库文件，也可以点击不保存数据库。</p>
+<p><img src="https://img-blog.csdnimg.cn/d457b2a0e5b44fc6b86cbe5c3fa377cc.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_17,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="3-3-主界面"><a href="#3-3-主界面" class="headerlink" title="3.3 主界面"></a>3.3 主界面</h2><p><img src="https://img-blog.csdnimg.cn/60592b70921c4eba94f1f0d334f2b153.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述">【1】函数窗口：列出该so文件里每一个函数，常用对函数进行搜索<br>【2】消息窗口：IDA工具的输出控制台，从中可以读到IDA的运行情况<br>【3】工具栏区域：其主要包括六个逆向工作中的常用窗口</p>
+<ul>
+<li>IDA View：操作和分析二进制文件的主要工具，其主要包括两种形式：文本视图(汇编代码)和图形视图(某个函数的调用执行情况）</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/428a3d4216544d25899035f05e445642.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/c690ca2d40e3418e8c30781f7100297a.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/57d2023f95574747bc1c0787ec140f2a.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs">红色箭头：表示跨函数调用<br>粗箭头：表示循环<br>实线箭头：表示无条件分支<br>点线箭头：表示条件分支<br></code></pre></td></tr></table></figure>
+<ul>
+<li>Hex View：显示程序内容的标准十六进制代码，每行显示十六个字节，以及对应的ascii字符，假如在文本视图中选中某一地址，则切换至十六进制窗口中该地址代码将会显示高亮</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/2a09e33310e24202a6b07cc294a62fb2.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><img src="https://img-blog.csdnimg.cn/3a2c0ef1961d4b83abff83d9d924989d.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>结构体窗口：用于显示IDA决定决定在一个二进制文件中使用的复杂数据结构，双击结构体名称可以展开内部结构</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/1d91fc9afcf14af3914c599c33b8d2ea.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><img src="https://img-blog.csdnimg.cn/aa954a4680be47dfb2bd3338d48e759b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>枚举窗口：类似于结构体窗口，当IDA识别到枚举类型，则在该窗口展现</li>
+<li>导出窗口：列出文件的入口点，其包含该so文件导出函数的名称及虚拟地址</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/a19a51a0c6834ed4b14860f263f128f5.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>导入窗口：和导出窗口相反，表示该so文件导入的所有函数名及虚拟地址</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/87e608a195a847ef816b110b966f0f00.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述">【4】概况导航栏：表示不同类型的文件内容</p>
+<p><img src="https://img-blog.csdnimg.cn/1240f927b35641639b78ad599b67bd00.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>蓝色：.text section<ul>
+<li>深蓝：用户自己写的函数编译后的代码区</li>
+<li>浅蓝：编译器自己添加的函数，像启动函数，异常函数等（我自己猜的，不一定百分百正确）</li>
+</ul>
+</li>
+<li>粉红色：.idata section<ul>
+<li>有关输入表的一些数据信息</li>
+</ul>
+</li>
+<li>军绿色：.rdata section<ul>
+<li>纯数据，只读</li>
+</ul>
+</li>
+<li>灰色：为了段对齐而留下的空隙</li>
+<li>黑色：禁区，不存在任何数据</li>
+</ul>
+<p>IDA在加载完程序后会显示为如下图所示界面，左侧为被分析的程序所用到的函数，点击可查看其汇编代码，右侧为图形视图（CTRL+鼠标滚轮可以调整窗口大小），里面将条件判断和交叉引用都标注了出来，绿色的线代表条件成立之后跳转的代码，红色的就是没有成功跳转的代码。然后上面的箭头指向的一栏是各种数据的展示窗口</p>
+<p><img src="https://img-blog.csdnimg.cn/6485befb6201463db00dfe8ced65746b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/c5a250354fec47a291d2ea8b3b96ddf7.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>在图形视图上使用空格键可以切换为代码视图，代码视图标注了当前代码的地址，分析出的函数、参数、局部变量、常量、结构体、交叉引用信息等</p>
+<p><img src="https://img-blog.csdnimg.cn/f092b5ff546d4cc79a1c07d2191dd00c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>IDA像OD一样显示操作码，可点击Options-》General，然后如下图操作把操作码字节数改为8就可以了</p>
+<p><img src="https://img-blog.csdnimg.cn/8f866216c29045e0ade67ea75b85946f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/108a1e426d24415da936a91b5d4ecb4b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>上面那条彩带叫做导航带，导航带时加载文件的地址空间的线性视图，默认情况下其会呈现二进制文件的整个地址范围。不同的颜色表示不同类型的文件，如代码或者数据。同时，还会有一个细小的当前未知指示符（默认为黄色）指向与当前反汇编窗口中显示的地址对应的导航带地址。我们通常分析程序时略过其库函数而分析程序的常规函数，我们可以根据导航带确定大致的范围。</p>
+<p><img src="https://img-blog.csdnimg.cn/8612e27477d44dbea36bab91fe7abd90.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>IDA还有很多展示数据的视图，我们可以在视图中打开子视图，例如 shift+F12 打开程序的字符串窗口，系统会从二进制文件中自动分析出程序使用了哪些字符串，还可以在窗口上点击右键—》建立，来设置扫描类型，我们双击窗口中的字符串反汇编窗口将跳到该字符串所在的地址处，然后结合交叉引用可以快速定位程序中任何引用该字符串的位置。有时候通过字符串窗口查找关键字符串来定位程序关键代码位置是效率非常高的一种方法</p>
+<p><img src="https://img-blog.csdnimg.cn/5d976d7ce1b144f2978bfa232b0e49bd.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/7a5f5cd1dbd341ceaebda0adadd149bf.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/e098ca815fcf4f0c8b971389ae193151.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>双击字符串到引用位置，然后按Ctrl+x显示出该字符串的交叉引用，如下图所示该字符串在函数sub_4AF69C中被引用了</p>
+<p><img src="https://img-blog.csdnimg.cn/e5e900a8c3a543669125caa11ab80542.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/d375daf51a514b37810f47f4eca4e037.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/6504ee29e64043e7b4896549832d6129.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>视图里面的输入（imports）窗口，可以列出当前可执行文件调用的所有函数（也就是程序的导入表），包括函数名称、包含该函数的库的名称，还有其虚拟地址，双击即可跳转到反汇编窗口的函数地址处</p>
+<p><img src="https://img-blog.csdnimg.cn/31fc3b38fa2d49809fabd03e73ac8e71.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>输出窗口显示程序的导出信息，如果没有导出信息，默认有一个就是程序的OEP，名称为start</p>
+<p><img src="https://img-blog.csdnimg.cn/df0d4b56f14b4aeabf726e6c65cdddbb.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><img src="https://img-blog.csdnimg.cn/82eaf733cc144ea0a8e4d4a7e0050f10.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>名称窗口：将IDA能识别的函数、数据、名称都列了出来，分为以下几类</p>
+<ul>
+<li>F：常规函数</li>
+<li>L：库函数</li>
+<li>I：导入的名称</li>
+<li>C：命名代码</li>
+<li>D：数据</li>
+<li>A：字符串数据<br><img src="https://img-blog.csdnimg.cn/e39a5b535fa7493a8b79cfb9693bc73b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></li>
+</ul>
+<p>十六进制窗口：我们可以按F2键对其中的数据进行修改，修改后再次按F2键即可应用</p>
+<p>结构体窗口：IDA可以根据类型库识别常用的系统结构体还有库中的结构体，我们也可以在分析的时候添加自己识别出的结构体</p>
+<p>枚举窗口：枚举窗口和结构体窗口类似，自己也可以定义枚举类型，以帮助自己更好的分析反汇编代码</p>
+<p>区段窗口：显示程序各个段的起始地址、结束地址、权限等</p>
+<p>签名窗口：签名也就是sig文件，我们可以使用IDA的fair工具制作常见库的sig文件，当加载库的sig文件时，库中的函数名称就能按照我们制作的识别出来</p>
+<h2 id="3-4-跳转"><a href="#3-4-跳转" class="headerlink" title="3.4 跳转"></a>3.4 跳转</h2><p>在反汇编窗口中按G键，打开跳转界面，然后在框中输入一个地址（十六进制）即可跳转到指定地址处。执行完跳转后，按Esc键即可返回刚才跳转前的位置。若要再想看跳转后的位置按Ctrl+Enter键即可，这两个操作可在多个跳转之间反复横跳</p>
+<p><img src="https://img-blog.csdnimg.cn/0ab951143c5147a691da501efba940f8.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="3-5-交叉引用"><a href="#3-5-交叉引用" class="headerlink" title="3.5 交叉引用"></a>3.5 交叉引用</h2><p>上面说到的交叉引用（XREF）可以知道指定代码相互调用的关系。例如下图中的 CODE XREF：sub_401090+1FF↑o，”o”表示偏移量，表示该调用地址是401090h函数的+1FF的位置，也就是40128F处，我们双击或者在此处按enter键即可跳到40128F处</p>
+<p>我们在分析时可能会搞不清一些名称的前缀含义，前缀有以下几种：</p>
+<ul>
+<li>sub_XXXXXX，表示地址XXXXXX处的函数XXXXXX为函数的起始地址</li>
+<li>loc_XXXXXX，表示地址XXXXXX处的一个指令</li>
+<li>byte_XXXXXX，表示位置XXXXXX处的8位数据</li>
+<li>word_XXXXXX，表示位置XXXXXX处的16位数据</li>
+<li>dword_XXXXXX，表示位置XXXXXX处的32位数据</li>
+<li>unk_XXXXXX，表示位置XXXXXX处大小未知的数据</li>
+<li>j_XXXXXX，表示跳转到XXXXXX处的跳转指令</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/6c582361fa4540d6a07cd2c5a8cf5d91.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="3-6-F5生成伪代码"><a href="#3-6-F5生成伪代码" class="headerlink" title="3.6 F5生成伪代码"></a>3.6 F5生成伪代码</h2><p>IDA 插件HexRays，也就是F5大法</p>
+<p>可能在分析一个程序的时候不喜欢看汇编代码，想要更直观一些的分析程序逻辑，那么就可以使用IDA的F5功能，让整个函数以类C的伪代码形式展现，使得代码分析起来更加的容易。</p>
+<p><strong>用法</strong>：</p>
+<ul>
+<li>只需要在函数处，按F5即可</li>
+</ul>
+<p>例如，下图使用交叉引用跳转到sub_401090函数中，然后按F5即打开了伪代码窗口，第一行为函数的原型，然后下面为局部变量的声明，而且每个局部变量后面使用注释表明这个变量所在的位置，然后是函数的逻辑，生成的伪代码中的变量名可能会在不同机器不同版本IDA上面有所不同</p>
+<p><img src="https://img-blog.csdnimg.cn/3e68c8710fa048a0ab0ee3949636c78b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>但是F5并不是万能的，也会出现失败的时候，大多数原因是与这个函数相关的某些参数设置错误，例如这个函数中调用其他函数的调用约定出现错误，导致参数解析失败或者调用前后栈不平衡。</p>
+<p>有时候，可能会遇到call analysis failed，就需要在错误提示界面上找到其错误的位置，修改函数原型声明中的调用约定即可。例如把thiscall改为cdecl。还有一种是sp-analusis failed ，这种错误可能是因为编译器的优化问题使得某个函数调用的调用约定出错，或者该函数的参数个数出错，导致IDA算错了栈指针的变化量，也有可能是程序代码有一些干扰代码，让IDA的反汇编分析出现错误。比如用push + n条指令 + retn来实际跳转，而IDA会以为retn是函数要结束，结果它分析后发现调用栈不平衡，因此就提示sp analysis failed。出现这种错误就只能在选项（options）-&gt;常规（General）-》勾选堆栈指针，然后反汇编窗口地址处右边会多一列栈的偏移量，在没有使用动态长度数组的正常程序中，在初始化完毕，调用前后的栈的偏移量不变。然后一点点的看完栈指针，将其与正常栈指针的变化规律相比较就可以找出其问题所在并修改即可</p>
+<p><img src="https://img-blog.csdnimg.cn/8247d1560a7c48f090a572bd000e1f5b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="3-7-重命名"><a href="#3-7-重命名" class="headerlink" title="3.7 重命名"></a>3.7 重命名</h2><p>可以看到系统，帮助无我们，识别出了许多的函数并添加上了名称，例如GetDlgItemTextA、strlen、ExitProcess等。</p>
+<p>如果遇到一个函数或者数据不知道干什么的，IDA也没有识别出来，可以双击进去查看其逻辑，分析出其是做什么的，然后自己给它命名，例如：点击了CloseHandle函数进去之后分析出了它是异或加密函数，就可以在函数名称上面点击右键选择重命名全局项目，然后输入自己给它起的名称例如：CloseHandle_test，这样这个程序中所有引用这个此函数的地方就都变成了CloseHandle_test，也就不用自己再挨个去识别了，不止是函数，数据同样使用此方法（需注意：低版本的IDA没有撤销功能，所以操作前要小心）</p>
+<p><img src="https://img-blog.csdnimg.cn/7cfd5894aad24fafa0943f8867aa4b03.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="3-8-拍摄快照"><a href="#3-8-拍摄快照" class="headerlink" title="3.8 拍摄快照"></a>3.8 拍摄快照</h2><p>由于IDA不提供撤销的功能，如果你不小心按到某个键，导致ida数据库发生了改变，就得重新来过，所以要记得在经常操作的时候，加上快照：file–&gt;take database snapshot 加完快照后，会生成一个新的ida数据库文件，本质上是有点像另存的操作</p>
+<p>快捷键：ctrl+shift+w</p>
+<h2 id="3-9-菜单栏常用设置"><a href="#3-9-菜单栏常用设置" class="headerlink" title="3.9 菜单栏常用设置"></a>3.9 菜单栏常用设置</h2><ul>
+<li><p>view–&gt;open subviews: 可以恢复你无意中关闭的数据显示窗口</p>
+</li>
+<li><p>windows–&gt;reset desktop: 可以恢复初始ida布局</p>
+</li>
+<li><p>option–&gt;font: 可以改变字体的相关属性</p>
+</li>
+</ul>
+<h2 id="3-10-在流程视图中添加地址偏移"><a href="#3-10-在流程视图中添加地址偏移" class="headerlink" title="3.10 在流程视图中添加地址偏移"></a>3.10 在流程视图中添加地址偏移</h2><p>IDA中的流程视图可以说是非常的好用，简单明了地能看出程序的执行流程，尤其是在看if分支代码和循环代码的时候，能够非常直观</p>
+<p><img src="https://img-blog.csdnimg.cn/ddaecd6ddd6d4257bc7b5154e0e53f20.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>但是，还可以改得更加好用，在这个视图中添加地址偏移的话，我们取地址就非常方便，不再需要按空格切换视图去找，在菜单栏中设置：option–&gt;general</p>
+<p><img src="https://img-blog.csdnimg.cn/1868d41a3d894a62962a5b52a35a24f2.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>将该选项打钩后就可以看到效果了：</p>
+<p><img src="https://img-blog.csdnimg.cn/d75a6aa616bb4e96b994a55bce88d54c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="3-11自动添加反汇编注释"><a href="#3-11自动添加反汇编注释" class="headerlink" title="3.11自动添加反汇编注释"></a>3.11自动添加反汇编注释</h2><p>这个功能对于萌新来说非常友好，在刚刚初学汇编的时候， 难免遇到几个不常用的蛇皮汇编指令，就得自己一个个去查，很麻烦，开启了自动注释的功能后，IDA就可以直接告诉你汇编指令的意思</p>
+<p>同样是在菜单栏中设置：option–&gt;general</p>
+<p><img src="https://img-blog.csdnimg.cn/c9037c46935b454f802c7e00a947c63d.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>效果如下：</p>
+<p><img src="https://img-blog.csdnimg.cn/e2f7306f7e6c4950ace46aa160fad747.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="3-12-注释"><a href="#3-12-注释" class="headerlink" title="3.12 注释"></a>3.12 注释</h2><p>分析程序的时候如果需要对某句逻辑添加自己的注释，可以在此句后面按“&#x2F;”，即可添加注释</p>
+<p><img src="https://img-blog.csdnimg.cn/43fad263dc314f31b62896a97047c796.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>给汇编代码添加注释是按“ ；”</p>
+<p><img src="https://img-blog.csdnimg.cn/8996449e409e406d895dfb11d1425e86.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="3-13-添加标记"><a href="#3-13-添加标记" class="headerlink" title="3.13 添加标记"></a>3.13 添加标记</h2><p>分析过程中想在某处做个标记，然后方便自己查找，只需把鼠标光标点到想要标记的位置，然后按下Alt+M，然后给这个位置取个名字点击保存即可，然后如果我们标记了很多位置，按CTRL+M即可查看自己标记过的位置列表，双击即可跳转过去</p>
+<ul>
+<li>Alt+M</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/11f58a1869d14ed4ab2b97017d8f0b02.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>CTRL+M</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/cc76e0b5ef9a4b048233bfd6e224c5ab.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>选择一项标记内容，点击OK</p>
+<p><img src="https://img-blog.csdnimg.cn/39b4665ca4404525af67abfa0dcd69ee.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="3-14-格式化指令操作数"><a href="#3-14-格式化指令操作数" class="headerlink" title="3.14 格式化指令操作数"></a>3.14 格式化指令操作数</h2><p>IDA中可以格式化指令使用的常量，在分析的时候应将常量尽可能的使用符号名称代替，从而分析起来更加的清晰明了，一般IDA会自动根据反汇编指令的上下文进行格式化，但是有时候IDA就将常量显示为一个十六进制数。可以将光标移动到想要格式化的常量上面，单击右键即可转换其进制，或者让其当成字符串展示。例如，知道了函数所使用的参数属于什么类型，右键-》使用标准符号常量选择其对应的标准显示符号</p>
+<p><img src="https://img-blog.csdnimg.cn/ce4ddd5b4e214791b7193cc59a65eb2c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="3-15-函数操作"><a href="#3-15-函数操作" class="headerlink" title="3.15 函数操作"></a>3.15 函数操作</h2><p>IDA允许手动干预创建、编辑、删除函数，新函数由不属于某个函数的现有指令创建，或者由未被IDA以任何方式定义的原始数据创建。</p>
+<p>如下图所示，由这么一段数据，我们一看就知道这肯定是一个函数，但是我们点击F5将其转变为伪代码时IDA提示“请将光标在一个函数上”，可见IDA并没有将其正确的识别为函数，我们就可以先将其创建成函数，再按F5生成伪代码来分析，我们将光标移到要创建函数的第一个字节上，也就是loc_80000290处右键-》创建函数，或者直接快捷键P，即可以函数的形式重组代码，在重组代码时IDA会将数据转换成代码以便分析函数的结构，若能找到函数的结束部分IDA将生成一个新的函数名，以函数的形式重组代码。如果无法确定函数的结束部分或者发现非法指令，这个操作将会终止</p>
+<p><img src="https://img-blog.csdnimg.cn/b6b281eac1a149c98e2b24502ffaf6b8.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/708d723885f64ce7b8a906cae84da90f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>重组函数后名称变为了sub_8000290</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/33b2c455eaef4326a2c69615ff14b809.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>按F5即可正确识别出伪代码</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/cce38c152c354e788490c4b8304de497.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="3-16-代码和数据转换"><a href="#3-16-代码和数据转换" class="headerlink" title="3.16 代码和数据转换"></a>3.16 代码和数据转换</h2><p>IDA反汇编的时候可能无法正确的区分数据和代码，数据字节可能被错误的识别为代码字节，而代码字节被错误的识别为数据字节。有些程序就是用这种IDA的缺陷来对抗静态反汇编的，不过可以人工修改来帮助IDA度过难关。IDA可以让我们将某段十六进制数据（机器码）指定为代码或数据。</p>
+<p>假设，确信某段十六进制数据是一段指令，只需要将光标移到其起始位置按C键即可，按P键可以将其某段代码定义为子程序，并列出参数调用。若要取消定义则按U键，数据将重新以十六进制形式显示。</p>
+<p>举个例子：</p>
+<p>下图为IDA错误的反汇编代码，因为地址0x4010D9和0x4040DB分别为JZ和JNZ也就是说无论如何都会跳转到loc_4010DD+2的位置，也就是4010DF处，但是程序相应位置并没有识别出来4040DF处的代码，所以明显出现了识别错误，即可在4010DD处使用快捷键D将其转化为数据。</p>
+<p><img src="https://img-blog.csdnimg.cn/8d5c322082074821b3ba12cb14788b77.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>然后，在地址4040DF处使用快捷键C将其转化为代码，即修正了反汇编代码显示出了正常的内容。其中的dw 0E89h就是添加的对抗静态反汇编的垃圾数据，目的就是干扰IDA的反汇编，使其误将数据当成代码来解析，从而产生了错误的逻辑</p>
+<p><img src="https://img-blog.csdnimg.cn/731cfb18cb9d441a9338ea5bcf3cf534.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>上面说到4010DD处的两个字节数据（dw 0E89Ah）为多余字节，虽然经过代码的修正后能够看到正常的反汇编代码，但是不能直接进行反编译，此时我们将多余的两个字节转化为空指令（nop指令，对应字节码为0x90），这样函数就能直接的正常反编译了。</p>
+<p>修改方法为鼠标光标移到需要修改的数据地址处，依次选择菜单栏中的编辑（Edit）-》修补程序（Patch program）-》单字节更改方式(Change byte)  来进行修改</p>
+<h2 id="3-17-字符串"><a href="#3-17-字符串" class="headerlink" title="3.17 字符串"></a>3.17 字符串</h2><p>在确定某段数据是一个字符串的时候，把光标移动到其开头处按A即可将其转换为字符串，IDA默认是C语言形式的，如果想要其他形式的可以在Options-》字符串文本，设置其他字符串格式的默认值</p>
+<p><img src="https://img-blog.csdnimg.cn/d515939771234da59783fd7ee428858b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/d3d7d8c1d9e140f6bbbcb65c9554664d.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>IDA有时无法确定ASCII字符串，发生这种错误的原因是这个字符串在程序中没有被直接调用，例如下图中，只需将光标移动到40478EH处，按A键，该处就会被定义并生成一个变量名，如果要将其恢复则按U键，可以在名称窗口（Names）看到这些字符串变量</p>
+<p><img src="https://img-blog.csdnimg.cn/0dfbe553fc7941a8975e513d06cc9e80.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="3-18-数组"><a href="#3-18-数组" class="headerlink" title="3.18 数组"></a>3.18 数组</h2><p>在操作IDA的时候，经常会遇到需要创建数组的情况，尤其是为了能方便我们看字符串的时候，创建数组显得非常必要</p>
+<ul>
+<li>例如C语言编写一个数组如下</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">static</span> <span class="hljs-type">int</span> a[<span class="hljs-number">3</span>]=&#123;<span class="hljs-number">0x11</span>,<span class="hljs-number">0x22</span>,<span class="hljs-number">0x33</span>&#125;;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>IDA生成的汇编代码如下</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">mov     edi, dword_407030[eax]<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>其中dword_407030位置指向的就是一个数组</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/46a891ba7dd14538841613cd28fd75e2.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>将光标放到此处按“ * ” 键即可打开数组排列调整窗口，数组大小填写3，每行项数填0让其根据页面自动调整即可，其余默认</li>
+</ul>
+<p>在菜单栏中选择：edit–&gt;array，就会弹出如下的选项框</p>
+<p><img src="https://img-blog.csdnimg.cn/8ff7beb5c4704d4998dd085e7802b265.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>或</p>
+<p>首先点击选中你想要转换成数组的一块区域：</p>
+<p><img src="https://img-blog.csdnimg.cn/e1524ff6b6914f79a787b7a304f890dc.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>接着在菜单栏中选择：edit–&gt;array，就会弹出如下的选项框</p>
+<p><img src="https://img-blog.csdnimg.cn/2790d13d0bb143f9b5a24d1591b73b94.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>创建好了以后，就变成了这样：</p>
+<p><img src="https://img-blog.csdnimg.cn/a3b0dfdda3f74b7986a070afdba1b4b1.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>下面来解释一下各个参数的意思：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs c">Array element size 这个值表示各数组元素的大小（这里是<span class="hljs-number">1</span>个字节），是根据你选中的数据值的大小所决定的<br><br>Maximum possible size 这个值是由自动计算得出的，他表示数组中的元素的可能的最大值<br><br>Array size 表示数组元素的数量，一般都根据你选定的自动产生默认值<br><br>Items on a line 这个表示指定每个反汇编行显示的元素数量，它可以减少显示数组所需的空间<br><br>Element print width 这个值用于格式化，当一行显示多个项目时，他控制列宽<br><br>Use “dup” construct ：使用重复结构，这个选项可以使得相同的数据值合并起来，用一个重复说明符组合成一项<br><br>Signed elements 表示将数据显示为有符号数还是无符号数<br><br>Display indexes 显示索引，使得数组索引以常规的形式显示，如果选了这个选项，还会启动右边的Indexes选项栏，用于选择索引的显示格式<br><br>Create as <span class="hljs-built_in">array</span> 创建为数组，这个一般默认选上的<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>调整完成后</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/75f77bee60e843ed9db5392b5b9f691f.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="3-19-流程图"><a href="#3-19-流程图" class="headerlink" title="3.19 流程图"></a>3.19 流程图</h2><h3 id="3-19-1-折叠流程图中的分支"><a href="#3-19-1-折叠流程图中的分支" class="headerlink" title="3.19.1 折叠流程图中的分支"></a>3.19.1 折叠流程图中的分支</h3><p>在流程视图中，分支过多的时候，可以在窗口标题处右击选择group nodes，就能把当前块折叠起来</p>
+<p><img src="https://img-blog.csdnimg.cn/5f126aa5ce114caf963a9afc2727d30a.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>效果如下:</p>
+<p><img src="https://img-blog.csdnimg.cn/022aefb3433046ecb9c4dd3a8afd9d0f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>分支块是可以自己命名的，方便自己逆向理解</p>
+<h3 id="3-19-2-函数调用图"><a href="#3-19-2-函数调用图" class="headerlink" title="3.19.2 函数调用图"></a>3.19.2 函数调用图</h3><p>菜单栏中：view–&gt;graphs–&gt;Function calls(快捷键Ctrl+F12)</p>
+<p><img src="https://img-blog.csdnimg.cn/e6ca6778bf9d48caaa1a0ae8ceca8bbf.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>这个图能很清楚地看到函数之间是如何相互调用的</p>
+<h3 id="3-19-3-函数流程图"><a href="#3-19-3-函数流程图" class="headerlink" title="3.19.3 函数流程图"></a>3.19.3 函数流程图</h3><p>菜单栏中：view–&gt;graphs–&gt;flowt chart(快捷键F12)</p>
+<p><img src="https://img-blog.csdnimg.cn/2764abfb3ab344ff9ec6307ceed380f5.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>这个其实跟IDA自带的反汇编流程视图差不多，可以导出来作为单独的一张图</p>
+<h2 id="3-20-结构体"><a href="#3-20-结构体" class="headerlink" title="3.20 结构体"></a>3.20 结构体</h2><h3 id="3-20-1-手工创建结构体"><a href="#3-20-1-手工创建结构体" class="headerlink" title="3.20.1 手工创建结构体"></a>3.20.1 手工创建结构体</h3><p>创建结构体是在IDA的structures窗口中进行的</p>
+<p><img src="https://img-blog.csdnimg.cn/710afda63ece4218a74c15fe4936bf46.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>可以看到，这里已经存在了四个结构体，程序本身存在的，可以右击选择hide&#x2F;unhide,来看具体的结构体的内容</p>
+<p><img src="https://img-blog.csdnimg.cn/6ff97aa240514961b098e53c97a5feee.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>创建结构体的快捷键是：insert</p>
+<p><img src="https://img-blog.csdnimg.cn/05ca9e8b88b24630920a0cc3a2b7194f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>在弹出的窗口中，可以编辑结构体的名字</p>
+<p>这底下有三个复选框，第一个表示显示在当前结构体之前（就会排列在第一位，否则排列在你鼠标选定的位置），第二个表示是否在窗口中显示新的结构体，第三个表示是否创建联合体。</p>
+<p>需要注意的是，结构体的大小是它所包含的字段大小的总和，而联合体的大小则等于其中最大字段的大小</p>
+<p>在单击ok以后，就定好了一个空的结构体：</p>
+<p><img src="https://img-blog.csdnimg.cn/d36cd4ef2fb14784bfa1d83b89b043b6.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>将鼠标放在 ends这一行，单击快捷键D即可添加结构体成员，成员的命名默认是以field_x表示的，x代表了该成员在结构体中的偏移</p>
+<p><img src="https://img-blog.csdnimg.cn/c4a7a40b19344649a1d747f91506d216.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>同时，可以把鼠标放在结构体成员所在的行，按D，就可以切换不同的字节大小</p>
+<p>默认情况下可供选择的就只有db，dw，dd（1，2，4字节大小）</p>
+<p>如果想添加型的类型，可以在option–&gt;setup data types(快捷键Alt+D)，进行设置</p>
+<p><img src="https://img-blog.csdnimg.cn/fa7caa5fa9264c709c9eea09edab2527.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>如图，勾选了第五个和第九个的话，就会出现dq和xmmword了（代表了8字节和16字节）</p>
+<p><img src="https://img-blog.csdnimg.cn/007c0521ed7b4ef8a7a2a5487d5899ad.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>如果要添加数组成员则可以对着成员所在的那一行，右击选择array</p>
+<p><img src="https://img-blog.csdnimg.cn/98e2dd0263ce40249223758f8e5b9398.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>如图，要创建的是16个元素的4字节数组</p>
+<p>如果要删除结构体，那么对着结构体按下delete键即可删除</p>
+<p>如果要删除成员，则对着成员按下u（undefine）但是需要注意的是，这里只是删除了成员的名字，而没有删除它所分配的空间</p>
+<p>如图，我们删除了中间的field_10的数组成员：</p>
+<p><img src="https://img-blog.csdnimg.cn/08730bb3390b477fbf144db23fba9154.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>会变成这样：</p>
+<p><img src="https://img-blog.csdnimg.cn/f8421fff3edf43f08fa2050362fd3679.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>数组所分配的20个字节的空间并没有被删除，这时如果要删除掉这些空间，就需要在原来数组成员所在的第一行中按下Ctrl+S，删除空间（Edit–&gt;shrink struct types）</p>
+<p>就可以真正的删除掉成员</p>
+<p><strong>给结构体的成员重命名可以用快捷键N</strong></p>
+<p>我们在IDA中创建好了结构体以后，就是去应用它了</p>
+<p>如图，这是一个典型的堆的题目</p>
+<p><img src="https://img-blog.csdnimg.cn/3e6d921f239c4362962e90dfedd261c5.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>可以看到v1是一个新建的chunk的地址指针，而后的操作都是往chunk不同的偏移位置写入内容，为了方便我们逆向观察，可以将其变成一个结构体，通过v1 v1+4 v1+0x48 这样的偏移，创建好结构体后，将char *v1的类型改成mail *v1,（快捷键Y可以更改函数、变量的类型和参数）这个mail是我们创建的结构体的名称，效果如下：</p>
+<p><img src="https://img-blog.csdnimg.cn/967d306037a84153a2c4b449c96e5bc9.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h3 id="3-20-2-导入C语言声明的结构体"><a href="#3-20-2-导入C语言声明的结构体" class="headerlink" title="3.20.2 导入C语言声明的结构体"></a>3.20.2 导入C语言声明的结构体</h3><p>结构体（struct）是一种数据结构，可以将不同类型的数据结构组合到一个复合的数据类型中，结构体可以被声明为变量、指针、或数组，从而实现比较复杂的数据结构。</p>
+<p>先来看下面一个例子：</p>
+<p><img src="https://img-blog.csdnimg.cn/cb686ac9ee534a838e773705cfafae05.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>上面的MyStruct就是我们定义的一个结构体。然后在main函数中对结构体中的各个变量赋值，最后打印出来。</p>
+<p>IDA中显示如下，在CALL上面分析传参方式，三个变量以缓冲区方式传参，推测是结构体传参</p>
+<p><img src="https://img-blog.csdnimg.cn/934860a1920c48b68ad7ca397fbfd199.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>在结构体窗口按Ins键插入一个结构体</p>
+<p><img src="https://img-blog.csdnimg.cn/4d813a5daa3d48b4b6b09ad1a794b8bc.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>然后，点击结构体名称。然后按D，添加结构体中的变量</p>
+<p>选中变量，按N重命名变量</p>
+<p><img src="https://img-blog.csdnimg.cn/1ce8fd7f8bd74210b173ee5affb6bddc.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>可以在局部堆栈中将变量转换成结构体类型</p>
+<p>选中变量，按ALT+Q转换成指定结构体</p>
+<p><img src="https://img-blog.csdnimg.cn/46a85f02dccf4c1f9530f3c0c4cb2c66.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>使用结构体解析变量后，可以看到反汇编窗口中变量显示以结构体形式显示</p>
+<p><img src="https://img-blog.csdnimg.cn/9c0f13f36f664fd68ab465d8158829a7.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><strong>实际上，IDA有提供一个更方便的创建结构体的方法，就是直接写代码导入</strong></p>
+<p>在View–&gt;Open Subviews–&gt;Local Types中可以看到本地已有的结构体，在该窗口中右击insert</p>
+<p>可以添加新的结构体：</p>
+<p><img src="https://img-blog.csdnimg.cn/ca11f3ba861e4797b7bdeebd44fe4f53.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>这样就导入了新的结构体：</p>
+<p><img src="https://img-blog.csdnimg.cn/77c9d4d96a9949f4a546cfeb0b4db25f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>但同时我们发现structure视图里面，并没有这个结构体，我们需要对着my_structure右击，选择 synchronize to idb</p>
+<p>这样structure视图就有了，如图</p>
+<p><img src="https://img-blog.csdnimg.cn/b71e3b74fc214e6dbec9fc9cd9624e4b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>这里你会发现，多出来两个db的undefined的成员，这是因为ida默认是会把结构体统一4字节对齐的，满足结构体的大小为0x28</p>
+<h2 id="3-21-IDA动态调试elf"><a href="#3-21-IDA动态调试elf" class="headerlink" title="3.21 IDA动态调试elf"></a>3.21 IDA动态调试elf</h2><p>以一个在Ubuntu虚拟机中的elf为例子，进行调试</p>
+<p>首先把ida目录中的dbgsrv文件夹中的linux_server64拷贝到Ubuntu的elf的文件夹下，这个elf是64位的所有用的是linux_server64，如果你调试的是32位的程序，你就需要拷贝linux_server</p>
+<p>记得给权限，然后在终端运行，这个程序的作用就像是连接ida和虚拟机中elf的桥梁</p>
+<p><img src="https://img-blog.csdnimg.cn/6a2e92baf6f2427280887cef5972c9cc.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>然后再到ida中进行配置：</p>
+<ul>
+<li>在菜单栏中选择：debugger–&gt;process options</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/6b0d46cc22eb47578697b50d921ee257.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><strong>注意</strong>：application和input file 都是填写在虚拟机中的elf的路径，记得要加文件名</p>
+<p>而directory 填写elf所在目录，不用加文件名</p>
+<p>hostname是虚拟机的ip地址，port是默认的连接端口</p>
+<p>parameter和password一般都不用填</p>
+<p>设置好了以后点击ok</p>
+<p>接着可以直接在反汇编视图中下断点，只要点击左边的小蓝点即可</p>
+<p><img src="https://img-blog.csdnimg.cn/8daa5c1b42ed460e86fb8c138054eb52.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li><p>这时按下快捷键F9，可以直接开始调试</p>
+</li>
+<li><p>按下快捷键F4，则直接运行到断点处停下</p>
+</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/f2467bc01914407e96895c9423a133de.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>这个就是基本的各个功能区的介绍，上面是我比较喜欢的常用布局，和ida默认的不太一样，想要自定义添加一些视图的话，可以在debugger–&gt;quick debug view中添加</p>
+<p>另外可以在Windows–&gt;save desktop来保持当前的视图布局，以后就可以直接加载使用</p>
+<p>下面介绍一些常用的快捷键</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c">F7 单步步入，遇到函数，将进入函数代码内部<br>F8 单步步过，执行下一条指令，不进入函数代码内部<br>F4 运行到光标处（断点处）<br>F9 继续运行<br>CTRL+F2 终止一个正在运行的调试进程<br>CTRL+F7 运行至返回,直到遇到RETN（或断点）时才停止.<br></code></pre></td></tr></table></figure>
+
+<p>知道了这些快捷键后，调试起来就比较容易了，ida调试有个比较方便的地方在于能直接看到函数的真实地址，下断点也非常直观易操作</p>
+<h2 id="3-22-IDA-python"><a href="#3-22-IDA-python" class="headerlink" title="3.22 IDA-python"></a>3.22 IDA-python</h2><p>在IDA的最下面有个不起眼的Output Window的界面，其实是一个终端界面，这里有python终端和IDC终端</p>
+<p><img src="https://img-blog.csdnimg.cn/b51e71d001b74da1a35eab8229a75f86.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>在IDA的运用中，我们经常需要计算地址，计算偏移，就可以直接在这个终端界面进行操作，非常方便</p>
+<ul>
+<li>上面说的只是很简单的python用法，真正的IDA-python的用法是这样的：这里以简单的一道逆向题来做个例子</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/d322e8d8c92a456ebd0a12c11575c23e.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>这个程序很简单，一开始来个for循环，把judge函数的内容全部异或0xc，这样就导致了程序一运行就会直接破坏掉judge函数</p>
+<p><img src="https://img-blog.csdnimg.cn/d102bbf3e1b44bcd841564284d4730f3.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>从而使得没法进行后面的flag判断</p>
+<p>这里我们就需要写一个脚本来先把被破坏的内容还原，这里IDA提供了两种写脚本操作的方法，一种就是IDC脚本，一种就是python脚本</p>
+<p>这里只简单的介绍IDA-python</p>
+<p>而IDA-python通过三个python模块将python代码注入IDA中：</p>
+<p>idaapi模块负责访问核心IDA API</p>
+<p>idc模块负责提供IDA中的所有函数功能</p>
+<p>idautils模块负责提供大量实用函数，其中许多函数可以生成各种数据库相关对象的python列表</p>
+<p>所有的IDApython脚本会自动导入idc和idautils模块，而idaapi模块得自己去导入</p>
+<p>这里贴上IDApython的官方函数文档(<a target="_blank" rel="noopener" href="https://www.hex-rays.com/products/ida/support/idapython_docs/)%EF%BC%8C%E8%BF%99%E9%87%8C%E5%8C%85%E5%90%AB%E4%BA%86%E6%89%80%E6%9C%89%E5%87%BD%E6%95%B0%EF%BC%8C%E5%80%BC%E5%BE%97%E4%B8%80%E7%9C%8B">https://www.hex-rays.com/products/ida/support/idapython_docs/)，这里包含了所有函数，值得一看</a></p>
+<p>针对以上的题目，我们只需要做一个脚本，指定judg函数的0-181范围的字节异或0xc，即可恢复</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c">judge=<span class="hljs-number">0x600B00</span><br><span class="hljs-keyword">for</span> i in range(<span class="hljs-number">182</span>):<br>    addr=<span class="hljs-number">0x600B00</span>+i<br>    byte=get_bytes(addr,<span class="hljs-number">1</span>)#获取指定地址的指定字节数<br>    byte=ord(byte)^<span class="hljs-number">0xC</span><br>    patch_byte(addr,byte)#打patch修改字节<br></code></pre></td></tr></table></figure>
+
+<p>在菜单栏中file–&gt;script file，加载python脚本</p>
+<p>接着在judge函数中undefined掉原来的函数，在重新生成函数（快捷键p），就可以重新f5了<br>脚本中出现的函数都是已经封装在idc模块中的，具体可查官方文档</p>
+<p><img src="https://img-blog.csdnimg.cn/76a81b8a35c445019cb4ad49fdc7f2ac.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="3-23-打PATCH"><a href="#3-23-打PATCH" class="headerlink" title="3.23 打PATCH"></a>3.23 打PATCH</h2><p>打patch，其实就是给程序打补丁，本质上是修改程序的数据，指令等，这在CTF中的AWD赛制中经常用到，发现程序漏洞后马上就要用这个功能给程序打好patch，防止其他队伍攻击我们的gamebox</p>
+<p>此处案例，用的是一个叫keypatch的插件进行操作的，IDA自带的patch功能不太好用</p>
+<h3 id="3-23-1-安装keypatch"><a href="#3-23-1-安装keypatch" class="headerlink" title="3.23.1 安装keypatch"></a>3.23.1 安装keypatch</h3><p><a target="_blank" rel="noopener" href="https://github.com/keystone-engine/keypatch">https://github.com/keystone-engine/keypatch</a></p>
+<p>下载Keypatch.py复制到插件目录</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">IDA</span> <span class="hljs-number">7</span>.<span class="hljs-number">0</span>\plugins\Keypatch.py<br></code></pre></td></tr></table></figure>
+
+<p>下载安装keystone python模块，64位系统只需要安装这一个就行</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/keystone-engine/keystone/releases/download/0.9.1/keystone-0.9.1-python-win64.msi">https://github.com/keystone-engine/keystone/releases/download/0.9.1/keystone-0.9.1-python-win64.msi</a></p>
+<p>安装好后，你就会发现这里有个keypatch的选项</p>
+<p><img src="https://img-blog.csdnimg.cn/8cfeea3439e24619a8399050e09c8b67.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h3 id="3-23-2-修改程序指令"><a href="#3-23-2-修改程序指令" class="headerlink" title="3.23.2 修改程序指令"></a>3.23.2 修改程序指令</h3><p>修改程序本身的指令</p>
+<p><img src="https://img-blog.csdnimg.cn/a0dad26232c349d5992d669c5a812574.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>如图，我们要修改63h这个值</p>
+<p>将鼠标指向改行，按快捷键Ctrl+Alt+K</p>
+<p><img src="https://img-blog.csdnimg.cn/858d914a804348c1bac9cbda2e5cad8f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>直接输入汇编语句即可修改，打好patch后效果如图：</p>
+<p><img src="https://img-blog.csdnimg.cn/b2a26dd68c7240fc8b85195704b5e571.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>这里会生成注释告诉你，这里打过patch，非常人性化</p>
+<p>接着还要在菜单栏进行设置才能真正使得patch生效</p>
+<p><img src="https://img-blog.csdnimg.cn/2872be353e364774be728261b169acda.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>这样一来，原来的程序就已经被修改了</p>
+<h3 id="3-23-3-撤销patch"><a href="#3-23-3-撤销patch" class="headerlink" title="3.23.3 撤销patch"></a>3.23.3 撤销patch</h3><p>如果不小心打错了patch，就可以在这里进行撤销上一次patch的操作了</p>
+<p><img src="https://img-blog.csdnimg.cn/b632f0ef47884546b54c58db4148f9a2.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>但是如果打了很多次patch，不好分清该撤销哪一次的patch，那么可以在菜单栏中打开patched bytes界面</p>
+<p><img src="https://img-blog.csdnimg.cn/ebb9773b04e546ffaa6c7c2ce78d1f1a.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>看到所有的patch，要撤销哪一个就右击选择 revert</p>
+<p><img src="https://img-blog.csdnimg.cn/3cde54307e934a1a9eca28e25070da50.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="3-24-IDA导出数据文件"><a href="#3-24-IDA导出数据文件" class="headerlink" title="3.24 IDA导出数据文件"></a>3.24 IDA导出数据文件</h2><p>在菜单栏中，这里有个选项可以生成各种不同的输出文件</p>
+<p><img src="https://img-blog.csdnimg.cn/abec2ea57a6042539b93b04c22824615.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>这里简单的介绍前两个文件，后面的大家可以自己去生成测试一下用途，就不详细介绍了</p>
+<p>.map文件描述二进制文件的总体结构，包括与构成改二进制文件的节有关的信息，以及每个节中符号的位置。</p>
+<p>.asm文件，也就是汇编了，直接能导出ida中反汇编的结果，这个非常实用，有的时候在逆向中经常遇到大量数据加解密的情况，如果在从IDA中一个个慢慢复制可就太没效率了，直接导出生成asm，在里面复制数据快很多</p>
+<h2 id="3-25-枚举类型"><a href="#3-25-枚举类型" class="headerlink" title="3.25 枚举类型"></a>3.25 枚举类型</h2><p>源码如下，枚举类型weekday里面包含了周一到周日</p>
+<p><img src="https://img-blog.csdnimg.cn/70646ece72244c41830645eaa3fa10ae.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>IDA中反汇编如下</p>
+<p><img src="https://img-blog.csdnimg.cn/7e39eedd1b87436caebf4b0fb1d9cb68.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>可以在子视图枚举窗口中按Ins键插入一个新的枚举类型weekday，然后在新建的枚举类型中按N添加枚举成员，0对应MONDAY，1对应TUESDAY以此类推</p>
+<p><img src="https://img-blog.csdnimg.cn/52ac048266814794b6dc53d0d9722d56.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>定义完之后我们返回反汇编代码，在想要转换的数据上面按M即可选择将其转换为我们设置的枚举成员</p>
+<p><img src="https://img-blog.csdnimg.cn/37f684cbd174425283e2e0a24adaeb2c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="3-26-IDA-脚本功能（IDC和ythonp）"><a href="#3-26-IDA-脚本功能（IDC和ythonp）" class="headerlink" title="3.26 IDA 脚本功能（IDC和ythonp）"></a>3.26 IDA 脚本功能（IDC和ythonp）</h2><p>如下图所示打开脚本文件，支持.idc和.py文件类型。然后我们选择我们的.idc脚本文件，执行脚本，脚本的输出结果将在IDA提示窗口中展示</p>
+<p><img src="https://img-blog.csdnimg.cn/c6968c193cf047e7923ac3c717b06dd7.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>IDA脚本还支持命令功能，说这个之前先说一下SMC，也就是代码自修改技术，就是在可执行文件中保存着加密数据，只有在程序运行时才会由程序在某处通过一段还原代码来解密这段加密代码，然后执行这段解密后的代码。</p>
+<p>例如，找到了其解密函数，分析出了其解密过程，就可以编写一个解密脚本来代替SMC，例如下面脚本</p>
+<p><img src="https://img-blog.csdnimg.cn/2cc082b1d8cd4ac1b917e67bb3f9839b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>选择脚本文件加载脚本以后按shift+F12即可打开IDC命令执行窗口，我们就可以在右侧执行函数并传入参数</p>
+<p>解密前401060处汇编代码</p>
+<p><img src="https://img-blog.csdnimg.cn/af5cc5f460124352bc0c4c849ac546d0.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>执行脚本解密后401060处汇编代码</p>
+<p><img src="https://img-blog.csdnimg.cn/bd8acb4748a54fdf999982e22cafd340.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>在实际环境中可能解密算法很复杂，但是思路是一样的，在IDA中对这种SMC或者其他技术加密的代码也可以使用其他方法，例如用OD动态调试，然后用IDA的“Additional binary file”功能附加二进制文件将解密文件重新加载，这样做是很有效的</p>
+<h2 id="3-27-签名"><a href="#3-27-签名" class="headerlink" title="3.27 签名"></a>3.27 签名</h2><p>有时候我们在反编译程序的时候，如果没有正确的选择其库，这时候IDA就会识别不出来这个函数的真实名称，可能只会给到你相应的函数地址，例如 识别到了strlen()函数,但是IDA不知道他是strlen，本来是call strlen可能给你显示的是call sub_xxxxxx，这样就不利于我们进行分析。</p>
+<p><img src="https://img-blog.csdnimg.cn/bb61384aa9ac4820837852dab2782934.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>我们可以按shift+F5打开应用库模块列表，然后按Ins键来应用正确的库，应用成功后IDA会重新自动分析全部代码。如果IDA没有重新进行自动分析，我们就可以在选项(Options)-》常规(General)-》分析  点击重新分析程序（Reanalyze program）即可</p>
+<p><img src="https://img-blog.csdnimg.cn/4d3cb9df91b74123983bdbc0ff0969e4.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>如果没有我们想要的库文件，IDA也提供自己创建签名文件</p>
+<h2 id="3-28-插件"><a href="#3-28-插件" class="headerlink" title="3.28 插件"></a>3.28 插件</h2><p>IDC脚本适用于小型任务和快速开发工作，但它不支持复杂的数据类型和一些复杂的任务，IDA提供了插件功能，并且支持win32API和很多标准库，这给插件的开发提供了很好的条</p>
+<ul>
+<li><p>hex-rays下载页面：<a target="_blank" rel="noopener" href="https://www.hex-rays.com/">https://www.hex-rays.com/</a></p>
+</li>
+<li><p>OpenRce下载页面：<a target="_blank" rel="noopener" href="http://www.openrce.org/downloads/">http://www.openrce.org/downloads/</a></p>
+</li>
+<li><p>看雪论坛工具面板：<a target="_blank" rel="noopener" href="https://bbs.pediy.com/forum-53.htm">https://bbs.pediy.com/forum-53.htm</a></p>
+</li>
+</ul>
+<p>IDA安装插件很简单，将已经编译好的插件模块复制到IDA安装目录的plugins目录中即可，注意有些插件可能会有兼容性问题，安装前先阅读其说明文档，查看其支持的IDA版本和使用说明。</p>
+<h2 id="3-29-IDA调试器"><a href="#3-29-IDA调试器" class="headerlink" title="3.29 IDA调试器"></a>3.29 IDA调试器</h2><p>IDA支持本地调试和远程调试（包括windows32&#x2F;64、windowsCE&#x2F;ARM、Mac OS 32&#x2F;64、Linux32&#x2F;64&#x2F;ARM 、Android等）</p>
+<h2 id="3-30-使用IDA的一些小技巧"><a href="#3-30-使用IDA的一些小技巧" class="headerlink" title="3.30 使用IDA的一些小技巧"></a>3.30 使用IDA的一些小技巧</h2><p>如果想了解某个函数的参数传递情况，在其函数上按CTRL+K即可打开其栈，查看其中所使用到的变量，也可以自己重命名。</p>
+<ul>
+<li>查找main函数</li>
+</ul>
+<p>在windows和Linux下，很多可执行文件都不是直接从main()函数开始执行的，而是先进行一些初始化操作，然后再转到main()函数。</p>
+<ul>
+<li><p>查找main()函数的技巧如下：</p>
+<ul>
+<li>main()函数经常在可执行文件的靠前位置，因为很多链接器是先处理对象文件后处理静态库</li>
+<li>VC的入口点（IDA中的start()函数）会直接调用main()函数，在start（）函数中被调用的函数有三个参数，并且返回值被传入exit()函数的，可以重点查看</li>
+</ul>
+</li>
+<li><p>例如，下面的sub_271000()函数</p>
+</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/a27d267bf91345e6b42c2a6aa5dc7caa.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>GCC将main()函数的地址传入__libc_start_main来调用main函数，查看调用的参数即可找到main（）函数的地址</li>
+</ul>
+<h2 id="3-31-其它的一些静态分析操作"><a href="#3-31-其它的一些静态分析操作" class="headerlink" title="3.31 其它的一些静态分析操作"></a>3.31 其它的一些静态分析操作</h2><ul>
+<li>拿到一个程序的时候不止是使用IDA来静态分析，也可以使用其他工具来获取一些信息</li>
+</ul>
+<p>例如：如果是可执行文件，我们就会选择一些PE工具来进行分析</p>
+<ul>
+<li>查看链接器版本（4.20-VB5，2.25-Delphi7）</li>
+<li>查看OEP代码，看是否加壳、未加壳的编译器环境（代码是否正常，如果有pushad这类的就代表可能是不正常，加壳了）</li>
+<li>查看区段信息（.text微软  CODE宝蓝）</li>
+<li>查看导入表导出表信息（看使用的函数名）</li>
+<li>查看资源段信息（看有无自定义的资源段，里面可能藏着好东西）</li>
+<li>查看TLS信息（有无设置TLS回调函数）</li>
+<li>文件大小和图标情况有时候也会有线索</li>
+</ul>
+<h2 id="3-32-静态分析中常用快捷键"><a href="#3-32-静态分析中常用快捷键" class="headerlink" title="3.32 静态分析中常用快捷键"></a>3.32 静态分析中常用快捷键</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs C">F5/tab:功能都是查看伪c代码，但tab可以在伪c代码和汇编之间相互切换，且切换时光标位置相同<br>shift+F12 : strings（展示所有字符串内容窗口，能够查看字符串存储地址及调用地址）<br>shift+F7 ：segments<br>Ctrl+S：查看段地址的快捷键，得到段的起始地址和结束地址<br>alt+t :text search<br>ctrl+t: next text<br>g ：快速查找到对应地址（跳转到指定地址的代码位置）<br>shift+e :提取数据<br>Enter：跟进函数实现，查看标号对应的地址<br>Esc 返回跟进处<br>A 解释光标处的地址为一个字符串的首地址<br>B 十六进制数与二进制数转换<br>C 解释光标处的地址为一条指令<br>D 解释光标处的地址为数据<br>H 十六进制数与十进制数转换<br>K 将数据解释为栈变量<br>X 转换视图到交叉参考模式<br></code></pre></td></tr></table></figure>
+
+<p><strong>y JNIEnv</strong>：还原C代码后部分方法调用需要还原JNI函数方法名，选中对应指针按y然后输入JNIEnv *还原JNI函数名</p>
+<p><img src="https://img-blog.csdnimg.cn/89a57715c0e14a11890936a5fa9dadf5.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><strong>SPACE</strong>：用于在IDA VIEW视图中切换文本视图及图形视图</p>
+<h2 id="3-33-IDA常见命名意义"><a href="#3-33-IDA常见命名意义" class="headerlink" title="3.33 IDA常见命名意义"></a>3.33 IDA常见命名意义</h2><p>IDA经常会自动生成假名字，用于表示子函数，程序地址和数据。根据不同的类型和值假名字有不同前缀</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs java">sub 指令和子函数起点locret 返回指令<br>loc 指令off 数据，包含偏移量<br>seg 数据，包含段地址值asc 数据，ASCII字符串<br><span class="hljs-type">byte</span> 数据，字节（或字节数组）word 数据，<span class="hljs-number">16</span>位数据（或字数组）<br>dword 数据，<span class="hljs-number">32</span>位数据（或双字数组）qword 数据，<span class="hljs-number">64</span>位数据（或<span class="hljs-number">4</span>字数组）<br>flt 浮点数据，<span class="hljs-number">32</span>位（或浮点数组）dbl 浮点数，<span class="hljs-number">64</span>位（或双精度数组）<br>tbyte 浮点数，<span class="hljs-number">80</span>位（或扩展精度浮点数）stru 结构体(或结构体数组)<br>algn 对齐指示unk 未处理字节<br></code></pre></td></tr></table></figure>
+
+<p>IDA中有常见的说明符号，如db、dw、dd分别代表了1个字节、2个字节、4个字节</p>
+<h2 id="3-33-IDA反编译报错"><a href="#3-33-IDA反编译报错" class="headerlink" title="3.33 IDA反编译报错"></a>3.33 IDA反编译报错</h2><p>目前来说， 我遇到的反编译报错的情况，一般是两种</p>
+<p>一是由于程序存在动态加密，导致程序的某些代码段被修改，从而反编译出错，这种情况，就需要去使用IDA-python解密一波，再进行F5反汇编</p>
+<p>二是由于某些玄学问题，直接提示了某个地方出错，一般来说，就按照IDA的提示，去进行修改</p>
+<p>比如，出现如下报错：</p>
+<p><img src="https://img-blog.csdnimg.cn/45d7418dcdc7431391aaeb2b315d505c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>解决的办法就是去找413238这个地址的地方，提示是说sp指针的值没有被找到，说明是这里出错了，那么就去修改sp的值，修改方法如下：</p>
+<p><img src="https://img-blog.csdnimg.cn/01b12a307c8947bc9ae969ce992ca60b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>也可以使用快捷键 Alt+K</li>
+</ul>
+<p>有的时候，遇到的这种报错</p>
+<p><img src="https://img-blog.csdnimg.cn/8ff518c9159248f5aa09a0ea4e4d0149.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>就尝试着把报错的地址的汇编语句改一哈，改成nop，就可以解决问题</p>
+<p>目前来说，我遇到报错的情况不多，一般都可以通过以上方法解决</p>
+<h2 id="3-34-配置IDA"><a href="#3-34-配置IDA" class="headerlink" title="3.34 配置IDA"></a>3.34 配置IDA</h2><p>在ida的根目录的cfg文件夹是专门用来存储配置文件的</p>
+<p>ida的主配置文件为ida.cfg，另外的还有idagui.cfg，idatui.cfg这两个配置文件对应IDA的GUI配置和文本模式的版本</p>
+<h3 id="3-34-1-ida-cfg"><a href="#3-34-1-ida-cfg" class="headerlink" title="3.34.1 ida.cfg"></a>3.34.1 ida.cfg</h3><p>该文件包含了option–&gt;general中的所有选项的配置，可以通过选项中的描述在配置文件总找到相应的选项</p>
+<p>这里举几个例子：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs c">SHOW_AUTOCOMMENTS 表示是否自动生成汇编指令的注释<br><br>GRAPH_SHOW_LINEPREFIXES 表示是否在流程控制视图中显示地址<br><br>VPAGESIZE 表示内存调整参数，当处理非常大的输入文件时，IDA可能报告内存不足而无法创建新数据库，在这种情况下增大该参数，重新打开输入文件即可解决问题<br><br>OPCODE_BYTES 表示要显示的操作码字节数的默认值<br><br>INDENTATION 表示指令缩进的距离<br><br>NameChars 表示IDA支持的变量命令使用的字符集，默认是数字+字母还有几个特殊符号，如果需要添加就改变该参数<br></code></pre></td></tr></table></figure>
+
+<h3 id="3-34-2-idagui-cfg"><a href="#3-34-2-idagui-cfg" class="headerlink" title="3.34.2 idagui.cfg"></a>3.34.2 idagui.cfg</h3><p>这个文件主要配置默认的GUI行为，键盘的快捷键等，这个很少需要修改，不做过多介绍。感兴趣的可以自己打开该文件观察，并不难懂，改改快捷键还是很容易的</p>
+<h3 id="3-34-3-idatui-cfg"><a href="#3-34-3-idatui-cfg" class="headerlink" title="3.34.3 idatui.cfg"></a>3.34.3 idatui.cfg</h3><p>idatui.cfg需要注意的是，以上三个文件是默认配置，也就是说，每次打开创建新的ida数据库的时候，都会以这三个配置文件的设置进行创建，之前临时在菜单栏的设置就会消失，要永久设置ida的配置，就改这三个文件</p>
+<p>但，凡事都有例外，在option–&gt;font和option–&gt;colors这两个选项是全局选项，修改一次就永久生效的，不用在以上三个配置文件中改</p>
+<h1 id="0x04-静态分析之IDA-Pro-分析Native-方法"><a href="#0x04-静态分析之IDA-Pro-分析Native-方法" class="headerlink" title="0x04 静态分析之IDA Pro 分析Native 方法"></a>0x04 静态分析之IDA Pro 分析Native 方法</h1><p>先来看看Android中把重要的一些信息写在native中进行加载的代码，如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs java"># direct methods<br># 加载so库<br>.method <span class="hljs-keyword">static</span> constructor &lt;clinit&gt;()V<br>    .locals <span class="hljs-number">1</span><br><br>    .prologue<br>    .line <span class="hljs-number">26</span><br>    const-string v0, <span class="hljs-string">&quot;verify&quot;</span><br><br>    invoke-<span class="hljs-keyword">static</span> &#123;v0&#125;, Ljava/lang/System;-&gt;loadLibrary(Ljava/lang/String;)V<br><br>    .line <span class="hljs-number">27</span><br>    <span class="hljs-keyword">return</span>-<span class="hljs-keyword">void</span><br>.end method<br><br>#定义<span class="hljs-keyword">native</span> 方法<br>.method <span class="hljs-keyword">public</span> <span class="hljs-keyword">native</span> <span class="hljs-title function_">verify</span><span class="hljs-params">([B)</span>Ljava/lang/String;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs smali"><span class="hljs-comment">#调用so层方法</span><span class="hljs-built_in"></span><br><span class="hljs-built_in">invoke-virtual </span>&#123;v1, v2&#125;, <span class="hljs-class">Lcom/example/cctf/MainActivity;</span>-&gt;verify([B)<span class="hljs-class">Ljava/lang/String;</span><br></code></pre></td></tr></table></figure>
+
+<p>当反编译java代码为smali代码，看到以上类似的代码，就应该能猜得其关键逻辑是在so层进行处理的，这个时候就需要对so进行调试分析，如下所示</p>
+<ul>
+<li>将apk解压后，把里面的classes.dex取出来，放到baksmali.jar 路径下，然后打开cmd命令界面，运行如下命令将java代码转换为smali，运行完成后会在当前路径生成一个out的文件夹</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java">java -jar baksmali.jar classes.dex<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/9ae8b84b9abc4e9ca925e80b252fdc75.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="4-1-IDA-Pro-分析Native-方法案例"><a href="#4-1-IDA-Pro-分析Native-方法案例" class="headerlink" title="4.1 IDA Pro 分析Native 方法案例"></a>4.1 IDA Pro 分析Native 方法案例</h2><p>so文件一般在apk中的lib文件夹中，将其解压出来，丢到IDA进行静态分析</p>
+<p>在安卓逆向的过程当中会遇到以下场景：</p>
+<ul>
+<li>经过上一阶段的Java层代码静态分析以及动态调试，发现加密参数的生成方法调用了Native层方法</li>
+<li>经过对Native层代码分析后修改对应代码，替换原so文件发现app运行异常</li>
+</ul>
+<p>针对以上的情景，需要使用IDA直接对Native层方法进行静态分析，找出关键代码并且完成相应的代码修改及复现，最终的目的是完成加密算法的还原或是本地调用对应的so文件</p>
+<p>APK 还是以上一个文章的APK为例子，用dex2jar反编译APK为java代码之后，用jadx-gui打开，发现它的onCreate方法中有一个加载so的代码，如下图:</p>
+<p><img src="https://img-blog.csdnimg.cn/f9950d43a1c04577a9c5dc491ea64b9f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>application 下还有一个PasswordProcess.class，如下图：</p>
+<p><img src="https://img-blog.csdnimg.cn/ab8329045bf143829395998f7aa41937.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>获取密码的方法是native，我们查看一下PasswordProcess.class里面的getDbPassword方法。用IDA打开libpsProcess.so文件，如图</p>
+<p><img src="https://img-blog.csdnimg.cn/e1f160682c0e4b11b219e3a5d131500c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/b61b1f6881f7456f98ff5d87cc1d63db.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>打开IDA里面的Java_com_shuqi_application_PasswordProcess_getDbPassword</p>
+<p><img src="https://img-blog.csdnimg.cn/6d39b9ae1ef24a1da2a325c72b81a4a3.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><strong>注</strong>：绿色箭头表示当 xxx 条件成立后所跳转到的地方，红色箭头表示当条件不成立后所跳转到的地方</p>
+<p>一般看这个函数的实现，直接看BL&#x2F;BLX等信息、跳转逻辑，还有就是返回值。在函数的最后部分发现一个重点，就是BL android log_print，看起来好像是打印了什么日志出来。这是在native层调用log的函数。再往上看，发现tag是System.out.c</p>
+<ul>
+<li>ADD 表示算数加法操作指令</li>
+<li>B 跳转指令<ul>
+<li>仅仅执行跳转操作</li>
+</ul>
+</li>
+<li>BL 带返回的跳转指令<ul>
+<li>执行跳转操作的同时还将 PC 寄存器的值保存在 LR 寄存器中，BL 指令用于实现子程序调用，子程序的返回可以通过将 LR 寄存器的值复制到 PC 寄存器中来实现</li>
+</ul>
+</li>
+<li>BX 带状态切换的跳转指令<ul>
+<li>BX 指令跳转到指令中指定的目标地址，目标地址处的指令可以是 ARM 指令，也可以是 Thumb 指令</li>
+</ul>
+</li>
+<li>BLX 带返回和状态切换的跳转指令<ul>
+<li>从 ARM 指令跳转到指令中指定的目标地址，目标地址可以是 ARM 指令，也可以是 Thumb 指令</li>
+</ul>
+</li>
+</ul>
+<p>具体的arm算法请前往如下链接：</p>
+<ul>
+<li>[IOV安全入门] 十五. Android安全之ARM汇编指令集手册【精简汇总版】</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://orangey.blog.csdn.net/article/details/122718139">https://orangey.blog.csdn.net/article/details/122718139</a></p>
+<p>jadx-gui 里全局搜索这个方法，发现是在yi这个类中调用的</p>
+<p><img src="https://img-blog.csdnimg.cn/8e065486c23d4c5baac92c2bf5980008.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/413c0e10d2344ddcb9ed6e4aaff13ea3.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>修改yi.smail代码</p>
+<ul>
+<li>未修改前</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/433412d37b4848d3a66f09b4d75b654f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><strong>PS</strong>：可以看到，该应用使用了sqlcipher框架对数据库做了加密。有很多应用加密数据库都是使用这个框架的，微信也是使用这个框架对本地通讯信息数据库进行加密的，该加密工具对应的有一个Windows程序可以打开它，但需要密码才能打开</p>
+<ul>
+<li>修改后</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/e35a6c5187a3400b9589c802a1f0eaf7.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>回编译APK，然后将APK安装到模拟器里运行</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c">java -jar apktool.jar b -d debug -o debug_test.apk<br>java -jar .\signapk.jar .\testkey.x509.pem .\testkey.pk8 debug_test.apk debug_test_V1.apk<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>最后开启对应的log监听</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c">adb logcat -s JW<br><br>adb logcat -s System.out.c<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/c446cec9bd084914867ba5d17732e2ed.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>最后从上图，可发现返回的密码java层和native层是一样的。说明静态分析native的思路是正确的，到此本篇静态分析APK的基础文章到此结束，后续增加更多实例分析APK文章</p>
+<h2 id="4-2-IDA-Pro-分析Native-方法案例2"><a href="#4-2-IDA-Pro-分析Native-方法案例2" class="headerlink" title="4.2 IDA Pro 分析Native 方法案例2"></a>4.2 IDA Pro 分析Native 方法案例2</h2><p>下面是打开APK后用F5生成了伪java代码，发现代码里面有用于调用安卓日志类输出指针v27之前共33个字符</p>
+<p><img src="https://img-blog.csdnimg.cn/1d465185f0ec443ca946f331a947e273.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>此时，如果想修改这个v22参数，将其变大，使其输出80个字符，我们首先需要去到IDA VIEW中查看该命令地址以及在IDA HEX中该地址对应的十六进制代码</p>
+<p><img src="https://img-blog.csdnimg.cn/bf00904ff3d84f3b94ef50f4dd93b4bd.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><img src="https://img-blog.csdnimg.cn/52c96905fd0142e8b37a083d5bbf0795.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>进入<a target="_blank" rel="noopener" href="https://armconverter.com/%E4%B8%AD%E5%B0%86%E6%83%B3%E8%A6%81%E6%9B%BF%E6%8D%A2%E7%9A%84%E6%B1%87%E7%BC%96%E4%BB%A3%E7%A0%81%E7%94%9F%E6%88%90%E5%8D%81%E5%85%AD%E8%BF%9B%E5%88%B6%E4%BB%A3%E7%A0%81">https://armconverter.com/中将想要替换的汇编代码生成十六进制代码</a></p>
+<p><img src="https://img-blog.csdnimg.cn/8ca0437e858f4aada777deaa2b80de9c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>得到十六进制代码后回到IDA HEX窗口按F2修改对应的十六进制代码，修改完毕后按F12保存</p>
+<p><img src="https://img-blog.csdnimg.cn/f1812f70c4bf47d1aa5d651487974ad0.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>保存完毕后查看查看代码是否修改成功</p>
+<p><img src="https://img-blog.csdnimg.cn/687ade5ed9ab41d79716f46fa12865e8.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>经过上一步对Native代码进行修改，我们需要对so文件进行重新打包，并且完成替换原so文件操作，点击hedaer工具栏Edit-》Path program-》Apply pathces to input file-》ok</p>
+<p><img src="https://img-blog.csdnimg.cn/25593e1311da4c53bbb7e3e36762bdf0.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>进入安卓模拟器路径&#x2F;data&#x2F;app&#x2F;{对应app文件夹}&#x2F;lib&#x2F;替换原有so文件</p>
+<p><img src="https://img-blog.csdnimg.cn/d36185a7f08f467e816cb3f8f4a5c031.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><strong>参考链接</strong>：</p>
+<p><a target="_blank" rel="noopener" href="https://xz.aliyun.com/t/4205">https://xz.aliyun.com/t/4205</a></p>
+<p><a target="_blank" rel="noopener" href="http://www.520monkey.com/archives/569">http://www.520monkey.com/archives/569</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.freebuf.com/sectool/263233.html">https://www.freebuf.com/sectool/263233.html</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_43900244/article/details/118192820">https://blog.csdn.net/weixin_43900244/article/details/118192820</a></p>
+<hr>
+<p><strong>你以为你有很多路可以选择，其实你只有一条路可以走</strong></p>
+<hr>
+</div>
+
+			<link rel="stylesheet" type="text/css" href="https://qiniu.techgrow.cn/readmore/dist/hexo.css">
+			<script src="https://qiniu.techgrow.cn/readmore/dist/readmore.js" type="text/javascript"></script>
+			<script>
+			var isMobile = navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i);
+			if (!isMobile) {
+				try {
+					var plugin = new ReadmorePlugin();
+					plugin.init({
+						"id": "readmore-container",
+						"blogId": "25525-4637332244353-147",
+						"name": "橙留香Park",
+						"qrcode": "https://i.imgtg.com/2022/10/03/mjCQ1.jpg",
+						"keyword": "验证码",
+						"lockToc": "yes",
+						"type": "hexo",
+						"random": "1",
+						"interval": "60",
+						"expires": "1",
+						"height": "auto"
+					});
+				} catch(e) {
+					console.warn("readmore plugin occurred error: " + e.name + " | " + e.message);
+				}
+			}
+			</script>
+		
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/AndroidSecurity/">#AndroidSecurity</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>「干货」静态逆向APK应用浅析「手动注入smali」+「IDA Pro静态分析so文件」+「IDA Pro基础使用讲解」</div>
+      <div>https://orangey.info/2022/09/23/123520495/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>橙留香</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年9月23日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/09/23/123787445/" title="「干货」动态调试APP的一些技巧「Android Studio调试」">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">「干货」动态调试APP的一些技巧「Android Studio调试」</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/09/23/122787743/" title="Drozer安全测试详细使用教程">
+                        <span class="hidden-mobile">Drozer安全测试详细使用教程</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  <article id="comments" lazyload>
+    
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1e96aec5ac46370916fa","clientSecret":"ee5e97a65cf34e9fe31e15ab0421a94968237f5e","repo":"ogGitalk","owner":"ananasOrangey","admin":["ananasOrangey"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: 'e4267a585d334d5987d4bf7a9df7d14c'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+  </article>
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://orangey.blog.csdn.net" target="_blank" rel="nofollow noopener"><span>橙留香CSDN博客</span></a> <i class="iconfont icon-love"></i> <a href="https://i.imgtg.com/2022/09/21/gNXxK.png" target="_blank" rel="nofollow noopener"><span>橙留香微信公众号</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

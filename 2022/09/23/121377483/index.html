@@ -1,0 +1,808 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="橙留香">
+  <meta name="keywords" content="橙留香车联网安全技术博客">
+  
+    <meta name="description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  Android安全付费专栏长期更新，本篇最新内容请前往：  [车联网安全自学篇] Android安全之Android加密算法浅析  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;ananasorangey&#x2F;categ">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android加密算法浅析">
+<meta property="og:url" content="https://orangey.info/2022/09/23/121377483/index.html">
+<meta property="og:site_name" content="车联网安全技术博客 | 橙留香">
+<meta property="og:description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  Android安全付费专栏长期更新，本篇最新内容请前往：  [车联网安全自学篇] Android安全之Android加密算法浅析  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;ananasorangey&#x2F;categ">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/21/gNXxK.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/22c80b77756c469d992e6967e8b844de.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/628c13be464c4306a370ffe986665d78.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8707446abce3433995111dd33d38fb4e.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/ff0a069103d74cccbe550ed689678716.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/3d31781564fd411b81576a19ac754e98.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8d7bd3bc2a9542b99593f2a43755d9c1.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/db59df1378fd4820af9060901b66ccd3.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/9b9f4a2ed6af4c6bbfa152a24bdc868e.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/7301ab0441b14235a54d8f8819510f02.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/273cba0e521a49fca701673c7eb3b0d3.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2418f3df0c2c436eb5d914ce2dce1393.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/ebe51f451018413abc5a3b64e55687bf.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2399bdf23f484ad887183a8b772f7f22.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/a52732252b2e48039cd80f9146fa6f6b.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/1c517cdbd5224c3a8a1605a0c61d0092.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/92a98274bc31474cb43006eca998d00f.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/4fcb91e9dd634079bda14860777170a7.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_17,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d620ff243e674263a4ff30a03b2c5725.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/a683efc4f03b468cbfb5bd9d22cbdd6f.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8dd4f59712894944a7194c680a638441.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e3a7c5f2b6374c2b98887d22e5dd27e6.png">
+<meta property="article:published_time" content="2022-09-23T15:50:33.528Z">
+<meta property="article:modified_time" content="2022-09-24T16:36:47.573Z">
+<meta property="article:author" content="橙留香">
+<meta property="article:tag" content="AndroidSecurity">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+  
+  
+  
+  <title>Android加密算法浅析 - 车联网安全技术博客 | 橙留香</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"orangey.info","root":"/","version":"1.9.3","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"java"},"copy_btn":false,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>橙留香</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Android加密算法浅析"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-09-23 23:50" pubdate>
+          2022年9月23日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          6.5k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          <!-- compatible with older versions-->
+          55 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Android加密算法浅析</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <div id="readmore-container"><hr>
+<p><strong>也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大</strong></p>
+<p><strong>少走了弯路，也就错过了风景，无论如何，感谢经历</strong></p>
+<hr>
+<p>Android安全付费专栏长期更新，本篇最新内容请前往：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://orangey.blog.csdn.net/article/details/121377483">[车联网安全自学篇] Android安全之Android加密算法浅析</a></li>
+</ul>
+<p>更多关于Android安全的知识，可前往：<a target="_blank" rel="noopener" href="https://blog.csdn.net/ananasorangey/category11955914.html">https://blog.csdn.net/ananasorangey/category11955914.html</a></p>
+<p><img src="https://i.imgtg.com/2022/09/25/gdpGP.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><img src="https://i.imgtg.com/2022/09/21/gNXxK.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x01-前言"><a href="#0x01-前言" class="headerlink" title="0x01 前言"></a>0x01 前言</h1><p>车机渗透，博主感觉大致可分为：软件层、系统层、硬件层</p>
+<p>例如，我们测试软件层以及系统层的时候，会关注一些加密算法以及该密码或敏感数据是否加密或加密后又如何解析，它们又存放在哪个位置等等。</p>
+<p>例如，Android设备(也可以是手机，也可以是智能大屏等)解锁屏幕时输入的密码，那么这个密码存放在哪里？是否为明文存储？如果是加密存储，那么加密算法是什么？</p>
+<p>例如，连接一些车机WI-FI时，为了安全考虑会要求输入PIN码才能连接成功，那么此时我们要考虑该PIN码输入的密码，那么这个密码存放在哪里？是否为明文存储？如果是加密存储，那么加密算法是什么？</p>
+<h1 id="0x02-Android加密算法浅析"><a href="#0x02-Android加密算法浅析" class="headerlink" title="0x02 Android加密算法浅析"></a>0x02 Android加密算法浅析</h1><p>这里以Android 里面的锁屏为例，来对加密算法了解，以点盖面</p>
+<p>Android 设备中常见的锁屏密码主要有两种：一种是手势密码(九宫格密码图)；一种是输入密码，分为PIN密码和复杂字符密码，而PIN密码就是数字密码，比较简单;还有一种是指纹密码</p>
+<p>我们这里主要关注PIN码来说说，通过工具获取当前PIN输入界面的View类，然后定位到一个锁屏密码工具类：LockPatternUtils.java</p>
+<p><strong>此处，大家可以思考一个小问题</strong>：假如有一台智能后视镜，智能电视机等硬件设备， 本身开启热点，但需要输入PIN码才能接入，但当前设备可root接入，你会怎么办呢？是拆卸机器从串口进行攻击？还是adb进入系统？</p>
+<p>这里以5.1版本的源码进行分析，至于真机或模拟器，当前按照自身条件来。</p>
+<h2 id="2-1-源码编译-此处可跳过"><a href="#2-1-源码编译-此处可跳过" class="headerlink" title="2.1 源码编译(此处可跳过)"></a>2.1 源码编译(此处可跳过)</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c">mkdir ~/bin<br>PATH=~/bin:$PATH<br>curl https:<span class="hljs-comment">//storage.googleapis.com/git-repo-downloads/repo &gt; ~/bin/repo</span><br>chmod a+x ~/bin/repo<br></code></pre></td></tr></table></figure>
+
+<p>编辑 ~&#x2F;bin&#x2F;repo，把 REPO_URL 一行替换成下面的：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">REPO_URL = <span class="hljs-string">&#x27;https://gerrit-googlesource.lug.ustc.edu.cn/git-repo&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/22c80b77756c469d992e6967e8b844de.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>然后repo sync 一下同步</p>
+<p><img src="https://img-blog.csdnimg.cn/628c13be464c4306a370ffe986665d78.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br>后续步骤省略，，自行查找。网上容易出现问题的是源地址错误等问题。</p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?src=11&timestamp=1636973397&ver=3438&signature=qDqStSKLNK-tkGDm28pgD5c-5c1E7aXmXcFJTmJDGylQJiPVAjTRW5jZys53jX2gnmr3r7xbz3JzZfdSZfUZDqWhzgYmQZUgvOu1ybdhNWAFc8u0Gw4gCD4PPffPygDK&new=1">Windows 下载Android源码教程链接</a></p>
+<p>模拟器博主用的是夜神模拟器(夜神默认手机机型是三星，大家可切换一下机型方便测试)：</p>
+<p><img src="https://img-blog.csdnimg.cn/8707446abce3433995111dd33d38fb4e.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述">探测一下试试是否能成功连接夜神模拟器：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c">adb connect <span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span>:<span class="hljs-number">62001</span><br>adb devices<br>adb shell<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>简短的Android版本历史</li>
+</ul>
+<p>Android 1.5纸杯蛋糕：2009年4月27日<br>Android 1.6，Donut： 2009年9月15日<br>Android 2.0-2.1，Eclair： 2009年10月26日（初始版本）<br>Android 2.2-2.2.3，Froyo：2010年5月20日（初始版本）<br>Android 2.3-2.3.7，姜饼：2010年12月6日（初始版本）<br>Android 3.0-3.2.6，Honeycomb：2011年2月22日（初始版本）<br>Android 4.0-4.0.4，冰淇淋三明治：2011年10月18日（初始版本）<br>Android 4.1-4.3.1，Jelly Bean：2012年7月9日（初始版本）<br>Android 4.4-4.4.4，KitKat： 2013年10月31日（初始版本）<br>Android 5.0-5.1.1，棒棒糖：2014年11月12日（初始版本）<br>Android 6.0-6.0.1，棉花糖：2015年10月5日（初始版本）<br>Android 7.0-7.1.2，牛轧糖：2016年8月22日（初始版本）<br>Android 8.0-8.1，奥利奥（Oreo）：2017年8月21日（初始版本）<br>Android 9.0，Pie：八月6，2018<br>Android 10.0：2019年9月3日<br>Android 11：2020年9月8日<br>Android 12：2021年10月4日</p>
+<p>博主，编译老是出错，最后直接下载现有的好了，地址如下（Android 5.1.1）：<a target="_blank" rel="noopener" href="https://github.com/AndroidSDKSources/android-sdk-sources-for-api-level-22">Android 5.1.1源码</a></p>
+<h2 id="2-2-Android-锁屏源码浅析"><a href="#2-2-Android-锁屏源码浅析" class="headerlink" title="2.2 Android 锁屏源码浅析"></a>2.2 Android 锁屏源码浅析</h2><p>源码下载好后，开始正式进入正题，定位到锁屏的java代码，了解锁屏界面输入密码的规则，此处我们使用Android-SDK 3.0.1 (这里你也可以使用最新版的，都是一样的)中的uiautomatorviewer.bat（该工具默认是安装在C盘当前用户的&#x2F;AppData&#x2F;local&#x2F;Android&#x2F;Sdk&#x2F;tools&#x2F;bin目录下）工具分析获取当前的锁屏View类LockPattern，一步步追踪，最终会跟到一个包名为com.android.internal.widget锁屏密码工类：LockPatternUtils.java，如下图：</p>
+<p>下载地址：<a target="_blank" rel="noopener" href="https://developer.android.com/studio/archive?hl=zh-cn">https://developer.android.com/studio/archive?hl=zh-cn</a></p>
+<p>锁屏代码的目录路径：frameworks&#x2F;base&#x2F;core&#x2F;java&#x2F;com&#x2F;android&#x2F;internal&#x2F;widget&#x2F;LockPatternView.java</p>
+<p><strong>如果是，下载的Github的源码的话在文件的android\internal\widget目录下</strong></p>
+<p>checkPasswordHistory的方法，这个方法就是来对比密码是否一致的，能否成功解锁手机的</p>
+<p><img src="https://img-blog.csdnimg.cn/ff0a069103d74cccbe550ed689678716.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>passwordToHash方法就是输入密码的算法，继续跟踪（passwordToHash()方法）：</p>
+<p><img src="https://img-blog.csdnimg.cn/3d31781564fd411b81576a19ac754e98.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>从上面代码的注释中已经告诉我们，这个View是用于绘制九宫格和手势密码的地方。passwordToHash 方法中的参数为用户输入的密码和当前用户对应的id，一般设备不会有多个用户，所以这里的userId是默认值0。再往下看就是加密算法了：原文密码+设备的salt值，然后分别进行SHA-1和Md5加密，将数据复制到一个数组中后转换成Hex编码进行拼接，得到的就是最终保存到本地的加密密码内容。而这里最重要的是如何获取设备对应的salt值，这可以跟踪代码（getsalt()方法）：</p>
+<p><img src="https://img-blog.csdnimg.cn/8d7bd3bc2a9542b99593f2a43755d9c1.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>查看getsalt方法（如何获取到设备对应的salt值），long salt &#x3D; getLong(LOCK_PASSWORD_SALT_KEY, 0, userId);，首先根据字段key为lockscreen.password_salt从某个地方获取salt值，通过if判断该值为0的话，就调用SecureRandom.getInstance(“SHA1PRNG”).nextLong()随机生成一个，然后将其保存到key为LOCK_PASSWORD_SALT_KEY的那个方法，最后将salt值转换为Hex值即可，继续跟踪代码（getLong()方法）：</p>
+<p><img src="https://img-blog.csdnimg.cn/db59df1378fd4820af9060901b66ccd3.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>应该是把密码保存起来了，继续跟踪代码（getLockSettings()方法）：</p>
+<p><img src="https://img-blog.csdnimg.cn/9b9f4a2ed6af4c6bbfa152a24bdc868e.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>通过getLong()方法发现这个地方用了AIDL类型，通过在ServiceManager中获取一个服务来进行操作，那么它应该是有相应的Service类，这里是在包名为com.android.server.locksettings下的LockSettingsService.java类，找到这个类，查看它的getLong方法</p>
+<p>frameworks&#x2F;base&#x2F;services&#x2F;core&#x2F;java&#x2F;com &#x2F;android&#x2F;server &#x2F;LockSettingsService.java</p>
+<p><strong>如果是，下载的Github的源码的话在文件的com\android\server目录下</strong></p>
+<p><img src="https://img-blog.csdnimg.cn/7301ab0441b14235a54d8f8819510f02.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>到此，我们已经可以确定该Service类是保存在数据库中的了，而且在LockSettingsService构造方法中存在SQLiteDatabase的字眼</p>
+<p><strong>PS</strong>：SQLiteDatabase代表一个数据库对象,提供了操作数据库的一些方法</p>
+<p><img src="https://img-blog.csdnimg.cn/273cba0e521a49fca701673c7eb3b0d3.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><img src="https://img-blog.csdnimg.cn/2418f3df0c2c436eb5d914ce2dce1393.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>这里调用了mStorage方法，继续跟踪代码</p>
+<p><img src="https://img-blog.csdnimg.cn/ebe51f451018413abc5a3b64e55687bf.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>从上图中的mStorage &#x3D; new LockSettingsStorage(context, new LockSettingsStorage.Callback()  可以看到，将输入的密码存放到了数据库中，继续跟踪代码：</p>
+<p>到LockSettingsStorage方法中去看一下</p>
+<p><img src="https://img-blog.csdnimg.cn/2399bdf23f484ad887183a8b772f7f22.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><img src="https://img-blog.csdnimg.cn/a52732252b2e48039cd80f9146fa6f6b.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>数据库名字叫做：locksettings.db，那么它保存在哪里呢？</p>
+<p><img src="https://img-blog.csdnimg.cn/1c517cdbd5224c3a8a1605a0c61d0092.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>两个key文件，那么这个就是用来保存加密之后的手势密码和输入密码的信息到本地，下次开机解锁就需要读取这个文件内容进行密码比对了，查看具体的存在路径：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">find -name / locksettings.db<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/92a98274bc31474cb43006eca998d00f.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>SQLite Expert Professional 是一个专用高级可靠的工具，旨在帮助大家同时管理多个数据库，并且执行各种数据库语法。由于所有菜单功能集成到一个简约易懂的窗口中，刚入门的人员和专业人员都能很好的掌握该工具。在主窗口中，用户可以直接明了的查看所有已连接的数据库，并使用相关的语法进行操作。左侧区域为可用表，能够进行字段重组、外键、触发器等功能，并且不会丢失任何数据库信息。如果需要连接或者打开新的数据库，则可以通过菜单中的文件选项进行操作，并为文件名或者新数据库重新命名。除此之外，该工具还能轻松处理并纠正故障，保证数据库不会受到外界的干扰和影响。</p>
+<p>首先设置锁屏密码（模拟器中设置锁屏密码）：</p>
+<p><img src="https://img-blog.csdnimg.cn/4fcb91e9dd634079bda14860777170a7.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_17,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>PS：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c">/data/data/com.android.providers.settings/databases/databasessettings.db（Android <span class="hljs-number">4.0</span>及以前）<br><br>/data/system/locksettings.db（Android4<span class="hljs-number">.1</span>及以后）<br></code></pre></td></tr></table></figure>
+
+<p>单独拷贝locksettings.db 是没数据的，如下：</p>
+<p><img src="https://img-blog.csdnimg.cn/d620ff243e674263a4ff30a03b2c5725.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>应该将locksettings.db-shm、locksettings.db-wal 一起拷贝出来</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c">adb pull /data/system/locksettings.db<br>adb pull /data/system/locksettings.db-shm<br>adb pull /data/system/locksettings.db-wal<br></code></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/a683efc4f03b468cbfb5bd9d22cbdd6f.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>salt值：-2428488924405522123</p>
+<p>还有一个加密密码Key文件</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs awk">adb pull <span class="hljs-regexp">/data/</span>system/password.key .<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">E03FF03CA6C923FC3D7BE13ECA1AD9E159917CD7F901431E8569A3F7F815E570E758EBD5<br></code></pre></td></tr></table></figure>
+
+<p>最终的值应该是类似这样的（MD5（输入明文密码+设备的salt）.Hex+SHA1（输入明文密码+设备的salt）.Hex就是最终的加密内容）拼接起来就是密码：</p>
+<p><img src="https://img-blog.csdnimg.cn/8dd4f59712894944a7194c680a638441.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA6I-g6JCdX-apmeeVmemmmQ==,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><img src="https://img-blog.csdnimg.cn/e3a7c5f2b6374c2b98887d22e5dd27e6.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>但我这里借出来跟原生程序不太一样，发现是模拟器用的是三星的系统，这个系统对锁屏做过修改，没有用原生程序，网上有代码说是做了1024次Sha1运算，此处可以使用hashcat 爆破，三星做了1024次Sha1运算代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-type">byte</span>[] passwordToHash(String paramString)<br>  &#123;<br>    <span class="hljs-keyword">if</span> (paramString == <span class="hljs-literal">null</span>)<br>      <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;<br>    <span class="hljs-type">String</span> <span class="hljs-variable">str</span> <span class="hljs-operator">=</span> <span class="hljs-literal">null</span>;<br>    <span class="hljs-type">byte</span>[] arrayOfByte1 = <span class="hljs-literal">null</span>;<br>    <span class="hljs-keyword">try</span><br>    &#123;<br>      <span class="hljs-type">byte</span>[] arrayOfByte2 = (paramString + getSalt()).getBytes();<br>      <span class="hljs-type">byte</span>[] arrayOfByte3 = <span class="hljs-literal">null</span>;<br>      str = <span class="hljs-string">&quot;SHA-1&quot;</span>;<br>      <span class="hljs-type">MessageDigest</span> <span class="hljs-variable">localMessageDigest</span> <span class="hljs-operator">=</span> MessageDigest.getInstance(str);<br>      <span class="hljs-type">long</span> <span class="hljs-variable">l1</span> <span class="hljs-operator">=</span> System.currentTimeMillis();<br>      <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">1024</span>; i++)<br>      &#123;<br>        arrayOfByte1 = <span class="hljs-literal">null</span>;<br>        <span class="hljs-keyword">if</span> (arrayOfByte3 != <span class="hljs-literal">null</span>)<br>          localMessageDigest.update(arrayOfByte3);<br>        localMessageDigest.update((<span class="hljs-string">&quot;&quot;</span> + i).getBytes());<br>        localMessageDigest.update(arrayOfByte2);<br>        arrayOfByte3 = localMessageDigest.digest();<br>      &#125;<br>      arrayOfByte1 = toHex(arrayOfByte3).getBytes();<br>      <span class="hljs-type">long</span> <span class="hljs-variable">l2</span> <span class="hljs-operator">=</span> System.currentTimeMillis();<br>      Log.w(<span class="hljs-string">&quot;LockPatternUtils&quot;</span>, <span class="hljs-string">&quot;passwordToHash time = &quot;</span> + (l2 - l1) + <span class="hljs-string">&quot;ms&quot;</span>);<br>      <span class="hljs-keyword">return</span> arrayOfByte1;<br>    &#125;<br>    <span class="hljs-keyword">catch</span> (NoSuchAlgorithmException localNoSuchAlgorithmException)<br>    &#123;<br>      Log.w(<span class="hljs-string">&quot;LockPatternUtils&quot;</span>, <span class="hljs-string">&quot;Failed to encode string because of missing algorithm: &quot;</span> + str);<br>    &#125;<br>    <span class="hljs-keyword">return</span> arrayOfByte1;<br>  &#125;<br></code></pre></td></tr></table></figure>
+
+<p>PIN或复杂密码，因为salt 值是随机的，且输入密码加salt后再sha1+md5拼接复杂的多，所以安全性相对九宫格密码要安全一些</p>
+<p><strong>参考链接：</strong></p>
+<p><a target="_blank" rel="noopener" href="http://blog.md5.red/?p=456">http://blog.md5.red/?p=456</a></p>
+<p><a target="_blank" rel="noopener" href="http://www.520monkey.com/archives/1022">http://www.520monkey.com/archives/1022</a></p>
+<hr>
+<p><strong>你以为你有很多路可以选择，其实你只有一条路可以走</strong></p>
+<hr>
+</div>
+
+			<link rel="stylesheet" type="text/css" href="https://qiniu.techgrow.cn/readmore/dist/hexo.css">
+			<script src="https://qiniu.techgrow.cn/readmore/dist/readmore.js" type="text/javascript"></script>
+			<script>
+			var isMobile = navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i);
+			if (!isMobile) {
+				try {
+					var plugin = new ReadmorePlugin();
+					plugin.init({
+						"id": "readmore-container",
+						"blogId": "25525-4637332244353-147",
+						"name": "橙留香Park",
+						"qrcode": "https://i.imgtg.com/2022/10/03/mjCQ1.jpg",
+						"keyword": "验证码",
+						"lockToc": "yes",
+						"type": "hexo",
+						"random": "1",
+						"interval": "60",
+						"expires": "1",
+						"height": "auto"
+					});
+				} catch(e) {
+					console.warn("readmore plugin occurred error: " + e.name + " | " + e.message);
+				}
+			}
+			</script>
+		
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/AndroidSecurity/">#AndroidSecurity</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Android加密算法浅析</div>
+      <div>https://orangey.info/2022/09/23/121377483/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>橙留香</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年9月23日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/09/23/122089268/" title="Android APP应用程序的汉化功能 (修改so中的字符串内容)">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Android APP应用程序的汉化功能 (修改so中的字符串内容)</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/09/23/121448565/" title="ADB命令总结？看这一篇就够了「收藏版」">
+                        <span class="hidden-mobile">ADB命令总结？看这一篇就够了「收藏版」</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  <article id="comments" lazyload>
+    
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1e96aec5ac46370916fa","clientSecret":"ee5e97a65cf34e9fe31e15ab0421a94968237f5e","repo":"ogGitalk","owner":"ananasOrangey","admin":["ananasOrangey"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '3e2da40f0eacacb0023c750c58148d7c'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+  </article>
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://orangey.blog.csdn.net" target="_blank" rel="nofollow noopener"><span>橙留香CSDN博客</span></a> <i class="iconfont icon-love"></i> <a href="https://i.imgtg.com/2022/09/21/gNXxK.png" target="_blank" rel="nofollow noopener"><span>橙留香微信公众号</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

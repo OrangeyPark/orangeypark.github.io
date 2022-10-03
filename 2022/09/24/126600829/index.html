@@ -1,0 +1,864 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="橙留香">
+  <meta name="keywords" content="橙留香车联网安全技术博客">
+  
+    <meta name="description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  Android安全付费专栏长期更新，本篇最新内容请前往：  [车联网安全自学篇] Android安全之APK内存敏感信息泄露挖掘【动态分析】 文章中的环境搭建  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;anan">
+<meta property="og:type" content="article">
+<meta property="og:title" content="关于Linux+Windows安装r2Frida环境配置及使用，你必须知道的那些事">
+<meta property="og:url" content="https://orangey.info/2022/09/24/126600829/index.html">
+<meta property="og:site_name" content="车联网安全技术博客 | 橙留香">
+<meta property="og:description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  Android安全付费专栏长期更新，本篇最新内容请前往：  [车联网安全自学篇] Android安全之APK内存敏感信息泄露挖掘【动态分析】 文章中的环境搭建  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;anan">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/21/gNXxK.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2441d86bcece4838a89d11183cd0214f.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/9c4a192b402342858405e710acc57439.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/221fefe645a44e4780ebbb52d73d91ad.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/05d81536eca14c9da20217e452f528b2.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5676399fa2e2405889c3efef4810d464.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8a9b33cc2b45458f801c7259054120c1.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c1854ef91d5c435d85f7c9648a6b2bd4.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/6ce3142477c1490da9255d5e5b22a346.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/4af8bd6730c64ad3948b9175f12843c2.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2e447db679ac49f2b3aabd6d319a8786.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/4d3f84ab40ba4f6f9faf26bc4e242c86.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8ed1901bedac4d46babd5209feacc5a8.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/cb5e96bd4ce14c028ee0364498ce00cf.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/08e285205ba34cf8b5e8568fb86aebbb.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/fc4b7affc8014556838919043f13ffe9.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/445ee3d27a954222aa36d34d410c0a6f.png">
+<meta property="article:published_time" content="2022-09-24T09:41:47.873Z">
+<meta property="article:modified_time" content="2022-09-24T16:48:21.114Z">
+<meta property="article:author" content="橙留香">
+<meta property="article:tag" content="AndroidSecurity">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+  
+  
+  
+  <title>关于Linux+Windows安装r2Frida环境配置及使用，你必须知道的那些事 - 车联网安全技术博客 | 橙留香</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"orangey.info","root":"/","version":"1.9.3","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"java"},"copy_btn":false,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>橙留香</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="关于Linux+Windows安装r2Frida环境配置及使用，你必须知道的那些事"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-09-24 17:41" pubdate>
+          2022年9月24日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          4.4k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          <!-- compatible with older versions-->
+          37 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">关于Linux+Windows安装r2Frida环境配置及使用，你必须知道的那些事</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <div id="readmore-container"><hr>
+<p><strong>也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大</strong></p>
+<p><strong>少走了弯路，也就错过了风景，无论如何，感谢经历</strong></p>
+<hr>
+<p>Android安全付费专栏长期更新，本篇最新内容请前往：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://orangey.blog.csdn.net/article/details/126600829">[车联网安全自学篇] Android安全之APK内存敏感信息泄露挖掘【动态分析】 文章中的环境搭建</a></li>
+</ul>
+<p>更多关于Android安全的知识，可前往：<a target="_blank" rel="noopener" href="https://blog.csdn.net/ananasorangey/category11955914.html">https://blog.csdn.net/ananasorangey/category11955914.html</a></p>
+<p><img src="https://i.imgtg.com/2022/09/25/gdpGP.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><img src="https://i.imgtg.com/2022/09/21/gNXxK.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><strong>注</strong>：<font color='red'>真心推荐优先Ubuntu 或Linux安装，Windows安装容易出错，安装真的是重灾区，呜呜呜… …</font></p>
+<h1 id="0x01-Linux-安装radare2-r2frida-【推荐】"><a href="#0x01-Linux-安装radare2-r2frida-【推荐】" class="headerlink" title="0x01 Linux 安装radare2+r2frida 【推荐】"></a>0x01 Linux 安装radare2+r2frida 【推荐】</h1><p><strong>Linux 系统安装</strong>，此处安装的系统为Ubuntu（我用得Ubuntu 18，不太推荐用Kali Linux，我这里使用Kali 2022版本的有些源依赖找不到或更新源容易出问题，以前版本没遇到过这种问题，大家看着来吧，如果Kali 用如下方法失败，建议用个干净点的Ubuntu系统来安装），步骤如下：</p>
+<ul>
+<li>安装radare2</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// 需要提前安装好需要的环境</span><br>sudo apt install curl<br>sudo apt install nodejs<br>sudo apt install python3<br>sudo apt install python3-pip<br>sudo apt install git<br>sudo apt install frida<br><br><br><span class="hljs-comment">//提前配置个科学理想的上网方式，因为要下载github上的东西，可能会下载失败</span><br>export http_proxy=<span class="hljs-string">&quot;http://192.168.6.23:7890&quot;</span><br>export https_proxy=<span class="hljs-string">&quot;http://192.168.6.23:7890&quot;</span><br><br><span class="hljs-comment">// 接着git下载代系统中运行安装</span><br>sudo git clone https:<span class="hljs-comment">//github.com/radareorg/radare2</span><br>radare2/sys/install.sh<br>或自行下载好后丢到虚拟机中并运行安装，下面是解压和安装的命令<br>unzip radare2-master.zip<br>mv radare2-master radare2<br>radare2/sys/install.sh<br></code></pre></td></tr></table></figure>
+
+<p>在快安装好的结尾，会提示输入密码，然后自动配置一些环境变量等配置，此时就代表已安全好了</p>
+<p><img src="https://img-blog.csdnimg.cn/2441d86bcece4838a89d11183cd0214f.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/9c4a192b402342858405e710acc57439.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>安装r2frida依赖</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c">sudo apt-get update &amp;&amp; sudo apt-get upgrade -y<br>sudo apt install -y make gcc libzip-dev nodejs npm curl pkg-config git<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>依然优先推荐使用<code>r2pm -ci r2frida</code>命令自动化安装，如果失败的话再自行下载源码<code>make install</code>编译安装</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">r2pm -ci r2frida<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/221fefe645a44e4780ebbb52d73d91ad.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>安装成功将提示：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c">mkdir -p /<span class="hljs-string">&quot;/home/ww/.local/share/radare2/plugins&quot;</span><br>rm -f <span class="hljs-string">&quot;//home/ww/.local/share/radare2/plugins/io_frida.so&quot;</span><br>cp -f io_frida.so* /<span class="hljs-string">&quot;/home/ww/.local/share/radare2/plugins&quot;</span><br></code></pre></td></tr></table></figure>
+
+<p>接着运行<code>r2 frida://?</code>显示帮助，测试插件是否安装成功，如下：</p>
+<p><img src="https://img-blog.csdnimg.cn/05d81536eca14c9da20217e452f528b2.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>运行<code>r2 frida://?</code>显示帮助，测试插件是否安装成功，如下：</p>
+<ul>
+<li><p>打开开发者选项里的USB调试</p>
+<ul>
+<li>设置里面，关于本机，然后狂点系统版本号，即可开启开发者模式</li>
+<li>返回设置的关于本机界面，会多一个开发者选项（有些是狂点版本号后直接跳转到开发者选项界面）</li>
+<li>点击开启USB调试开关按钮</li>
+</ul>
+</li>
+<li><p>获取当前模拟器的CPU，好选择frida-server的版本</p>
+</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">adb shell getprop ro.product.cpu.abi<br></code></pre></td></tr></table></figure>
+
+<p>AndroidCPU架构：</p>
+<table>
+<thead>
+<tr>
+<th>CPU架构</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>armeabi</td>
+<td>第5代 ARM v5TE，使用软件浮点运算，兼容所有ARM设备，通用性强，速度慢</td>
+</tr>
+<tr>
+<td>armeabi-v7a</td>
+<td>第7代 ARM v7，使用硬件浮点运算，具有高级扩展功能</td>
+</tr>
+<tr>
+<td>arm64-v8a</td>
+<td>第8代，64位,包含 Aarch32、Arch64两个执行状态对应32、64bit</td>
+</tr>
+<tr>
+<td>x86</td>
+<td>intel32位，一般用于平板电脑</td>
+</tr>
+<tr>
+<td>x86_64</td>
+<td>intel64位，一般用于平板电脑</td>
+</tr>
+<tr>
+<td>mips</td>
+<td>少接触</td>
+</tr>
+<tr>
+<td>mips64</td>
+<td>少接触</td>
+</tr>
+</tbody></table>
+<ul>
+<li>在手机上运行Frida服务端：</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c">adb push frida-server<span class="hljs-number">-15.2</span><span class="hljs-number">.2</span>-android-x86  /data/local/tmp/<br>adb shell <br>su<br>cd /data/local/tmp/<br>chmod <span class="hljs-number">777</span> frida-server<span class="hljs-number">-15.2</span><span class="hljs-number">.2</span>-android-x86<br>./frida-server<span class="hljs-number">-15.2</span><span class="hljs-number">.2</span>-android-x86<br></code></pre></td></tr></table></figure>
+
+
+
+<p><strong>注</strong>：有些APP会检测本地是否启动了frida-server，以及监听是否开启了27042端口。有反调试的话，可以将名字重新改成别的，fshbbx86之类的，以及更改端口，此处不介绍反检测绕过的知识，感兴趣的同学可以私下自行了解</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">./data/local/tmp/fshbbx86 -l <span class="hljs-number">0.0</span><span class="hljs-number">.0</span><span class="hljs-number">.0</span>:<span class="hljs-number">8080</span>  (<span class="hljs-number">8080</span>为自定义端口)<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>启动frida并修改监听端口（防止部分app监测默认端口）【可选】</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">adb shell /data/local/tmp/frida-server<span class="hljs-number">-15.2</span><span class="hljs-number">.2</span>-android-x86 -l <span class="hljs-number">0.0</span><span class="hljs-number">.0</span><span class="hljs-number">.0</span>:<span class="hljs-number">8080</span><br></code></pre></td></tr></table></figure>
+
+
+<ul>
+<li>转发frida端口</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c">adb forward tcp:<span class="hljs-number">27042</span> tcp:<span class="hljs-number">27042</span><br>adb forward tcp:<span class="hljs-number">27043</span> tcp:<span class="hljs-number">27043</span><br>adb forward tcp:<span class="hljs-number">38089</span> tcp:<span class="hljs-number">38089</span><br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><code>frida-ls-devices</code>查看USB的设备的名称或IP</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">frida-ls-devices<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/5676399fa2e2405889c3efef4810d464.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>对于USB调试<code>iOS/Android</code>应用程序，使用如下操作。需要注意，spawn 可以替换为OR，并且名称可以是应用程序名称或PID</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c">$ r2 frida:<span class="hljs-comment">//spawn/usb/         # 枚举设备</span><br>$ r2 frida:<span class="hljs-comment">//spawn/usb//        # 枚举第一个设备的应用程序</span><br>$ r2 frida:<span class="hljs-comment">//spawn/usb//HelloWorldJNI # 运行 HelloWorldJNI 应用程序</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/8a9b33cc2b45458f801c7259054120c1.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>要使用r2frida的命令，得在命令的前面加上 <code>\ </code>或 <code>=!</code>，比如获取 help：<code>=!?</code>或 <code>\?</code>，此处的命令前面加<code>\</code>运行失败了，用的<code>=!</code>正常运行成功</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">=!?<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/c1854ef91d5c435d85f7c9648a6b2bd4.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/6ce3142477c1490da9255d5e5b22a346.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>如果想要获取某个字母有哪些命令只需要在其后面加 <code>? </code>即可，如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">=!dm?<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/4af8bd6730c64ad3948b9175f12843c2.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>这里用到的匹配符<code>~</code>，这个符号类似<code>grep</code>命令；也可以以radare的格式输出，只需要在命令后面加个<code>* </code>符号，如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">$ =!dm*~sg.vantagepoint.helloworldjni<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/2e447db679ac49f2b3aabd6d319a8786.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>如果你想更方便的把获取到的数据直接使用，可以输出为JSON格式，只需要在命令后面加<code>j</code>，如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">$ =!dmj~sg.vantagepoint.helloworldjni<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/4d3f84ab40ba4f6f9faf26bc4e242c86.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h1 id="0x02-Windows-安装radare2-r2frida【不推荐】"><a href="#0x02-Windows-安装radare2-r2frida【不推荐】" class="headerlink" title="0x02 Windows 安装radare2+r2frida【不推荐】"></a>0x02 Windows 安装radare2+r2frida【不推荐】</h1><p>提前准备环境：Visual Studio 2019、Node.js 14.17.4、Cygwin 3.2.0(记得选择wget)、Frida 15.1.2<br>（提前安装好以上环境，VS版本至少为2015）</p>
+<p>在Linux和Windows上安装r2frida：<a target="_blank" rel="noopener" href="https://blog.xhyeax.com/2021/10/01/r2frida-install-on-linux-and-win/">https://blog.xhyeax.com/2021/10/01/r2frida-install-on-linux-and-win/</a></p>
+<p>下载<a target="_blank" rel="noopener" href="https://github.com/radareorg/radare2/releases">radare2</a>的radare2-5.7.6-w64.zip，解压到任意目录，将..\radare2\bin目录添加到PATH环境变量后，执行<code>r2 -v</code>查看版本号</p>
+<p><img src="https://img-blog.csdnimg.cn/8ed1901bedac4d46babd5209feacc5a8.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>下载<a target="_blank" rel="noopener" href="https://github.com/nowsecure/r2frida">r2frida</a>，然后编辑<code>build.bat</code>，修改<code>frida_version</code>为frida安装版本，修改R2_BASE为radare2安装目录（不需要bin）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">frida --version<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/cb5e96bd4ce14c028ee0364498ce00cf.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/08e285205ba34cf8b5e8568fb86aebbb.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>将<code>..\radare2\include\libr\r_cons.h</code>以<code>UTF-8 with BOM</code>编码重新保存</p>
+<p><img src="https://img-blog.csdnimg.cn/fc4b7affc8014556838919043f13ffe9.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>在cmd中打开该目录，使用<code>vcvarsall.bat</code>初始化环境，然后执行安装脚本</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-string">&quot;[Visual Studio安装位置]\VC\Auxiliary\Build\vcvarsall.bat&quot;</span> x64<br>.\build.bat install<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/445ee3d27a954222aa36d34d410c0a6f.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>安装成功将提示(我这里安装失败了，((((ToT)†~~~)：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c">Installing...<br>Copying <span class="hljs-string">&#x27;io_frida.dll&#x27;</span> to C:\Users\xhy\.local\share\radare2\plugins<br>        <span class="hljs-number">1</span> file(s) copied.<br></code></pre></td></tr></table></figure>
+
+<p><strong>参考链接</strong>：</p>
+<p><a target="_blank" rel="noopener" href="https://blog.xhyeax.com/2021/10/01/r2frida-install-on-linux-and-win/">https://blog.xhyeax.com/2021/10/01/r2frida-install-on-linux-and-win/</a></p>
+<p><a target="_blank" rel="noopener" href="https://ckcat.github.io/2019/12/21/r2Frida%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%E5%8F%8A%E4%BD%BF%E7%94%A8/">https://ckcat.github.io/2019/12/21/r2Frida%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%E5%8F%8A%E4%BD%BF%E7%94%A8/</a></p>
+<hr>
+<p><strong>你以为你有很多路可以选择，其实你只有一条路可以走</strong></p>
+<hr>
+</div>
+
+			<link rel="stylesheet" type="text/css" href="https://qiniu.techgrow.cn/readmore/dist/hexo.css">
+			<script src="https://qiniu.techgrow.cn/readmore/dist/readmore.js" type="text/javascript"></script>
+			<script>
+			var isMobile = navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i);
+			if (!isMobile) {
+				try {
+					var plugin = new ReadmorePlugin();
+					plugin.init({
+						"id": "readmore-container",
+						"blogId": "25525-4637332244353-147",
+						"name": "橙留香Park",
+						"qrcode": "https://i.imgtg.com/2022/10/03/mjCQ1.jpg",
+						"keyword": "验证码",
+						"lockToc": "yes",
+						"type": "hexo",
+						"random": "1",
+						"interval": "60",
+						"expires": "1",
+						"height": "auto"
+					});
+				} catch(e) {
+					console.warn("readmore plugin occurred error: " + e.name + " | " + e.message);
+				}
+			}
+			</script>
+		
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/AndroidSecurity/">#AndroidSecurity</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>关于Linux+Windows安装r2Frida环境配置及使用，你必须知道的那些事</div>
+      <div>https://orangey.info/2022/09/24/126600829/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>橙留香</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年9月24日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/09/24/126602548/" title="关于利用ADT获取内存中敏感信息，你必须知道的那些事">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">关于利用ADT获取内存中敏感信息，你必须知道的那些事</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/09/24/126548441/" title="「Android 安全」APK应用程序签名异常的检测方法">
+                        <span class="hidden-mobile">「Android 安全」APK应用程序签名异常的检测方法</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  <article id="comments" lazyload>
+    
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1e96aec5ac46370916fa","clientSecret":"ee5e97a65cf34e9fe31e15ab0421a94968237f5e","repo":"ogGitalk","owner":"ananasOrangey","admin":["ananasOrangey"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: 'cfd3853831c4a0a91af7aebf55bd0ad0'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+  </article>
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://orangey.blog.csdn.net" target="_blank" rel="nofollow noopener"><span>橙留香CSDN博客</span></a> <i class="iconfont icon-love"></i> <a href="https://i.imgtg.com/2022/09/21/gNXxK.png" target="_blank" rel="nofollow noopener"><span>橙留香微信公众号</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

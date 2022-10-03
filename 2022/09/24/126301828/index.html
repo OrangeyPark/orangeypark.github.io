@@ -1,0 +1,1184 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="橙留香">
+  <meta name="keywords" content="橙留香车联网安全技术博客">
+  
+    <meta name="description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  ATTACK付费专栏长期更新，本篇最新内容请前往：  [车联网安全自学篇] ATTACK安全之Android车机证书攻击场景检测【检测系统代理】  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;ananasorang">
+<meta property="og:type" content="article">
+<meta property="og:title" content="「干货」Android 车机证书攻击场景检测「检测系统代理篇」">
+<meta property="og:url" content="https://orangey.info/2022/09/24/126301828/index.html">
+<meta property="og:site_name" content="车联网安全技术博客 | 橙留香">
+<meta property="og:description" content="也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大 少走了弯路，也就错过了风景，无论如何，感谢经历  ATTACK付费专栏长期更新，本篇最新内容请前往：  [车联网安全自学篇] ATTACK安全之Android车机证书攻击场景检测【检测系统代理】  更多关于Android安全的知识，可前往：https:&#x2F;&#x2F;blog.csdn.net&#x2F;ananasorang">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+<meta property="og:image" content="https://i.imgtg.com/2022/09/21/gNXxK.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5395e5491147472bbb97a8ae671e5c45.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/839dca6848a04ff6a0aab21a5a599de2.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/fc35b0c2fc6a4163a71952e67f5d56ae.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/a904d1d9108047a1838f1f83cd23c7f9.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/7faff581fe81400391fc16c2ef717444.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/f72d596cc0224818816bf396646cdfb4.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/fd02ab4024d54c858c41eb298c5d78ba.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/22d34148c9eb4d5aa7d00d0f30febb6a.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c76ed327602145e1ad960ba2d3e09256.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8eb732faa7fa457d8c6940320a203227.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/ad37aead07b94f27a89aa94b09ed5b3b.png">
+<meta property="article:published_time" content="2022-09-24T09:51:55.086Z">
+<meta property="article:modified_time" content="2022-09-24T16:47:55.917Z">
+<meta property="article:author" content="橙留香">
+<meta property="article:tag" content="Android_ATTACK">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://i.imgtg.com/2022/09/25/gdpGP.png">
+  
+  
+  
+  <title>「干货」Android 车机证书攻击场景检测「检测系统代理篇」 - 车联网安全技术博客 | 橙留香</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"orangey.info","root":"/","version":"1.9.3","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":true,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"java"},"copy_btn":false,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>橙留香</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="「干货」Android 车机证书攻击场景检测「检测系统代理篇」"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-09-24 17:51" pubdate>
+          2022年9月24日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          38k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          <!-- compatible with older versions-->
+          318 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">「干货」Android 车机证书攻击场景检测「检测系统代理篇」</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <div id="readmore-container"><hr>
+<p><strong>也许每个人出生的时候都以为这世界都是为他一个人而存在的，当他发现自己错的时候，他便开始长大</strong></p>
+<p><strong>少走了弯路，也就错过了风景，无论如何，感谢经历</strong></p>
+<hr>
+<p>ATTACK付费专栏长期更新，本篇最新内容请前往：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://orangey.blog.csdn.net/article/details/126301828">[车联网安全自学篇] ATTACK安全之Android车机证书攻击场景检测【检测系统代理】</a></li>
+</ul>
+<p>更多关于Android安全的知识，可前往：<a target="_blank" rel="noopener" href="https://blog.csdn.net/ananasorangey/category11955914.html">https://blog.csdn.net/ananasorangey/category11955914.html</a></p>
+<p><img src="https://i.imgtg.com/2022/09/25/gdpGP.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><img src="https://i.imgtg.com/2022/09/21/gNXxK.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<h2 id="0x01-前言"><a href="#0x01-前言" class="headerlink" title="0x01 前言"></a>0x01 前言</h2><p>拿到一个车机的Shell后，首先是要尽可能的收集相关敏感信息和内网横向的信息，以及查看密钥是否进行了不安全存储。比如密钥在系统的文件夹中存储，但是没有配置安全的权限，这里举个例子：假如有个文件的配置权限为777的开自启动<code>.sh</code>文件，此时低权限用户即可通过该配置错误的文件提升权限到root权限</p>
+<p>在车企中许多时候，开发人员为了方便或量产前的疏忽，导致同款系列的每一辆车，有可能使用相同的初始CA证书，并用该CA证书生成设备与后端之间OTA通信加密用的永久证书，但往往初始CA证书的密码都为了方便设置的是弱密码（比如：123456或admin123等）或不设置密码，就跟我们在传统Web安全里发现一个后台登录界面一样，弱口令是永远的0day，嘻嘻(#^.^#)。看到这里大家也发现此处就存在了安全隐患，只要获得了其中一款证书就能获得同款系列所有车的CA证书，来进行攻击，比如攻击者利用泄露的初始CA证书来攻击制造商的后端服务，使攻击者获得永久证书，这会导致非常严重的危害，因为TCU和制造商之间的所有加密通信，都可被攻击者解密，所以进行渗透测试时需要重点关注已获得权限的系统上是否对密钥进行了不安全存储</p>
+<p>密钥加密有两种：对称加密和非对称加密，后者也称为公钥加密。在对称加密中，对话的双方都使用相同的密钥将明文转换为密文，反之亦然</p>
+<p>什么是对称&#x2F;非对称加密？</p>
+<ul>
+<li>对称加密：指的就是加、解密使用的同是一串密钥，所以被称做对称加密。对称加密只有一个密钥作为私钥。常见的对称加密算法：DES，AES等<ul>
+<li>提供了8种对称加密算法，其中7种是分组加密算法，仅有的一种流加密算法是RC4</li>
+<li>7种分组加密算法分别是AES、DES、Blowfish、CAST、IDEA、RC2、RC5，都支持电子密码本模式（ECB）、加密分组链接模式（CBC）、加密反馈模式（CFB）、计算器模式（CTR）和输出反馈模式（OFB）五种常用的分组密码加密模式。其中，AES使用的加密反馈模式（CFB）和输出反馈模式（OFB）分组长度是128位，其它算法使用的则是64位。事实上，DES算法里面不仅仅是常用的DES算法，还支持三个密钥和两个密钥3DES算法；计算器模式（CTR）不常见，在CTR模式中， 有一个自增的算子，这个算子用密钥加密之后的输出和明文异或的结果得到密文，相当于一次一密。这种加密方式简单快速，安全可靠，而且可以并行加密，但是在计算器不能维持很长的情况下，密钥只能使用一次</li>
+</ul>
+</li>
+<li>非对称加密（也称为公钥加密）：指的是加、解密使用不同的密钥，一把作为公开的公钥，另一把作为私钥。公钥加密的信息，只有私钥才能解密。反之，私钥加密的信息，只有公钥才能解密。最常用的非对称加密算法：RSA<ul>
+<li>提供了4种非对称加密算法，包括DH算法、RSA算法、DSA算法和椭圆曲线算法（EC）</li>
+<li>DH算法一般用户密钥交换</li>
+<li>RSA算法既可以用于密钥交换，也可以用于数字签名，但速度堪忧，你不介意的话也可以用于数据加密</li>
+<li>DSA算法则一般只用于数字签名</li>
+</ul>
+</li>
+</ul>
+<p>对称加密优缺点：</p>
+<ul>
+<li>优点：对称加密相比非对称加密算法来说，加解密的效率要高得多、加密速度快</li>
+<li>缺点：对于密钥的管理和分发上比较困难，不是非常安全，密钥管理负担很重</li>
+</ul>
+<p>非对称加密优缺点：</p>
+<ul>
+<li>优点：安全性更高，公钥是公开的，密钥是自己保存的，不需要将私钥给别人</li>
+<li>缺点：加密和解密花费时间长、速度慢，只适合对少量数据进行加密</li>
+</ul>
+<p>对称加密与非对称加密的区别：</p>
+<ul>
+<li>两者之间的区别在于如何分发证书以及分发什么样的证书到设备端（客户端）</li>
+</ul>
+<p>在非对称或公共密钥加密中，对话的双方各自使用不同的密钥。一个密钥称为公钥，一个密钥称为私钥，之所以如此命名，是因为其中一方将其保密，并且永远不会与任何人共享。当使用公钥加密明文时，只有私钥可以解密它，而公钥不能。反过来也成立：用私钥加密的明文，只有公钥才能将其解密</p>
+<p><img src="https://img-blog.csdnimg.cn/5395e5491147472bbb97a8ae671e5c45.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>从上，可以看出要说安全性的话，肯定是非对称加密安全，但是效率比较慢，对称加密效率高，但是不安全。较好的解决方法是将对称加密的密钥使用非对称加密的公钥进行加密（对称加密+非对称加密，这里利用了对称加密性能好，利用非对称加密安全的特性），然后发送出去，接收方使用私钥进行解密得到对称加密的密钥，然后双方可以使用对称加密来进行沟通。但在实际工作中开发人员会直接使用非对称加、解密，因为觉得平时一般请求的报文不会很大，加解密起来速度在可接受范围内，或者可以对敏感字段，比如密码、手机号、身份证号等进行分段加密，效率还可以</p>
+<p><strong>注</strong>：对称加密+非对称加密，虽然更安全了，但我们无法保证第一步服务器返回的公钥不会被黑客篡改。假如黑客把服务端返回的公钥变为自己的公钥，那么攻击者就可对客户端的所有消息使用自己的私钥解密</p>
+<p>在车企中使用对称密钥加密来进行数据传输也是较为普遍，这里说车的吧，上面也说了对称加密只有一个密钥，该密钥必须在TCU（联网通信模块）和制造商的后端之间共享，同一个密钥用于加密和解密通信，这就导致制造商必须保存该密钥的副本，并将同一密钥放在TCU上，如果密钥遭到泄露，你懂得… …；再来说说非对称加密（也称为公钥加密），它是一个公钥和一个私钥来做加解密端点之间的信息，这就导致TCU（联网通信模块）将拥有制造商的公钥，而制造商将拥有该车系中每个TCU（联网通信模块）的公钥，当TCU（联网通信模块）通过OTA向后端发送数据时，将使用制造商的公钥来对信息做加密，且智能使用制造商的私钥才能对信息解密。反之亦然，当制造商将数据发送回TCU（联网通信模块）时，使用非对称加密中的TCU（联网通信模块）公钥对数据进行加密，私钥通过TCU（联网通信模块）和后端之间的GSM【全球移动通讯系统 (<code>Global System for Mobile Communications</code>)】连接进行交换</p>
+<p><strong>注</strong>：后端安全通信(TLS)：现在大部分汽车都具有联网通信模块(常说的TCU)，该模块允许用于远程控制车辆，或者获取车辆信息。这些通常都是基于蜂窝网络的，目前在网络层的加密和验证通常使用TLS协议套件来实现，它是目前全世界最常用的安全协议</p>
+<p><strong>注</strong>：此处的TCU，并不是指传统汽车领域里的「变速箱控制单元（transmission control unit）」，而是智能网联领域的「远程信息控制单元TCU（Telematic control unit）」，又称T-Box</p>
+<p>依据车联网通信证书的用途可将证书分为CA证书、注册证书、假名证书和应用证书4类</p>
+<ul>
+<li><p>CA证书(CA Certificate)是颁发注册证书、假名证书或应用证书的证书颁发机构(Certificate Authority，CA)的证书。其中根CA证书(Root Certificate)是一个自签名证书，其为一个PKI系统所有证书链的根节点，又称为一个PKI系统的信任锚点(trust anchor)。根CA可以根据需要向下级CA颁发子CA证书，例如注册CA证书、假名CA证书和应用CA证书等</p>
+<ul>
+<li>CA将为后端生成用来跟OTA通信的证书，然后将证书防止在后端服务器上，用于TCU（联网通信模块）的公钥或私钥对</li>
+</ul>
+</li>
+<li><p>注册证书(Enrollment Certificate)由注册CA颁发给车联网设备。车联网设备被注册机构认证后，由注册CA为其颁发注册证书。注册证书与设备唯一对应。设备需要使用注册证书从其他授权机构(Authorization Authority，AA)申请适用于某一应用领域的通信证书</p>
+<ul>
+<li>CR 是使用公钥生成证书</li>
+</ul>
+</li>
+<li><p>假名证书(Pseudonym Certificate)由假名CA颁发给OBU。OBU使用假名证书签发其播发的主动安全消息(Basic Safety Message，BSM)。为保护用户隐私，需要使用密码技术对用户的身份信息进行加密。OBU可拥有多个假名证书，用于定时切换使用，从而避免泄露车辆行驶轨迹。</p>
+</li>
+<li><p>应用证书(Application Certificate)由应用CA颁发给RSU或车联网应用服务提供方(Service Provider，SP)，用于特定的车联网应用领域。RSU使用应用证书签发其播发的某种应用消息。例如RSU使用应用证书签发其播发的交通信号灯状态、交通信息、商业服务消息等。针对某个特定的车联网应用，RSU只能拥有一个应用证书。</p>
+</li>
+<li><p>身份证书(Identity Certificate)由应用CA颁发给OBU，用于特定的车联网应用领域。车联网设备使用应用证书签发其播发的某种应用消息。例如OBU使用应用证书签发其与其他OBU或RSU交互的消息。针对某个特定的车联网应用，OBU只能拥有一个应用证书。</p>
+</li>
+</ul>
+<p>互联网通信PKI系统的证书文件较大，但存储有限且需要避免DSRC通道拥堵，车辆PKI系统需较短的密钥，为了满足该需求，车辆PKI系统使用椭圆曲线加密算法((ECDSA-256)密铜，可生成大小约为Internet证书八分之一的证书)</p>
+<p>需要注意，后端上的证书只是设备公钥或私钥对中的公钥，该公钥由CA的私钥签名，还有后端对发送到设备的通信数据进行加密，只有设备的私钥才能对传输的信息进行解密，因为后端使用与设备私钥配对的公钥对数据进行加密。</p>
+<p>比如TCU（联网通信模块）PKI  会遇到的一些安全问题：</p>
+<ul>
+<li>汽车端：T-box<ul>
+<li>如何实时辨别T-box端的真实身份，非仿冒车载终端</li>
+<li>如何确认从T-box传到TSP通讯数据的加密性、完整性、不可篡改性</li>
+<li>如何保障T-box软件代码不被恶意篡改</li>
+<li>如何让终端设备、终端APP、网页访问人员确认TSP平台是可信网站，而非钓鱼网站</li>
+<li>如何确认终端关键操作时间的真实性</li>
+<li>如何确保蓝牙钥匙与车载终端的安全认证</li>
+</ul>
+</li>
+<li>手机端：终端APP</li>
+<li>TSP后台怎么识别APP的真实性，怎么确认APP身份</li>
+<li>如何确认终端APP与TSP后台之间数据传输安全性、加密性</li>
+<li>如何确认用户关键操作时间的真实性</li>
+<li>如何确保蓝牙钥匙与车载终端的安全认证</li>
+<li>TSP后台所在的云端服务器、云端管理人员<ul>
+<li>如何让终端设备、终端APP、网页访问人员确认TSP平台是可信网站，而非钓鱼网站</li>
+<li>云端管理人员登录TSP后台时，如何确认管理人员身份</li>
+<li>云端管理人员在TSP进行重要业务操作时，如何保障信息安全性、抗抵赖性</li>
+</ul>
+</li>
+<li>设备厂商访问TSP后台操作<ul>
+<li>设备厂商登录TSP后台时，如何进行身份认证</li>
+<li>设备厂商登录TSP进行发布新消息、新产品等时，如何保障信息的完整性、防抵赖性</li>
+<li>如何保障设备厂商上传的软件代码不被恶意篡改</li>
+<li>如何确认用户关键操作时间的真实性</li>
+<li>一旦出现纠纷，如何保障车联网的权益</li>
+</ul>
+</li>
+</ul>
+<p>CA服务平台：</p>
+<ul>
+<li>签名验签系统</li>
+<li>数字证书认证系统</li>
+<li>加密机</li>
+<li>证书综合管理系统</li>
+</ul>
+<p>TSP服务平台：</p>
+<ul>
+<li>车载系统服务端或OTA</li>
+<li>电子签名应用服务器(API)</li>
+<li>SSL服务器证书</li>
+<li>数字证书安全存储</li>
+</ul>
+<p>移动端：</p>
+<ul>
+<li>车联网APP</li>
+<li>移动端SDK</li>
+<li>证书存储沙盒</li>
+<li>证书应用接口</li>
+</ul>
+<p>车载系统：</p>
+<ul>
+<li>证书定制库</li>
+<li>证书应用接口</li>
+<li>证书存储模块&#x2F;芯片</li>
+<li>车载操作系统</li>
+</ul>
+<p>VSD、充电桩等设备：</p>
+<ul>
+<li>车联网服务</li>
+<li>证书应用接口</li>
+<li>证书存储模块</li>
+</ul>
+<p><strong>车载终端安全方案</strong>：主要关注车载终端T-BOX和TSP平台系统之间的数据传输加密和数据不可篡改、车载终端T-BOX的身份识别、车载终端T-BOX软件代码不被篡改等安全，使用LDAP、OCSP、CRL服务保证TSP平台系统中数字证书的实时真实有效性</p>
+<p><strong>TSP云端身份安全方案</strong>：主要针对TSP云端服务和后台人员身份识别，保障TSP服务端身份真实性，TSP后台人员网页操作与TSP平台系统数据签名防抵赖和数据传输加密安全</p>
+<p><strong>终端APP</strong>：主要针对APP终端用户、终端设备签发身份标识，保障终端APP与车载终端、及TSP服务端身份认证安全</p>
+<p><strong>设备厂商安全方案</strong>：主要针对设备厂商登录TSP平台系统的身份识别、重要节点数据安全等安全保障和法律服务</p>
+<p>TCU上的证书一般分为两种：初始证书和常规证书</p>
+<ul>
+<li>初始证书：在制造阶段安装在设备上的证书<ul>
+<li>不排除初始证书存在有规律可循的现象或直接是一模一样的</li>
+</ul>
+</li>
+<li>常规证书：在量产时，制造商后端初次启动的时候会使用初始证书，并为未来TCU和后端之间的所有OTA通信生成一个证书，新生成的证书将是未来所有通信的永久会话密钥</li>
+</ul>
+<p>上面了解到对称加密都支持电子密码本模式（ECB），简单的说下ECB模式的原理：首先需要将明文分组，每个分组长度与密钥Key的长度相同，然后每个分组使用相同的密钥进行AES加密。再来说下ECB模式的安全缺点，因为每个分组的加密方式和Key完全相同，在明文相同的情况下，密文将会完全一样，导致存在安全风险隐患，但但但尽管ECB模式有多么多么的不行，还是有一些厂商会使用</p>
+<p>除了ECB模式外，加密分组链接模式（CBC）、加密反馈模式（CFB）和输出反馈模式（OFB）等模式都使用一个名为初始化向量IV（一个随机的且长度为一个分组长度的比特序列）的消息随机数来确保每次加密的结果都是不同的，比如TCU（联网通信模块）和后端服务器之间的加密通信中向密文添加随机性或不可预测性来确保每次加密的结果都是不同的。IV可能存在的攻击面，车机自带的OEM系统不排除能重复使用之前发送过的初始化向量IV，该OME系统使用的IV是基于后端通过GSM【全球移动通讯系统 (<code>Global System for Mobile Communications</code>)】发送到TCU（联网通信模块）的证书序列号生成的，存在中间人攻击风险。这里大家可以想到路由器中使用的WEP 有线等效加密为什么不再被使用，其中一个原因就是因为V 长度为 24 位，可供使用的 IV 值为 1600 万，因此在网络上很快会出现重复，一旦出现重复的密钥流，流密码很容易被攻击者识破。因此当TCU（联网通信模块）使用固定IV与相同密钥时，总用相同的密文加密数据，一旦出现重复的密钥流，者就很容易被查看流量的攻击者们关注。下面列一下WEP 存在的一些安全问题：</p>
+<ul>
+<li>手动管理密钥存在重大隐患：配相同的密钥给所有成员过程繁琐，只要有任意成员离开，就需要重新分配密钥，且一旦密钥泄漏，将无任何私密性可言</li>
+<li>密钥问题：EP 通过简单级联初始化向量（Initialization Vector，IV）和密钥形成种子，并以明文方式发送 IV，这种方式在 RC4 算法下容易产生弱密钥，给入侵者打开了方便之门</li>
+<li>空间问题：V 长度为 24 位，可供使用的 IV 值为 1600 万，因此在网络上很快会出现重复，一旦出现重复的密钥流，流密码很容易被识破</li>
+<li>防篡改：EP 采用的 CRC32 算法不能阻止攻击者篡改数据，由于 CRC32 是线性运算，攻击者很容易在篡改密文的同时，更改与明文对应的 ICV，这样接收方 ICV 校验无法检测出数据是否经过篡改</li>
+<li>防重放攻击：WEP 不能防重放攻击。在重放攻击中，攻击者会发送一系列以前捕获的帧，尝试以此方式获得访问权或修改数据</li>
+</ul>
+<p>可以了解一下XOR异或算法，通过指定的密钥对每个字符执行按位异或运算来加密文本字符串，想要解密的话就需要对应的密钥来做异或运算即可，某些厂商习惯使用相同的密钥和相同的固定IV加密TCU与后端之间的消息，此时攻击者只需要将两个密文异或在一起，就能得到对应明文的异或运算解密方法。这些总总信息表面，如果车企在使用TCU（联网通信模块）的时候，应用对称加密的CBC模式和固定IV的话，就容易导致加密的信息被恢复明文，而且仅仅只需要攻击者拥有有效的IV即可。所以，在对车机进行渗透时，我们可以重点关注IV是否被加密，被加密了的话我们要排查OEM系统用于加密IV的密钥是否与用于加密信息的密钥不同，如果两者使用的密钥相同，就算OEM系统使用了CTR模式加密，只要OEM仍然使用ECB模式加密IV，导致任意是谁都可用加密的IV对密文的第一个块进行异或运算来获得该块的明文信息</p>
+<p>初始密钥：在较多数OEM系统中的TCU（联网通信模块）都会有一个初始密钥，该密钥一般情况下是OEM创建，为了避免密钥被窃取，每个控制器的初始密钥应该是都不相同的，但许多时候大家可能还是为了图方便，都使用相同的初始密钥。比如，为TCU配置第一个密钥，该密钥用于其首次通电后通过OTA与后端进行初始连接，这个过程中初始密钥用来请求其永久会话密钥，然后将该证书存储在TCU（联网通信模块）中，那么此处的攻击面就来了，只要OEM在每个设备中使用了相同的初始密钥，那么攻击者只需要满足后端在初始连接器件的所有校验，即可欺骗后端说自己就是XXX设备端</p>
+<ul>
+<li>同学们，是不是以为密钥没有有效期？</li>
+</ul>
+<p>答：其实，也是有有效期的，但有效期时间的长短不一，理想状态的半年，但可能会遇到长达几年甚至几十年的证书，跟特闷永久的没啥区别了，可能车都开报废或人都挂彩了，证书还没过期。举个例子，比如之前我们讲过的TCU（联网通信模块）在首次通电后会通过OTA与后端进行初始连接，并使用初始密钥来新生成车辆的永久密钥（通常这个永久密钥的有效期贯穿车辆的使用寿命周期）</p>
+<h2 id="1-1-密钥存储不安全"><a href="#1-1-密钥存储不安全" class="headerlink" title="1.1 密钥存储不安全"></a>1.1 密钥存储不安全</h2><p>密钥的安全问题，不只是在Android 移动安全中才有，在车联网安全中也是存在的。我们这里说的密钥不是指用来开门或启动汽车的车钥匙，而是指用于对后端发送TCU（联网通信模块）的数据进行解密的加密密钥（此处说的密钥是私钥）</p>
+<p>可信平台模块（TPM）和硬件安全模块（HSM）：</p>
+<ul>
+<li>TPM：TPM就像门卫一样，特别保护车辆的外部接口，例如在车载信息娱乐系统或远程信息处理单元中的接口。它检查数字数据发送方和接收方的身份，比如制造商的后端服务器。它对数据进行加密和解密，并帮助确保只有驾驶员或制造商真正想要的数据才能进入汽车。交互中安全功能所需的加密密钥存储在TPM中，就像存储在保险箱中一样，即使有人从车上吹下芯片，这些密钥也不会被读取</li>
+<li>HSM：HSM是一种自主的硬件，可以用于车辆安全信息（比如密钥）的生成，存贮以及处理，且隔离外部恶意软件的攻击；HSM可以用于构建，验证可靠的软件，以保护在软件加载并初次访问之前的安全启动。HSM包含有加密&#x2F;解密硬件加速功能，和软件解决方案相比（Cry），能够有效降低CPU负载</li>
+</ul>
+<p>可信平台模块（TPM）和硬件安全模块（HSM）都是用来加密存储密钥的硬件模块，是存储私钥的替代方法，只要使用了TPM或HSM后，私钥将存储在硬件模块内部</p>
+<p>可信平台模块（TPM）和硬件安全模块（HSM）的区别：</p>
+<ul>
+<li>1）可信平台模块 (TPM) 是计算机主板上的硬件芯片，用于存储用于加密的加密密钥<ul>
+<li>现在许多计算机都有TPM，比如，当我们打开 Microsoft Windows BitLocker 进行整个磁盘加密的时候，它实际上会在计算机的TPM中查找加密&#x2F;解密文件的密钥，这样做的原因是为了防止别人将加密后的硬盘从计算机中取出，放到另外一台计算机中启动来获取原来计算机中的数据，如果新系统没有包含密钥的TPM，新系统将无法启动</li>
+<li>通常TPM 包含一个烧入其中的唯一 RSA 密钥，用于非对称加密。此外，它还可以生成、存储和保护加密和解密过程中（TCU（联网通信模块）和后端之间的数据）使用的其他密钥</li>
+</ul>
+</li>
+<li>2）硬件安全模块 (HSM) 是一种安全设备，您可以添加到系统中以管理、生成和安全存储加密密钥<ul>
+<li>HSM 是可移动或使用 TCP&#x2F;IP 连接到网络的外部设备（一个独立的系统图），较小的 HSM 也可作为安装在服务器中的扩展卡，或作为插入计算机端口的设备提供，但这种情况较少见</li>
+<li>HSM支持密钥注入，能使用随机数生成器将单个密钥注入半导体芯片中<ul>
+<li>注：凭借汽车零部件的唯一密钥，智能网联汽车拥有了数字身份证，在整个声明周期中验证车辆和内部部件以及软件。比如对车机中的APP软件进行数字签名，来验证APP软件的真实性、完整性、可用性</li>
+</ul>
+</li>
+<li>HSM 可用于车载、车对基础设施和车对车通信，被用来验证车内的每个零部件，包含每个ECU和通过OTA发送到每个车辆的更新信息</li>
+<li></li>
+</ul>
+</li>
+<li>两者区别：<ul>
+<li>HSM 是可移动或使用 TCP&#x2F;IP 连接到网络的外部设备（一个独立的系统图）</li>
+<li>TPM 通常是按照在TCU（联网通信模块）上的芯片</li>
+</ul>
+</li>
+</ul>
+<p>可信平台模块（TPM）和硬件安全模块（HSM）的共同点：</p>
+<ul>
+<li>两者都是通过存储和使用 RSA 密钥来提供安全加密功能</li>
+</ul>
+<p>从上面的了解中，我们知道了用于代码签名、PKI，以及密钥注入的密钥和证书，都是在数据中心的根信任HSM 中生成和保存着的，它存放的位置可能是在云服务器或汽车制造商甚至一级供应商内部。部分制造商也将汽车中搭载的车载网络HSM在市场上售卖</p>
+<p><strong>注</strong>：如果TCU（联网通信模块）在接收到后端的永久密钥后就会开始进行解密密钥的操作，然后将预处理和未加密的密钥存储在TCU（联网通信模块）文件系统目录的明文文件中，且该目录是全局可读的权限的话，你懂得，直接读啊，不就是我们想要的大宝贝吗？</p>
+<p>再最后说一下OEM 通常喜欢用弱口令密码来保护私钥，攻击者只需要将私钥导出到本地物理主机，使用暴力破解工具花费一些时间来破解它，就可以获得该私钥密码并将该私钥导入到keychain（密码管理应用）中，最后我们就可以通过curl买了向后端发送HTTP请求来伪造成是该私钥所属的车辆发送的HTTP请求</p>
+<h2 id="1-2-冒充攻击"><a href="#1-2-冒充攻击" class="headerlink" title="1.2 冒充攻击"></a>1.2 冒充攻击</h2><p>此处的冒充估计指的是，攻击者成功地伪装为智能网联汽车与后端服务器之间的两个端点的其中一个端点，切记这里容易跟中间人攻击混淆，两者很相似，但有一点区别就是中间人攻击是两个之前互相传送数据，攻击者在中间件监听；冒充攻击，是直接伪造某一个端点设备的信息来发送；再说的简单点就是中间人攻击包含了冒充攻击的手段</p>
+<p>在车机中查找密钥的方法，使用如下命令：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta"># find /  -name  *.证书后缀名</span><br>find / -name *.p12<br></code></pre></td></tr></table></figure>
+
+
+
+<p>根据不同的服务器以及服务器的版本，需要用到不同的证书格式，下面列一些格式：</p>
+<ul>
+<li><code>.DER和.CER</code>：是二进制格式，只保存证书，不保存私钥</li>
+<li><code>.PEM</code>：一般是文本格式，可保存证书，可保存私钥</li>
+<li><code>.key</code>：是一个pem格式只包含私玥的文件，.key 作为文件名只是作为一个明显的别名</li>
+<li><code>.cert、.cer、.crt</code>：pem或者der编码格式的证书文件，这些文件后缀名都会被windows 资源管理器认为是证书文件</li>
+<li><code>.CRT</code>：可是二进制格式，也可是文本格式，与 .DER 格式相同，不保存私钥</li>
+<li><code>.PFX 和 .P12</code>：是二进制格式，同时包含证书和私钥，一般有密码保护</li>
+<li><code>JKS</code>：是二进制格式，JKS证书通常将根证书、中间证书、用户证书和私钥合并存放并设置密码，主要用于Java Web Server，同时包含证书和私钥</li>
+<li><code>BKS</code>：<ul>
+<li>在Android中是无法使用jks证书的，Android 系统中使用的证书要求是bks格式</li>
+</ul>
+</li>
+<li><code>.csr</code>：是证书请求文件，是由 RFC 2986定义的PKCS10格式，包含部分&#x2F;全部的请求证书的信息，比如，主题, 机构，国家等，并且包含了请求证书的公玥，这些被CA中心签名后返回一张证书。返回的证书是公钥证书（只包含公玥不含私钥）</li>
+<li><code>PKCS#7</code>：基于Base64编码的证书格式，扩展名包括p7b和p7c。<code>PKCS#7</code>证书通常将根证书和中间证书合并存放，将用户证书单独存放。<code>PKCS#7</code>证书不包含私钥，主要用于Tomcat和Windows Server</li>
+<li><code>.p8</code>：<code>.p8</code>是 PKCS #8的文件格式后缀，<code>PKCS #8</code>格式的名字为私钥信息语法标准（<code>Private-Key Information Syntax Standard</code>）。存储的私钥可以被加密，支持多密码加密，存储的内容是PEM 编码的格式</li>
+<li><code>PKCS#12</code>：基于二进制编码的证书格式，该格式通常将私钥与其X508证书捆绑在一起，扩展名包括pfx和p12。<code>PKCS#12</code>证书通常将根证书、中间证书、用户证书和私钥合并存放并设置密码，主要用于Windows Server</li>
+</ul>
+<p><strong>注</strong>：证书颁发机构CA签发的证书通常是PEM格式或<code>PKCS#7</code>格式，而<code>PKCS#12</code>格式和JKS格式的证书需要进行证书格式转换才能得到，可以通过OpenSSL、Keytool或在线证书转换工具等方式将PEM格式或<code>PKCS#7</code>格式的证书转换为我们需要的其他格式</p>
+<p>证书文件常见格式：</p>
+<table>
+<thead>
+<tr>
+<th>文件后缀</th>
+<th>文件类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>*.DER或*.CER</code></td>
+<td>二进制格式</td>
+<td>只含有证书信息，不包含私钥</td>
+</tr>
+<tr>
+<td><code>*.CRT</code></td>
+<td>二进制格式或文本格式</td>
+<td>只含有证书信息，不包含私钥</td>
+</tr>
+<tr>
+<td><code>*.PEM</code></td>
+<td>文本格式</td>
+<td>一般存放证书或私钥，或同时包含证书和私钥。<code>*.PEM</code>文件如果只包含私钥，一般用<code>*.KEY</code>文件代替</td>
+</tr>
+<tr>
+<td><code>*.PFX或*.P12</code></td>
+<td>二进制格式</td>
+<td>同时包含证书和私钥，且一般有密码保护</td>
+</tr>
+</tbody></table>
+<p><strong>注</strong>：常见SSL证书主要的文件类型和协议有: <code>PEM、DER、PFX、JKS、KDB、CER、KEY、CSR、CRT、CRL、OCSP、SCEP</code>等</p>
+<p>说的简单点，就是使用find 命令全局查找，先查找常见的证书后缀名格式，都没找到再换其他不常见的格式，优先查找如下格式：</p>
+<ul>
+<li>pem<ul>
+<li>.crt</li>
+<li>.cer</li>
+</ul>
+</li>
+<li>p12</li>
+<li>pfx</li>
+<li>.p7b</li>
+<li>.p7c</li>
+</ul>
+<p>如果找到密钥文件后，发现是加密的话，使用GPU暴力破解工具破解即可，破解成功后将其导入自己操作系统的keychain中就好了。导入证书后我们需要该证书的指纹，此时就需要在Personal–&gt;Certificates存储区的证书列表中找到具有VIN号的证书，点击该证书查看该证书的指纹信息，该指纹是证书的唯一ID，为什么要获得该指纹，这里以SLL Pining为例说一下服务端一个简单的校验过程，如下：</p>
+<ul>
+<li>首先对服务器端证书&#x2F;证书中的公钥进行哈希，得到ssl指纹内置到app中</li>
+<li>通信连接时，服务器发来证书</li>
+<li>app对该证书进行哈希操作，将哈希值与app内置的ssl指纹进行对比，若对比成功，则建立连接，否则，断开连接</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/839dca6848a04ff6a0aab21a5a599de2.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>额，看明白了吗？就是本地利用curl构造一个跟后端交互的请求，并开启Wireshark抓捕进出网的TCU数据包，如果该IV的固定部分不变，只是在固定部分上家了随机字节生成的数字，那么就存在被破解的风险，攻击者可能只需要观察足够多的TCU跟后端三次握手的包，就能计算出IV</p>
+<p><strong>注</strong>：也可使用openssl命令提取私钥，这里以从PKCS 12文件中提取私钥。下面列出OpenSSL 提取 pfx 证书公钥与私钥，从pfx证书中提取密钥信息，并转换为key格式（pfx使用pkcs12模式补足）</p>
+<ul>
+<li>提取密钥对(如果pfx证书已加密，会提示输入密码)<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">openssl pkcs12 -in idsrv4.pfx -nocerts -nodes -out idsrv4.key<br></code></pre></td></tr></table></figure></li>
+<li>从密钥对提取公钥<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">openssl rsa -in idsrv4.key -pubout -out idsrv4_pub.key<br></code></pre></td></tr></table></figure></li>
+<li>从密钥对提取私钥<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">openssl rsa -in  idsrv4.key -out idsrv4_pri.key<br></code></pre></td></tr></table></figure></li>
+<li>因为RSA算法使用的是 pkcs8 模式补足，需要对提取的私钥进一步处理得到最终私钥<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">openssl pkcs8 -topk8 -inform PEM -in idsrv4_pri.key -outform PEM -nocrypt<br></code></pre></td></tr></table></figure></li>
+</ul>
+<p><strong>注</strong>：额外多说一个小技巧，检测开启启动脚本比如init.rc，以及系统根目录下的<code>*.rc</code>文件，比如：</p>
+<ul>
+<li>1）可能从中会发现我们意想不到的内容，比如adbd 守护进程明明被关闭了，但系统重启后会再次被开启</li>
+<li>2）可能开发人员对系统使用+RW（读+写）挂载根文件系统，一般情况下只是可读，能可写的话，那对攻击者来说就有操作的空间了，修改启动项，以root权限执行某个脚本等等恶意行为</li>
+<li>4）查看<code>*.rc </code>脚本文件，是否有安装内核调试<code>pseudo-filesystem</code>且允许进程崩溃时转存内核<ul>
+<li>如果允许进程崩溃时转存内核，攻击者可以利用内核调试信息和崩溃转储文件（核心文件）来获取进程以 UID&#x2F;GID为root权限运行的当前该进程更多的信息</li>
+</ul>
+</li>
+<li>5）检查系统所有文件中是否存在出发系统超级用户命令，比如设置root命令</li>
+<li>6）系统处于DevMode (开发者模式) 下可能会有一些意想不到的操作，在翻看文件的时候也需要重要关注</li>
+</ul>
+<p>Android 的根证书存放位置（ <code>/system/etc/security/</code>）： 在 AOSP 源码库中，CA 根证书主要存放在 <code>system/ca-certificates</code>目录下，而在 Android 系统中，则存放在 <code>/system/etc/security/</code>目录下</p>
+<ul>
+<li>cacerts_google 目录：该目录下的根证书，主要用于 <code>system/update_engine、external/libbrillo</code>和 <code>system/core/crash_reporter</code>等模块</li>
+<li>cacerts 目录：该目录下的根证书则用于所有的应用，且该目录下的根证书，即 Android 系统的根证书库</li>
+<li><code>/data/data/APK应用程序名/cache</code>：该目录是应用程序自身需要用到的证书，比如在 <code>/data/data/com.guoshi.httpcanary/cache/</code>目录下我们可以找到 <code>HttpCanary.pem</code></li>
+<li>&#x2F;dev&#x2F;： 设备文件， Linux系统常规文件夹，里面的文件很多都是设备模拟的文件系统。这里面也可能存放CA证书，比如<code>/dev/abcixxxe0.0</code></li>
+<li>其他存放方式，使用<code>find / -name &quot;*.0&quot;</code>命令全局查找</li>
+</ul>
+<p><strong>注</strong>：Android中的CA证书以其哈希名称存储，扩展名为“ 0”，比如<code>12312312.0</code>是CA证书</p>
+<p>移动端常见的几种不安全的密钥存储方式：</p>
+<ul>
+<li>直接硬编码在代码中，很容易被逆向分析</li>
+<li>存储在私有目录的文件中，有最高权限的终端可以导出查看</li>
+<li>将密钥分段，分别存储在代码和文件中，最终在内存中拼接起来，由于内存中还是出现了完整的原始密钥，所以攻击者只需要花点时间，也可以逆向分析出来；</li>
+<li>将密钥存储在动态库中，同时加解密也都在动态库中进行，这在一定程度上增大了分析难度，但是有经验的攻击者并不难将其逆向出来</li>
+<li>用另外一个密钥B加密这个密钥A，将密钥A的密文存储在文件或代码中，在实际使用时进行解密，虽然增加了静态分析难度，但可以使用动态调试的方法，对加解密方法进行插桩，即 Hook，也可以分析出密钥 A</li>
+</ul>
+<h2 id="1-3-证书攻击面"><a href="#1-3-证书攻击面" class="headerlink" title="1.3 证书攻击面"></a>1.3 证书攻击面</h2><p>端上：</p>
+<ul>
+<li>本地存储（Android 密钥库和公钥的攻击面）：分为服务端和客户端检测，服务端平台不可控所以做不了<ul>
+<li>硬编码在APP代码中或本地存储在系统的某个文件中（比如某个txt文件、加密数据库、资源文件、应用程序日志文件、证书等等里面，还有可能有傻逼放到外部存储的SD卡上）</li>
+<li>被动攻击一种是指直接获取消息的内容，还有一种是对消息的某些特征进行分析</li>
+<li>主动攻击是指对明文数据的篡改来产生对攻击有价值的密文数据，防止主动攻击一般都非常困难，需要提前预防</li>
+</ul>
+</li>
+<li>系统设置的系统&#x2F;普通证书（system用户证书和user用户证书）<ul>
+<li>注：Android 7以上需root权限，而且还需要包含反Hook的检测，要不然绕过风险很高</li>
+<li>校验证书完整性检查，如有效性、完整性和可信度</li>
+<li>证书是否由可信 CA 签发</li>
+<li>证书是否过期</li>
+<li>证书是否自签名</li>
+</ul>
+</li>
+<li>应用程序SSL 证书固定<ul>
+<li>某些应用程序将实现 SSL 固定，这会阻止应用程序将拦截证书作为有效证书接受。这代表者我们无法监视应用程序和服务器之间的通信量</li>
+</ul>
+</li>
+<li>检测加密操作时监视文件系统访问，以评估向何处写入或从何处读取 key material<ul>
+<li>有些证书密钥，可能会在应用程序首次跟后端服务器建立连接时获取，不会硬编码在代码中</li>
+<li>检测方法：</li>
+<li>1、<code>D/NetworkSecurityConfig: Using Network Security Config from resource network_security_config</code></li>
+<li>2、<code>I/X509Util: Failed to validate the certificate chain, error: Pin verification failed</code></li>
+</ul>
+</li>
+<li>证书绕过<ul>
+<li>Objection 工具：使用 android sslpinning disable 命令</li>
+<li>Xposed：安装 TrustMeAlready 或 SSLUnpinning 模块</li>
+<li>Cydia Substrate：安装 Android-SSL-TrustKiller</li>
+<li>静态绕过自定义证书锁定</li>
+<li>执行find 命令查找证书的行为</li>
+<li>检测hook 工具绕过证书时的固定系统函数</li>
+</ul>
+</li>
+</ul>
+<h1 id="0x02-Android-Wi-Fi-是否配置系统代理的检测"><a href="#0x02-Android-Wi-Fi-是否配置系统代理的检测" class="headerlink" title="0x02  Android Wi-Fi 是否配置系统代理的检测"></a>0x02  Android Wi-Fi 是否配置系统代理的检测</h1><p>wpa_supplicant.conf 配置文件是连接 WiFi 设备的一些配置信息，比如如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs c">country=CN<br>ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev<br>update_config=<span class="hljs-number">1</span><br>network=&#123;<br>    ssid=<span class="hljs-string">&quot;12345678&quot;</span><br>    psk=<span class="hljs-string">&quot;88888888&quot;</span><br>    key_mgmt=WPA-PSK<br>    priority=<span class="hljs-number">1</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>上面配置文件的含义是：</p>
+<ul>
+<li>ssid:网络的ssid</li>
+<li>psk:密码</li>
+<li>priority: 连接优先级，数字越大优先级越高（不可以是负数）</li>
+<li>scan_ssid:连接隐藏WiFi时需要指定该值为1</li>
+</ul>
+<hr>
+<p><strong>如下为补充知识</strong>：</p>
+<p>Android Wi-Fi 主要的代码模块都放在WifiConfigStore.java中，该类主要负责网络配置信息的管理工作，包括保存、读取配置信息等。当我们在Settings中触发一个保存网络、连接网络或者<code>auto_connect</code>自动重连动作时，都会调用到WifiConfigStore中的方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">WifiConfigStore</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">IpConfigStore</span><br></code></pre></td></tr></table></figure>
+
+<p>WifiConfigStore继承自IpConfigStore，它提供了一套API去管理用户配置过的网络。下面介绍一些framework中经常调用到的API接口</p>
+<p>1）<code>saveNetwork()、selectNetwork()</code></p>
+<p>WifiStateMachine中，WifiConfigStore对象的创建发生在其构造函数中： </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java">mWifiConfigStore = <span class="hljs-keyword">new</span> <span class="hljs-title class_">WifiConfigStore</span>(context,<span class="hljs-built_in">this</span>,  mWifiNative);<br></code></pre></td></tr></table></figure>
+
+<p>此处传入了Context、当前的WifiStateMachine对象和一个WifiNative对象。通过mWifiNative对象可以向wpa_s下发一系列连接、选择的命令。我们在连接一个网络的时候，会先保存该网络的配置信息，调用： </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">/**</span><br><span class="hljs-comment">     * Add/update the specified configuration and save config</span><br><span class="hljs-comment">     *</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> config WifiConfiguration to be saved</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@return</span> network update result</span><br><span class="hljs-comment">     */</span><br>    NetworkUpdateResult <span class="hljs-title function_">saveNetwork</span><span class="hljs-params">(WifiConfiguration config, <span class="hljs-type">int</span> uid)</span> &#123;<br>        WifiConfiguration conf;<br> <br>        <span class="hljs-comment">// A new network cannot have null SSID</span><br>        <span class="hljs-keyword">if</span> (config == <span class="hljs-literal">null</span> || (config.networkId == INVALID_NETWORK_ID &amp;&amp;<br>                config.SSID == <span class="hljs-literal">null</span>)) &#123;<br>            <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">NetworkUpdateResult</span>(INVALID_NETWORK_ID);<br>        &#125;<br>        <span class="hljs-keyword">if</span> (VDBG) localLog(<span class="hljs-string">&quot;WifiConfigStore: saveNetwork netId&quot;</span>, config.networkId);<br>        <span class="hljs-keyword">if</span> (VDBG) &#123;<br>            loge(<span class="hljs-string">&quot;WifiConfigStore saveNetwork, size=&quot;</span> + mConfiguredNetworks.size()<br>                    + <span class="hljs-string">&quot; SSID=&quot;</span> + config.SSID<br>                    + <span class="hljs-string">&quot; Uid=&quot;</span> + Integer.toString(config.creatorUid)<br>                    + <span class="hljs-string">&quot;/&quot;</span> + Integer.toString(config.lastUpdateUid));<br>        &#125;<br> <br>        <span class="hljs-keyword">if</span> (mDeletedEphemeralSSIDs.remove(config.SSID)) &#123;<br>            <span class="hljs-keyword">if</span> (VDBG) &#123;<br>                loge(<span class="hljs-string">&quot;WifiConfigStore: removed from ephemeral blacklist: &quot;</span> + config.SSID);<br>            &#125;<br>            <span class="hljs-comment">// <span class="hljs-doctag">NOTE:</span> This will be flushed to disk as part of the addOrUpdateNetworkNative call</span><br>            <span class="hljs-comment">// below, since we&#x27;re creating/modifying a config.</span><br>        &#125;<br> <br>        <span class="hljs-type">boolean</span> <span class="hljs-variable">newNetwork</span> <span class="hljs-operator">=</span> (config.networkId == INVALID_NETWORK_ID);<br>        <span class="hljs-type">NetworkUpdateResult</span> <span class="hljs-variable">result</span> <span class="hljs-operator">=</span> addOrUpdateNetworkNative(config, uid);<br>        <span class="hljs-type">int</span> <span class="hljs-variable">netId</span> <span class="hljs-operator">=</span> result.getNetworkId();<br> <br>        <span class="hljs-keyword">if</span> (VDBG) localLog(<span class="hljs-string">&quot;WifiConfigStore: saveNetwork got it back netId=&quot;</span>, netId);<br> <br>        <span class="hljs-comment">/* enable a new network */</span><br>        <span class="hljs-keyword">if</span> (newNetwork &amp;&amp; netId != INVALID_NETWORK_ID) &#123;<br>            <span class="hljs-keyword">if</span> (VDBG) localLog(<span class="hljs-string">&quot;WifiConfigStore: will enable netId=&quot;</span>, netId);<br> <br>            mWifiNative.enableNetwork(netId, <span class="hljs-literal">false</span>);<br>            conf = mConfiguredNetworks.get(netId);<br>            <span class="hljs-keyword">if</span> (conf != <span class="hljs-literal">null</span>)<br>                conf.status = Status.ENABLED;<br>        &#125;<br> <br>        conf = mConfiguredNetworks.get(netId);<br>        <span class="hljs-keyword">if</span> (conf != <span class="hljs-literal">null</span>) &#123;<br>            <span class="hljs-keyword">if</span> (conf.autoJoinStatus != WifiConfiguration.AUTO_JOIN_ENABLED) &#123;<br>                <span class="hljs-keyword">if</span> (VDBG) localLog(<span class="hljs-string">&quot;WifiConfigStore: re-enabling: &quot;</span> + conf.SSID);<br> <br>                <span class="hljs-comment">// reenable autojoin, since new information has been provided</span><br>                conf.setAutoJoinStatus(WifiConfiguration.AUTO_JOIN_ENABLED);<br>                enableNetworkWithoutBroadcast(conf.networkId, <span class="hljs-literal">false</span>);<br>            &#125;<br>            <span class="hljs-keyword">if</span> (VDBG) &#123;<br>                loge(<span class="hljs-string">&quot;WifiConfigStore: saveNetwork got config back netId=&quot;</span><br>                        + Integer.toString(netId)<br>                        + <span class="hljs-string">&quot; uid=&quot;</span> + Integer.toString(config.creatorUid));<br>            &#125;<br>        &#125;<br> <br>        mWifiNative.saveConfig();<br>        sendConfiguredNetworksChangedBroadcast(conf, result.isNewNetwork() ?<br>                WifiManager.CHANGE_REASON_ADDED : WifiManager.CHANGE_REASON_CONFIG_CHANGE);<br>        <span class="hljs-keyword">return</span> result;<br>    &#125;<br></code></pre></td></tr></table></figure>
+
+<p>saveNetwork()主要负责根据WifiConfiguration对象更新、保存网络的各配置信息；WifiConfiguration代表一个配置过的网络，主要包括该网络的加密方式、SSID、密钥等等信息。重要的一个操作是调用<code>addOrUpdateNetworkNative()</code>来更新配置信息、并保存到本地；该函数的函数实现虽然较多，看起来复杂，但实际处理却还是较为简单的： </p>
+<ul>
+<li>首先从mConfiguredNetworks中根据传入的config对象获取到先前保存过的同netId的savedConfig对象；mConfiguredNetworks是一个HasMap结构，它以某个网络的netId为key，以对应的WifiConfiguration对象作为value，由此可知它以键值对的形式保存了当前所有配置过的网络信息。后续的操作都是比对config和savedConfig直接的差异，保存到wpa_s配置文件中并进行更新，最后再将更新过的WifiConfiguration对象保存到mConfiguredNetworks中</li>
+<li>调用<code>writeIpAndProxyConfigurationsOnChange()</code>将新的配置信息保存到本地文件<code>/data/misc/wifi/ipconfig.txt</code>中</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">/* Compare current and new configuration and write to file on change */</span><br><span class="hljs-keyword">private</span> NetworkUpdateResult <span class="hljs-title function_">writeIpAndProxyConfigurationsOnChange</span><span class="hljs-params">(</span><br><span class="hljs-params">        WifiConfiguration currentConfig,</span><br><span class="hljs-params">        WifiConfiguration newConfig)</span> &#123;<br>    <span class="hljs-type">boolean</span> <span class="hljs-variable">ipChanged</span> <span class="hljs-operator">=</span> <span class="hljs-literal">false</span>;<br>    <span class="hljs-type">boolean</span> <span class="hljs-variable">proxyChanged</span> <span class="hljs-operator">=</span> <span class="hljs-literal">false</span>;<br> <br>    <span class="hljs-keyword">if</span> (VDBG) &#123;<br>        loge(<span class="hljs-string">&quot;writeIpAndProxyConfigurationsOnChange: &quot;</span> + currentConfig.SSID + <span class="hljs-string">&quot; -&gt; &quot;</span> +<br>                newConfig.SSID + <span class="hljs-string">&quot; path: &quot;</span> + ipConfigFile);<br>    &#125;<br> <br> <br>    <span class="hljs-keyword">switch</span> (newConfig.getIpAssignment()) &#123;<br>        <span class="hljs-keyword">case</span> STATIC:<br>            <span class="hljs-keyword">if</span> (currentConfig.getIpAssignment() != newConfig.getIpAssignment()) &#123;<br>                ipChanged = <span class="hljs-literal">true</span>;<br>            &#125; <span class="hljs-keyword">else</span> &#123;<br>                ipChanged = !Objects.equals(<br>                        currentConfig.getStaticIpConfiguration(),<br>                        newConfig.getStaticIpConfiguration());<br>            &#125;<br>            <span class="hljs-keyword">break</span>;<br>        <span class="hljs-keyword">case</span> DHCP:<br>            <span class="hljs-keyword">if</span> (currentConfig.getIpAssignment() != newConfig.getIpAssignment()) &#123;<br>                ipChanged = <span class="hljs-literal">true</span>;<br>            &#125;<br>            <span class="hljs-keyword">break</span>;<br>        <span class="hljs-keyword">case</span> UNASSIGNED:<br>            <span class="hljs-comment">/* Ignore */</span><br>            <span class="hljs-keyword">break</span>;<br>        <span class="hljs-keyword">default</span>:<br>            loge(<span class="hljs-string">&quot;Ignore invalid ip assignment during write&quot;</span>);<br>            <span class="hljs-keyword">break</span>;<br>    &#125;<br> <br>    <span class="hljs-keyword">switch</span> (newConfig.getProxySettings()) &#123;<br>        <span class="hljs-keyword">case</span> STATIC:<br>        <span class="hljs-keyword">case</span> PAC:<br>            <span class="hljs-type">ProxyInfo</span> <span class="hljs-variable">newHttpProxy</span> <span class="hljs-operator">=</span> newConfig.getHttpProxy();<br>            <span class="hljs-type">ProxyInfo</span> <span class="hljs-variable">currentHttpProxy</span> <span class="hljs-operator">=</span> currentConfig.getHttpProxy();<br> <br>            <span class="hljs-keyword">if</span> (newHttpProxy != <span class="hljs-literal">null</span>) &#123;<br>                proxyChanged = !newHttpProxy.equals(currentHttpProxy);<br>            &#125; <span class="hljs-keyword">else</span> &#123;<br>                proxyChanged = (currentHttpProxy != <span class="hljs-literal">null</span>);<br>            &#125;<br>            <span class="hljs-keyword">break</span>;<br>        <span class="hljs-keyword">case</span> NONE:<br>            <span class="hljs-keyword">if</span> (currentConfig.getProxySettings() != newConfig.getProxySettings()) &#123;<br>                proxyChanged = <span class="hljs-literal">true</span>;<br>            &#125;<br>            <span class="hljs-keyword">break</span>;<br>        <span class="hljs-keyword">case</span> UNASSIGNED:<br>            <span class="hljs-comment">/* Ignore */</span><br>            <span class="hljs-keyword">break</span>;<br>        <span class="hljs-keyword">default</span>:<br>            loge(<span class="hljs-string">&quot;Ignore invalid proxy configuration during write&quot;</span>);<br>            <span class="hljs-keyword">break</span>;<br>    &#125;<br> <br>    <span class="hljs-keyword">if</span> (ipChanged) &#123;<br>        currentConfig.setIpAssignment(newConfig.getIpAssignment());<br>        currentConfig.setStaticIpConfiguration(newConfig.getStaticIpConfiguration());<br>        log(<span class="hljs-string">&quot;IP config changed SSID = &quot;</span> + currentConfig.SSID);<br>        <span class="hljs-keyword">if</span> (currentConfig.getStaticIpConfiguration() != <span class="hljs-literal">null</span>) &#123;<br>            log(<span class="hljs-string">&quot; static configuration: &quot;</span> +<br>                currentConfig.getStaticIpConfiguration().toString());<br>        &#125;<br>    &#125;<br> <br>    <span class="hljs-keyword">if</span> (proxyChanged) &#123;<br>        currentConfig.setProxySettings(newConfig.getProxySettings());<br>        currentConfig.setHttpProxy(newConfig.getHttpProxy());<br>        log(<span class="hljs-string">&quot;proxy changed SSID = &quot;</span> + currentConfig.SSID);<br>        <span class="hljs-keyword">if</span> (currentConfig.getHttpProxy() != <span class="hljs-literal">null</span>) &#123;<br>            log(<span class="hljs-string">&quot; proxyProperties: &quot;</span> + currentConfig.getHttpProxy().toString());<br>        &#125;<br>    &#125;<br> <br>    <span class="hljs-keyword">if</span> (ipChanged || proxyChanged) &#123;<br>        writeIpAndProxyConfigurations();<br>        sendConfiguredNetworksChangedBroadcast(currentConfig,<br>                WifiManager.CHANGE_REASON_CONFIG_CHANGE);<br>    &#125;<br>    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">NetworkUpdateResult</span>(ipChanged, proxyChanged);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>函数中涉及到<code>IpAssignment和ProxySettings</code>两个枚举类型： </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">enum</span> <span class="hljs-title class_">IpAssignment</span> &#123;<br>     <span class="hljs-comment">/* Use statically configured IP settings. Configuration can be accessed</span><br><span class="hljs-comment">      * with staticIpConfiguration */</span><br>     STATIC,<br>     <span class="hljs-comment">/* Use dynamically configured IP settigns */</span><br>     DHCP,<br>     <span class="hljs-comment">/* no IP details are assigned, this is used to indicate</span><br><span class="hljs-comment">      * that any existing IP settings should be retained */</span><br>     UNASSIGNED<br> &#125;<br> <br> <span class="hljs-keyword">public</span> <span class="hljs-keyword">enum</span> <span class="hljs-title class_">ProxySettings</span> &#123;<br>     <span class="hljs-comment">/* No proxy is to be used. Any existing proxy settings</span><br><span class="hljs-comment">      * should be cleared. */</span><br>     NONE,<br>     <span class="hljs-comment">/* Use statically configured proxy. Configuration can be accessed</span><br><span class="hljs-comment">      * with httpProxy. */</span><br>     STATIC,<br>     <span class="hljs-comment">/* no proxy details are assigned, this is used to indicate</span><br><span class="hljs-comment">      * that any existing proxy settings should be retained */</span><br>     UNASSIGNED,<br>     <span class="hljs-comment">/* Use a Pac based proxy.</span><br><span class="hljs-comment">      */</span><br>     PAC<br> &#125;<br></code></pre></td></tr></table></figure>
+
+<p>IpAssignment代表当前获取IP使用的方式，我们可以根据自己的需求在里面添加自定义的方式，比如PPPoE；同理，ProxySettings表示当前网络使用的代理方式</p>
+<p>IpAssignment类型的值一般由设置根据用户选择的IP模式来赋值，并传递给framework，以让底层可以知道该使用什么方式去获取IP地址。例如，如果用户选择Static IP，则在<code>WifiStateMachine::ObtainingIpState</code>中会有： </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">if</span> (!mWifiConfigStore.isUsingStaticIp(mLastNetworkId)) &#123;<br>    <span class="hljs-keyword">if</span> (isRoaming()) &#123;<br>        renewDhcp();<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>        <span class="hljs-comment">// Remove any IP address on the interface in case we&#x27;re switching from static</span><br>        <span class="hljs-comment">// IP configuration to DHCP. This is safe because if we get here when not</span><br>        <span class="hljs-comment">// roaming, we don&#x27;t have a usable address.</span><br>        clearIPv4Address(mInterfaceName);<br>        startDhcp();<br>    &#125;<br>    obtainingIpWatchdogCount++;<br>    logd(<span class="hljs-string">&quot;Start Dhcp Watchdog &quot;</span> + obtainingIpWatchdogCount);<br>    <span class="hljs-comment">// Get Link layer stats so as we get fresh tx packet counters</span><br>    getWifiLinkLayerStats(<span class="hljs-literal">true</span>);<br>    sendMessageDelayed(obtainMessage(CMD_OBTAINING_IP_ADDRESS_WATCHDOG_TIMER,<br>            obtainingIpWatchdogCount, <span class="hljs-number">0</span>), OBTAINING_IP_ADDRESS_GUARD_TIMER_MSEC);<br>&#125; <span class="hljs-keyword">else</span> &#123;<br>    <span class="hljs-comment">// stop any running dhcp before assigning static IP</span><br>    stopDhcp();<br>    <span class="hljs-type">StaticIpConfiguration</span> <span class="hljs-variable">config</span> <span class="hljs-operator">=</span> mWifiConfigStore.getStaticIpConfiguration(<br>            mLastNetworkId);<br>    <span class="hljs-keyword">if</span> (config.ipAddress == <span class="hljs-literal">null</span>) &#123;<br>        logd(<span class="hljs-string">&quot;Static IP lacks address&quot;</span>);<br>        sendMessage(CMD_STATIC_IP_FAILURE);<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>        <span class="hljs-type">InterfaceConfiguration</span> <span class="hljs-variable">ifcg</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">InterfaceConfiguration</span>();<br>        ifcg.setLinkAddress(config.ipAddress);<br>        ifcg.setInterfaceUp();<br>        <span class="hljs-keyword">try</span> &#123;<br>            mNwService.setInterfaceConfig(mInterfaceName, ifcg);<br>            <span class="hljs-keyword">if</span> (DBG) log(<span class="hljs-string">&quot;Static IP configuration succeeded&quot;</span>);<br>            <span class="hljs-type">DhcpResults</span> <span class="hljs-variable">dhcpResults</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">DhcpResults</span>(config);<br>            sendMessage(CMD_STATIC_IP_SUCCESS, dhcpResults);<br>        &#125; <span class="hljs-keyword">catch</span> (RemoteException re) &#123;<br>            loge(<span class="hljs-string">&quot;Static IP configuration failed: &quot;</span> + re);<br>            sendMessage(CMD_STATIC_IP_FAILURE);<br>        &#125; <span class="hljs-keyword">catch</span> (IllegalStateException e) &#123;<br>            loge(<span class="hljs-string">&quot;Static IP configuration failed: &quot;</span> + e);<br>            sendMessage(CMD_STATIC_IP_FAILURE);<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>通过<code>WifiConfigStore.isUsingStaticIp(mLastNetworkId)</code>方法获知当前用户使用的获取IP地址类型，具体方法定义： </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * Return if the specified network is using static IP</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@param</span> netId id</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@return</span> &#123;<span class="hljs-doctag">@code</span> true&#125; if using static ip for netId</span><br><span class="hljs-comment"> */</span><br><span class="hljs-type">boolean</span> <span class="hljs-title function_">isUsingStaticIp</span><span class="hljs-params">(<span class="hljs-type">int</span> netId)</span> &#123;<br>    <span class="hljs-type">WifiConfiguration</span> <span class="hljs-variable">config</span> <span class="hljs-operator">=</span> mConfiguredNetworks.get(netId);<br>    <span class="hljs-keyword">if</span> (config != <span class="hljs-literal">null</span> &amp;&amp; config.getIpAssignment() == IpAssignment.STATIC) &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;<br>    &#125;<br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>根据传入的netId，从mConfiguredNetworks集合中获取对应网络的WifiConfiguration对象，再获取该对象配置的IpAssignment值，来区分不用的网络方式，进而控制流程走不同的分支。如果我们有加入别的方式，可以仿照这个原生例子，写出自己的程序。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br></pre></td><td class="code"><pre><code class="hljs riteIpAndProxyConfigurationsOnChange()```中会根据IpAssignment、ProxySettings的类型是否改变，去更新currentConfig对象，并```writeIpAndProxyConfigurations()```方法写入到本地磁盘文件："><br>```java<br>    private void writeIpAndProxyConfigurations() &#123;<br>        final SparseArray&lt;IpConfiguration&gt; networks = new SparseArray&lt;IpConfiguration&gt;();<br>        for(WifiConfiguration config : mConfiguredNetworks.values()) &#123;<br>            if (!config.ephemeral &amp;&amp; config.autoJoinStatus != WifiConfiguration.AUTO_JOIN_DELETED) &#123;<br>                networks.put(configKey(config), config.getIpConfiguration());<br>            &#125;<br>        &#125;<br> <br>        super.writeIpAndProxyConfigurations(ipConfigFile, networks);//in IpConfigStore<br>    &#125;<br>    <br>   public void IpConfigStore::writeIpAndProxyConfigurations(String filePath,<br>                                              final SparseArray&lt;IpConfiguration&gt; networks) &#123;<br>        mWriter.write(filePath, new DelayedDiskWrite.Writer() &#123;<br>            public void onWriteCalled(DataOutputStream out) throws IOException&#123;<br>                out.writeInt(IPCONFIG_FILE_VERSION);<br>                for(int i = 0; i &lt; networks.size(); i++) &#123;<br>                    writeConfig(out, networks.keyAt(i), networks.valueAt(i));<br>                &#125;<br>            &#125;<br>        &#125;);<br>    &#125;<br>    <br>   private boolean writeConfig(DataOutputStream out, int configKey,<br>                                IpConfiguration config) throws IOException &#123;<br>        boolean written = false;<br> <br>        try &#123;<br>            switch (config.ipAssignment) &#123;<br>                case STATIC:<br>                    out.writeUTF(IP_ASSIGNMENT_KEY);<br>                    out.writeUTF(config.ipAssignment.toString());<br>                    StaticIpConfiguration staticIpConfiguration = config.staticIpConfiguration;<br>                    if (staticIpConfiguration != null) &#123;<br>                        if (staticIpConfiguration.ipAddress != null) &#123;<br>                            LinkAddress ipAddress = staticIpConfiguration.ipAddress;<br>                            out.writeUTF(LINK_ADDRESS_KEY);<br>                            out.writeUTF(ipAddress.getAddress().getHostAddress());<br>                            out.writeInt(ipAddress.getPrefixLength());<br>                        &#125;<br>                        if (staticIpConfiguration.gateway != null) &#123;<br>                            out.writeUTF(GATEWAY_KEY);<br>                            out.writeInt(0);  // Default route.<br>                            out.writeInt(1);  // Have a gateway.<br>                            out.writeUTF(staticIpConfiguration.gateway.getHostAddress());<br>                        &#125;<br>                        for (InetAddress inetAddr : staticIpConfiguration.dnsServers) &#123;<br>                            out.writeUTF(DNS_KEY);<br>                            out.writeUTF(inetAddr.getHostAddress());<br>                        &#125;<br>                    &#125;<br>                    written = true;<br>                    break;<br>                case DHCP:<br>                    out.writeUTF(IP_ASSIGNMENT_KEY);<br>                    out.writeUTF(config.ipAssignment.toString());<br>                    written = true;<br>                    break;<br>                case UNASSIGNED:<br>                /* Ignore */<br>                    break;<br>                default:<br>                    loge(&quot;Ignore invalid ip assignment while writing&quot;);<br>                    break;<br>            &#125;<br> <br>            switch (config.proxySettings) &#123;<br>                case STATIC:<br>                    ProxyInfo proxyProperties = config.httpProxy;<br>                    String exclusionList = proxyProperties.getExclusionListAsString();<br>                    out.writeUTF(PROXY_SETTINGS_KEY);<br>                    out.writeUTF(config.proxySettings.toString());<br>                    out.writeUTF(PROXY_HOST_KEY);<br>                    out.writeUTF(proxyProperties.getHost());<br>                    out.writeUTF(PROXY_PORT_KEY);<br>                    out.writeInt(proxyProperties.getPort());<br>                    if (exclusionList != null) &#123;<br>                        out.writeUTF(EXCLUSION_LIST_KEY);<br>                        out.writeUTF(exclusionList);<br>                    &#125;<br>                    written = true;<br>                    break;<br>                case PAC:<br>                    ProxyInfo proxyPacProperties = config.httpProxy;<br>                    out.writeUTF(PROXY_SETTINGS_KEY);<br>                    out.writeUTF(config.proxySettings.toString());<br>                    out.writeUTF(PROXY_PAC_FILE);<br>                    out.writeUTF(proxyPacProperties.getPacFileUrl().toString());<br>                    written = true;<br>                    break;<br>                case NONE:<br>                    out.writeUTF(PROXY_SETTINGS_KEY);<br>                    out.writeUTF(config.proxySettings.toString());<br>                    written = true;<br>                    break;<br>                case UNASSIGNED:<br>                    /* Ignore */<br>                        break;<br>                    default:<br>                        loge(&quot;Ignore invalid proxy settings while writing&quot;);<br>                        break;<br>            &#125;<br> <br>            if (written) &#123;<br>                out.writeUTF(ID_KEY);<br>                out.writeInt(configKey);<br>            &#125;<br>        &#125; catch (NullPointerException e) &#123;<br>            loge(&quot;Failure in writing &quot; + config + e);<br>        &#125;<br>        out.writeUTF(EOS);<br> <br>        return written;<br>    &#125;<br></code></pre></td></tr></table></figure>
+
+<p>最终写入文件的操作是父类<code>IpConfigStore::writeConfig()</code>方法处理的。在<code>WifiConfigStore::writeIpAndProxyConfigurations()</code>中，我们会将所有保存的网络配置信息从mConfiguredNetworks集合中取出，重新按照<code>&lt;</code>一个唯一int值，IpConfiguration<code>&gt;</code>的形式保存到一个<code>SparseArray&lt;IpConfiguration&gt; networks</code>对象中（可以看做是一个集合）；ipConfigFile的值就是路径：”<code>/data/misc/wifi/ipconfig.txt</code>“。</p>
+<p>在<code>IpConfigStore::writeIpAndProxyConfigurations和IpConfigStore::writeConfig()</code>中，我们会遍历networks集合，并按照 </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">switch</span> (config.ipAssignment) <br><span class="hljs-keyword">switch</span> (config.proxySettings)  <br></code></pre></td></tr></table></figure>
+
+<p>的分类，将信息写入<code>ipconfig.txt</code>文件中；这里的写入也是有一定的规则的，每一个标签后面跟一个该标签对应的值。这样做方法后面的数据读取。定义的标签值有： </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">/* IP and proxy configuration keys */</span><br><span class="hljs-keyword">protected</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">String</span> <span class="hljs-variable">ID_KEY</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;id&quot;</span>;<br><span class="hljs-keyword">protected</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">String</span> <span class="hljs-variable">IP_ASSIGNMENT_KEY</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;ipAssignment&quot;</span>;<br><span class="hljs-keyword">protected</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">String</span> <span class="hljs-variable">LINK_ADDRESS_KEY</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;linkAddress&quot;</span>;<br><span class="hljs-keyword">protected</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">String</span> <span class="hljs-variable">GATEWAY_KEY</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;gateway&quot;</span>;<br><span class="hljs-keyword">protected</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">String</span> <span class="hljs-variable">DNS_KEY</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;dns&quot;</span>;<br><span class="hljs-keyword">protected</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">String</span> <span class="hljs-variable">PROXY_SETTINGS_KEY</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;proxySettings&quot;</span>;<br><span class="hljs-keyword">protected</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">String</span> <span class="hljs-variable">PROXY_HOST_KEY</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;proxyHost&quot;</span>;<br><span class="hljs-keyword">protected</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">String</span> <span class="hljs-variable">PROXY_PORT_KEY</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;proxyPort&quot;</span>;<br><span class="hljs-keyword">protected</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">String</span> <span class="hljs-variable">PROXY_PAC_FILE</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;proxyPac&quot;</span>;<br><span class="hljs-keyword">protected</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">String</span> <span class="hljs-variable">EXCLUSION_LIST_KEY</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;exclusionList&quot;</span>;<br><span class="hljs-keyword">protected</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">String</span> <span class="hljs-variable">EOS</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;eos&quot;</span>;<br> <br><span class="hljs-keyword">protected</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> <span class="hljs-variable">IPCONFIG_FILE_VERSION</span> <span class="hljs-operator">=</span> <span class="hljs-number">2</span>;<br></code></pre></td></tr></table></figure>
+
+<p>从这里我们可以看到一些可以定制的地方。现在，有一部分Android手机上的Wifi功能是支持无线PPPoE的；要使用PPPoE，就要用到账户信息；此时，我们是否可以在WifiConfiguration或IpConfiguration中添加对应的账户属性字段，在保存网络时，加入对账户密码字段的写入保存动作；同时，在从<code>ipconfig.txt</code>读取信息时，将该信息重新封装到<code>WifiConfiguration或IpConfiguration</code>对象中，供无线PPPoE获取IP时使用</p>
+<p>最后还会涉及到<code>writeKnownNetworkHistory()</code>的调用，它会向<code>/data/misc/wifi/networkHistory.txt</code>中写入每个WifiConfiguration对象中的一些字段值，包括优先级、SSID等等；写入方式跟前面相同。这里，saveNetwork()的处理就结束了。selectNetwork()的作用是选择一个特定的网络去准备连接，这里会涉及到网络优先级更新和enable网络的部分</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * Selects the specified network for connection. This involves</span><br><span class="hljs-comment"> * updating the priority of all the networks and enabling the given</span><br><span class="hljs-comment"> * network while disabling others.</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * Selecting a network will leave the other networks disabled and</span><br><span class="hljs-comment"> * a call to enableAllNetworks() needs to be issued upon a connection</span><br><span class="hljs-comment"> * or a failure event from supplicant</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@param</span> config network to select for connection</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@param</span> updatePriorities makes config highest priority network</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@return</span> false if the network id is invalid</span><br><span class="hljs-comment"> */</span><br><span class="hljs-type">boolean</span> <span class="hljs-title function_">selectNetwork</span><span class="hljs-params">(WifiConfiguration config, <span class="hljs-type">boolean</span> updatePriorities, <span class="hljs-type">int</span> uid)</span> &#123;<br>    <span class="hljs-keyword">if</span> (VDBG) localLog(<span class="hljs-string">&quot;selectNetwork&quot;</span>, config.networkId);<br>    <span class="hljs-keyword">if</span> (config.networkId == INVALID_NETWORK_ID) <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;<br> <br>    <span class="hljs-comment">// Reset the priority of each network at start or if it goes too high.</span><br>    <span class="hljs-keyword">if</span> (mLastPriority == -<span class="hljs-number">1</span> || mLastPriority &gt; <span class="hljs-number">1000000</span>) &#123;<br>        <span class="hljs-keyword">for</span>(WifiConfiguration config2 : mConfiguredNetworks.values()) &#123;<br>            <span class="hljs-keyword">if</span> (updatePriorities) &#123;<br>                <span class="hljs-keyword">if</span> (config2.networkId != INVALID_NETWORK_ID) &#123;<br>                    config2.priority = <span class="hljs-number">0</span>;<br>                    setNetworkPriorityNative(config2.networkId, config.priority);<br>                &#125;<br>            &#125;<br>        &#125;<br>        mLastPriority = <span class="hljs-number">0</span>;<br>    &#125;<br> <br>    <span class="hljs-comment">// Set to the highest priority and save the configuration.</span><br>    <span class="hljs-keyword">if</span> (updatePriorities) &#123;<br>        config.priority = ++mLastPriority;<br>        setNetworkPriorityNative(config.networkId, config.priority);<br>        buildPnoList();<br>    &#125;<br> <br>    <span class="hljs-keyword">if</span> (config.isPasspoint()) &#123;<br>        <span class="hljs-comment">/* need to slap on the SSID of selected bssid to work */</span><br>        <span class="hljs-keyword">if</span> (getScanDetailCache(config).size() != <span class="hljs-number">0</span>) &#123;<br>            <span class="hljs-type">ScanDetail</span> <span class="hljs-variable">result</span> <span class="hljs-operator">=</span> getScanDetailCache(config).getFirst();<br>            <span class="hljs-keyword">if</span> (result == <span class="hljs-literal">null</span>) &#123;<br>                loge(<span class="hljs-string">&quot;Could not find scan result for &quot;</span> + config.BSSID);<br>            &#125; <span class="hljs-keyword">else</span> &#123;<br>                log(<span class="hljs-string">&quot;Setting SSID for &quot;</span> + config.networkId + <span class="hljs-string">&quot; to&quot;</span> + result.getSSID());<br>                setSSIDNative(config.networkId, result.getSSID());<br>                config.SSID = result.getSSID();<br>            &#125;<br> <br>        &#125; <span class="hljs-keyword">else</span> &#123;<br>            loge(<span class="hljs-string">&quot;Could not find bssid for &quot;</span> + config);<br>        &#125;<br>    &#125;<br> <br>    <span class="hljs-keyword">if</span> (updatePriorities)<br>        mWifiNative.saveConfig();<br>    <span class="hljs-keyword">else</span><br>        mWifiNative.selectNetwork(config.networkId);<br> <br>    updateLastConnectUid(config, uid);<br>    writeKnownNetworkHistory(<span class="hljs-literal">false</span>);<br> <br>    <span class="hljs-comment">/* Enable the given network while disabling all other networks */</span><br>    enableNetworkWithoutBroadcast(config.networkId, <span class="hljs-literal">true</span>);<br> <br>   <span class="hljs-comment">/* Avoid saving the config &amp; sending a broadcast to prevent settings</span><br><span class="hljs-comment">    * from displaying a disabled list of networks */</span><br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>mLastPriority是一个int类型的整数值，它代表当前网络中的优先级的最大值。越是最近连接过的网络，它的priority优先级值就越大。updatePriorities代表是否需要更新优先级。当当前的最大优先级值为-1或1000000时，都会重新设置mLastPriority值；如果updatePriorities为true，也会将更改更新到<code>wpa_supplicant.conf</code>文件中</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// Set to the highest priority and save the configuration.</span><br><span class="hljs-keyword">if</span> (updatePriorities) &#123;<br>    config.priority = ++mLastPriority;<br>    setNetworkPriorityNative(config.networkId, config.priority);<br>    buildPnoList();<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>从这可以看出，每个当前正在连接的网络，都具有最高的优先级。最后<code>enableNetworkWithoutBroadcast()</code>中，会在mConfiguredNetworks将选中网络的status属性设为<code>Status.ENABLED</code>，其他的设置为<code>Status.DISABLED</code>： </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">/* Mark all networks except specified netId as disabled */</span><br><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">markAllNetworksDisabledExcept</span><span class="hljs-params">(<span class="hljs-type">int</span> netId)</span> &#123;<br>    <span class="hljs-keyword">for</span>(WifiConfiguration config : mConfiguredNetworks.values()) &#123;<br>        <span class="hljs-keyword">if</span>(config != <span class="hljs-literal">null</span> &amp;&amp; config.networkId != netId) &#123;<br>            <span class="hljs-keyword">if</span> (config.status != Status.DISABLED) &#123;<br>                config.status = Status.DISABLED;<br>                config.disableReason = WifiConfiguration.DISABLED_UNKNOWN_REASON;<br>            &#125;<br>        &#125;<br>    &#125;<br></code></pre></td></tr></table></figure>
+
+<p>2）重新打开Wifi时，<code>ipconfig.txt</code>文件的读取</p>
+<p>当我们重新打开Wifi时，Wifi正常情况下都会有网络自动重连的动作。此时，WifiStateMachine中： </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java">mWifiConfigStore.loadAndEnableAllNetworks();<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * Fetch the list of configured networks</span><br><span class="hljs-comment"> * and enable all stored networks in supplicant.</span><br><span class="hljs-comment"> */</span><br><span class="hljs-keyword">void</span> <span class="hljs-title function_">loadAndEnableAllNetworks</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-keyword">if</span> (DBG) log(<span class="hljs-string">&quot;Loading config and enabling all networks &quot;</span>);<br>    loadConfiguredNetworks();<br>    enableAllNetworks();<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>看<code>loadConfiguredNetworks()</code>： </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">void</span> <span class="hljs-title function_">loadConfiguredNetworks</span><span class="hljs-params">()</span> &#123;<br> <br>    mLastPriority = <span class="hljs-number">0</span>;<br> <br>    mConfiguredNetworks.clear();<br> <br>    <span class="hljs-type">int</span> <span class="hljs-variable">last_id</span> <span class="hljs-operator">=</span> -<span class="hljs-number">1</span>;<br>    <span class="hljs-type">boolean</span> <span class="hljs-variable">done</span> <span class="hljs-operator">=</span> <span class="hljs-literal">false</span>;<br>    <span class="hljs-keyword">while</span> (!done) &#123;<br> <br>        <span class="hljs-type">String</span> <span class="hljs-variable">listStr</span> <span class="hljs-operator">=</span> mWifiNative.listNetworks(last_id);<br>        <span class="hljs-keyword">if</span> (listStr == <span class="hljs-literal">null</span>)<br>            <span class="hljs-keyword">return</span>;<br> <br>        String[] lines = listStr.split(<span class="hljs-string">&quot;\n&quot;</span>);<br> <br>        <span class="hljs-keyword">if</span> (showNetworks) &#123;<br>            localLog(<span class="hljs-string">&quot;WifiConfigStore: loadConfiguredNetworks:  &quot;</span>);<br>            <span class="hljs-keyword">for</span> (String net : lines) &#123;<br>                localLog(net);<br>            &#125;<br>        &#125;<br> <br>        <span class="hljs-comment">// Skip the first line, which is a header</span><br>        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">1</span>; i &lt; lines.length; i++) &#123;<br>            String[] result = lines[i].split(<span class="hljs-string">&quot;\t&quot;</span>);<br>            <span class="hljs-comment">// network-id | ssid | bssid | flags</span><br>            <span class="hljs-type">WifiConfiguration</span> <span class="hljs-variable">config</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">WifiConfiguration</span>();<br>            <span class="hljs-keyword">try</span> &#123;<br>                config.networkId = Integer.parseInt(result[<span class="hljs-number">0</span>]);<br>                last_id = config.networkId;<br>            &#125; <span class="hljs-keyword">catch</span>(NumberFormatException e) &#123;<br>                loge(<span class="hljs-string">&quot;Failed to read network-id &#x27;&quot;</span> + result[<span class="hljs-number">0</span>] + <span class="hljs-string">&quot;&#x27;&quot;</span>);<br>                <span class="hljs-keyword">continue</span>;<br>            &#125;<br>            <span class="hljs-keyword">if</span> (result.length &gt; <span class="hljs-number">3</span>) &#123;<br>                <span class="hljs-keyword">if</span> (result[<span class="hljs-number">3</span>].indexOf(<span class="hljs-string">&quot;[CURRENT]&quot;</span>) != -<span class="hljs-number">1</span>)<br>                    config.status = WifiConfiguration.Status.CURRENT;<br>                <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (result[<span class="hljs-number">3</span>].indexOf(<span class="hljs-string">&quot;[DISABLED]&quot;</span>) != -<span class="hljs-number">1</span>)<br>                    config.status = WifiConfiguration.Status.DISABLED;<br>                <span class="hljs-keyword">else</span><br>                    config.status = WifiConfiguration.Status.ENABLED;<br>            &#125; <span class="hljs-keyword">else</span> &#123;<br>                config.status = WifiConfiguration.Status.ENABLED;<br>            &#125;<br> <br>            readNetworkVariables(config);<br> <br>            <span class="hljs-type">Checksum</span> <span class="hljs-variable">csum</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">CRC32</span>();<br>            <span class="hljs-keyword">if</span> (config.SSID != <span class="hljs-literal">null</span>) &#123;<br>                csum.update(config.SSID.getBytes(), <span class="hljs-number">0</span>, config.SSID.getBytes().length);<br>                <span class="hljs-type">long</span> <span class="hljs-variable">d</span> <span class="hljs-operator">=</span> csum.getValue();<br>                <span class="hljs-keyword">if</span> (mDeletedSSIDs.contains(d)) &#123;<br>                    loge(<span class="hljs-string">&quot; got CRC for SSID &quot;</span> + config.SSID + <span class="hljs-string">&quot; -&gt; &quot;</span> + d + <span class="hljs-string">&quot;, was deleted&quot;</span>);<br>                &#125;<br>            &#125;<br> <br>            <span class="hljs-keyword">if</span> (config.priority &gt; mLastPriority) &#123;<br>                mLastPriority = config.priority;<br>            &#125;<br> <br>            config.setIpAssignment(IpAssignment.DHCP);<span class="hljs-comment">//默认设置DHCP</span><br>            config.setProxySettings(ProxySettings.NONE);<span class="hljs-comment">//默认设置NONE</span><br> <br>            <span class="hljs-keyword">if</span> (mConfiguredNetworks.getByConfigKey(config.configKey()) != <span class="hljs-literal">null</span>) &#123;<br>                <span class="hljs-comment">// That SSID is already known, just ignore this duplicate entry</span><br>                <span class="hljs-keyword">if</span> (showNetworks) localLog(<span class="hljs-string">&quot;discarded duplicate network &quot;</span>, config.networkId);<br>            &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(WifiServiceImpl.isValid(config))&#123;<br>                mConfiguredNetworks.put(config.networkId, config);<br>                <span class="hljs-keyword">if</span> (showNetworks) localLog(<span class="hljs-string">&quot;loaded configured network&quot;</span>, config.networkId);<br>            &#125; <span class="hljs-keyword">else</span> &#123;<br>                <span class="hljs-keyword">if</span> (showNetworks) log(<span class="hljs-string">&quot;Ignoring loaded configured for network &quot;</span> + config.networkId<br>                    + <span class="hljs-string">&quot; because config are not valid&quot;</span>);<br>            &#125;<br>        &#125;<br> <br>        done = (lines.length == <span class="hljs-number">1</span>);<br>    &#125;<br> <br>    readPasspointConfig();<br>    readIpAndProxyConfigurations();<span class="hljs-comment">//读取ipconfig.txt</span><br>    readNetworkHistory();<span class="hljs-comment">//读取networkHistory.txt</span><br>    readAutoJoinConfig();<br> <br>    buildPnoList();<br> <br>    sendConfiguredNetworksChangedBroadcast();<br> <br>    <span class="hljs-keyword">if</span> (showNetworks) localLog(<span class="hljs-string">&quot;loadConfiguredNetworks loaded &quot;</span> + mConfiguredNetworks.size() + <span class="hljs-string">&quot; networks&quot;</span>);<br> <br>    <span class="hljs-keyword">if</span> (mConfiguredNetworks.isEmpty()) &#123;<br>        <span class="hljs-comment">// no networks? Lets log if the file contents</span><br>        logKernelTime();<br>        logContents(SUPPLICANT_CONFIG_FILE);<br>        logContents(SUPPLICANT_CONFIG_FILE_BACKUP);<br>        logContents(networkHistoryConfigFile);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>函数开始就会清空mConfiguredNetworks集合： </p>
+<ul>
+<li>从wp_s读取保存的网络配置列表，并保存到mConfiguredNetworks中</li>
+<li>调用<code>readIpAndProxyConfigurations()</code>方法，从<code>ipconfig.txt</code>中读取保存的IpConfiguration对象，更新到mConfiguredNetworks保存的各WifiConfiguration对象中</li>
+<li>调用mConfiguredNetworks()方法，从<code>/data/misc/wifi/networkHistory.txt</code>文件中读取保存的信息，更新到mConfiguredNetworks保存的各WifiConfiguration对象中</li>
+</ul>
+<p>读取的方式跟前面介绍的写入的方式基本相似。经过上所述的两次读取操作，我们持有的WifiConfiguration对象的信息就是比较完整的了。</p>
+<p>如果有我们前面说过的无线PPPoE的场景，<code>readIpAndProxyConfigurations()</code>方法中就会把我们事先写入的账号密码信息也读取出来，存到mConfiguredNetworks中。走auto_connect流程时，获取到最近一次连接的网络netId，从mConfiguredNetworks中取出的对应的WifiConfiguration对象中就保存有PPPoE的账号密码，这样我们在PPPoE获取IP时，就有可用的账户信息了</p>
+<p>其它更深入Android WiFi源码学习地址：</p>
+<ul>
+<li>如上补充知识的原文链接：<code>https://blog.csdn.net/csdn_of_coder/article/details/52389603</code></li>
+<li>另外一个觉得挺细的Wifi启动流程的分析文章，看雪师傅的，地址如下：<code>https://bbs.pediy.com/thread-252161-1.htm</code></li>
+<li>深入理解Android：Wi-Fi、NFC和GPS卷：<code>http://static.kancloud.cn/alex_wsc/android-wifi-nfc-gps/414086</code></li>
+</ul>
+<hr>
+<p>源码中，我们已知，wifi配置时有两种状态，一种是直连（NONE），一种是配置了代理（STATIC）后有的状态：</p>
+<p><img src="https://img-blog.csdnimg.cn/fc35b0c2fc6a4163a71952e67f5d56ae.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>接着获取这个代理的配置是否为空，不为空的话就获取获取代理设置的信息：</p>
+<p><img src="https://img-blog.csdnimg.cn/a904d1d9108047a1838f1f83cd23c7f9.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>… … 最后发送一个广播<code>Proxy.PROXY_CHANGE_ACTION</code>，后面省略，主要是不想分析了（其实就是不会了，O(∩_∩)O哈哈~）… …</p>
+<h2 id="0x02-检测Android-系统代理是否开启的方法"><a href="#0x02-检测Android-系统代理是否开启的方法" class="headerlink" title="0x02 检测Android 系统代理是否开启的方法"></a>0x02 检测Android 系统代理是否开启的方法</h2><p>这里当然用APP代码直接搞是最容易的，但我们还是想插深一丢丢，明白是怎么检测的。前面我们已经对相关的源码做了了解，接下来我们要使用dumpsys 命令来帮助我们进行检测，先来介绍一下dumpsys</p>
+<p>dumpsys 是一种在 Android 设备上运行的工具，可提供有关系统服务的信息。您可以使用 Android 调试桥 (ADB) 从命令行调用 dumpsys，获取在连接的设备上运行的所有系统服务的诊断输出。此输出通常比您想要的更详细，因此您可以使用下文所述的命令行选项仅获取您感兴趣的系统服务的输出。本页还介绍了如何使用 dumpsys 完成常见的任务，如检查输入、RAM、电池或网络诊断</p>
+<ul>
+<li>第一种方式：检查<code>/data/misc/wifi/ipconfig.txt</code>里面有没有<code>STATIC</code>+<code>proxyHost</code>+<code>proxyPort</code>三个关键字，至于为什么看过之前WiFi 补充知识部分的同学应该就明白了<ul>
+<li><p>注：有些Android设备，会把WiFi可设置系统代理等高级选项的功能阉割掉，此处的判断可能就没有效果了。可以使用<code>adb shell settings put global http_proxy 127.0.0.1:8888</code>命令来设置代理，但有时候也会不管用，当然我们还可以使用代理工具的APP来实现代理，此处不是我们要讨论和研究的，还有单向认证、双向认证、SSL证书固定等，但此处不设计，所以不做检测</p>
+</li>
+<li><p>缺点：不管是有没有配置了No Proxy参数，只要做了全局代理都会被绕过。如下第一张图表示的No Proxy参数发起网络请求，即使系统设置了代理也会被绕过的对比图：<br><img src="https://img-blog.csdnimg.cn/7faff581fe81400391fc16c2ef717444.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+</li>
+<li><p>No Proxy参数发起网络请求的代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">run</span><span class="hljs-params">()</span> &#123;<br>      Looper.prepare();<br>      <span class="hljs-type">OkHttpClient</span> <span class="hljs-variable">okHttpClient</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">OkHttpClient</span>.Builder().<br>              proxy(Proxy.NO_PROXY).      <span class="hljs-comment">// 使用此参数，可绕过系统代理直接发包</span><br>              build();<br>      <span class="hljs-type">Request</span> <span class="hljs-variable">request</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Request</span>.Builder()<br>              .url(<span class="hljs-string">&quot;http://www.baidu.com&quot;</span>)<br>              .build();<br>      <span class="hljs-type">Response</span> <span class="hljs-variable">response</span> <span class="hljs-operator">=</span> <span class="hljs-literal">null</span>;<br>      <span class="hljs-keyword">try</span> &#123;<br>          response = okHttpClient.newCall(request).execute();<br>          Toast.makeText(<span class="hljs-built_in">this</span>, Objects.requireNonNull(response.body()).string(), Toast.LENGTH_SHORT).show();<br>      &#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>          e.printStackTrace();<br>      &#125;<br>      Looper.loop();<br>  &#125;<br></code></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/f72d596cc0224818816bf396646cdfb4.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><img src="https://img-blog.csdnimg.cn/fd02ab4024d54c858c41eb298c5d78ba.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<ul>
+<li>第二种检测方式：判断WiFi信息里面的<code>Proxy settings</code>参数值是否不为STATIC，否则就是存在系统代理行为</li>
+</ul>
+<p>利用dumpsys 获取wifi的服务信息，判断有没有<code>Proxy settings: STATIC</code></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">adb shell dumpsys wifi | grep <span class="hljs-string">&quot;Proxy settings: STATIC&quot;</span> -A <span class="hljs-number">1</span><br></code></pre></td></tr></table></figure>
+
+<p>如果有代理返回代理信息，否则返回为空。需结合下面的命令判断是否是当前连接的Wi-Fi（通过networkId判断）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">adb shell dumpsys netstats | grep <span class="hljs-string">&quot;Active interfaces:&quot;</span> -A <span class="hljs-number">1</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/22d34148c9eb4d5aa7d00d0f30febb6a.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p><strong>注</strong>：上面<code>grep -A</code>参数后的1 ，是表示除了显示符合范本样式的那一行之外，并显示该行之后的内容</p>
+<p>接下来，配置Android 设备端在设置代理时和没有设置代理时的Proxy settings状态，如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">adb shell <span class="hljs-string">&quot;dumpsys wifi | grep &#x27;Proxy settings: STATIC&#x27; -A 1&quot;</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/c76ed327602145e1ad960ba2d3e09256.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/8eb732faa7fa457d8c6940320a203227.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">adb shell <span class="hljs-string">&quot;dumpsys wifi | grep &#x27;Proxy settings: NONE&#x27; -A 1&quot;</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/ad37aead07b94f27a89aa94b09ed5b3b.png" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+<p>下面，是一段常见的APP检测系统是否有代理的实例代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs java"> <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 判断设备 是否使用代理上网</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> context 上下文对象</span><br><span class="hljs-comment">     * return  当前网络是否开启了代理</span><br><span class="hljs-comment">     */</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">isWifiProxy</span><span class="hljs-params">(Context context)</span> &#123;<br>    <span class="hljs-keyword">final</span> <span class="hljs-type">boolean</span> <span class="hljs-variable">IS_ICS_OR_LATER</span> <span class="hljs-operator">=</span> Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.ICE_CREAM_SANDWICH;<br>    String proxyAddress;<br>    <span class="hljs-type">int</span> proxyPort;<br>    <span class="hljs-keyword">if</span> (IS_ICS_OR_LATER) &#123;<br>        proxyAddress = System.getProperty(<span class="hljs-string">&quot;http.proxyHost&quot;</span>);    <span class="hljs-comment">// 获取代理主机</span><br>        <span class="hljs-type">String</span> <span class="hljs-variable">portStr</span> <span class="hljs-operator">=</span> System.getProperty(<span class="hljs-string">&quot;http.proxyPort&quot;</span>);  <span class="hljs-comment">// 获取代理端口</span><br>        proxyPort = Integer.parseInt((portStr != <span class="hljs-literal">null</span> ? portStr : <span class="hljs-string">&quot;-1&quot;</span>));<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>        proxyAddress = android.net.Proxy.getHost(context);<br>        proxyPort = android.net.Proxy.getPort(context);<br>    &#125;<br>   Log.i(<span class="hljs-string">&quot;代理信息&quot;</span>,<span class="hljs-string">&quot;proxyAddress :&quot;</span>+proxyAddress + <span class="hljs-string">&quot;prot : &quot;</span> proxyPort<span class="hljs-string">&quot;)</span><br><span class="hljs-string">   return (!TextUtils.isEmpty(proxyAddress)) &amp;&amp; (proxyPort != -1);</span><br><span class="hljs-string">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>VPN：tap、tun、ipsec、ppp</li>
+</ul>
+<p>未完，待后续更新下一篇</p>
+<p><strong>参考链接</strong>：</p>
+<p><a target="_blank" rel="noopener" href="https://www.cloudflare.com/zh-cn/learning/ssl/what-is-a-cryptographic-key/">https://www.cloudflare.com/zh-cn/learning/ssl/what-is-a-cryptographic-key/</a></p>
+<p><a target="_blank" rel="noopener" href="https://juejin.cn/post/6844903584073515016">https://juejin.cn/post/6844903584073515016</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.51cto.com/groot/1877034">https://blog.51cto.com/groot/1877034</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.wangan.com/wenda/4013">https://www.wangan.com/wenda/4013</a></p>
+<hr>
+<p><strong>你以为你有很多路可以选择，其实你只有一条路可以走</strong></p>
+<hr>
+</div>
+
+			<link rel="stylesheet" type="text/css" href="https://qiniu.techgrow.cn/readmore/dist/hexo.css">
+			<script src="https://qiniu.techgrow.cn/readmore/dist/readmore.js" type="text/javascript"></script>
+			<script>
+			var isMobile = navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i);
+			if (!isMobile) {
+				try {
+					var plugin = new ReadmorePlugin();
+					plugin.init({
+						"id": "readmore-container",
+						"blogId": "25525-4637332244353-147",
+						"name": "橙留香Park",
+						"qrcode": "https://i.imgtg.com/2022/10/03/mjCQ1.jpg",
+						"keyword": "验证码",
+						"lockToc": "yes",
+						"type": "hexo",
+						"random": "1",
+						"interval": "60",
+						"expires": "1",
+						"height": "auto"
+					});
+				} catch(e) {
+					console.warn("readmore plugin occurred error: " + e.name + " | " + e.message);
+				}
+			}
+			</script>
+		
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Android-ATTACK/">#Android_ATTACK</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>「干货」Android 车机证书攻击场景检测「检测系统代理篇」</div>
+      <div>https://orangey.info/2022/09/24/126301828/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>橙留香</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年9月24日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/09/24/122542065/" title="最新Snort3和Snort2安装详细教程">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">最新Snort3和Snort2安装详细教程</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/09/24/126290777/" title="「干货」Android 车机设备中，监控命令执行的一些想法「概念篇」">
+                        <span class="hidden-mobile">「干货」Android 车机设备中，监控命令执行的一些想法「概念篇」</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  <article id="comments" lazyload>
+    
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.7.2/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"1e96aec5ac46370916fa","clientSecret":"ee5e97a65cf34e9fe31e15ab0421a94968237f5e","repo":"ogGitalk","owner":"ananasOrangey","admin":["ananasOrangey"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: 'd708e65d8f31eaaeca845ee8fc739453'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+  </article>
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://orangey.blog.csdn.net" target="_blank" rel="nofollow noopener"><span>橙留香CSDN博客</span></a> <i class="iconfont icon-love"></i> <a href="https://i.imgtg.com/2022/09/21/gNXxK.png" target="_blank" rel="nofollow noopener"><span>橙留香微信公众号</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
